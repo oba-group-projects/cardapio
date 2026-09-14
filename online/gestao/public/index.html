@@ -57,6 +57,7 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
 <button class="tab" data-tab="options">Opcionais</button>
 <button class="tab" data-tab="combos">Combos</button>
 <button class="tab" data-tab="config">Loja</button>
+<button class="tab" data-tab="visual">✏️ Edição Visual</button>
 </div>
 
 <section id="panel-flavors" class="panel active"><div class="toolbar"><h2>Sabores</h2><button class="primary" data-new="flavors">+ Novo sabor</button><input id="buscaSabor" placeholder="Buscar sabor"><select id="filtroCategoria"><option value="">Todas as categorias</option></select></div><table><thead><tr><th>Nome</th><th>Categoria</th><th>Preço</th><th class="hide-mobile">Imagem</th><th>Status</th></tr></thead><tbody id="body-flavors"></tbody></table></section>
@@ -66,6 +67,208 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
 <section id="panel-options" class="panel"><div class="toolbar"><h2>Opcionais</h2><button class="primary" data-new="options">+ Novo opcional</button></div><table><thead><tr><th>Nome</th><th>Preço</th><th>Ordem</th><th>Status</th></tr></thead><tbody id="body-options"></tbody></table></section>
 <section id="panel-combos" class="panel"><div class="toolbar"><h2>Combos</h2><button class="primary" data-new="combos">+ Novo combo</button></div><table><thead><tr><th>Nome</th><th>Preço</th><th>Imagem</th><th>Status</th></tr></thead><tbody id="body-combos"></tbody></table></section>
 <section id="panel-config" class="panel"><h2>Loja</h2><form id="formConfig"><div class="grid"><div class="field"><label>WhatsApp</label><input id="cfgWhatsapp" required></div><div class="field"><label>Locale</label><input id="cfgLocale"></div><div class="field"><label>Moeda</label><input id="cfgCurrency"></div><div class="field full"><label>Formas de pagamento</label><input id="cfgPayments" placeholder="Pix, Dinheiro, Cartão"></div></div><div class="actions"><button class="primary" type="submit">Salvar loja</button></div></form></section>
+
+<!-- ================================================================
+     FASE 9B — PAINEL DE EDIÇÃO VISUAL
+================================================================ -->
+<section id="panel-visual" class="panel">
+  <div class="toolbar" style="margin-bottom:18px">
+    <h2 style="margin:0 auto 0 0">Edição Visual</h2>
+    <span class="badge">Textos, imagens e cores das páginas do cardápio</span>
+  </div>
+
+  <!-- SUB-ABAS internas -->
+  <div class="tabs" id="visual-subtabs" style="margin-bottom:16px">
+    <button class="tab active" id="vsubtab-paginas" onclick="obaVisualSubtab('paginas')">📄 Páginas</button>
+    <button class="tab"        id="vsubtab-tema"    onclick="obaVisualSubtab('tema')">🎨 Tema Global</button>
+  </div>
+
+  <!-- ===== SUB-PAINEL: PÁGINAS ===== -->
+  <div id="vpanel-paginas">
+
+    <!-- Boas-vindas -->
+    <details class="oba-pg-details" open>
+      <summary class="oba-pg-summary">Página 1 — Boas-vindas</summary>
+      <form id="formPg1" class="oba-pg-form grid">
+        <div class="field"><label>Título</label><input id="pg1-titulo" placeholder="Bem-vindo"></div>
+        <div class="field"><label>Subtítulo</label><input id="pg1-subtitulo" placeholder="Prepare-se para descobrir..."></div>
+        <div class="field full"><label>Texto do botão CTA</label><input id="pg1-cta" placeholder="Descobrir Nossa História"></div>
+        <div class="field full"><label>Logo (caminho da imagem)</label>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <input id="pg1-logo" placeholder="Images/Logo_Oba/logo-vertical.png" style="flex:1;min-width:200px">
+            <img id="pg1-logo-preview" class="preview-img" src="" alt="preview logo" onerror="this.style.display='none'" style="width:80px;height:60px;object-fit:contain;border:1px solid var(--line);border-radius:8px">
+          </div>
+          <span class="hint">Use o caminho relativo ou a URL de uma mídia já enviada.</span>
+        </div>
+        <div class="field full actions"><button class="primary" type="submit">Salvar Boas-vindas</button></div>
+      </form>
+    </details>
+
+    <!-- Nossa Essência -->
+    <details class="oba-pg-details">
+      <summary class="oba-pg-summary">Página 2 — Nossa Essência</summary>
+      <form id="formPg2" class="oba-pg-form grid">
+        <div class="field"><label>Título</label><input id="pg2-titulo" placeholder="Nossa Essência"></div>
+        <div class="field"><label>Logo (caminho da imagem)</label>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <input id="pg2-logo" placeholder="Images/Logo_Oba/logo-circular.png" style="flex:1;min-width:200px">
+            <img id="pg2-logo-preview" class="preview-img" src="" alt="preview logo" onerror="this.style.display='none'" style="width:80px;height:60px;object-fit:contain;border:1px solid var(--line);border-radius:8px">
+          </div>
+        </div>
+        <div class="field full"><label>Texto principal</label><textarea id="pg2-texto" rows="4" placeholder="Na OBA Doceria..."></textarea></div>
+        <div class="field full"><label>Citação em itálico</label><input id="pg2-citacao" placeholder="Feito à mão, com amor e precisão."></div>
+        <div class="field full actions"><button class="primary" type="submit">Salvar Nossa Essência</button></div>
+      </form>
+    </details>
+
+    <!-- Menu Principal -->
+    <details class="oba-pg-details">
+      <summary class="oba-pg-summary">Página 3 — Menu Principal</summary>
+      <form id="formPg3" class="oba-pg-form grid">
+        <div class="field"><label>Subtítulo</label><input id="pg3-subtitulo" placeholder="Escolha sua Experiência"></div>
+        <div class="field"><label>Logo (caminho da imagem)</label>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <input id="pg3-logo" placeholder="Images/Logo_Oba/logo-horizontal.png" style="flex:1;min-width:200px">
+            <img id="pg3-logo-preview" class="preview-img" src="" alt="preview logo" onerror="this.style.display='none'" style="width:80px;height:60px;object-fit:contain;border:1px solid var(--line);border-radius:8px">
+          </div>
+        </div>
+        <div class="field"><label>Label — Caixas de Doces</label><input id="pg3-label-caixas" placeholder="Caixas de Doces"></div>
+        <div class="field"><label>Sublabel — Caixas</label><input id="pg3-sub-caixas" placeholder="Montagem"></div>
+        <div class="field"><label>Label — Presenteáveis</label><input id="pg3-label-presenteaveis" placeholder="Presenteáveis / Especiais"></div>
+        <div class="field"><label>Sublabel — Presenteáveis</label><input id="pg3-sub-presenteaveis" placeholder="Kits &amp; Presentes"></div>
+        <div class="field"><label>Label — Personalizados</label><input id="pg3-label-personalizados" placeholder="Doces Personalizados"></div>
+        <div class="field"><label>Sublabel — Personalizados</label><input id="pg3-sub-personalizados" placeholder="Exclusivo"></div>
+        <div class="field"><label>Label — Eventos</label><input id="pg3-label-eventos" placeholder="Grandes Eventos"></div>
+        <div class="field"><label>Sublabel — Eventos</label><input id="pg3-sub-eventos" placeholder="Proposta"></div>
+        <div class="field full actions"><button class="primary" type="submit">Salvar Menu Principal</button></div>
+      </form>
+    </details>
+
+    <!-- Vitrine de Presentes -->
+    <details class="oba-pg-details">
+      <summary class="oba-pg-summary">Vitrine de Presentes</summary>
+      <form id="formVitrine" class="oba-pg-form grid">
+        <div class="field"><label>Título da seção</label><input id="vit-titulo" placeholder="Vitrine de Presentes"></div>
+        <div class="field full"><label>Subtítulo descritivo</label><input id="vit-subtitulo" placeholder="Nossas opções exclusivas já vêm montadas com carinho."></div>
+        <div class="field full actions"><button class="primary" type="submit">Salvar Vitrine</button></div>
+      </form>
+    </details>
+
+    <!-- Modal Doces Personalizados -->
+    <details class="oba-pg-details">
+      <summary class="oba-pg-summary">Modal — Doces Personalizados</summary>
+      <form id="formPers" class="oba-pg-form grid">
+        <div class="field"><label>Título do modal</label><input id="pers-m-titulo" placeholder="Doces Personalizados"></div>
+        <div class="field"><label>Título do bloco Informações</label><input id="pers-m-info-titulo" placeholder="Informações"></div>
+        <div class="field full"><label>Item 1 das Informações</label><input id="pers-m-info-1" placeholder="Modelagem artesanal."></div>
+        <div class="field full"><label>Item 2 das Informações</label><input id="pers-m-info-2" placeholder="Mínimo: 20 unidades."></div>
+        <div class="field full"><label>Título do bloco Pacotes</label><input id="pers-m-pacotes-titulo" placeholder="Pacotes Especiais"></div>
+        <div class="field full actions"><button class="primary" type="submit">Salvar Modal Personalizados</button></div>
+      </form>
+    </details>
+
+    <!-- Modal Eventos -->
+    <details class="oba-pg-details">
+      <summary class="oba-pg-summary">Modal — Orçamentos de Eventos</summary>
+      <form id="formEventos" class="oba-pg-form grid">
+        <div class="field full"><label>Título do modal</label><input id="eventos-m-titulo" placeholder="Orçamentos de Eventos"></div>
+        <div class="field full actions"><button class="primary" type="submit">Salvar Modal Eventos</button></div>
+      </form>
+    </details>
+
+  </div><!-- /vpanel-paginas -->
+
+  <!-- ===== SUB-PAINEL: TEMA GLOBAL ===== -->
+  <div id="vpanel-tema" style="display:none">
+    <form id="formTema" class="grid">
+
+      <div style="grid-column:1/-1;margin-bottom:4px">
+        <p class="hint" style="margin:0">Altere as cores e a fonte do cardápio. As mudanças ficam salvas no Rascunho e só aparecem no cardápio público após a publicação.</p>
+      </div>
+
+      <!-- Cores -->
+      <div class="field">
+        <label>Cor Primária <span class="hint">(marrom da marca — títulos, botões)</span></label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="color" id="tema-corPrimaria" value="#8B4513" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
+          <input type="text"  id="tema-corPrimaria-hex" value="#8B4513" maxlength="7" placeholder="#8B4513" style="width:100px">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Cor de Fundo <span class="hint">(fundo geral da página)</span></label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="color" id="tema-corFundo" value="#FAF5F0" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
+          <input type="text"  id="tema-corFundo-hex" value="#FAF5F0" maxlength="7" placeholder="#FAF5F0" style="width:100px">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Cor de Borda <span class="hint">(bordas dos cards)</span></label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="color" id="tema-corBorda" value="#E8D5B5" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
+          <input type="text"  id="tema-corBorda-hex" value="#E8D5B5" maxlength="7" placeholder="#E8D5B5" style="width:100px">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Cor de Texto <span class="hint">(texto principal)</span></label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="color" id="tema-corTexto" value="#3B2A1E" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
+          <input type="text"  id="tema-corTexto-hex" value="#3B2A1E" maxlength="7" placeholder="#3B2A1E" style="width:100px">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Cor de Fundo dos Cards <span class="hint">(interior dos cards claros)</span></label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="color" id="tema-corFundoCard" value="#FFF8F0" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
+          <input type="text"  id="tema-corFundoCard-hex" value="#FFF8F0" maxlength="7" placeholder="#FFF8F0" style="width:100px">
+        </div>
+      </div>
+
+      <!-- Fonte -->
+      <div class="field full">
+        <label>Família de Fonte <span class="hint">(aplica em todo o cardápio)</span></label>
+        <select id="tema-fonte">
+          <option value="Poppins">Poppins (atual)</option>
+          <option value="Lato">Lato</option>
+          <option value="Inter">Inter</option>
+          <option value="Nunito">Nunito</option>
+          <option value="Roboto">Roboto</option>
+          <option value="Montserrat">Montserrat</option>
+          <option value="Playfair Display">Playfair Display (elegante)</option>
+          <option value="DM Sans">DM Sans</option>
+        </select>
+      </div>
+
+      <!-- Preview de cores inline -->
+      <div class="field full" id="tema-preview-box" style="border:1px solid var(--line);border-radius:12px;padding:16px;background:#fff">
+        <p class="hint" style="margin:0 0 10px;font-weight:700">Pré-visualização das cores selecionadas:</p>
+        <div id="tema-preview-inner" style="border-radius:10px;padding:16px;text-align:center">
+          <div id="tema-preview-bg" style="border-radius:10px;padding:16px">
+            <p id="tema-preview-titulo" style="font-size:18px;font-weight:800;margin:0 0 6px">BEM-VINDO</p>
+            <p id="tema-preview-subtitulo" style="font-size:13px;margin:0 0 12px">Prepare-se para descobrir o verdadeiro sabor artesanal.</p>
+            <div id="tema-preview-btn" style="display:inline-block;padding:10px 20px;border-radius:14px;font-size:12px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:1px">
+              Descobrir Nossa História
+            </div>
+            <div id="tema-preview-card" style="margin-top:12px;border-radius:10px;padding:10px;border:2px solid">
+              <p style="margin:0;font-size:12px">Exemplo de card com borda</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field full actions">
+        <button class="secondary" type="button" id="temaResetBtn">Restaurar padrão</button>
+        <button class="primary"   type="submit">Salvar Tema Global</button>
+      </div>
+
+    </form>
+  </div><!-- /vpanel-tema -->
+
+</section>
+<!-- /FASE 9B -->
 
 </main>
 
@@ -138,7 +341,8 @@ function obaNormalizeCatalog(raw){
     products:s.products||s.produtos||[],
     options:s.options||s.opcionais||[],
     combos:s.combos||[],
-    config:s.config||s.loja||s.store||{}
+    config:s.config||s.loja||s.store||{},
+    tema:s.tema||s.theme||{}
   };
 }
 
@@ -150,7 +354,8 @@ function obaDraftPayload(state=catalogo){
     produtos:state.products||[],
     opcionais:state.options||[],
     combos:state.combos||[],
-    loja:state.config||{}
+    loja:state.config||{},
+    tema:state.tema||{}
   };
 }
 
@@ -489,6 +694,7 @@ async function carregar(){
   catalogo=await obaLoadDraftCatalog();
   const f=$('filtroCategoria');f.replaceChildren(new Option('Todas as categorias',''));catalogo.categories.forEach(c=>f.add(new Option(c.nome,c.id)));
   $('cfgWhatsapp').value=catalogo.config?.store?.whatsapp??'';$('cfgLocale').value=catalogo.config?.store?.locale??'pt-BR';$('cfgCurrency').value=catalogo.config?.store?.currency??'BRL';$('cfgPayments').value=Array.isArray(catalogo.config?.checkout?.paymentMethods)?catalogo.config.checkout.paymentMethods.join(', '):'';
+  obaPopularFormTema();
   renderTudo();await atualizarStatus();
 }
 
@@ -510,6 +716,240 @@ $('formConfig').onsubmit=async e=>{
     catalogo.config=cfg;addPendencia('Configurações da loja alteradas');msg('Loja salva. Backup: '+res.backup);
   }catch(err){msg(String(err.message||err),'erro')}
 };
+
+/* ================================================================
+   FASE 9B — EDIÇÃO VISUAL: CSS + JS
+================================================================ */
+(function(){
+  /* ---------- CSS da aba ---------- */
+  const style=document.createElement('style');
+  style.id='oba-central-9b-css';
+  style.textContent=`
+    .oba-pg-details{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;background:#fff;overflow:hidden}
+    .oba-pg-details[open]{border-color:var(--brand)}
+    .oba-pg-summary{padding:13px 16px;font-weight:700;font-size:14px;cursor:pointer;color:var(--text);list-style:none;display:flex;align-items:center;gap:8px}
+    .oba-pg-summary::before{content:'▶';font-size:10px;color:var(--muted);transition:transform 0.2s}
+    .oba-pg-details[open] .oba-pg-summary::before{transform:rotate(90deg)}
+    .oba-pg-summary:hover{background:#fffaf6}
+    .oba-pg-form{padding:14px 16px 4px}
+    input[type=color]{border:1px solid var(--line) !important;background:#fff !important}
+    #vpanel-tema .field label{display:flex;flex-direction:column;gap:2px}
+  `;
+  document.head.appendChild(style);
+
+  /* ---------- helpers ---------- */
+  const temaDefault={
+    corPrimaria:'#8B4513',corFundo:'#FAF5F0',corBorda:'#E8D5B5',
+    corTexto:'#3B2A1E',corFundoCard:'#FFF8F0',fonte:'Poppins'
+  };
+
+  /* Sincroniza color-picker <-> input texto */
+  function obaBindCorPair(baseId){
+    const picker=$('tema-'+baseId);
+    const hex=$('tema-'+baseId+'-hex');
+    if(!picker||!hex)return;
+    picker.oninput=()=>{hex.value=picker.value;obaAtualizarPreviewCores()};
+    hex.oninput=()=>{
+      const v=hex.value.trim();
+      if(/^#[0-9a-fA-F]{6}$/.test(v)){picker.value=v;obaAtualizarPreviewCores()}
+    };
+  }
+
+  ['corPrimaria','corFundo','corBorda','corTexto','corFundoCard'].forEach(obaBindCorPair);
+  $('tema-fonte')&&($('tema-fonte').onchange=obaAtualizarPreviewCores);
+
+  /* Preview inline de cores */
+  function obaAtualizarPreviewCores(){
+    const corP=$('tema-corPrimaria')?.value||temaDefault.corPrimaria;
+    const corF=$('tema-corFundo')?.value||temaDefault.corFundo;
+    const corB=$('tema-corBorda')?.value||temaDefault.corBorda;
+    const corT=$('tema-corTexto')?.value||temaDefault.corTexto;
+    const corC=$('tema-corFundoCard')?.value||temaDefault.corFundoCard;
+    const fonte=$('tema-fonte')?.value||temaDefault.fonte;
+    const bg=$('tema-preview-bg');const tit=$('tema-preview-titulo');
+    const sub=$('tema-preview-subtitulo');const btn=$('tema-preview-btn');
+    const card=$('tema-preview-card');
+    if(bg){bg.style.background=corF;bg.style.fontFamily=`'${fonte}', sans-serif`}
+    if(tit){tit.style.color=corP}
+    if(sub){sub.style.color=corT}
+    if(btn){btn.style.background=corP}
+    if(card){card.style.background=corC;card.style.borderColor=corB;card.style.color=corT}
+  }
+
+  /* Popula campos do formTema a partir de catalogo.tema */
+  window.obaPopularFormTema=function(){
+    const t=(catalogo&&catalogo.tema)||{};
+    const pg=t.paginas||{};
+    const tm=t.tema||{};
+
+    /* Boas-vindas */
+    const bv=pg.boas_vindas||{};
+    obaSetVal('pg1-titulo',bv.titulo);obaSetVal('pg1-subtitulo',bv.subtitulo);
+    obaSetVal('pg1-cta',bv.botaoCTA);obaSetVal('pg1-logo',bv.logo);
+    obaAtualizarLogoPreview('pg1-logo','pg1-logo-preview');
+
+    /* Nossa Essência */
+    const ne=pg.nossa_essencia||{};
+    obaSetVal('pg2-titulo',ne.titulo);obaSetVal('pg2-logo',ne.logo);
+    obaSetVal('pg2-texto',ne.texto);
+    obaSetVal('pg2-citacao',ne.citacao?ne.citacao.replace(/^"|"$/g,''):'');
+    obaAtualizarLogoPreview('pg2-logo','pg2-logo-preview');
+
+    /* Menu Principal */
+    const mp=pg.menu_principal||{};const op=mp.opcoes||{};
+    obaSetVal('pg3-subtitulo',mp.subtitulo);obaSetVal('pg3-logo',mp.logo);
+    obaAtualizarLogoPreview('pg3-logo','pg3-logo-preview');
+    obaSetVal('pg3-label-caixas',(op.caixas||{}).label);
+    obaSetVal('pg3-sub-caixas',(op.caixas||{}).sublabel);
+    obaSetVal('pg3-label-presenteaveis',(op.presenteaveis||{}).label);
+    obaSetVal('pg3-sub-presenteaveis',(op.presenteaveis||{}).sublabel);
+    obaSetVal('pg3-label-personalizados',(op.personalizados||{}).label);
+    obaSetVal('pg3-sub-personalizados',(op.personalizados||{}).sublabel);
+    obaSetVal('pg3-label-eventos',(op.eventos||{}).label);
+    obaSetVal('pg3-sub-eventos',(op.eventos||{}).sublabel);
+
+    /* Vitrine */
+    const vp=pg.vitrine_presentes||{};
+    obaSetVal('vit-titulo',vp.titulo);obaSetVal('vit-subtitulo',vp.subtitulo);
+
+    /* Modal Personalizados */
+    const pm=pg.personalizados_modal||{};
+    obaSetVal('pers-m-titulo',pm.titulo);obaSetVal('pers-m-info-titulo',pm.info_titulo);
+    obaSetVal('pers-m-pacotes-titulo',pm.pacotes_titulo);
+    obaSetVal('pers-m-info-1',Array.isArray(pm.info_items)?pm.info_items[0]||'':'');
+    obaSetVal('pers-m-info-2',Array.isArray(pm.info_items)?pm.info_items[1]||'':'');
+
+    /* Modal Eventos */
+    const em=pg.eventos_modal||{};
+    obaSetVal('eventos-m-titulo',em.titulo);
+
+    /* Tema Global */
+    obaSetColor('tema-corPrimaria',tm.corPrimaria||temaDefault.corPrimaria);
+    obaSetColor('tema-corFundo',tm.corFundo||temaDefault.corFundo);
+    obaSetColor('tema-corBorda',tm.corBorda||temaDefault.corBorda);
+    obaSetColor('tema-corTexto',tm.corTexto||temaDefault.corTexto);
+    obaSetColor('tema-corFundoCard',tm.corFundoCard||temaDefault.corFundoCard);
+    const selFonte=$('tema-fonte');
+    if(selFonte)selFonte.value=tm.fonte||temaDefault.fonte;
+    obaAtualizarPreviewCores();
+  };
+
+  function obaSetVal(id,val){const el=$?$(id):document.getElementById(id);if(el&&val!=null)el.value=val}
+  function obaSetColor(id,hex){
+    const picker=$?$(id):document.getElementById(id);
+    const hx=$?$(id+'-hex'):document.getElementById(id+'-hex');
+    if(picker&&/^#[0-9a-fA-F]{6}$/.test(hex)){picker.value=hex}
+    if(hx&&/^#[0-9a-fA-F]{6}$/.test(hex)){hx.value=hex}
+  }
+  function obaAtualizarLogoPreview(inputId,previewId){
+    const inp=$?$(inputId):document.getElementById(inputId);
+    const img=$?$(previewId):document.getElementById(previewId);
+    if(!inp||!img)return;
+    const v=(inp.value||'').trim();
+    if(v){img.src=v;img.style.display=''}else{img.style.display='none'}
+    inp.oninput=()=>{const vv=(inp.value||'').trim();if(vv){img.src=vv;img.style.display=''}else{img.style.display='none'}};
+  }
+
+  /* Monta o objeto tema completo a partir dos campos do form */
+  function obaLerFormTema(){
+    return {
+      schemaVersion:1,
+      updatedAt:new Date().toISOString().slice(0,10),
+      paginas:{
+        boas_vindas:{
+          logo:$('pg1-logo')?.value.trim()||'',
+          titulo:$('pg1-titulo')?.value.trim()||'',
+          subtitulo:$('pg1-subtitulo')?.value.trim()||'',
+          botaoCTA:$('pg1-cta')?.value.trim()||''
+        },
+        nossa_essencia:{
+          logo:$('pg2-logo')?.value.trim()||'',
+          titulo:$('pg2-titulo')?.value.trim()||'',
+          texto:$('pg2-texto')?.value.trim()||'',
+          citacao:$('pg2-citacao')?.value.trim()||''
+        },
+        menu_principal:{
+          logo:$('pg3-logo')?.value.trim()||'',
+          subtitulo:$('pg3-subtitulo')?.value.trim()||'',
+          opcoes:{
+            caixas:{label:$('pg3-label-caixas')?.value.trim()||'',sublabel:$('pg3-sub-caixas')?.value.trim()||''},
+            presenteaveis:{label:$('pg3-label-presenteaveis')?.value.trim()||'',sublabel:$('pg3-sub-presenteaveis')?.value.trim()||''},
+            personalizados:{label:$('pg3-label-personalizados')?.value.trim()||'',sublabel:$('pg3-sub-personalizados')?.value.trim()||''},
+            eventos:{label:$('pg3-label-eventos')?.value.trim()||'',sublabel:$('pg3-sub-eventos')?.value.trim()||''}
+          }
+        },
+        vitrine_presentes:{
+          titulo:$('vit-titulo')?.value.trim()||'',
+          subtitulo:$('vit-subtitulo')?.value.trim()||''
+        },
+        personalizados_modal:{
+          titulo:$('pers-m-titulo')?.value.trim()||'',
+          info_titulo:$('pers-m-info-titulo')?.value.trim()||'',
+          info_items:[
+            $('pers-m-info-1')?.value.trim()||'',
+            $('pers-m-info-2')?.value.trim()||''
+          ].filter(Boolean),
+          pacotes_titulo:$('pers-m-pacotes-titulo')?.value.trim()||''
+        },
+        eventos_modal:{
+          titulo:$('eventos-m-titulo')?.value.trim()||''
+        }
+      },
+      tema:{
+        corPrimaria:$('tema-corPrimaria')?.value||temaDefault.corPrimaria,
+        corFundo:$('tema-corFundo')?.value||temaDefault.corFundo,
+        corBorda:$('tema-corBorda')?.value||temaDefault.corBorda,
+        corTexto:$('tema-corTexto')?.value||temaDefault.corTexto,
+        corFundoCard:$('tema-corFundoCard')?.value||temaDefault.corFundoCard,
+        fonte:$('tema-fonte')?.value||temaDefault.fonte
+      }
+    };
+  }
+
+  /* Troca de sub-abas internas */
+  window.obaVisualSubtab=function(id){
+    $('vpanel-paginas').style.display=id==='paginas'?'':'none';
+    $('vpanel-tema').style.display=id==='tema'?'':'none';
+    ['paginas','tema'].forEach(t=>{
+      const b=$('vsubtab-'+t);if(b)b.classList.toggle('active',t===id)
+    });
+  };
+
+  /* Handlers de submit por página */
+  async function obaSalvarPaginaDoTema(nomeAba){
+    try{
+      const temaAtual=obaLerFormTema();
+      const res=await obaSaveDraftWith('tema',temaAtual);
+      catalogo.tema=temaAtual;
+      addPendencia('Edição Visual salva: '+nomeAba);
+      msg(nomeAba+' salvo. Backup: '+res.backup);
+    }catch(err){msg(String(err.message||err),'erro')}
+  }
+
+  ['formPg1','formPg2','formPg3','formVitrine','formPers','formEventos','formTema'].forEach(fid=>{
+    const nomes={
+      formPg1:'Boas-vindas',formPg2:'Nossa Essência',formPg3:'Menu Principal',
+      formVitrine:'Vitrine de Presentes',formPers:'Modal Personalizados',
+      formEventos:'Modal Eventos',formTema:'Tema Global'
+    };
+    const frm=$(fid);
+    if(frm)frm.onsubmit=async e=>{e.preventDefault();await obaSalvarPaginaDoTema(nomes[fid]||fid)};
+  });
+
+  /* Restaurar padrão do tema */
+  const resetBtn=$('temaResetBtn');
+  if(resetBtn)resetBtn.onclick=()=>{
+    if(!confirm('Restaurar todas as cores e fonte para os valores padrão da Oba Doceria?'))return;
+    obaSetColor('tema-corPrimaria',temaDefault.corPrimaria);
+    obaSetColor('tema-corFundo',temaDefault.corFundo);
+    obaSetColor('tema-corBorda',temaDefault.corBorda);
+    obaSetColor('tema-corTexto',temaDefault.corTexto);
+    obaSetColor('tema-corFundoCard',temaDefault.corFundoCard);
+    const sf=$('tema-fonte');if(sf)sf.value=temaDefault.fonte;
+    obaAtualizarPreviewCores();
+  };
+
+})();/* fim FASE 9B */
 
 $('previewBtn').onclick=async()=>{
   const b=$('previewBtn');
