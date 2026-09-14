@@ -14,7 +14,8 @@
     'products.json':'produtos',
     'options.json':'opcionais',
     'combos.json':'combos',
-    'config.json':'loja'
+    'config.json':'loja',
+    'theme.json':'tema'
   };
   window.fetch=async function(input,init){
     const raw=typeof input==='string'?input:(input&&input.url?input.url:String(input));

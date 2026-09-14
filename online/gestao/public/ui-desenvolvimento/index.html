@@ -18,6 +18,10 @@
     .step-title{font-size:1rem;font-weight:800;color:#8B4513;display:flex;align-items:center;gap:12px;text-transform:uppercase}
     .btn-step-icon{background-color:#8B4513;color:white;width:22px;height:22px;border-radius:9999px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
   </style>
+  <!-- ================================================================
+       R9A - VARIÁVEIS DE TEMA VISUAL (preenchidas por hidratarTemaDoModeloMestre)
+       ================================================================ -->
+  <style id="oba-tema-vars"></style>
 <style id="r117a-mobile-flow">
 
   /* ==========================================================
@@ -2088,10 +2092,10 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
   <div class="bg-white max-w-xl w-full rounded-[2rem] p-6 relative shadow-2xl" onclick="event.stopPropagation()">
     <button onclick="fecharModalPersonalizados()" class="absolute top-4 right-4 bg-gray-100 rounded-full w-8 h-8 font-bold text-gray-500">✕</button>
     <div id="pers-view-info" class="space-y-5">
-      <div class="text-center"><h2 class="text-xl font-black text-[#8B4513] uppercase tracking-tight">Doces Personalizados</h2></div>
+      <div class="text-center"><h2 id="oba-pers-titulo" class="text-xl font-black text-[#8B4513] uppercase tracking-tight">Doces Personalizados</h2></div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs leading-relaxed">
-        <div class="p-4 bg-orange-50 rounded-2xl border border-orange-100"><h4 class="font-bold mb-2 uppercase text-[10px]">Informações</h4><p>• Modelagem artesanal.</p><p>• Mínimo: 20 unidades.</p></div>
-        <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100"><h4 class="font-bold mb-2 uppercase text-[10px]">Pacotes Especiais</h4><p>• 20 doces: <b>R$ 196,00</b></p><p>• 35 doces: <b>R$ 280,00</b></p><p>• 50 doces: <b>R$ 375,00</b></p></div>
+        <div class="p-4 bg-orange-50 rounded-2xl border border-orange-100"><h4 id="oba-pers-info-titulo" class="font-bold mb-2 uppercase text-[10px]">Informações</h4><p id="oba-pers-info-1">• Modelagem artesanal.</p><p id="oba-pers-info-2">• Mínimo: 20 unidades.</p></div>
+        <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100"><h4 id="oba-pers-pacotes-titulo" class="font-bold mb-2 uppercase text-[10px]">Pacotes Especiais</h4><p>• 20 doces: <b>R$ 196,00</b></p><p>• 35 doces: <b>R$ 280,00</b></p><p>• 50 doces: <b>R$ 375,00</b></p></div>
       </div>
       <button onclick="avancarFormularioPersonalizados()" class="w-full py-4 bg-[#8B4513] text-white rounded-2xl font-bold text-xs uppercase tracking-widest active:scale-95">Preencher Reserva</button>
     </div>
@@ -2109,7 +2113,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
 <div id="modal-eventos" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center p-4" onclick="fecharModalEventos()">
   <div class="bg-white max-w-xl w-full rounded-[2rem] p-6 relative shadow-2xl text-center" onclick="event.stopPropagation()">
     <button onclick="fecharModalEventos()" class="absolute top-4 right-4 w-8 h-8 bg-gray-100 rounded-full font-bold text-gray-500">✕</button>
-    <h2 class="text-xl font-black text-[#8B4513] mb-6 uppercase">Orçamentos de Eventos</h2>
+    <h2 id="oba-eventos-titulo" class="text-xl font-black text-[#8B4513] mb-6 uppercase">Orçamentos de Eventos</h2>
     <div class="space-y-3 text-left">
       <input type="text" id="eve-nome" placeholder="Seu Nome Completo" class="w-full p-3.5 bg-gray-50 border rounded-xl outline-none">
       <input type="text" id="eve-tipo" placeholder="Tipo (Casamento, Formatura...)" class="w-full p-3.5 bg-gray-50 border rounded-xl outline-none">
@@ -2128,23 +2132,23 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
 <div id="app-container" class="w-full max-w-6xl mx-auto overflow-hidden relative min-h-screen">
 
   <section id="pag-1" class="min-h-screen flex flex-col items-center justify-center px-6 py-10 fade-page max-w-md mx-auto">
-    <img src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-vertical.png" class="w-44 sm:w-52 h-auto object-contain mb-10 drop-shadow-sm" alt="Logo">
+    <img id="oba-pag1-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-vertical.png" class="w-44 sm:w-52 h-auto object-contain mb-10 drop-shadow-sm" alt="Logo">
     <div class="text-center space-y-5 w-full max-w-xs">
-      <h1 class="text-2xl font-light tracking-[0.2em] text-[#8B4513] uppercase">Bem-vindo</h1>
-      <p class="text-sm text-gray-500 font-light leading-relaxed px-2">Prepare-se para descobrir o verdadeiro sabor artesanal em cada detalhe.</p>
+      <h1 id="oba-pag1-titulo" class="text-2xl font-light tracking-[0.2em] text-[#8B4513] uppercase">Bem-vindo</h1>
+      <p id="oba-pag1-subtitulo" class="text-sm text-gray-500 font-light leading-relaxed px-2">Prepare-se para descobrir o verdadeiro sabor artesanal em cada detalhe.</p>
       <button onclick="navegarPara(2)" class="w-full py-4 mt-4 bg-[#8B4513] text-white rounded-[1.25rem] font-medium text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-[#8B4513]/20 active:scale-95 flex justify-center items-center gap-3">
-        Descobrir Nossa História <i class="fa-solid fa-chevron-right text-[9px]"></i>
+        <span id="oba-pag1-cta">Descobrir Nossa História</span> <i class="fa-solid fa-chevron-right text-[9px]"></i>
       </button>
     </div>
   </section>
 
   <section id="pag-2" class="min-h-screen hidden flex-col items-center justify-center px-5 py-8 fade-page max-w-md mx-auto">
     <div class="w-full glass-card p-8 rounded-[2.5rem] text-center space-y-6 shadow-sm">
-      <img src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-circular.png" class="w-28 h-28 object-contain mx-auto mb-2 drop-shadow-sm" alt="Logo">
-      <h2 class="text-sm sm:text-base font-semibold tracking-[0.15em] text-[#8B4513] uppercase">Nossa Essência</h2>
+      <img id="oba-pag2-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-circular.png" class="w-28 h-28 object-contain mx-auto mb-2 drop-shadow-sm" alt="Logo">
+      <h2 id="oba-pag2-titulo" class="text-sm sm:text-base font-semibold tracking-[0.15em] text-[#8B4513] uppercase">Nossa Essência</h2>
       <div class="w-10 h-[2px] bg-orange-200/60 mx-auto rounded-full"></div>
-      <p class="text-[13px] text-gray-600 leading-relaxed font-light px-1">Na OBA Doceria, cada brigadeiro é uma obra de arte. Criamos receitas exclusivas com rigor técnico e os melhores insumos, resultando em doces menos açucarados e intensamente cremosos.</p>
-      <p class="text-xs text-[#8B4513]/70 italic font-medium">"Feito à mão, com amor e precisão."</p>
+      <p id="oba-pag2-texto" class="text-[13px] text-gray-600 leading-relaxed font-light px-1">Na OBA Doceria, cada brigadeiro é uma obra de arte. Criamos receitas exclusivas com rigor técnico e os melhores insumos, resultando em doces menos açucarados e intensamente cremosos.</p>
+      <p id="oba-pag2-citacao" class="text-xs text-[#8B4513]/70 italic font-medium">"Feito à mão, com amor e precisão."</p>
     </div>
     <div class="flex gap-3 w-full mt-6">
       <button onclick="navegarPara(1)" class="w-1/3 py-4 border border-[#8B4513]/20 rounded-[1.25rem] text-[10px] text-[#8B4513] font-semibold uppercase tracking-widest bg-white/50 active:scale-95">Voltar</button>
@@ -2156,24 +2160,24 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
 
   <section id="pag-3" class="min-h-screen hidden flex-col items-center justify-center px-6 py-10 fade-page max-w-md mx-auto">
     <header class="text-center mb-10 w-full">
-      <img src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png" class="w-36 h-auto mx-auto mb-6 object-contain" alt="Logo">
-      <h2 class="text-[11px] text-[#8B4513]/60 font-semibold uppercase tracking-[0.2em]">Escolha sua Experiência</h2>
+      <img id="oba-pag3-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png" class="w-36 h-auto mx-auto mb-6 object-contain" alt="Logo">
+      <h2 id="oba-pag3-subtitulo" class="text-[11px] text-[#8B4513]/60 font-semibold uppercase tracking-[0.2em]">Escolha sua Experiência</h2>
     </header>
     <div class="w-full space-y-4">
       <button onclick="entFluxoCaixas()" class="w-full p-6 bg-[#8B4513] text-white rounded-[2rem] shadow-xl shadow-[#8B4513]/20 text-left flex justify-between items-center active:scale-95 transition-all">
-        <div><span class="block text-[9px] uppercase tracking-widest opacity-70 mb-1">Montagem</span><span class="text-sm font-medium">Caixas de Doces</span></div>
+        <div><span id="oba-pag3-sub-caixas" class="block text-[9px] uppercase tracking-widest opacity-70 mb-1">Montagem</span><span id="oba-pag3-label-caixas" class="text-sm font-medium">Caixas de Doces</span></div>
         <i class="fa-solid fa-box-open text-xl opacity-40"></i>
       </button>
       <button onclick="entFluxoPresenteaveis()" class="w-full p-6 bg-white border border-[#8B4513]/10 text-[#8B4513] rounded-[2rem] text-left flex justify-between items-center active:scale-95 transition-all shadow-sm">
-        <div><span class="block text-[9px] uppercase tracking-widest opacity-50 mb-1">Kits & Presentes</span><span class="text-sm font-medium">Presenteáveis / Especiais</span></div>
+        <div><span id="oba-pag3-sub-presenteaveis" class="block text-[9px] uppercase tracking-widest opacity-50 mb-1">Kits & Presentes</span><span id="oba-pag3-label-presenteaveis" class="text-sm font-medium">Presenteáveis / Especiais</span></div>
         <i class="fa-solid fa-gift text-xl opacity-20"></i>
       </button>
       <button data-oba-business-channel="personalizados" onclick="abrirModalEspecial('personalizados')" class="w-full p-6 bg-white border border-[#8B4513]/10 text-[#8B4513] rounded-[2rem] text-left flex justify-between items-center active:scale-95 transition-all shadow-sm">
-        <div><span class="block text-[9px] uppercase tracking-widest opacity-50 mb-1">Exclusivo</span><span class="text-sm font-medium">Doces Personalizados</span></div>
+        <div><span id="oba-pag3-sub-personalizados" class="block text-[9px] uppercase tracking-widest opacity-50 mb-1">Exclusivo</span><span id="oba-pag3-label-personalizados" class="text-sm font-medium">Doces Personalizados</span></div>
         <i class="fa-solid fa-wand-magic-sparkles text-xl opacity-20"></i>
       </button>
       <button data-oba-business-channel="eventos" onclick="abrirModalEspecial('eventos')" class="w-full p-6 bg-white border border-[#8B4513]/10 text-[#8B4513] rounded-[2rem] text-left flex justify-between items-center active:scale-95 transition-all shadow-sm">
-        <div><span class="block text-[9px] uppercase tracking-widest opacity-50 mb-1">Proposta</span><span class="text-sm font-medium">Grandes Eventos</span></div>
+        <div><span id="oba-pag3-sub-eventos" class="block text-[9px] uppercase tracking-widest opacity-50 mb-1">Proposta</span><span id="oba-pag3-label-eventos" class="text-sm font-medium">Grandes Eventos</span></div>
         <i class="fa-solid fa-champagne-glasses text-xl opacity-20"></i>
       </button>
     </div>
@@ -2183,7 +2187,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
   <!-- FLUXO PRINCIPAL -->
   <section id="fluxo-principal" class="min-h-screen hidden flex-col px-4 py-8 fade-page max-w-5xl mx-auto">
     <header class="text-center mb-8">
-      <img src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png" class="w-32 mx-auto mb-4" alt="Logo">
+      <img id="oba-fluxo-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png" class="w-32 mx-auto mb-4" alt="Logo">
       <button onclick="retornarParaMenuSeletor()" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest border border-gray-200 px-4 py-1.5 rounded-full">← Voltar às Opções</button>
     </header>
 
@@ -2193,8 +2197,8 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
         <!-- VITRINE KITS -->
         <div id="secao-kits" class="hidden space-y-6">
           <div class="bg-white p-6 md:p-8 rounded-[2rem] border border-[#E8D5B5] shadow-sm">
-            <h3 class="step-title mb-2"><i class="fa-solid fa-gift text-[#8B4513]"></i> Vitrine de Presentes</h3>
-            <p class="text-xs text-gray-500">Nossas opções exclusivas já vêm montadas com carinho.</p>
+            <h3 id="oba-vitrine-titulo" class="step-title mb-2"><i class="fa-solid fa-gift text-[#8B4513]"></i> Vitrine de Presentes</h3>
+            <p id="oba-vitrine-subtitulo" class="text-xs text-gray-500">Nossas opções exclusivas já vêm montadas com carinho.</p>
           </div>
           <div id="kits-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full"></div>
         </div>
@@ -3351,6 +3355,125 @@ async function hidratarCatalogoDoModeloMestre() {
 }
 
 hidratarCatalogoDoModeloMestre();
+
+/* ================================================================
+   R9A - HIDRATAR TEMA VISUAL DO MODELO MESTRE
+   Carrega theme.json e aplica textos + variáveis CSS.
+   Fallback: mantém os valores hardcoded no HTML.
+   ================================================================ */
+async function hidratarTemaDoModeloMestre() {
+  try {
+    const resp = await fetch('../data/catalog-v1/theme.json', { cache: 'no-store' });
+    if (!resp.ok) throw new Error('Falha HTTP theme.json: ' + resp.status);
+    const tema = await resp.json();
+    if (!tema || typeof tema !== 'object') throw new Error('theme.json inválido.');
+
+    /* --- TEXTOS DAS PÁGINAS --- */
+    function _set(id, valor) {
+      const el = document.getElementById(id);
+      if (el && typeof valor === 'string' && valor.trim()) el.textContent = valor;
+    }
+    function _setSrc(id, caminho) {
+      const el = document.getElementById(id);
+      if (!el || !caminho) return;
+      el.src = resolverAssetModeloMestre(caminho);
+    }
+
+    const p = tema.paginas || {};
+
+    /* Boas-vindas */
+    const bv = p.boas_vindas || {};
+    _setSrc('oba-pag1-logo',       bv.logo);
+    _set('oba-pag1-titulo',        bv.titulo);
+    _set('oba-pag1-subtitulo',     bv.subtitulo);
+    _set('oba-pag1-cta',           bv.botaoCTA);
+
+    /* Nossa Essência */
+    const ne = p.nossa_essencia || {};
+    _setSrc('oba-pag2-logo',       ne.logo);
+    _set('oba-pag2-titulo',        ne.titulo);
+    _set('oba-pag2-texto',         ne.texto);
+    _set('oba-pag2-citacao',       ne.citacao ? `"${ne.citacao.replace(/^"|"$/g, '')}"` : null);
+
+    /* Menu Principal */
+    const mp = p.menu_principal || {};
+    _setSrc('oba-pag3-logo',       mp.logo);
+    _setSrc('oba-fluxo-logo',      mp.logo);
+    _set('oba-pag3-subtitulo',     mp.subtitulo);
+    const opcoes = mp.opcoes || {};
+    if (opcoes.caixas) {
+      _set('oba-pag3-label-caixas',        opcoes.caixas.label);
+      _set('oba-pag3-sub-caixas',          opcoes.caixas.sublabel);
+    }
+    if (opcoes.presenteaveis) {
+      _set('oba-pag3-label-presenteaveis', opcoes.presenteaveis.label);
+      _set('oba-pag3-sub-presenteaveis',   opcoes.presenteaveis.sublabel);
+    }
+    if (opcoes.personalizados) {
+      _set('oba-pag3-label-personalizados', opcoes.personalizados.label);
+      _set('oba-pag3-sub-personalizados',   opcoes.personalizados.sublabel);
+    }
+    if (opcoes.eventos) {
+      _set('oba-pag3-label-eventos', opcoes.eventos.label);
+      _set('oba-pag3-sub-eventos',   opcoes.eventos.sublabel);
+    }
+
+    /* Vitrine de Presentes */
+    const vp = p.vitrine_presentes || {};
+    _set('oba-vitrine-titulo',     vp.titulo);
+    _set('oba-vitrine-subtitulo',  vp.subtitulo);
+
+    /* Modal Personalizados */
+    const pm = p.personalizados_modal || {};
+    _set('oba-pers-titulo',        pm.titulo);
+    _set('oba-pers-info-titulo',   pm.info_titulo);
+    _set('oba-pers-pacotes-titulo',pm.pacotes_titulo);
+    if (Array.isArray(pm.info_items)) {
+      _set('oba-pers-info-1', pm.info_items[0] ? '• ' + pm.info_items[0] : null);
+      _set('oba-pers-info-2', pm.info_items[1] ? '• ' + pm.info_items[1] : null);
+    }
+
+    /* Modal Eventos */
+    const em = p.eventos_modal || {};
+    _set('oba-eventos-titulo', em.titulo);
+
+    /* --- TEMA VISUAL (CSS variables) --- */
+    const t = tema.tema || {};
+    const vars = [];
+    if (t.corPrimaria)  vars.push(`--oba-cor-primaria: ${t.corPrimaria}`);
+    if (t.corFundo)     vars.push(`--oba-cor-fundo: ${t.corFundo}`);
+    if (t.corBorda)     vars.push(`--oba-cor-borda: ${t.corBorda}`);
+    if (t.corTexto)     vars.push(`--oba-cor-texto: ${t.corTexto}`);
+    if (t.corFundoCard) vars.push(`--oba-cor-fundo-card: ${t.corFundoCard}`);
+
+    if (vars.length > 0) {
+      const styleEl = document.getElementById('oba-tema-vars');
+      if (styleEl) {
+        styleEl.textContent = `:root { ${vars.join('; ')} }`;
+        if (t.corFundo)  document.body.style.backgroundColor = t.corFundo;
+        if (t.corTexto)  document.body.style.color = t.corTexto;
+      }
+    }
+
+    /* Fonte personalizada */
+    if (t.fonte && t.fonte !== 'Poppins') {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(t.fonte)}:wght@300;400;500;600;700;800&display=swap`;
+      document.head.appendChild(link);
+      document.body.style.fontFamily = `'${t.fonte}', sans-serif`;
+    }
+
+    window.__OBA_R9A_TEMA__ = { ok: true, paginas: Object.keys(p).length };
+    console.info('[R9A] Tema visual carregado do Modelo Mestre.', window.__OBA_R9A_TEMA__);
+
+  } catch (erro) {
+    window.__OBA_R9A_TEMA__ = { ok: false, erro: String(erro) };
+    console.info('[R9A] Fallback do tema visual preservado.', erro);
+  }
+}
+
+hidratarTemaDoModeloMestre();
 
 
 // ================================================================

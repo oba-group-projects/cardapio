@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-09-14",
+  "paginas": {
+    "boas_vindas": {
+      "logo": "Images/Logo_Oba/logo-vertical.png",
+      "titulo": "Bem-vindo",
+      "subtitulo": "Prepare-se para descobrir o verdadeiro sabor artesanal em cada detalhe.",
+      "botaoCTA": "Descobrir Nossa História"
+    },
+    "nossa_essencia": {
+      "logo": "Images/Logo_Oba/logo-circular.png",
+      "titulo": "Nossa Essência",
+      "texto": "Na OBA Doceria, cada brigadeiro é uma obra de arte. Criamos receitas exclusivas com rigor técnico e os melhores insumos, resultando em doces menos açucarados e intensamente cremosos.",
+      "citacao": "Feito à mão, com amor e precisão."
+    },
+    "menu_principal": {
+      "logo": "Images/Logo_Oba/logo-horizontal.png",
+      "subtitulo": "Escolha sua Experiência",
+      "opcoes": {
+        "caixas":         { "label": "Caixas de Doces",           "sublabel": "Montagem" },
+        "presenteaveis":  { "label": "Presenteáveis / Especiais", "sublabel": "Kits & Presentes" },
+        "personalizados": { "label": "Doces Personalizados",       "sublabel": "Exclusivo" },
+        "eventos":        { "label": "Grandes Eventos",            "sublabel": "Proposta" }
+      }
+    },
+    "vitrine_presentes": {
+      "titulo": "Vitrine de Presentes",
+      "subtitulo": "Nossas opções exclusivas já vêm montadas com carinho."
+    },
+    "personalizados_modal": {
+      "titulo": "Doces Personalizados",
+      "info_titulo": "Informações",
+      "info_items": ["Modelagem artesanal.", "Mínimo: 20 unidades."],
+      "pacotes_titulo": "Pacotes Especiais"
+    },
+    "eventos_modal": {
+      "titulo": "Orçamentos de Eventos"
+    }
+  },
+  "tema": {
+    "corPrimaria":   "#8B4513",
+    "corFundo":      "#FAF5F0",
+    "corBorda":      "#E8D5B5",
+    "corTexto":      "#3B2A1E",
+    "corFundoCard":  "#FFF8F0",
+    "fonte":         "Poppins"
+  }
+}

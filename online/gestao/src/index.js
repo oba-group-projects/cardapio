@@ -425,7 +425,8 @@ const OBA_CATALOG_FILES = Object.freeze({
   "caixas": "boxes.json",
   "sabores": "flavors.json",
   "produtos": "products.json",
-  "opcionais": "options.json"
+  "opcionais": "options.json",
+  "tema": "theme.json"
 });
 
 const OBA_CATALOG_ALIASES = Object.freeze({
@@ -461,7 +462,10 @@ const OBA_CATALOG_ALIASES = Object.freeze({
 
   loja: "loja",
   config: "loja",
-  store: "loja"
+  store: "loja",
+
+  tema: "tema",
+  theme: "tema"
 });
 
 async function obaReadCatalogFile(
