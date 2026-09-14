@@ -1,26 +1,54 @@
 # HANDOFF
 
-Atualizado: 2026-09-03 12:47:00
+Atualizado: 2026-09-14 00:00:00
 
 Projeto: Oba Doceria - Cardapio Virtual + Central de Gestao.
 Branch: feature/gestao-online-segura
+Commit HEAD: 1a2afd6
 
 ## Ultima fase aprovada
-8E.10 — Homologação Geral do Sistema (Gestão Ponta a Ponta, Cardápio, Mídia, Segurança e WhatsApp).
+9A — Infraestrutura de Tema Visual.
 
-- Central -> DRAFT: operacional e autenticada.
-- DRAFT -> PREVIEW: operacional com promoção auditada.
-- Preview privado (/__preview): operacional com isolamento estrito (CSP e noindex).
-- PREVIEW -> PUBLISHED: operacional com proteção anti-stale (HTTP 409) e batch atômico no D1.
-- GET /api/publish/history: operacional (retorna promoções, revisões e status ativo).
-- UI da Central: botão "Histórico de versões", modal e restauração instantânea homologados.
-- Rollback seguro: operacional via UI e API, com integridade confirmada no D1.
-- Mídia Online: upload com compressão Canvas, gravação no D1 (`catalog_media`) e servimento público com cache imutável e ETag / 304.
-- Segurança: isolamento de 9 rotas privadas contra acessos anônimos (401/303) e proteção CSRF em mutações (403).
-- Cardápio & WhatsApp: regras de negócio e checkout preservados.
-- Zero serviços pagos / sem cartão.
+### O que foi implementado
+- `online/gestao/public/data/catalog-v1/theme.json` (novo):
+  Arquivo JSON com os textos editáveis de todas as páginas do cardápio e os tokens
+  do tema visual (cores e fonte). É a fonte canônica das configurações visuais.
+
+- `online/gestao/src/index.js` (alterado):
+  `"tema": "theme.json"` adicionado a `OBA_CATALOG_FILES`.
+  Aliases `tema`/`theme` adicionados a `OBA_CATALOG_ALIASES`.
+  `obaCatalogSnapshot()` inclui `theme.json` automaticamente no payload
+  gravado no DRAFT e promovido para PREVIEW/PUBLISHED.
+
+- `online/gestao/public/preview-bootstrap.js` (alterado):
+  `'theme.json': 'tema'` adicionado ao mapa de interceptação de `window.fetch`.
+  O preview privado (/__preview) entrega o tema do slot PREVIEW do D1.
+
+- `online/gestao/public/ui-desenvolvimento/index.html` (alterado):
+  `<style id="oba-tema-vars">` adicionado no `<head>` para receber CSS variables.
+  31 IDs `oba-*` adicionados nos elementos editáveis das páginas 1, 2, 3,
+  fluxo-principal, secao-kits, modal personalizados e modal eventos.
+  Função `hidratarTemaDoModeloMestre()` adicionada após `hidratarCatalogoDoModeloMestre()`:
+  carrega `theme.json`, aplica textos nos IDs e injeta variáveis CSS.
+  Fallback preservado: se o fetch falhar, HTML original é mantido intacto.
+
+### Estado do ciclo DRAFT/PREVIEW/PUBLISHED
+- theme.json está nos assets estáticos com os valores originais do cardápio.
+- O slot DRAFT do D1 ainda não foi atualizado com tema (será feito na 9B via Central).
+- O cardápio público já carrega e aplica theme.json — comportamento transparente
+  (valores idênticos ao hardcoded original enquanto não houver edição).
+
+## Fases concluídas
+- 8E.10 — Homologação Geral do Sistema (Gestão Ponta a Ponta, Cardápio, Mídia, Segurança e WhatsApp).
+- 8E.11 — Encerramento da Migração, Tag Oficial e Sincronização no GitHub.
+- 9A — Infraestrutura de Tema Visual (commit 1a2afd6).
 
 ## Proximo passo
-Encerramento da migração: Remoção controlada da exposição da Central pública antiga, consolidação de backups e documentação de release.
+9B — Aba de Edição Visual na Central de Gestão:
+  - Nova aba "Edição Visual" na Central privada.
+  - Sub-aba "Páginas": formulários estruturados por página (textos + imagens via galeria).
+  - Sub-aba "Tema Global": color pickers para as 5 cores + seletor de fonte.
+  - Salva no DRAFT (debounced) via POST /api/draft.
+  - Confirmar que o DRAFT inclui o tema antes de prosseguir para PREVIEW.
 
 Leia AGENTS.md, docs/CURRENT_STATE.md, docs/DECISIONS.md e docs/ROADMAP.md antes de alterar codigo.
