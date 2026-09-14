@@ -1,6 +1,7 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "updatedAt": "2026-09-14",
+  "variante": "classica",
   "paginas": {
     "boas_vindas": {
       "logo": "Images/Logo_Oba/logo-vertical.png",
@@ -44,6 +45,12 @@
     "corBorda":      "#E8D5B5",
     "corTexto":      "#3B2A1E",
     "corFundoCard":  "#FFF8F0",
-    "fonte":         "Poppins"
+    "fonte":         "Poppins",
+    "tamanhoTitulo": "24",
+    "tamanhoCorpo":  "13",
+    "pesoTitulo":    "300",
+    "pesoCorpo":     "400",
+    "arredondamento": "20",
+    "espacamento":   "normal"
   }
 }

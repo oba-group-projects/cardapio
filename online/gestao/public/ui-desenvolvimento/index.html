@@ -3446,6 +3446,13 @@ async function hidratarTemaDoModeloMestre() {
     if (t.corTexto)     vars.push(`--oba-cor-texto: ${t.corTexto}`);
     if (t.corFundoCard) vars.push(`--oba-cor-fundo-card: ${t.corFundoCard}`);
 
+    /* R9A-v2: novos tokens de tipografia e layout */
+    if (t.tamanhoTitulo) vars.push(`--oba-tam-titulo: ${t.tamanhoTitulo}px`);
+    if (t.tamanhoCorpo)  vars.push(`--oba-tam-corpo: ${t.tamanhoCorpo}px`);
+    if (t.pesoTitulo)    vars.push(`--oba-peso-titulo: ${t.pesoTitulo}`);
+    if (t.pesoCorpo)     vars.push(`--oba-peso-corpo: ${t.pesoCorpo}`);
+    if (t.arredondamento) vars.push(`--oba-radius: ${t.arredondamento}px`);
+
     if (vars.length > 0) {
       const styleEl = document.getElementById('oba-tema-vars');
       if (styleEl) {
@@ -3455,16 +3462,33 @@ async function hidratarTemaDoModeloMestre() {
       }
     }
 
+    /* Espaçamento geral */
+    if (t.espacamento) {
+      const espMap = { compacto: '12px', normal: '20px', 'espaçado': '28px' };
+      const espVal = espMap[t.espacamento] || '20px';
+      document.documentElement.style.setProperty('--oba-espacamento', espVal);
+    }
+
     /* Fonte personalizada */
     if (t.fonte && t.fonte !== 'Poppins') {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
-      link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(t.fonte)}:wght@300;400;500;600;700;800&display=swap`;
+      link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(t.fonte)}:wght@200;300;400;500;600;700;800&display=swap`;
       document.head.appendChild(link);
       document.body.style.fontFamily = `'${t.fonte}', sans-serif`;
     }
 
-    window.__OBA_R9A_TEMA__ = { ok: true, paginas: Object.keys(p).length };
+    /* Aplicar tipografia via IDs já existentes no DOM */
+    const h1 = document.getElementById('oba-pag1-titulo');
+    const h2 = document.getElementById('oba-pag2-titulo');
+    const h3 = document.getElementById('oba-pag3-subtitulo');
+    [h1, h2, h3].forEach(el => {
+      if (!el) return;
+      if (t.tamanhoTitulo) el.style.fontSize = t.tamanhoTitulo + 'px';
+      if (t.pesoTitulo)    el.style.fontWeight = t.pesoTitulo;
+    });
+
+    window.__OBA_R9A_TEMA__ = { ok: true, paginas: Object.keys(p).length, variante: tema.variante || 'classica' };
     console.info('[R9A] Tema visual carregado do Modelo Mestre.', window.__OBA_R9A_TEMA__);
 
   } catch (erro) {

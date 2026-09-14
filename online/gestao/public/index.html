@@ -79,8 +79,8 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
 
   <!-- SUB-ABAS internas -->
   <div class="tabs" id="visual-subtabs" style="margin-bottom:16px">
-    <button class="tab active" id="vsubtab-paginas" onclick="obaVisualSubtab('paginas')">📄 Páginas</button>
-    <button class="tab"        id="vsubtab-tema"    onclick="obaVisualSubtab('tema')">🎨 Tema Global</button>
+    <button class="vtab vtab-active" id="vsubtab-paginas" onclick="obaVisualSubtab('paginas')">📄 Páginas</button>
+    <button class="vtab"             id="vsubtab-tema"    onclick="obaVisualSubtab('tema')">🎨 Tema Global</button>
   </div>
 
   <!-- ===== SUB-PAINEL: PÁGINAS ===== -->
@@ -183,12 +183,23 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
     <form id="formTema" class="grid">
 
       <div style="grid-column:1/-1;margin-bottom:4px">
-        <p class="hint" style="margin:0">Altere as cores e a fonte do cardápio. As mudanças ficam salvas no Rascunho e só aparecem no cardápio público após a publicação.</p>
+        <p class="hint" style="margin:0">Altere cores, tipografia, arredondamento e espaçamento do cardápio. As mudanças ficam no Rascunho e só vão ao público após publicação.</p>
       </div>
 
-      <!-- Cores -->
+      <!-- ── VARIANTES RÁPIDAS ── -->
+      <div class="field full">
+        <p class="oba-secao-titulo">🎨 Variante visual — escolha um ponto de partida</p>
+        <div class="oba-variante-grid" id="tema-variantes-grid">
+          <!-- preenchido por JS -->
+        </div>
+        <p class="hint" style="margin:4px 0 0">Ao clicar em uma variante, os campos abaixo são preenchidos automaticamente. Você pode ajustar qualquer valor depois.</p>
+      </div>
+
+      <!-- ── CORES ── -->
+      <div style="grid-column:1/-1"><p class="oba-secao-titulo">🖌️ Cores</p></div>
+
       <div class="field">
-        <label>Cor Primária <span class="hint">(marrom da marca — títulos, botões)</span></label>
+        <label>Cor Primária <span class="hint">(títulos, botões, destaques)</span></label>
         <div style="display:flex;gap:8px;align-items:center">
           <input type="color" id="tema-corPrimaria" value="#8B4513" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
           <input type="text"  id="tema-corPrimaria-hex" value="#8B4513" maxlength="7" placeholder="#8B4513" style="width:100px">
@@ -220,47 +231,116 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
       </div>
 
       <div class="field">
-        <label>Cor de Fundo dos Cards <span class="hint">(interior dos cards claros)</span></label>
+        <label>Cor de Fundo dos Cards <span class="hint">(interior dos cards)</span></label>
         <div style="display:flex;gap:8px;align-items:center">
           <input type="color" id="tema-corFundoCard" value="#FFF8F0" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
           <input type="text"  id="tema-corFundoCard-hex" value="#FFF8F0" maxlength="7" placeholder="#FFF8F0" style="width:100px">
         </div>
       </div>
 
-      <!-- Fonte -->
+      <!-- ── TIPOGRAFIA ── -->
+      <div style="grid-column:1/-1"><p class="oba-secao-titulo">🔤 Tipografia</p></div>
+
       <div class="field full">
         <label>Família de Fonte <span class="hint">(aplica em todo o cardápio)</span></label>
         <select id="tema-fonte">
-          <option value="Poppins">Poppins (atual)</option>
-          <option value="Lato">Lato</option>
-          <option value="Inter">Inter</option>
-          <option value="Nunito">Nunito</option>
-          <option value="Roboto">Roboto</option>
-          <option value="Montserrat">Montserrat</option>
-          <option value="Playfair Display">Playfair Display (elegante)</option>
-          <option value="DM Sans">DM Sans</option>
+          <option value="Poppins">Poppins (atual — moderna e arredondada)</option>
+          <option value="Lato">Lato (limpa e neutra)</option>
+          <option value="Inter">Inter (digital, alta legibilidade)</option>
+          <option value="Nunito">Nunito (suave e amigável)</option>
+          <option value="Roboto">Roboto (clássica, Google)</option>
+          <option value="Montserrat">Montserrat (geométrica, impactante)</option>
+          <option value="Playfair Display">Playfair Display (elegante, serifada)</option>
+          <option value="DM Sans">DM Sans (contemporânea)</option>
+          <option value="Raleway">Raleway (sofisticada, fina)</option>
+          <option value="Quicksand">Quicksand (divertida, jovem)</option>
         </select>
       </div>
 
-      <!-- Preview de cores inline -->
-      <div class="field full" id="tema-preview-box" style="border:1px solid var(--line);border-radius:12px;padding:16px;background:#fff">
-        <p class="hint" style="margin:0 0 10px;font-weight:700">Pré-visualização das cores selecionadas:</p>
-        <div id="tema-preview-inner" style="border-radius:10px;padding:16px;text-align:center">
-          <div id="tema-preview-bg" style="border-radius:10px;padding:16px">
-            <p id="tema-preview-titulo" style="font-size:18px;font-weight:800;margin:0 0 6px">BEM-VINDO</p>
-            <p id="tema-preview-subtitulo" style="font-size:13px;margin:0 0 12px">Prepare-se para descobrir o verdadeiro sabor artesanal.</p>
-            <div id="tema-preview-btn" style="display:inline-block;padding:10px 20px;border-radius:14px;font-size:12px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:1px">
+      <div class="field">
+        <label>Tamanho do Título <span class="hint" id="tema-tamanhoTitulo-label">24px</span></label>
+        <div class="oba-slider-row">
+          <input type="range" id="tema-tamanhoTitulo" min="18" max="40" step="1" value="24">
+          <span class="oba-slider-val" id="tema-tamanhoTitulo-val">24px</span>
+        </div>
+        <p class="hint">Tamanho do "BEM-VINDO" e títulos de seção.</p>
+      </div>
+
+      <div class="field">
+        <label>Tamanho do Texto <span class="hint" id="tema-tamanhoCorpo-label">13px</span></label>
+        <div class="oba-slider-row">
+          <input type="range" id="tema-tamanhoCorpo" min="11" max="18" step="1" value="13">
+          <span class="oba-slider-val" id="tema-tamanhoCorpo-val">13px</span>
+        </div>
+        <p class="hint">Tamanho dos parágrafos e descrições.</p>
+      </div>
+
+      <div class="field">
+        <label>Peso do Título <span class="hint">(espessura da letra)</span></label>
+        <select id="tema-pesoTitulo">
+          <option value="200">200 — Ultra fino</option>
+          <option value="300" selected>300 — Fino (atual)</option>
+          <option value="400">400 — Normal</option>
+          <option value="500">500 — Médio</option>
+          <option value="600">600 — Semibold</option>
+          <option value="700">700 — Negrito</option>
+          <option value="800">800 — Extrabold</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Peso do Texto <span class="hint">(espessura do corpo)</span></label>
+        <select id="tema-pesoCorpo">
+          <option value="300">300 — Fino</option>
+          <option value="400" selected>400 — Normal (atual)</option>
+          <option value="500">500 — Médio</option>
+          <option value="600">600 — Semibold</option>
+        </select>
+      </div>
+
+      <!-- ── LAYOUT ── -->
+      <div style="grid-column:1/-1"><p class="oba-secao-titulo">📐 Layout</p></div>
+
+      <div class="field">
+        <label>Arredondamento dos Cards <span class="hint" id="tema-arredondamento-label">20px</span></label>
+        <div class="oba-slider-row">
+          <input type="range" id="tema-arredondamento" min="0" max="40" step="2" value="20">
+          <span class="oba-slider-val" id="tema-arredondamento-val">20px</span>
+        </div>
+        <p class="hint">0 = reto, 40 = totalmente arredondado.</p>
+      </div>
+
+      <div class="field">
+        <label>Espaçamento Geral <span class="hint">(padding entre os elementos)</span></label>
+        <select id="tema-espacamento">
+          <option value="compacto">Compacto — mais itens visíveis por tela</option>
+          <option value="normal" selected>Normal (atual)</option>
+          <option value="espaçado">Espaçado — mais respiro entre elementos</option>
+        </select>
+      </div>
+
+      <!-- ── PREVIEW ── -->
+      <div style="grid-column:1/-1"><p class="oba-secao-titulo">👁️ Pré-visualização ao vivo</p></div>
+
+      <div class="field full" id="tema-preview-box" style="border:1px solid var(--line);border-radius:12px;padding:16px;background:#f9f9f9">
+        <p class="hint" style="margin:0 0 10px;font-weight:700">Simula como ficará no celular com as configurações atuais:</p>
+        <div style="max-width:320px;margin:auto">
+          <div id="tema-preview-bg" style="border-radius:16px;padding:24px;text-align:center;transition:all 0.3s">
+            <p id="tema-preview-titulo" style="margin:0 0 8px;text-transform:uppercase;letter-spacing:3px;transition:all 0.3s">BEM-VINDO</p>
+            <p id="tema-preview-subtitulo" style="margin:0 0 16px;transition:all 0.3s">Prepare-se para descobrir o verdadeiro sabor artesanal em cada detalhe.</p>
+            <div id="tema-preview-btn" style="display:inline-block;color:#fff;text-transform:uppercase;letter-spacing:2px;font-weight:700;transition:all 0.3s">
               Descobrir Nossa História
             </div>
-            <div id="tema-preview-card" style="margin-top:12px;border-radius:10px;padding:10px;border:2px solid">
-              <p style="margin:0;font-size:12px">Exemplo de card com borda</p>
+            <div id="tema-preview-card" style="margin-top:16px;border:2px solid;transition:all 0.3s">
+              <p id="tema-preview-card-texto" style="margin:0;transition:all 0.3s">Exemplo de card — Caixas de Doces</p>
             </div>
           </div>
         </div>
       </div>
 
+      <!-- ── AÇÕES ── -->
       <div class="field full actions">
-        <button class="secondary" type="button" id="temaResetBtn">Restaurar padrão</button>
+        <button class="secondary" type="button" id="temaResetBtn">↺ Restaurar padrão</button>
         <button class="primary"   type="submit">Salvar Tema Global</button>
       </div>
 
@@ -734,14 +814,106 @@ $('formConfig').onsubmit=async e=>{
     .oba-pg-form{padding:14px 16px 4px}
     input[type=color]{border:1px solid var(--line) !important;background:#fff !important}
     #vpanel-tema .field label{display:flex;flex-direction:column;gap:2px}
+    .vtab{border:0;border-radius:9px;padding:9px 13px;cursor:pointer;background:#eee5dd;color:var(--text);font:inherit}
+    .vtab.vtab-active{background:var(--brand);color:#fff}
+    .vtab:hover:not(.vtab-active){background:#ddd4cb}
+    .oba-slider-row{display:flex;align-items:center;gap:10px}
+    .oba-slider-row input[type=range]{flex:1;accent-color:var(--brand)}
+    .oba-slider-val{min-width:42px;text-align:right;font-size:12px;font-weight:700;color:var(--brand)}
+    .oba-variante-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:4px}
+    .oba-variante-card{border:2px solid var(--line);border-radius:12px;padding:10px 8px;cursor:pointer;text-align:center;transition:border-color 0.15s,box-shadow 0.15s;background:#fff}
+    .oba-variante-card:hover{border-color:var(--brand)}
+    .oba-variante-card.oba-variante-ativa{border-color:var(--brand);box-shadow:0 0 0 3px rgba(157,76,12,0.15)}
+    .oba-variante-swatch{width:100%;height:28px;border-radius:6px;margin-bottom:6px;display:flex;gap:4px;overflow:hidden}
+    .oba-variante-swatch span{flex:1}
+    .oba-variante-nome{font-size:11px;font-weight:700;color:var(--text)}
+    .oba-secao-titulo{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin:16px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--line)}
   `;
   document.head.appendChild(style);
 
   /* ---------- helpers ---------- */
   const temaDefault={
     corPrimaria:'#8B4513',corFundo:'#FAF5F0',corBorda:'#E8D5B5',
-    corTexto:'#3B2A1E',corFundoCard:'#FFF8F0',fonte:'Poppins'
+    corTexto:'#3B2A1E',corFundoCard:'#FFF8F0',fonte:'Poppins',
+    tamanhoTitulo:'24',tamanhoCorpo:'13',
+    pesoTitulo:'300',pesoCorpo:'400',
+    arredondamento:'20',espacamento:'normal'
   };
+
+  /* Variantes predefinidas */
+  const obaVariantes=[
+    {id:'classica',   nome:'Clássica Oba', cores:['#8B4513','#FAF5F0','#E8D5B5','#3B2A1E','#FFF8F0'],
+     tema:{corPrimaria:'#8B4513',corFundo:'#FAF5F0',corBorda:'#E8D5B5',corTexto:'#3B2A1E',corFundoCard:'#FFF8F0',
+           fonte:'Poppins',tamanhoTitulo:'24',tamanhoCorpo:'13',pesoTitulo:'300',pesoCorpo:'400',arredondamento:'20',espacamento:'normal'}},
+    {id:'elegante',   nome:'Elegante',     cores:['#5C3317','#FBF7F2','#D4B896','#2C1A0E','#FFF5EC'],
+     tema:{corPrimaria:'#5C3317',corFundo:'#FBF7F2',corBorda:'#D4B896',corTexto:'#2C1A0E',corFundoCard:'#FFF5EC',
+           fonte:'Playfair Display',tamanhoTitulo:'28',tamanhoCorpo:'14',pesoTitulo:'400',pesoCorpo:'400',arredondamento:'12',espacamento:'espaçado'}},
+    {id:'moderna',    nome:'Moderna',      cores:['#C75B00','#FFFFFF','#E0E0E0','#1A1A1A','#F5F5F5'],
+     tema:{corPrimaria:'#C75B00',corFundo:'#FFFFFF',corBorda:'#E0E0E0',corTexto:'#1A1A1A',corFundoCard:'#F5F5F5',
+           fonte:'Inter',tamanhoTitulo:'26',tamanhoCorpo:'14',pesoTitulo:'700',pesoCorpo:'400',arredondamento:'8',espacamento:'normal'}},
+    {id:'suave',      nome:'Suave',        cores:['#A0522D','#FFF9F5','#F0DDD0','#4A2E20','#FFFAF7'],
+     tema:{corPrimaria:'#A0522D',corFundo:'#FFF9F5',corBorda:'#F0DDD0',corTexto:'#4A2E20',corFundoCard:'#FFFAF7',
+           fonte:'Nunito',tamanhoTitulo:'24',tamanhoCorpo:'14',pesoTitulo:'600',pesoCorpo:'400',arredondamento:'28',espacamento:'espaçado'}},
+    {id:'minimalista',nome:'Minimalista',  cores:['#222222','#FFFFFF','#DDDDDD','#111111','#F8F8F8'],
+     tema:{corPrimaria:'#222222',corFundo:'#FFFFFF',corBorda:'#DDDDDD',corTexto:'#111111',corFundoCard:'#F8F8F8',
+           fonte:'DM Sans',tamanhoTitulo:'22',tamanhoCorpo:'13',pesoTitulo:'800',pesoCorpo:'400',arredondamento:'4',espacamento:'compacto'}},
+    {id:'festiva',    nome:'Festiva',      cores:['#B5380A','#FFF3E5','#F5C79A','#3D1A05','#FFFAF2'],
+     tema:{corPrimaria:'#B5380A',corFundo:'#FFF3E5',corBorda:'#F5C79A',corTexto:'#3D1A05',corFundoCard:'#FFFAF2',
+           fonte:'Montserrat',tamanhoTitulo:'26',tamanhoCorpo:'13',pesoTitulo:'700',pesoCorpo:'500',arredondamento:'24',espacamento:'normal'}}
+  ];
+
+  /* Renderiza os cards de variante */
+  function obaRenderizarVariantes(varianteAtiva){
+    const grid=$('tema-variantes-grid');if(!grid)return;
+    grid.innerHTML='';
+    obaVariantes.forEach(v=>{
+      const card=document.createElement('button');
+      card.type='button';
+      card.className='oba-variante-card'+(v.id===varianteAtiva?' oba-variante-ativa':'');
+      card.dataset.varianteId=v.id;
+      const swatch=document.createElement('div');swatch.className='oba-variante-swatch';
+      v.cores.forEach(c=>{const s=document.createElement('span');s.style.background=c;swatch.appendChild(s)});
+      const nome=document.createElement('div');nome.className='oba-variante-nome';nome.textContent=v.nome;
+      card.appendChild(swatch);card.appendChild(nome);
+      card.onclick=()=>obaAplicarVariante(v.id);
+      grid.appendChild(card);
+    });
+  }
+
+  function obaAplicarVariante(id){
+    const v=obaVariantes.find(x=>x.id===id);if(!v)return;
+    const t=v.tema;
+    obaSetColor('tema-corPrimaria',t.corPrimaria);
+    obaSetColor('tema-corFundo',t.corFundo);
+    obaSetColor('tema-corBorda',t.corBorda);
+    obaSetColor('tema-corTexto',t.corTexto);
+    obaSetColor('tema-corFundoCard',t.corFundoCard);
+    const sf=$('tema-fonte');if(sf)sf.value=t.fonte;
+    obaSetSlider('tema-tamanhoTitulo',t.tamanhoTitulo);
+    obaSetSlider('tema-tamanhoCorpo',t.tamanhoCorpo);
+    const pt=$('tema-pesoTitulo');if(pt)pt.value=t.pesoTitulo;
+    const pc=$('tema-pesoCorpo');if(pc)pc.value=t.pesoCorpo;
+    obaSetSlider('tema-arredondamento',t.arredondamento);
+    const se=$('tema-espacamento');if(se)se.value=t.espacamento;
+    obaRenderizarVariantes(id);
+    obaAtualizarPreviewCores();
+  }
+
+  /* Sincroniza slider <-> label de valor */
+  function obaBindSlider(id){
+    const sl=$('tema-'+id);const lbl=$('tema-'+id+'-val');
+    if(!sl||!lbl)return;
+    sl.oninput=()=>{lbl.textContent=sl.value+'px';obaAtualizarPreviewCores()};
+  }
+  function obaSetSlider(id,val){
+    const sl=$(id);const lbl=$(id+'-val');
+    if(sl){sl.value=val;} if(lbl){lbl.textContent=val+'px';}
+  }
+
+  ['tamanhoTitulo','tamanhoCorpo','arredondamento'].forEach(obaBindSlider);
+  $('tema-pesoTitulo')&&($('tema-pesoTitulo').onchange=obaAtualizarPreviewCores);
+  $('tema-pesoCorpo')&&($('tema-pesoCorpo').onchange=obaAtualizarPreviewCores);
+  $('tema-espacamento')&&($('tema-espacamento').onchange=obaAtualizarPreviewCores);
 
   /* Sincroniza color-picker <-> input texto */
   function obaBindCorPair(baseId){
@@ -758,7 +930,7 @@ $('formConfig').onsubmit=async e=>{
   ['corPrimaria','corFundo','corBorda','corTexto','corFundoCard'].forEach(obaBindCorPair);
   $('tema-fonte')&&($('tema-fonte').onchange=obaAtualizarPreviewCores);
 
-  /* Preview inline de cores */
+  /* Preview inline de cores + tipografia */
   function obaAtualizarPreviewCores(){
     const corP=$('tema-corPrimaria')?.value||temaDefault.corPrimaria;
     const corF=$('tema-corFundo')?.value||temaDefault.corFundo;
@@ -766,14 +938,42 @@ $('formConfig').onsubmit=async e=>{
     const corT=$('tema-corTexto')?.value||temaDefault.corTexto;
     const corC=$('tema-corFundoCard')?.value||temaDefault.corFundoCard;
     const fonte=$('tema-fonte')?.value||temaDefault.fonte;
-    const bg=$('tema-preview-bg');const tit=$('tema-preview-titulo');
-    const sub=$('tema-preview-subtitulo');const btn=$('tema-preview-btn');
+    const tamTit=($('tema-tamanhoTitulo')?.value||temaDefault.tamanhoTitulo)+'px';
+    const tamCorp=($('tema-tamanhoCorpo')?.value||temaDefault.tamanhoCorpo)+'px';
+    const pesoTit=$('tema-pesoTitulo')?.value||temaDefault.pesoTitulo;
+    const pesoCorp=$('tema-pesoCorpo')?.value||temaDefault.pesoCorpo;
+    const arr=($('tema-arredondamento')?.value||temaDefault.arredondamento)+'px';
+    const esp=$('tema-espacamento')?.value||temaDefault.espacamento;
+    const pad=esp==='compacto'?'12px':esp==='espaçado'?'28px':'20px';
+
+    const bg=$('tema-preview-bg');
+    const tit=$('tema-preview-titulo');
+    const sub=$('tema-preview-subtitulo');
+    const btn=$('tema-preview-btn');
     const card=$('tema-preview-card');
-    if(bg){bg.style.background=corF;bg.style.fontFamily=`'${fonte}', sans-serif`}
-    if(tit){tit.style.color=corP}
-    if(sub){sub.style.color=corT}
-    if(btn){btn.style.background=corP}
-    if(card){card.style.background=corC;card.style.borderColor=corB;card.style.color=corT}
+    const cardTxt=$('tema-preview-card-texto');
+
+    if(bg){
+      bg.style.background=corF;
+      bg.style.fontFamily=`'${fonte}', sans-serif`;
+      bg.style.padding=pad;
+      bg.style.borderRadius=arr;
+    }
+    if(tit){tit.style.color=corP;tit.style.fontSize=tamTit;tit.style.fontWeight=pesoTit}
+    if(sub){sub.style.color=corT;sub.style.fontSize=tamCorp;sub.style.fontWeight=pesoCorp}
+    if(btn){
+      btn.style.background=corP;
+      btn.style.borderRadius=`calc(${arr} * 0.7)`;
+      btn.style.padding=`${parseInt(pad)*0.5}px ${parseInt(pad)*1.2}px`;
+      btn.style.fontSize='11px';
+    }
+    if(card){
+      card.style.background=corC;
+      card.style.borderColor=corB;
+      card.style.borderRadius=arr;
+      card.style.padding=`calc(${pad} * 0.7)`;
+    }
+    if(cardTxt){cardTxt.style.color=corT;cardTxt.style.fontSize=tamCorp}
   }
 
   /* Popula campos do formTema a partir de catalogo.tema */
@@ -831,6 +1031,15 @@ $('formConfig').onsubmit=async e=>{
     obaSetColor('tema-corFundoCard',tm.corFundoCard||temaDefault.corFundoCard);
     const selFonte=$('tema-fonte');
     if(selFonte)selFonte.value=tm.fonte||temaDefault.fonte;
+    /* Novos tokens */
+    obaSetSlider('tema-tamanhoTitulo',tm.tamanhoTitulo||temaDefault.tamanhoTitulo);
+    obaSetSlider('tema-tamanhoCorpo',tm.tamanhoCorpo||temaDefault.tamanhoCorpo);
+    obaSetSlider('tema-arredondamento',tm.arredondamento||temaDefault.arredondamento);
+    const pt=$('tema-pesoTitulo');if(pt)pt.value=tm.pesoTitulo||temaDefault.pesoTitulo;
+    const pc=$('tema-pesoCorpo');if(pc)pc.value=tm.pesoCorpo||temaDefault.pesoCorpo;
+    const se=$('tema-espacamento');if(se)se.value=tm.espacamento||temaDefault.espacamento;
+    /* Variantes */
+    obaRenderizarVariantes(t.variante||'classica');
     obaAtualizarPreviewCores();
   };
 
@@ -852,9 +1061,11 @@ $('formConfig').onsubmit=async e=>{
 
   /* Monta o objeto tema completo a partir dos campos do form */
   function obaLerFormTema(){
+    const varianteAtiva=document.querySelector('.oba-variante-card.oba-variante-ativa')?.dataset?.varianteId||'classica';
     return {
-      schemaVersion:1,
+      schemaVersion:2,
       updatedAt:new Date().toISOString().slice(0,10),
+      variante:varianteAtiva,
       paginas:{
         boas_vindas:{
           logo:$('pg1-logo')?.value.trim()||'',
@@ -901,7 +1112,13 @@ $('formConfig').onsubmit=async e=>{
         corBorda:$('tema-corBorda')?.value||temaDefault.corBorda,
         corTexto:$('tema-corTexto')?.value||temaDefault.corTexto,
         corFundoCard:$('tema-corFundoCard')?.value||temaDefault.corFundoCard,
-        fonte:$('tema-fonte')?.value||temaDefault.fonte
+        fonte:$('tema-fonte')?.value||temaDefault.fonte,
+        tamanhoTitulo:$('tema-tamanhoTitulo')?.value||temaDefault.tamanhoTitulo,
+        tamanhoCorpo:$('tema-tamanhoCorpo')?.value||temaDefault.tamanhoCorpo,
+        pesoTitulo:$('tema-pesoTitulo')?.value||temaDefault.pesoTitulo,
+        pesoCorpo:$('tema-pesoCorpo')?.value||temaDefault.pesoCorpo,
+        arredondamento:$('tema-arredondamento')?.value||temaDefault.arredondamento,
+        espacamento:$('tema-espacamento')?.value||temaDefault.espacamento
       }
     };
   }
@@ -911,7 +1128,7 @@ $('formConfig').onsubmit=async e=>{
     $('vpanel-paginas').style.display=id==='paginas'?'':'none';
     $('vpanel-tema').style.display=id==='tema'?'':'none';
     ['paginas','tema'].forEach(t=>{
-      const b=$('vsubtab-'+t);if(b)b.classList.toggle('active',t===id)
+      const b=$('vsubtab-'+t);if(b)b.classList.toggle('vtab-active',t===id)
     });
   };
 
@@ -939,14 +1156,8 @@ $('formConfig').onsubmit=async e=>{
   /* Restaurar padrão do tema */
   const resetBtn=$('temaResetBtn');
   if(resetBtn)resetBtn.onclick=()=>{
-    if(!confirm('Restaurar todas as cores e fonte para os valores padrão da Oba Doceria?'))return;
-    obaSetColor('tema-corPrimaria',temaDefault.corPrimaria);
-    obaSetColor('tema-corFundo',temaDefault.corFundo);
-    obaSetColor('tema-corBorda',temaDefault.corBorda);
-    obaSetColor('tema-corTexto',temaDefault.corTexto);
-    obaSetColor('tema-corFundoCard',temaDefault.corFundoCard);
-    const sf=$('tema-fonte');if(sf)sf.value=temaDefault.fonte;
-    obaAtualizarPreviewCores();
+    if(!confirm('Restaurar todas as configurações visuais para o padrão da Oba Doceria?'))return;
+    obaAplicarVariante('classica');
   };
 
 })();/* fim FASE 9B */
