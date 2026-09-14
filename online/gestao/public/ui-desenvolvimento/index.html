@@ -3388,6 +3388,23 @@ async function hidratarTemaDoModeloMestre() {
     _set('oba-pag1-subtitulo',     bv.subtitulo);
     _set('oba-pag1-cta',           bv.botaoCTA);
 
+    /* Tamanho da logo pag1 */
+    const logoTamMap = { pequeno: '96px', medio: '176px', grande: '240px' };
+    const elLogo1 = document.getElementById('oba-pag1-logo');
+    if (elLogo1 && bv.tamanhoLogo) elLogo1.style.width = logoTamMap[bv.tamanhoLogo] || '176px';
+
+    /* Cores específicas da pag1 */
+    const elPag1 = document.getElementById('pag-1');
+    if (elPag1 && bv.corFundo) elPag1.style.backgroundColor = bv.corFundo;
+    const elTit1 = document.getElementById('oba-pag1-titulo');
+    if (elTit1 && bv.corTitulo) elTit1.style.color = bv.corTitulo;
+
+    /* Visibilidade pag1 */
+    const elSub1 = document.getElementById('oba-pag1-subtitulo');
+    if (elSub1) elSub1.style.display = bv.exibirSubtitulo === false ? 'none' : '';
+    const elCTA1 = document.querySelector('#pag-1 button[onclick="navegarPara(2)"]');
+    if (elCTA1) elCTA1.style.display = bv.exibirCTA === false ? 'none' : '';
+
     /* Nossa Essência */
     const ne = p.nossa_essencia || {};
     _setSrc('oba-pag2-logo',       ne.logo);
@@ -3395,11 +3412,41 @@ async function hidratarTemaDoModeloMestre() {
     _set('oba-pag2-texto',         ne.texto);
     _set('oba-pag2-citacao',       ne.citacao ? `"${ne.citacao.replace(/^"|"$/g, '')}"` : null);
 
+    /* Tamanho da logo pag2 */
+    const elLogo2 = document.getElementById('oba-pag2-logo');
+    if (elLogo2 && ne.tamanhoLogo) {
+      const s = logoTamMap[ne.tamanhoLogo] || '112px';
+      elLogo2.style.width = s; elLogo2.style.height = s;
+    }
+
+    /* Cores específicas da pag2 */
+    const elCard2 = document.querySelector('#pag-2 .glass-card');
+    if (elCard2 && ne.corFundo) elCard2.style.background = ne.corFundo;
+    const elTit2 = document.getElementById('oba-pag2-titulo');
+    if (elTit2 && ne.corTitulo) elTit2.style.color = ne.corTitulo;
+
+    /* Visibilidade pag2 */
+    const elCitacao2 = document.getElementById('oba-pag2-citacao');
+    if (elCitacao2) elCitacao2.style.display = ne.exibirCitacao === false ? 'none' : '';
+    const elSep2 = document.querySelector('#pag-2 .bg-orange-200\\/60');
+    if (elSep2) elSep2.style.display = ne.exibirSeparador === false ? 'none' : '';
+
     /* Menu Principal */
     const mp = p.menu_principal || {};
     _setSrc('oba-pag3-logo',       mp.logo);
     _setSrc('oba-fluxo-logo',      mp.logo);
     _set('oba-pag3-subtitulo',     mp.subtitulo);
+
+    /* Tamanho da logo pag3 */
+    const elLogo3 = document.getElementById('oba-pag3-logo');
+    if (elLogo3 && mp.tamanhoLogo) elLogo3.style.width = logoTamMap[mp.tamanhoLogo] || '144px';
+
+    /* Cores específicas da pag3 */
+    const elPag3 = document.getElementById('pag-3');
+    if (elPag3 && mp.corFundo) elPag3.style.backgroundColor = mp.corFundo;
+    const elSub3 = document.getElementById('oba-pag3-subtitulo');
+    if (elSub3 && mp.corSubtitulo) elSub3.style.color = mp.corSubtitulo;
+
     const opcoes = mp.opcoes || {};
     if (opcoes.caixas) {
       _set('oba-pag3-label-caixas',        opcoes.caixas.label);
@@ -3417,6 +3464,20 @@ async function hidratarTemaDoModeloMestre() {
       _set('oba-pag3-label-eventos', opcoes.eventos.label);
       _set('oba-pag3-sub-eventos',   opcoes.eventos.sublabel);
     }
+
+    /* Visibilidade botões pag3 (data-oba-business-channel é para lógica de negócio,
+       aqui apenas ocultamos visualmente via display se visivel===false) */
+    const visBotoes = {
+      caixas: document.querySelector('#pag-3 button[onclick="entFluxoCaixas()"]'),
+      presenteaveis: document.querySelector('#pag-3 button[onclick="entFluxoPresenteaveis()"]'),
+      personalizados: document.querySelector('#pag-3 [data-oba-business-channel="personalizados"]'),
+      eventos: document.querySelector('#pag-3 [data-oba-business-channel="eventos"]')
+    };
+    Object.entries(visBotoes).forEach(([key, el]) => {
+      if (!el) return;
+      const vis = opcoes[key];
+      if (vis && vis.visivel === false) el.style.display = 'none';
+    });
 
     /* Vitrine de Presentes */
     const vp = p.vitrine_presentes || {};

@@ -1,28 +1,41 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "updatedAt": "2026-09-14",
   "variante": "classica",
   "paginas": {
     "boas_vindas": {
       "logo": "Images/Logo_Oba/logo-vertical.png",
+      "tamanhoLogo": "medio",
       "titulo": "Bem-vindo",
       "subtitulo": "Prepare-se para descobrir o verdadeiro sabor artesanal em cada detalhe.",
-      "botaoCTA": "Descobrir Nossa História"
+      "botaoCTA": "Descobrir Nossa História",
+      "corFundo": "",
+      "corTitulo": "",
+      "exibirCTA": true,
+      "exibirSubtitulo": true
     },
     "nossa_essencia": {
       "logo": "Images/Logo_Oba/logo-circular.png",
+      "tamanhoLogo": "medio",
       "titulo": "Nossa Essência",
       "texto": "Na OBA Doceria, cada brigadeiro é uma obra de arte. Criamos receitas exclusivas com rigor técnico e os melhores insumos, resultando em doces menos açucarados e intensamente cremosos.",
-      "citacao": "Feito à mão, com amor e precisão."
+      "citacao": "Feito à mão, com amor e precisão.",
+      "corFundo": "",
+      "corTitulo": "",
+      "exibirCitacao": true,
+      "exibirSeparador": true
     },
     "menu_principal": {
       "logo": "Images/Logo_Oba/logo-horizontal.png",
+      "tamanhoLogo": "medio",
       "subtitulo": "Escolha sua Experiência",
+      "corFundo": "",
+      "corSubtitulo": "",
       "opcoes": {
-        "caixas":         { "label": "Caixas de Doces",           "sublabel": "Montagem" },
-        "presenteaveis":  { "label": "Presenteáveis / Especiais", "sublabel": "Kits & Presentes" },
-        "personalizados": { "label": "Doces Personalizados",       "sublabel": "Exclusivo" },
-        "eventos":        { "label": "Grandes Eventos",            "sublabel": "Proposta" }
+        "caixas":         { "label": "Caixas de Doces",           "sublabel": "Montagem",        "visivel": true },
+        "presenteaveis":  { "label": "Presenteáveis / Especiais", "sublabel": "Kits & Presentes","visivel": true },
+        "personalizados": { "label": "Doces Personalizados",       "sublabel": "Exclusivo",       "visivel": true },
+        "eventos":        { "label": "Grandes Eventos",            "sublabel": "Proposta",        "visivel": true }
       }
     },
     "vitrine_presentes": {

@@ -90,16 +90,53 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
     <details class="oba-pg-details" open>
       <summary class="oba-pg-summary">Página 1 — Boas-vindas</summary>
       <form id="formPg1" class="oba-pg-form grid">
+
+        <div style="grid-column:1/-1"><p class="oba-secao-titulo">✏️ Textos</p></div>
         <div class="field"><label>Título</label><input id="pg1-titulo" placeholder="Bem-vindo"></div>
         <div class="field"><label>Subtítulo</label><input id="pg1-subtitulo" placeholder="Prepare-se para descobrir..."></div>
         <div class="field full"><label>Texto do botão CTA</label><input id="pg1-cta" placeholder="Descobrir Nossa História"></div>
-        <div class="field full"><label>Logo (caminho da imagem)</label>
+
+        <div style="grid-column:1/-1"><p class="oba-secao-titulo">🖼️ Imagem</p></div>
+        <div class="field full"><label>Logo (caminho ou URL da imagem)</label>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <input id="pg1-logo" placeholder="Images/Logo_Oba/logo-vertical.png" style="flex:1;min-width:200px">
-            <img id="pg1-logo-preview" class="preview-img" src="" alt="preview logo" onerror="this.style.display='none'" style="width:80px;height:60px;object-fit:contain;border:1px solid var(--line);border-radius:8px">
+            <img id="pg1-logo-preview" src="" alt="preview" onerror="this.style.display='none'" style="width:80px;height:60px;object-fit:contain;border:1px solid var(--line);border-radius:8px;display:none">
           </div>
           <span class="hint">Use o caminho relativo ou a URL de uma mídia já enviada.</span>
         </div>
+        <div class="field full">
+          <label>Tamanho da logo</label>
+          <select id="pg1-tamanhoLogo">
+            <option value="pequeno">Pequena — discreta, foco no texto</option>
+            <option value="medio" selected>Média (atual)</option>
+            <option value="grande">Grande — logo em destaque</option>
+          </select>
+        </div>
+
+        <div style="grid-column:1/-1"><p class="oba-secao-titulo">🎨 Cores desta página</p></div>
+        <div class="field">
+          <label>Cor de fundo <span class="hint">(vazio = usa o tema global)</span></label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="color" id="pg1-corFundo" value="#FAF5F0" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
+            <input type="text" id="pg1-corFundo-hex" value="" maxlength="7" placeholder="Tema global" style="width:110px">
+            <button type="button" class="secondary" style="padding:6px 10px;font-size:11px" onclick="obaClearCorPagina('pg1-corFundo')">✕ Limpar</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Cor do título <span class="hint">(vazio = usa o tema global)</span></label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="color" id="pg1-corTitulo" value="#8B4513" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
+            <input type="text" id="pg1-corTitulo-hex" value="" maxlength="7" placeholder="Tema global" style="width:110px">
+            <button type="button" class="secondary" style="padding:6px 10px;font-size:11px" onclick="obaClearCorPagina('pg1-corTitulo')">✕ Limpar</button>
+          </div>
+        </div>
+
+        <div style="grid-column:1/-1"><p class="oba-secao-titulo">👁️ Visibilidade</p></div>
+        <div class="field full" style="display:flex;gap:20px;flex-wrap:wrap">
+          <label class="oba-toggle-label"><input type="checkbox" id="pg1-exibirSubtitulo" checked> Exibir subtítulo</label>
+          <label class="oba-toggle-label"><input type="checkbox" id="pg1-exibirCTA" checked> Exibir botão CTA</label>
+        </div>
+
         <div class="field full actions"><button class="primary" type="submit">Salvar Boas-vindas</button></div>
       </form>
     </details>
@@ -108,15 +145,52 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
     <details class="oba-pg-details">
       <summary class="oba-pg-summary">Página 2 — Nossa Essência</summary>
       <form id="formPg2" class="oba-pg-form grid">
+
+        <div style="grid-column:1/-1"><p class="oba-secao-titulo">✏️ Textos</p></div>
         <div class="field"><label>Título</label><input id="pg2-titulo" placeholder="Nossa Essência"></div>
-        <div class="field"><label>Logo (caminho da imagem)</label>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-            <input id="pg2-logo" placeholder="Images/Logo_Oba/logo-circular.png" style="flex:1;min-width:200px">
-            <img id="pg2-logo-preview" class="preview-img" src="" alt="preview logo" onerror="this.style.display='none'" style="width:80px;height:60px;object-fit:contain;border:1px solid var(--line);border-radius:8px">
-          </div>
-        </div>
         <div class="field full"><label>Texto principal</label><textarea id="pg2-texto" rows="4" placeholder="Na OBA Doceria..."></textarea></div>
         <div class="field full"><label>Citação em itálico</label><input id="pg2-citacao" placeholder="Feito à mão, com amor e precisão."></div>
+
+        <div style="grid-column:1/-1"><p class="oba-secao-titulo">🖼️ Imagem</p></div>
+        <div class="field full"><label>Logo (caminho ou URL da imagem)</label>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <input id="pg2-logo" placeholder="Images/Logo_Oba/logo-circular.png" style="flex:1;min-width:200px">
+            <img id="pg2-logo-preview" src="" alt="preview" onerror="this.style.display='none'" style="width:80px;height:60px;object-fit:contain;border:1px solid var(--line);border-radius:8px;display:none">
+          </div>
+        </div>
+        <div class="field full">
+          <label>Tamanho da logo</label>
+          <select id="pg2-tamanhoLogo">
+            <option value="pequeno">Pequena</option>
+            <option value="medio" selected>Média (atual)</option>
+            <option value="grande">Grande</option>
+          </select>
+        </div>
+
+        <div style="grid-column:1/-1"><p class="oba-secao-titulo">🎨 Cores desta página</p></div>
+        <div class="field">
+          <label>Cor de fundo do card <span class="hint">(vazio = tema global)</span></label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="color" id="pg2-corFundo" value="#FAF5F0" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
+            <input type="text" id="pg2-corFundo-hex" value="" maxlength="7" placeholder="Tema global" style="width:110px">
+            <button type="button" class="secondary" style="padding:6px 10px;font-size:11px" onclick="obaClearCorPagina('pg2-corFundo')">✕ Limpar</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Cor do título <span class="hint">(vazio = tema global)</span></label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="color" id="pg2-corTitulo" value="#8B4513" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
+            <input type="text" id="pg2-corTitulo-hex" value="" maxlength="7" placeholder="Tema global" style="width:110px">
+            <button type="button" class="secondary" style="padding:6px 10px;font-size:11px" onclick="obaClearCorPagina('pg2-corTitulo')">✕ Limpar</button>
+          </div>
+        </div>
+
+        <div style="grid-column:1/-1"><p class="oba-secao-titulo">👁️ Visibilidade</p></div>
+        <div class="field full" style="display:flex;gap:20px;flex-wrap:wrap">
+          <label class="oba-toggle-label"><input type="checkbox" id="pg2-exibirCitacao" checked> Exibir citação em itálico</label>
+          <label class="oba-toggle-label"><input type="checkbox" id="pg2-exibirSeparador" checked> Exibir separador decorativo</label>
+        </div>
+
         <div class="field full actions"><button class="primary" type="submit">Salvar Nossa Essência</button></div>
       </form>
     </details>
@@ -125,13 +199,54 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
     <details class="oba-pg-details">
       <summary class="oba-pg-summary">Página 3 — Menu Principal</summary>
       <form id="formPg3" class="oba-pg-form grid">
-        <div class="field"><label>Subtítulo</label><input id="pg3-subtitulo" placeholder="Escolha sua Experiência"></div>
-        <div class="field"><label>Logo (caminho da imagem)</label>
+
+        <div style="grid-column:1/-1"><p class="oba-secao-titulo">✏️ Textos</p></div>
+        <div class="field full"><label>Subtítulo</label><input id="pg3-subtitulo" placeholder="Escolha sua Experiência"></div>
+
+        <div style="grid-column:1/-1"><p class="oba-secao-titulo">🖼️ Imagem</p></div>
+        <div class="field full"><label>Logo (caminho ou URL)</label>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <input id="pg3-logo" placeholder="Images/Logo_Oba/logo-horizontal.png" style="flex:1;min-width:200px">
-            <img id="pg3-logo-preview" class="preview-img" src="" alt="preview logo" onerror="this.style.display='none'" style="width:80px;height:60px;object-fit:contain;border:1px solid var(--line);border-radius:8px">
+            <img id="pg3-logo-preview" src="" alt="preview" onerror="this.style.display='none'" style="width:80px;height:60px;object-fit:contain;border:1px solid var(--line);border-radius:8px;display:none">
           </div>
         </div>
+        <div class="field full">
+          <label>Tamanho da logo</label>
+          <select id="pg3-tamanhoLogo">
+            <option value="pequeno">Pequena</option>
+            <option value="medio" selected>Média (atual)</option>
+            <option value="grande">Grande</option>
+          </select>
+        </div>
+
+        <div style="grid-column:1/-1"><p class="oba-secao-titulo">🎨 Cores desta página</p></div>
+        <div class="field">
+          <label>Cor de fundo <span class="hint">(vazio = tema global)</span></label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="color" id="pg3-corFundo" value="#FAF5F0" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
+            <input type="text" id="pg3-corFundo-hex" value="" maxlength="7" placeholder="Tema global" style="width:110px">
+            <button type="button" class="secondary" style="padding:6px 10px;font-size:11px" onclick="obaClearCorPagina('pg3-corFundo')">✕ Limpar</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Cor do subtítulo <span class="hint">(vazio = tema global)</span></label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="color" id="pg3-corSubtitulo" value="#8B4513" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
+            <input type="text" id="pg3-corSubtitulo-hex" value="" maxlength="7" placeholder="Tema global" style="width:110px">
+            <button type="button" class="secondary" style="padding:6px 10px;font-size:11px" onclick="obaClearCorPagina('pg3-corSubtitulo')">✕ Limpar</button>
+          </div>
+        </div>
+
+        <div style="grid-column:1/-1"><p class="oba-secao-titulo">👁️ Visibilidade dos botões do menu</p></div>
+        <div class="field full" style="display:flex;gap:20px;flex-wrap:wrap">
+          <label class="oba-toggle-label"><input type="checkbox" id="pg3-vis-caixas" checked> Caixas de Doces</label>
+          <label class="oba-toggle-label"><input type="checkbox" id="pg3-vis-presenteaveis" checked> Presenteáveis / Especiais</label>
+          <label class="oba-toggle-label"><input type="checkbox" id="pg3-vis-personalizados" checked> Doces Personalizados</label>
+          <label class="oba-toggle-label"><input type="checkbox" id="pg3-vis-eventos" checked> Grandes Eventos</label>
+        </div>
+        <p class="hint" style="grid-column:1/-1;margin:0 0 4px">Desmarcar oculta o botão no cardápio sem desativar o canal de negócio.</p>
+
+        <div style="grid-column:1/-1"><p class="oba-secao-titulo">✏️ Labels dos botões</p></div>
         <div class="field"><label>Label — Caixas de Doces</label><input id="pg3-label-caixas" placeholder="Caixas de Doces"></div>
         <div class="field"><label>Sublabel — Caixas</label><input id="pg3-sub-caixas" placeholder="Montagem"></div>
         <div class="field"><label>Label — Presenteáveis</label><input id="pg3-label-presenteaveis" placeholder="Presenteáveis / Especiais"></div>
@@ -140,6 +255,7 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
         <div class="field"><label>Sublabel — Personalizados</label><input id="pg3-sub-personalizados" placeholder="Exclusivo"></div>
         <div class="field"><label>Label — Eventos</label><input id="pg3-label-eventos" placeholder="Grandes Eventos"></div>
         <div class="field"><label>Sublabel — Eventos</label><input id="pg3-sub-eventos" placeholder="Proposta"></div>
+
         <div class="field full actions"><button class="primary" type="submit">Salvar Menu Principal</button></div>
       </form>
     </details>
@@ -828,6 +944,9 @@ $('formConfig').onsubmit=async e=>{
     .oba-variante-swatch span{flex:1}
     .oba-variante-nome{font-size:11px;font-weight:700;color:var(--text)}
     .oba-secao-titulo{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin:16px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--line)}
+    .oba-toggle-label{display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;user-select:none}
+    .oba-toggle-label:hover{background:#fffaf6;border-color:var(--brand)}
+    .oba-toggle-label input[type=checkbox]{accent-color:var(--brand);width:15px;height:15px;cursor:pointer}
   `;
   document.head.appendChild(style);
 
@@ -930,6 +1049,24 @@ $('formConfig').onsubmit=async e=>{
   ['corPrimaria','corFundo','corBorda','corTexto','corFundoCard'].forEach(obaBindCorPair);
   $('tema-fonte')&&($('tema-fonte').onchange=obaAtualizarPreviewCores);
 
+  /* Bindings de cor por página (picker <-> hex, com campo hex opcional) */
+  const obaCorPaginas=[
+    'pg1-corFundo','pg1-corTitulo',
+    'pg2-corFundo','pg2-corTitulo',
+    'pg3-corFundo','pg3-corSubtitulo'
+  ];
+  obaCorPaginas.forEach(baseId=>{
+    const picker=$(baseId);const hx=$(baseId+'-hex');
+    if(!picker||!hx)return;
+    picker.oninput=()=>{hx.value=picker.value};
+    hx.oninput=()=>{const v=hx.value.trim();if(/^#[0-9a-fA-F]{6}$/.test(v))picker.value=v};
+  });
+
+  /* Limpa a cor de uma página (seta campo hex para vazio = usa tema global) */
+  window.obaClearCorPagina=function(baseId){
+    const hx=$(baseId+'-hex');if(hx)hx.value='';
+  };
+
   /* Preview inline de cores + tipografia */
   function obaAtualizarPreviewCores(){
     const corP=$('tema-corPrimaria')?.value||temaDefault.corPrimaria;
@@ -986,6 +1123,11 @@ $('formConfig').onsubmit=async e=>{
     const bv=pg.boas_vindas||{};
     obaSetVal('pg1-titulo',bv.titulo);obaSetVal('pg1-subtitulo',bv.subtitulo);
     obaSetVal('pg1-cta',bv.botaoCTA);obaSetVal('pg1-logo',bv.logo);
+    obaSetSelect('pg1-tamanhoLogo',bv.tamanhoLogo,'medio');
+    obaSetCorPagina('pg1-corFundo',bv.corFundo);
+    obaSetCorPagina('pg1-corTitulo',bv.corTitulo);
+    obaSetCheck('pg1-exibirSubtitulo',bv.exibirSubtitulo!==false);
+    obaSetCheck('pg1-exibirCTA',bv.exibirCTA!==false);
     obaAtualizarLogoPreview('pg1-logo','pg1-logo-preview');
 
     /* Nossa Essência */
@@ -993,11 +1135,23 @@ $('formConfig').onsubmit=async e=>{
     obaSetVal('pg2-titulo',ne.titulo);obaSetVal('pg2-logo',ne.logo);
     obaSetVal('pg2-texto',ne.texto);
     obaSetVal('pg2-citacao',ne.citacao?ne.citacao.replace(/^"|"$/g,''):'');
+    obaSetSelect('pg2-tamanhoLogo',ne.tamanhoLogo,'medio');
+    obaSetCorPagina('pg2-corFundo',ne.corFundo);
+    obaSetCorPagina('pg2-corTitulo',ne.corTitulo);
+    obaSetCheck('pg2-exibirCitacao',ne.exibirCitacao!==false);
+    obaSetCheck('pg2-exibirSeparador',ne.exibirSeparador!==false);
     obaAtualizarLogoPreview('pg2-logo','pg2-logo-preview');
 
     /* Menu Principal */
     const mp=pg.menu_principal||{};const op=mp.opcoes||{};
     obaSetVal('pg3-subtitulo',mp.subtitulo);obaSetVal('pg3-logo',mp.logo);
+    obaSetSelect('pg3-tamanhoLogo',mp.tamanhoLogo,'medio');
+    obaSetCorPagina('pg3-corFundo',mp.corFundo);
+    obaSetCorPagina('pg3-corSubtitulo',mp.corSubtitulo);
+    obaSetCheck('pg3-vis-caixas',(op.caixas||{}).visivel!==false);
+    obaSetCheck('pg3-vis-presenteaveis',(op.presenteaveis||{}).visivel!==false);
+    obaSetCheck('pg3-vis-personalizados',(op.personalizados||{}).visivel!==false);
+    obaSetCheck('pg3-vis-eventos',(op.eventos||{}).visivel!==false);
     obaAtualizarLogoPreview('pg3-logo','pg3-logo-preview');
     obaSetVal('pg3-label-caixas',(op.caixas||{}).label);
     obaSetVal('pg3-sub-caixas',(op.caixas||{}).sublabel);
@@ -1050,6 +1204,21 @@ $('formConfig').onsubmit=async e=>{
     if(picker&&/^#[0-9a-fA-F]{6}$/.test(hex)){picker.value=hex}
     if(hx&&/^#[0-9a-fA-F]{6}$/.test(hex)){hx.value=hex}
   }
+  /* Popula select por value */
+  function obaSetSelect(id,val,fallback){
+    const el=$(id);if(!el)return;
+    el.value=val||fallback||'';
+    if(!el.value&&fallback)el.value=fallback;
+  }
+  /* Popula cor de página (hex input opcional — vazio = usa tema global) */
+  function obaSetCorPagina(baseId,hex){
+    const picker=$(baseId);const hx=$(baseId+'-hex');
+    const valido=hex&&/^#[0-9a-fA-F]{6}$/.test(hex);
+    if(picker){picker.value=valido?hex:'#8B4513'}
+    if(hx){hx.value=valido?hex:''}
+  }
+  /* Popula checkbox */
+  function obaSetCheck(id,val){const el=$(id);if(el)el.checked=!!val}
   function obaAtualizarLogoPreview(inputId,previewId){
     const inp=$?$(inputId):document.getElementById(inputId);
     const img=$?$(previewId):document.getElementById(previewId);
@@ -1069,24 +1238,37 @@ $('formConfig').onsubmit=async e=>{
       paginas:{
         boas_vindas:{
           logo:$('pg1-logo')?.value.trim()||'',
+          tamanhoLogo:$('pg1-tamanhoLogo')?.value||'medio',
           titulo:$('pg1-titulo')?.value.trim()||'',
           subtitulo:$('pg1-subtitulo')?.value.trim()||'',
-          botaoCTA:$('pg1-cta')?.value.trim()||''
+          botaoCTA:$('pg1-cta')?.value.trim()||'',
+          corFundo:$('pg1-corFundo-hex')?.value.trim()||'',
+          corTitulo:$('pg1-corTitulo-hex')?.value.trim()||'',
+          exibirSubtitulo:$('pg1-exibirSubtitulo')?.checked!==false,
+          exibirCTA:$('pg1-exibirCTA')?.checked!==false
         },
         nossa_essencia:{
           logo:$('pg2-logo')?.value.trim()||'',
+          tamanhoLogo:$('pg2-tamanhoLogo')?.value||'medio',
           titulo:$('pg2-titulo')?.value.trim()||'',
           texto:$('pg2-texto')?.value.trim()||'',
-          citacao:$('pg2-citacao')?.value.trim()||''
+          citacao:$('pg2-citacao')?.value.trim()||'',
+          corFundo:$('pg2-corFundo-hex')?.value.trim()||'',
+          corTitulo:$('pg2-corTitulo-hex')?.value.trim()||'',
+          exibirCitacao:$('pg2-exibirCitacao')?.checked!==false,
+          exibirSeparador:$('pg2-exibirSeparador')?.checked!==false
         },
         menu_principal:{
           logo:$('pg3-logo')?.value.trim()||'',
+          tamanhoLogo:$('pg3-tamanhoLogo')?.value||'medio',
           subtitulo:$('pg3-subtitulo')?.value.trim()||'',
+          corFundo:$('pg3-corFundo-hex')?.value.trim()||'',
+          corSubtitulo:$('pg3-corSubtitulo-hex')?.value.trim()||'',
           opcoes:{
-            caixas:{label:$('pg3-label-caixas')?.value.trim()||'',sublabel:$('pg3-sub-caixas')?.value.trim()||''},
-            presenteaveis:{label:$('pg3-label-presenteaveis')?.value.trim()||'',sublabel:$('pg3-sub-presenteaveis')?.value.trim()||''},
-            personalizados:{label:$('pg3-label-personalizados')?.value.trim()||'',sublabel:$('pg3-sub-personalizados')?.value.trim()||''},
-            eventos:{label:$('pg3-label-eventos')?.value.trim()||'',sublabel:$('pg3-sub-eventos')?.value.trim()||''}
+            caixas:{label:$('pg3-label-caixas')?.value.trim()||'',sublabel:$('pg3-sub-caixas')?.value.trim()||'',visivel:$('pg3-vis-caixas')?.checked!==false},
+            presenteaveis:{label:$('pg3-label-presenteaveis')?.value.trim()||'',sublabel:$('pg3-sub-presenteaveis')?.value.trim()||'',visivel:$('pg3-vis-presenteaveis')?.checked!==false},
+            personalizados:{label:$('pg3-label-personalizados')?.value.trim()||'',sublabel:$('pg3-sub-personalizados')?.value.trim()||'',visivel:$('pg3-vis-personalizados')?.checked!==false},
+            eventos:{label:$('pg3-label-eventos')?.value.trim()||'',sublabel:$('pg3-sub-eventos')?.value.trim()||'',visivel:$('pg3-vis-eventos')?.checked!==false}
           }
         },
         vitrine_presentes:{
