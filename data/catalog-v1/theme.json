@@ -65,6 +65,16 @@
           "sublabel": "TESTE 2",
           "url": "",
           "visivel": true
+        },
+        {
+          "acao": "caixas",
+          "destaque": false,
+          "icone": "fa-solid fa-star",
+          "id": "btn-5",
+          "label": "TESTE 2",
+          "sublabel": "TESTE 3",
+          "url": "",
+          "visivel": true
         }
       ],
       "corFundo": "",
