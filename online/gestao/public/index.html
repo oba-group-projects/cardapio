@@ -251,7 +251,14 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
           <button type="button" class="secondary" onclick="obaAdicionarBotaoMenu()" style="font-size:12px">+ Adicionar botão</button>
           <button type="button" class="secondary" onclick="obaRestaurarBotoesMenu()" style="font-size:12px">↺ Restaurar padrão</button>
         </div>
-        <p class="hint" style="grid-column:1/-1;margin:4px 0 0">Máximo recomendado: 6 botões. Ações disponíveis: Caixas, Presenteáveis, Personalizados, Eventos, Degustação, WhatsApp, Nossa História, Link externo.</p>
+        <p class="hint" style="grid-column:1/-1;margin:4px 0 0">Ações disponíveis: Caixas, Presenteáveis, Personalizados, Eventos, Degustação, WhatsApp, Nossa História, Link externo.</p>
+
+        <!-- R10B: Indicador de paginação automática -->
+        <div id="pg3-paginacao-info" style="grid-column:1/-1;display:none;margin-top:8px;padding:12px 14px;border-radius:10px;background:#fff8f0;border:1px solid #f5c89a">
+          <p style="margin:0 0 6px;font-size:12px;font-weight:700;color:#8B4513">📄 Paginação automática ativa</p>
+          <p style="margin:0 0 8px;font-size:12px;color:#666">Com mais de 4 botões, o cardápio distribui automaticamente em páginas de 4:</p>
+          <div id="pg3-paginacao-preview" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+        </div>
 
         <div class="field full actions"><button class="primary" type="submit">Salvar Menu Principal</button></div>
       </form>
@@ -1125,6 +1132,7 @@ $('formConfig').onsubmit=async e=>{
     if(!lista)return;
     lista.innerHTML='';
     (botoes||[]).forEach((b,i)=>obaAdicionarCardBotao(b,i));
+    obaAtualizarPaginacaoInfo();
   };
 
   /* Cria um card de edição para um botão */
@@ -1169,7 +1177,7 @@ $('formConfig').onsubmit=async e=>{
       <div class="oba-botao-card-body grid">
         <div class="field"><label>Label (nome principal)</label>
           <input class="pg3-btn-label" value="${b&&b.label||''}" placeholder="Ex: Caixas de Doces"
-            oninput="obaAtualizarPreviewBotao(this.closest('.oba-botao-card'))">
+            oninput="obaAtualizarPreviewBotao(this.closest('.oba-botao-card'));obaAtualizarPaginacaoInfo()">
         </div>
         <div class="field"><label>Sublabel (subtítulo pequeno)</label>
           <input class="pg3-btn-sublabel" value="${b&&b.sublabel||''}" placeholder="Ex: Montagem"
@@ -1213,11 +1221,8 @@ $('formConfig').onsubmit=async e=>{
 
   /* Adiciona novo botão vazio */
   window.obaAdicionarBotaoMenu=function(){
-    const lista=$('pg3-botoes-lista');
-    if(lista&&lista.children.length>=6){
-      alert('Máximo de 6 botões atingido.');return;
-    }
     obaAdicionarCardBotao({label:'',sublabel:'',icone:'fa-solid fa-star',acao:'caixas',destaque:false,visivel:true});
+    obaAtualizarPaginacaoInfo();
   };
 
   /* Restaura os 4 botões padrão */
@@ -1236,7 +1241,6 @@ $('formConfig').onsubmit=async e=>{
     card.remove();
     obaAtualizarNumeracaoBotoes();
   };
-
   /* Move um botão para cima ou para baixo */
   window.obaMoverBotao=function(btn,dir){
     const card=btn.closest('.oba-botao-card');
@@ -1251,6 +1255,36 @@ $('formConfig').onsubmit=async e=>{
   function obaAtualizarNumeracaoBotoes(){
     const cards=document.querySelectorAll('#pg3-botoes-lista .oba-botao-card');
     cards.forEach((c,i)=>{const n=c.querySelector('.oba-botao-num');if(n)n.textContent=i+1;});
+    obaAtualizarPaginacaoInfo();
+  }
+
+  /* Atualiza o painel de paginação automática */
+  function obaAtualizarPaginacaoInfo(){
+    const cards=document.querySelectorAll('#pg3-botoes-lista .oba-botao-card');
+    const total=cards.length;
+    const infoBox=$('pg3-paginacao-info');
+    const previewEl=$('pg3-paginacao-preview');
+    if(!infoBox||!previewEl)return;
+
+    const MAX=4;
+    if(total<=MAX){infoBox.style.display='none';return;}
+
+    infoBox.style.display='';
+    previewEl.innerHTML='';
+    const paginas=Math.ceil(total/MAX);
+    const letras=['A','B','C','D','E','F'];
+    for(let p=0;p<paginas;p++){
+      const ini=p*MAX;const fim=Math.min(ini+MAX,total);
+      const chip=document.createElement('div');
+      chip.style.cssText='background:#fff;border:1px solid #e8d5b5;border-radius:8px;padding:6px 10px;font-size:11px;color:#8B4513';
+      const nomes=Array.from(cards).slice(ini,fim).map(c=>{
+        const l=c.querySelector('.pg3-btn-label')?.value||'(vazio)';
+        return l.length>12?l.slice(0,12)+'…':l;
+      });
+      chip.innerHTML=`<b>Página ${letras[p]}</b><br>${nomes.join('<br>')}`;
+      if(p<paginas-1)chip.innerHTML+=`<br><span style="color:#aaa;font-size:10px">→ Ver mais</span>`;
+      previewEl.appendChild(chip);
+    }
   }
 
   /* Seleciona ícone */

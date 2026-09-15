@@ -3465,68 +3465,170 @@ async function hidratarTemaDoModeloMestre() {
         historia:      () => typeof navegarPara === 'function' && navegarPara(2)
       };
 
-      /* Garante que business channels são tratados corretamente */
       const bcAcoes = new Set(['personalizados', 'eventos']);
+      const MAX_POR_PAGINA = 4;
 
+      /* Cria um elemento botão de menu a partir de um objeto botao */
+      function obacriarBtnMenu(b) {
+        const btn = document.createElement('button');
+        if (b.destaque) {
+          btn.className = 'w-full p-6 bg-[#8B4513] text-white rounded-[2rem] shadow-xl shadow-[#8B4513]/20 text-left flex justify-between items-center active:scale-95 transition-all';
+        } else {
+          btn.className = 'w-full p-6 bg-white border border-[#8B4513]/10 text-[#8B4513] rounded-[2rem] text-left flex justify-between items-center active:scale-95 transition-all shadow-sm';
+        }
+        if (bcAcoes.has(b.acao)) btn.dataset.obaBusinessChannel = b.acao;
+
+        const div = document.createElement('div');
+        const sub = document.createElement('span');
+        sub.className = b.destaque
+          ? 'block text-[9px] uppercase tracking-widest opacity-70 mb-1'
+          : 'block text-[9px] uppercase tracking-widest opacity-50 mb-1';
+        sub.textContent = b.sublabel || '';
+        const lbl = document.createElement('span');
+        lbl.className = 'text-sm font-medium';
+        lbl.textContent = b.label || '';
+        div.appendChild(sub); div.appendChild(lbl);
+
+        const ico = document.createElement('i');
+        ico.className = (b.icone || 'fa-solid fa-star') + (b.destaque ? ' text-xl opacity-40' : ' text-xl opacity-20');
+
+        btn.appendChild(div); btn.appendChild(ico);
+
+        if (b.acao === 'url' && b.url) {
+          btn.onclick = () => window.open(b.url, '_blank', 'noopener,noreferrer');
+        } else if (acaoMap[b.acao]) {
+          btn.onclick = acaoMap[b.acao];
+        }
+        return btn;
+      }
+
+      /* ── R10B: OVERFLOW AUTOMÁTICO ──────────────────────────────────
+         Divide os botões em grupos de MAX_POR_PAGINA.
+         Grupo 0 → #pag-3 (já existe no HTML)
+         Grupo 1 → #pag-3b (criado dinamicamente)
+         Grupo 2 → #pag-3c (criado dinamicamente)
+         ...
+         Cada página tem "Ver mais →" se houver próxima página,
+         e "← Voltar ao menu" se for overflow.
+      ────────────────────────────────────────────────────────────── */
+      const botoesVisiveis = botoes.filter(b => b.visivel !== false);
+      const grupos = [];
+      for (let i = 0; i < botoesVisiveis.length; i += MAX_POR_PAGINA) {
+        grupos.push(botoesVisiveis.slice(i, i + MAX_POR_PAGINA));
+      }
+
+      /* Limpa páginas de overflow anteriores (3b, 3c...) para re-render */
+      document.querySelectorAll('[data-oba-overflow-menu]').forEach(el => el.remove());
+
+      /* Renderiza grupo 0 no #oba-menu-botoes (#pag-3) */
       const container = document.getElementById('oba-menu-botoes');
       if (container) {
         container.innerHTML = '';
+        (grupos[0] || []).forEach(b => container.appendChild(obacriarBtnMenu(b)));
 
-        botoes
-          .filter(b => b.visivel !== false)
-          .forEach(b => {
-            const btn = document.createElement('button');
-
-            /* Estilo destaque (primeiro / marcado como destaque) ou secundário */
-            if (b.destaque) {
-              btn.className = 'w-full p-6 bg-[#8B4513] text-white rounded-[2rem] shadow-xl shadow-[#8B4513]/20 text-left flex justify-between items-center active:scale-95 transition-all';
-            } else {
-              btn.className = 'w-full p-6 bg-white border border-[#8B4513]/10 text-[#8B4513] rounded-[2rem] text-left flex justify-between items-center active:scale-95 transition-all shadow-sm';
-            }
-
-            /* Business channel para lógica de visibilidade existente */
-            if (bcAcoes.has(b.acao)) {
-              btn.dataset.obaBusinessChannel = b.acao;
-            }
-
-            /* Conteúdo textual */
-            const div = document.createElement('div');
-            const sublabelEl = document.createElement('span');
-            sublabelEl.className = b.destaque
-              ? 'block text-[9px] uppercase tracking-widest opacity-70 mb-1'
-              : 'block text-[9px] uppercase tracking-widest opacity-50 mb-1';
-            sublabelEl.textContent = b.sublabel || '';
-
-            const labelEl = document.createElement('span');
-            labelEl.className = 'text-sm font-medium';
-            labelEl.textContent = b.label || '';
-
-            div.appendChild(sublabelEl);
-            div.appendChild(labelEl);
-
-            /* Ícone */
-            const icone = document.createElement('i');
-            icone.className = (b.icone || 'fa-solid fa-star') + (b.destaque ? ' text-xl opacity-40' : ' text-xl opacity-20');
-
-            btn.appendChild(div);
-            btn.appendChild(icone);
-
-            /* Ação ao clicar */
-            if (b.acao === 'url' && b.url) {
-              btn.onclick = () => window.open(b.url, '_blank', 'noopener,noreferrer');
-            } else if (acaoMap[b.acao]) {
-              btn.onclick = acaoMap[b.acao];
-            }
-
-            container.appendChild(btn);
-          });
-
-        /* Re-aplica hidratarBusinessChannelsDoModeloMestre para os novos elementos */
-        if (typeof hidratarBusinessChannelsDoModeloMestre === 'function') {
-          hidratarBusinessChannelsDoModeloMestre();
+        /* Se houver mais grupos, adiciona botão "Ver mais →" */
+        if (grupos.length > 1) {
+          const verMais = document.createElement('button');
+          verMais.onclick = () => {
+            /* Navega para a primeira página de overflow */
+            ['pag-1','pag-2','pag-3','fluxo-principal'].forEach(id => {
+              const el = document.getElementById(id);
+              if (el) { el.classList.add('hidden'); el.classList.remove('flex'); }
+            });
+            document.querySelectorAll('[data-oba-overflow-menu]').forEach(el => {
+              el.classList.add('hidden'); el.classList.remove('flex');
+            });
+            const p3b = document.getElementById('pag-3b');
+            if (p3b) { p3b.classList.remove('hidden'); p3b.classList.add('flex'); }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          };
+          verMais.className = 'w-full p-6 bg-white border-2 border-dashed border-[#8B4513]/30 text-[#8B4513]/60 rounded-[2rem] text-left flex justify-between items-center active:scale-95 transition-all';
+          verMais.innerHTML = `<div><span class="block text-[9px] uppercase tracking-widest opacity-50 mb-1">Mais opções</span><span class="text-sm font-medium">Ver mais →</span></div><i class="fa-solid fa-chevron-right text-xl opacity-30"></i>`;
+          container.appendChild(verMais);
         }
       }
+
+      /* Renderiza grupos 1, 2, 3... como novas seções antes do #fluxo-principal */
+      const fluxoPrincipal = document.getElementById('fluxo-principal');
+      const pag3 = document.getElementById('pag-3');
+
+      grupos.slice(1).forEach((grupo, idx) => {
+        const pageId = 'pag-3' + String.fromCharCode(98 + idx); /* 3b, 3c, 3d... */
+        const prevPageId = idx === 0 ? 'pag-3' : 'pag-3' + String.fromCharCode(97 + idx);
+        const nextPageId = idx + 2 < grupos.length ? 'pag-3' + String.fromCharCode(99 + idx) : null;
+
+        /* Reutiliza seção existente ou cria nova */
+        let secao = document.getElementById(pageId);
+        if (!secao) {
+          secao = document.createElement('section');
+          secao.id = pageId;
+          secao.dataset.obaOverflowMenu = '1';
+          if (fluxoPrincipal) {
+            fluxoPrincipal.parentNode.insertBefore(secao, fluxoPrincipal);
+          }
+        }
+
+        /* Copiar classes do pag-3 para layout idêntico */
+        secao.className = 'min-h-screen hidden flex-col items-center justify-center px-6 py-10 fade-page max-w-md mx-auto';
+
+        /* Header com mesma logo e subtítulo */
+        const logoSrc = pag3 ? (pag3.querySelector('#oba-pag3-logo')?.src || '') : '';
+        const subtituloTxt = pag3 ? (pag3.querySelector('#oba-pag3-subtitulo')?.textContent || '') : '';
+
+        secao.innerHTML = `
+          <header class="text-center mb-10 w-full">
+            <img src="${logoSrc}" class="w-36 h-auto mx-auto mb-6 object-contain" alt="Logo">
+            <h2 class="text-[11px] text-[#8B4513]/60 font-semibold uppercase tracking-[0.2em]">${subtituloTxt}</h2>
+          </header>
+          <div id="${pageId}-botoes" class="w-full space-y-4"></div>
+          <button class="mt-10 py-3 px-6 text-[10px] font-bold text-[#8B4513]/50 uppercase tracking-widest border border-transparent hover:border-[#8B4513]/20 rounded-full transition-all"
+            onclick="obaVoltarMenuOverflow('${prevPageId}')">← Voltar</button>
+        `;
+
+        /* Botões do grupo */
+        const botoesContainer = secao.querySelector(`#${pageId}-botoes`);
+        grupo.forEach(b => botoesContainer.appendChild(obacriarBtnMenu(b)));
+
+        /* Se houver próxima página de overflow */
+        if (nextPageId) {
+          const verMaisOverflow = document.createElement('button');
+          verMaisOverflow.onclick = () => obaNavOverflow(nextPageId);
+          verMaisOverflow.className = 'w-full p-6 bg-white border-2 border-dashed border-[#8B4513]/30 text-[#8B4513]/60 rounded-[2rem] text-left flex justify-between items-center active:scale-95 transition-all';
+          verMaisOverflow.innerHTML = `<div><span class="block text-[9px] uppercase tracking-widest opacity-50 mb-1">Mais opções</span><span class="text-sm font-medium">Ver mais →</span></div><i class="fa-solid fa-chevron-right text-xl opacity-30"></i>`;
+          botoesContainer.appendChild(verMaisOverflow);
+        }
+      });
+
+      /* Re-aplica business channels */
+      if (typeof hidratarBusinessChannelsDoModeloMestre === 'function') {
+        hidratarBusinessChannelsDoModeloMestre();
+      }
     }
+
+    /* Helpers de navegação para páginas de overflow */
+    window.obaNavOverflow = function(targetId) {
+      ['pag-1','pag-2','pag-3','fluxo-principal'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.classList.add('hidden'); el.classList.remove('flex'); }
+      });
+      document.querySelectorAll('[data-oba-overflow-menu]').forEach(el => {
+        el.classList.add('hidden'); el.classList.remove('flex');
+      });
+      const alvo = document.getElementById(targetId);
+      if (alvo) { alvo.classList.remove('hidden'); alvo.classList.add('flex'); }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.obaVoltarMenuOverflow = function(prevId) {
+      const ids = ['pag-1','pag-2','pag-3','fluxo-principal'];
+      [...ids, ...Array.from(document.querySelectorAll('[data-oba-overflow-menu]')).map(el => el.id)].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.classList.add('hidden'); el.classList.remove('flex'); }
+      });
+      const alvo = document.getElementById(prevId);
+      if (alvo) { alvo.classList.remove('hidden'); alvo.classList.add('flex'); }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     /* Vitrine de Presentes */
     const vp = p.vitrine_presentes || {};
