@@ -57,7 +57,7 @@
           "visivel": true
         },
         {
-          "acao": "historia",
+          "acao": "caixas",
           "destaque": false,
           "icone": "fa-solid fa-star",
           "id": "btn-4",
