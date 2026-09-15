@@ -318,6 +318,21 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
       </form>
     </details>
 
+    <!-- ================================================================
+         R10C — SEÇÕES EXTRAS (páginas customizadas)
+    ================================================================ -->
+    <div style="margin-top:24px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div>
+          <p class="oba-secao-titulo" style="margin:0 0 2px">➕ Seções Extras</p>
+          <p class="hint" style="margin:0">Crie novas páginas no cardápio com layout pronto. Cada seção pode ter um botão automático no menu.</p>
+        </div>
+        <button type="button" class="primary" style="font-size:12px;white-space:nowrap" onclick="obaAdicionarSecaoCustom()">+ Nova seção</button>
+      </div>
+      <div id="secoes-extras-lista" style="display:flex;flex-direction:column;gap:12px"></div>
+      <p id="secoes-extras-vazio" class="hint" style="text-align:center;padding:16px 0;color:var(--muted)">Nenhuma seção extra criada ainda. Clique em "+ Nova seção" para começar.</p>
+    </div>
+
   </div><!-- /vpanel-paginas -->
 
   <!-- ===== SUB-PAINEL: TEMA GLOBAL ===== -->
@@ -1476,6 +1491,9 @@ $('formConfig').onsubmit=async e=>{
     const em=pg.eventos_modal||{};
     obaSetVal('eventos-m-titulo',em.titulo);
 
+    /* R10C: Seções extras */
+    obaRenderizarSecoesExtras(Array.isArray(t.paginas_customizadas) ? t.paginas_customizadas : []);
+
     /* Tema Global */
     obaSetColor('tema-corPrimaria',tm.corPrimaria||temaDefault.corPrimaria);
     obaSetColor('tema-corFundo',tm.corFundo||temaDefault.corFundo);
@@ -1600,7 +1618,12 @@ $('formConfig').onsubmit=async e=>{
         pesoCorpo:$('tema-pesoCorpo')?.value||temaDefault.pesoCorpo,
         arredondamento:$('tema-arredondamento')?.value||temaDefault.arredondamento,
         espacamento:$('tema-espacamento')?.value||temaDefault.espacamento
-      }
+      },
+      paginas_customizadas:(()=>{
+        const lista=$('secoes-extras-lista');
+        if(!lista)return[];
+        return Array.from(lista.querySelectorAll('.oba-secao-card')).map(c=>obaLerSecaoDoCard(c));
+      })()
     };
   }
 
@@ -1640,6 +1663,360 @@ $('formConfig').onsubmit=async e=>{
     if(!confirm('Restaurar todas as configurações visuais para o padrão da Oba Doceria?'))return;
     obaAplicarVariante('classica');
   };
+
+  /* ================================================================
+     R10C — EDITOR DE SEÇÕES EXTRAS
+  ================================================================ */
+
+  /* Templates disponíveis */
+  const obaTemplates = [
+    { id:'informativa',    label:'📄 Informativa',       desc:'Texto livre com imagem, citação e botão CTA opcional.' },
+    { id:'lista_produtos', label:'🛒 Lista de Produtos',  desc:'Grade de cards com imagem, nome, descrição e preço.' },
+    { id:'menu_botoes',    label:'🔘 Menu de Botões',     desc:'Nova tela de menu, igual à Página 3, com seus próprios botões.' }
+  ];
+
+  /* Ícones disponíveis para o botão de menu da seção */
+  const obaIconesSecao = obaIconesMenu;
+
+  /* Gera um ID único baseado no timestamp */
+  function obaGerarIdSecao() {
+    return 'sec' + Date.now().toString(36);
+  }
+
+  /* Renderiza a lista completa de seções extras */
+  window.obaRenderizarSecoesExtras = function(secoes) {
+    const lista = $('secoes-extras-lista');
+    const vazio = $('secoes-extras-vazio');
+    if (!lista) return;
+    lista.innerHTML = '';
+    const arr = Array.isArray(secoes) ? secoes : [];
+    arr.forEach((sec, i) => obaAdicionarCardSecao(sec, i));
+    if (vazio) vazio.style.display = arr.length === 0 ? '' : 'none';
+  };
+
+  /* Adiciona nova seção vazia */
+  window.obaAdicionarSecaoCustom = function() {
+    const lista = $('secoes-extras-lista');
+    const vazio = $('secoes-extras-vazio');
+    const novoId = obaGerarIdSecao();
+    obaAdicionarCardSecao({ id: novoId, template: 'informativa', titulo: '', subtitulo: '', linkMenu: { ativo: true, label: '', sublabel: '', icone: 'fa-solid fa-star', destaque: false }, config: {} });
+    if (vazio) vazio.style.display = 'none';
+  };
+
+  /* Cria um card de edição para uma seção */
+  function obaAdicionarCardSecao(sec, idx) {
+    const lista = $('secoes-extras-lista');
+    if (!lista) return;
+    const total = lista.children.length;
+
+    const card = document.createElement('div');
+    card.className = 'oba-secao-card';
+    card.style.cssText = 'border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden;margin-bottom:0';
+    card.dataset.secaoId = sec.id;
+
+    /* Template selecionado */
+    const tmpl = sec.template || 'informativa';
+    const tmplDef = obaTemplates.find(t => t.id === tmpl) || obaTemplates[0];
+
+    /* Ícones para linkMenu */
+    const iconesHtml = (obaIconesSecao||[]).map(ic =>
+      `<button type="button" class="oba-icone-btn${sec.linkMenu&&sec.linkMenu.icone===ic.valor?' oba-icone-ativo':''}"
+        title="${ic.label}" onclick="obaEscolherIconeSecao(this,'${ic.valor.replace(/'/g,'&#39;')}')"
+        data-icone="${ic.valor}"><i class="${ic.valor}"></i></button>`
+    ).join('');
+
+    /* Campos específicos do template */
+    const cfg = sec.config || {};
+    const lm = sec.linkMenu || {};
+
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:#f0ede9;border-bottom:1px solid var(--line)">
+        <span style="width:22px;height:22px;border-radius:50%;background:var(--brand);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${total+1}</span>
+        <span style="font-size:13px;font-weight:700;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${sec.titulo||'Nova seção'}</span>
+        <span style="font-size:11px;color:var(--muted);flex-shrink:0">${tmplDef.label}</span>
+        <button type="button" class="danger" style="padding:4px 8px;font-size:11px" onclick="obaRemoverSecaoCustom(this)" title="Remover seção">✕</button>
+      </div>
+
+      <div style="padding:14px 16px 8px" class="grid">
+        <div style="grid-column:1/-1"><p class="oba-secao-titulo">📋 Configurações gerais</p></div>
+
+        <div class="field full">
+          <label>Template</label>
+          <select class="secao-template" onchange="obaAlterarTemplateSecao(this)">
+            ${obaTemplates.map(t => `<option value="${t.id}" ${tmpl===t.id?'selected':''}>${t.label} — ${t.desc}</option>`).join('')}
+          </select>
+        </div>
+
+        <div class="field"><label>Título da seção</label>
+          <input class="secao-titulo" value="${sec.titulo||''}" placeholder="Ex: Doces Sazonais"
+            oninput="this.closest('.oba-secao-card').querySelector('span:nth-child(2)').textContent=this.value||'Nova seção'">
+        </div>
+        <div class="field"><label>Subtítulo descritivo</label>
+          <input class="secao-subtitulo" value="${sec.subtitulo||''}" placeholder="Ex: Sabores especiais da estação">
+        </div>
+
+        <div style="grid-column:1/-1"><p class="oba-secao-titulo">🔘 Botão no menu principal</p></div>
+        <div class="field full" style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">
+          <label class="oba-toggle-label">
+            <input type="checkbox" class="secao-link-ativo" ${lm.ativo!==false?'checked':''}> Adicionar botão automático no menu
+          </label>
+        </div>
+        <div class="field"><label>Label do botão</label>
+          <input class="secao-link-label" value="${lm.label||''}" placeholder="Ex: Doces Sazonais">
+        </div>
+        <div class="field"><label>Sublabel do botão</label>
+          <input class="secao-link-sublabel" value="${lm.sublabel||''}" placeholder="Ex: Novidades">
+        </div>
+        <div class="field full"><label>Ícone do botão</label>
+          <div class="oba-icones-grid">${iconesHtml}</div>
+          <input type="hidden" class="secao-link-icone" value="${lm.icone||'fa-solid fa-star'}">
+        </div>
+        <div class="field full" style="display:flex;gap:16px;flex-wrap:wrap">
+          <label class="oba-toggle-label">
+            <input type="checkbox" class="secao-link-destaque" ${lm.destaque?'checked':''}> Botão em destaque (fundo marrom)
+          </label>
+        </div>
+
+        <!-- Campos específicos por template -->
+        <div class="secao-campos-template" style="grid-column:1/-1">
+          ${obaHtmlCamposTemplate(tmpl, cfg)}
+        </div>
+
+        <div class="field full actions">
+          <input type="hidden" class="secao-id-hidden" value="${sec.id}">
+          <button type="button" class="primary" onclick="obaFecharSalvarSecao(this)">Salvar seção</button>
+        </div>
+      </div>`;
+
+    lista.appendChild(card);
+  }
+
+  /* HTML dos campos específicos de cada template */
+  window.obaHtmlCamposTemplate = function(tmpl, cfg) {
+    if (tmpl === 'informativa') {
+      return `
+        <p class="oba-secao-titulo">✏️ Conteúdo</p>
+        <div class="field full grid" style="grid-template-columns:1fr 1fr;gap:11px">
+          <div class="field full"><label>Texto principal</label>
+            <textarea class="secao-cfg-texto" rows="4" placeholder="Descreva esta seção...">${cfg.texto||''}</textarea>
+          </div>
+          <div class="field full"><label>Citação em itálico (opcional)</label>
+            <input class="secao-cfg-citacao" value="${cfg.citacao||''}" placeholder="Uma frase marcante...">
+          </div>
+          <div class="field"><label>Texto do botão CTA (opcional)</label>
+            <input class="secao-cfg-ctaLabel" value="${cfg.ctaLabel||''}" placeholder="Ex: Ver mais">
+          </div>
+          <div class="field"><label>Ação do CTA</label>
+            <select class="secao-cfg-ctaAcao">
+              <option value="" ${!cfg.ctaAcao?'selected':''}>Sem botão CTA</option>
+              <option value="whatsapp" ${cfg.ctaAcao==='whatsapp'?'selected':''}>Abrir WhatsApp</option>
+              <option value="url" ${cfg.ctaAcao==='url'?'selected':''}>Link externo</option>
+            </select>
+          </div>
+          <div class="field full"><label>URL do CTA (se Link externo)</label>
+            <input class="secao-cfg-ctaUrl" value="${cfg.ctaUrl||''}" placeholder="https://...">
+          </div>
+        </div>`;
+    }
+    if (tmpl === 'lista_produtos') {
+      const itens = Array.isArray(cfg.itens) ? cfg.itens : [];
+      const itensHtml = itens.map((it, i) => `
+        <div class="oba-item-card" style="border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fafafa;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="field"><label>Nome</label><input class="item-nome" value="${it.nome||''}" placeholder="Nome do produto"></div>
+          <div class="field"><label>Preço</label><input class="item-preco" value="${it.preco||''}" placeholder="Ex: 45,00"></div>
+          <div class="field full"><label>Descrição</label><input class="item-descricao" value="${it.descricao||''}" placeholder="Breve descrição"></div>
+          <div class="field full"><label>Imagem (caminho ou URL)</label><input class="item-imagem" value="${it.imagem||''}" placeholder="Images/..."></div>
+          <div class="field full" style="text-align:right"><button type="button" class="danger" style="font-size:11px;padding:4px 8px" onclick="this.closest('.oba-item-card').remove()">✕ Remover</button></div>
+        </div>`).join('');
+      return `
+        <p class="oba-secao-titulo">🛒 Produtos da lista</p>
+        <div class="secao-itens-lista" style="display:flex;flex-direction:column;gap:8px">${itensHtml}</div>
+        <button type="button" class="secondary" style="font-size:12px;margin-top:6px" onclick="obaAdicionarItemSecao(this)">+ Adicionar produto</button>`;
+    }
+    if (tmpl === 'menu_botoes') {
+      const botoesCustom = Array.isArray(cfg.botoes) ? cfg.botoes : [];
+      const botoesHtml = botoesCustom.map((b, i) => `
+        <div class="oba-subitem-card" style="border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fafafa;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="field"><label>Label</label><input class="sbtn-label" value="${b.label||''}" placeholder="Nome do botão"></div>
+          <div class="field"><label>Sublabel</label><input class="sbtn-sublabel" value="${b.sublabel||''}" placeholder="Categoria"></div>
+          <div class="field"><label>Ação</label>
+            <select class="sbtn-acao">
+              <option value="caixas" ${b.acao==='caixas'?'selected':''}>Caixas de Doces</option>
+              <option value="presenteaveis" ${b.acao==='presenteaveis'?'selected':''}>Presenteáveis</option>
+              <option value="personalizados" ${b.acao==='personalizados'?'selected':''}>Personalizados</option>
+              <option value="eventos" ${b.acao==='eventos'?'selected':''}>Eventos</option>
+              <option value="degustacao" ${b.acao==='degustacao'?'selected':''}>Degustação</option>
+              <option value="whatsapp" ${b.acao==='whatsapp'?'selected':''}>WhatsApp</option>
+              <option value="url" ${b.acao==='url'?'selected':''}>Link externo</option>
+            </select>
+          </div>
+          <div class="field"><label>URL (se link)</label><input class="sbtn-url" value="${b.url||''}" placeholder="https://..."></div>
+          <div class="field full" style="text-align:right"><button type="button" class="danger" style="font-size:11px;padding:4px 8px" onclick="this.closest('.oba-subitem-card').remove()">✕</button></div>
+        </div>`).join('');
+      return `
+        <p class="oba-secao-titulo">🔘 Botões desta seção</p>
+        <div class="secao-subbotoes-lista" style="display:flex;flex-direction:column;gap:8px">${botoesHtml}</div>
+        <button type="button" class="secondary" style="font-size:12px;margin-top:6px" onclick="obaAdicionarSubBotaoSecao(this)">+ Adicionar botão</button>`;
+    }
+    return '';
+  };
+
+  /* Troca o template e re-renderiza os campos específicos */
+  window.obaAlterarTemplateSecao = function(sel) {
+    const card = sel.closest('.oba-secao-card');
+    const tmpl = sel.value;
+    const camposEl = card.querySelector('.secao-campos-template');
+    if (camposEl) camposEl.innerHTML = obaHtmlCamposTemplate(tmpl, {});
+  };
+
+  /* Adiciona item a uma lista de produtos */
+  window.obaAdicionarItemSecao = function(btn) {
+    const lista = btn.previousElementSibling;
+    if (!lista) return;
+    const item = document.createElement('div');
+    item.className = 'oba-item-card';
+    item.style.cssText = 'border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fafafa;display:grid;grid-template-columns:1fr 1fr;gap:8px';
+    item.innerHTML = `
+      <div class="field"><label>Nome</label><input class="item-nome" placeholder="Nome do produto"></div>
+      <div class="field"><label>Preço</label><input class="item-preco" placeholder="Ex: 45,00"></div>
+      <div class="field full"><label>Descrição</label><input class="item-descricao" placeholder="Breve descrição"></div>
+      <div class="field full"><label>Imagem (caminho ou URL)</label><input class="item-imagem" placeholder="Images/..."></div>
+      <div class="field full" style="text-align:right"><button type="button" class="danger" style="font-size:11px;padding:4px 8px" onclick="this.closest('.oba-item-card').remove()">✕ Remover</button></div>`;
+    lista.appendChild(item);
+  };
+
+  /* Adiciona sub-botão a uma seção de menu de botões */
+  window.obaAdicionarSubBotaoSecao = function(btn) {
+    const lista = btn.previousElementSibling;
+    if (!lista) return;
+    const item = document.createElement('div');
+    item.className = 'oba-subitem-card';
+    item.style.cssText = 'border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fafafa;display:grid;grid-template-columns:1fr 1fr;gap:8px';
+    item.innerHTML = `
+      <div class="field"><label>Label</label><input class="sbtn-label" placeholder="Nome do botão"></div>
+      <div class="field"><label>Sublabel</label><input class="sbtn-sublabel" placeholder="Categoria"></div>
+      <div class="field"><label>Ação</label>
+        <select class="sbtn-acao">
+          <option value="caixas">Caixas de Doces</option>
+          <option value="presenteaveis">Presenteáveis</option>
+          <option value="personalizados">Personalizados</option>
+          <option value="eventos">Eventos</option>
+          <option value="degustacao">Degustação</option>
+          <option value="whatsapp">WhatsApp</option>
+          <option value="url">Link externo</option>
+        </select>
+      </div>
+      <div class="field"><label>URL (se link)</label><input class="sbtn-url" placeholder="https://..."></div>
+      <div class="field full" style="text-align:right"><button type="button" class="danger" style="font-size:11px;padding:4px 8px" onclick="this.closest('.oba-subitem-card').remove()">✕</button></div>`;
+    lista.appendChild(item);
+  };
+
+  /* Ícone da seção */
+  window.obaEscolherIconeSecao = function(btn, valor) {
+    const card = btn.closest('.oba-secao-card');
+    card.querySelectorAll('.oba-icone-btn').forEach(b => b.classList.remove('oba-icone-ativo'));
+    btn.classList.add('oba-icone-ativo');
+    const hidden = card.querySelector('.secao-link-icone');
+    if (hidden) hidden.value = valor;
+  };
+
+  /* Remove seção */
+  window.obaRemoverSecaoCustom = function(btn) {
+    if (!confirm('Remover esta seção do cardápio?')) return;
+    const card = btn.closest('.oba-secao-card');
+    card.remove();
+    const lista = $('secoes-extras-lista');
+    const vazio = $('secoes-extras-vazio');
+    if (lista && vazio) vazio.style.display = lista.children.length === 0 ? '' : 'none';
+  };
+
+  /* Lê uma seção do card e salva tudo no DRAFT */
+  window.obaFecharSalvarSecao = async function(btn) {
+    const card = btn.closest('.oba-secao-card');
+    const tmpl = card.querySelector('.secao-template')?.value || 'informativa';
+    const id = card.querySelector('.secao-id-hidden')?.value || obaGerarIdSecao();
+    const titulo = card.querySelector('.secao-titulo')?.value.trim() || '';
+    const subtitulo = card.querySelector('.secao-subtitulo')?.value.trim() || '';
+    const linkAtivo = card.querySelector('.secao-link-ativo')?.checked !== false;
+    const linkLabel = card.querySelector('.secao-link-label')?.value.trim() || '';
+    const linkSublabel = card.querySelector('.secao-link-sublabel')?.value.trim() || '';
+    const linkIcone = card.querySelector('.secao-link-icone')?.value || 'fa-solid fa-star';
+    const linkDestaque = card.querySelector('.secao-link-destaque')?.checked === true;
+
+    /* Config específica do template */
+    let config = {};
+    if (tmpl === 'informativa') {
+      config = {
+        texto:    card.querySelector('.secao-cfg-texto')?.value.trim() || '',
+        citacao:  card.querySelector('.secao-cfg-citacao')?.value.trim() || '',
+        ctaLabel: card.querySelector('.secao-cfg-ctaLabel')?.value.trim() || '',
+        ctaAcao:  card.querySelector('.secao-cfg-ctaAcao')?.value || '',
+        ctaUrl:   card.querySelector('.secao-cfg-ctaUrl')?.value.trim() || ''
+      };
+    } else if (tmpl === 'lista_produtos') {
+      config.itens = Array.from(card.querySelectorAll('.oba-item-card')).map(it => ({
+        nome:      it.querySelector('.item-nome')?.value.trim() || '',
+        preco:     it.querySelector('.item-preco')?.value.trim() || '',
+        descricao: it.querySelector('.item-descricao')?.value.trim() || '',
+        imagem:    it.querySelector('.item-imagem')?.value.trim() || ''
+      })).filter(it => it.nome);
+    } else if (tmpl === 'menu_botoes') {
+      config.botoes = Array.from(card.querySelectorAll('.oba-subitem-card')).map((it, i) => ({
+        id:       'sbtn-' + i,
+        label:    it.querySelector('.sbtn-label')?.value.trim() || '',
+        sublabel: it.querySelector('.sbtn-sublabel')?.value.trim() || '',
+        acao:     it.querySelector('.sbtn-acao')?.value || 'caixas',
+        url:      it.querySelector('.sbtn-url')?.value.trim() || '',
+        icone:    'fa-solid fa-star',
+        destaque: false,
+        visivel:  true
+      })).filter(b => b.label);
+    }
+
+    const secaoObj = {
+      id, template: tmpl, titulo, subtitulo,
+      linkMenu: { ativo: linkAtivo, label: linkLabel, sublabel: linkSublabel, icone: linkIcone, destaque: linkDestaque },
+      config
+    };
+
+    /* Substitui no array em memoria */
+    const temaAtual = obaLerFormTema();
+    const lista = $('secoes-extras-lista');
+    const todasSecoes = Array.from(lista ? lista.querySelectorAll('.oba-secao-card') : []).map(c => {
+      const cId = c.querySelector('.secao-id-hidden')?.value;
+      return cId === id ? secaoObj : obaLerSecaoDoCard(c);
+    });
+    temaAtual.paginas_customizadas = todasSecoes;
+    catalogo.tema = temaAtual;
+
+    try {
+      const res = await obaSaveDraftWith('tema', temaAtual);
+      addPendencia('Seção extra salva: ' + (titulo || id));
+      msg('Seção "' + (titulo || id) + '" salva. Backup: ' + res.backup);
+    } catch(err) { msg(String(err.message||err), 'erro'); }
+  };
+
+  /* Lê dados de um card de seção (usado ao remontar o array) */
+  function obaLerSecaoDoCard(card) {
+    const tmpl = card.querySelector('.secao-template')?.value || 'informativa';
+    const id = card.querySelector('.secao-id-hidden')?.value || '';
+    const titulo = card.querySelector('.secao-titulo')?.value.trim() || '';
+    const subtitulo = card.querySelector('.secao-subtitulo')?.value.trim() || '';
+    const linkAtivo = card.querySelector('.secao-link-ativo')?.checked !== false;
+    const linkLabel = card.querySelector('.secao-link-label')?.value.trim() || '';
+    const linkSublabel = card.querySelector('.secao-link-sublabel')?.value.trim() || '';
+    const linkIcone = card.querySelector('.secao-link-icone')?.value || 'fa-solid fa-star';
+    const linkDestaque = card.querySelector('.secao-link-destaque')?.checked === true;
+    let config = {};
+    if (tmpl === 'informativa') {
+      config = { texto: card.querySelector('.secao-cfg-texto')?.value.trim()||'', citacao: card.querySelector('.secao-cfg-citacao')?.value.trim()||'', ctaLabel: card.querySelector('.secao-cfg-ctaLabel')?.value.trim()||'', ctaAcao: card.querySelector('.secao-cfg-ctaAcao')?.value||'', ctaUrl: card.querySelector('.secao-cfg-ctaUrl')?.value.trim()||'' };
+    } else if (tmpl === 'lista_produtos') {
+      config.itens = Array.from(card.querySelectorAll('.oba-item-card')).map(it => ({ nome: it.querySelector('.item-nome')?.value.trim()||'', preco: it.querySelector('.item-preco')?.value.trim()||'', descricao: it.querySelector('.item-descricao')?.value.trim()||'', imagem: it.querySelector('.item-imagem')?.value.trim()||'' })).filter(it=>it.nome);
+    } else if (tmpl === 'menu_botoes') {
+      config.botoes = Array.from(card.querySelectorAll('.oba-subitem-card')).map((it,i) => ({ id:'sbtn-'+i, label: it.querySelector('.sbtn-label')?.value.trim()||'', sublabel: it.querySelector('.sbtn-sublabel')?.value.trim()||'', acao: it.querySelector('.sbtn-acao')?.value||'caixas', url: it.querySelector('.sbtn-url')?.value.trim()||'', icone:'fa-solid fa-star', destaque:false, visivel:true })).filter(b=>b.label);
+    }
+    return { id, template:tmpl, titulo, subtitulo, linkMenu:{ativo:linkAtivo,label:linkLabel,sublabel:linkSublabel,icone:linkIcone,destaque:linkDestaque}, config };
+  }
 
 })();/* fim FASE 9B */
 

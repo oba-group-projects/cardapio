@@ -3467,6 +3467,45 @@ async function hidratarTemaDoModeloMestre() {
       const bcAcoes = new Set(['personalizados', 'eventos']);
       const MAX_POR_PAGINA = 4;
 
+      /* ── R10C: Botões automáticos de seções customizadas ────────────
+         Seções com linkMenu.ativo=true geram um botão automaticamente
+         no array de botões do menu, sem que o usuário precise adicioná-lo
+         manualmente na Página 3.
+      ────────────────────────────────────────────────────────────────── */
+      const secoesComLink = Array.isArray(tema.paginas_customizadas)
+        ? tema.paginas_customizadas.filter(s => s && s.id && s.linkMenu && s.linkMenu.ativo !== false && s.linkMenu.label)
+        : [];
+
+      /* Pré-registra ações sec-* no acaoMap para que obacriarBtnMenu funcione */
+      secoesComLink.forEach(sec => {
+        acaoMap['sec-' + sec.id] = () => {
+          ['pag-1','pag-2','pag-3','fluxo-principal'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) { el.classList.add('hidden'); el.classList.remove('flex'); }
+          });
+          document.querySelectorAll('[data-oba-overflow-menu],[data-oba-secao-custom]').forEach(el => {
+            el.classList.add('hidden'); el.classList.remove('flex');
+          });
+          const alvoSec = document.getElementById('pag-custom-' + sec.id);
+          if (alvoSec) { alvoSec.classList.remove('hidden'); alvoSec.classList.add('flex'); }
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+      });
+
+      /* Monta lista completa: botões manuais + botões automáticos das seções */
+      const botoesComSecoesCustom = [
+        ...botoes,
+        ...secoesComLink.map(sec => ({
+          id:       'auto-sec-' + sec.id,
+          label:    sec.linkMenu.label    || sec.titulo || sec.id,
+          sublabel: sec.linkMenu.sublabel || '',
+          icone:    sec.linkMenu.icone    || 'fa-solid fa-star',
+          acao:     'sec-' + sec.id,
+          destaque: sec.linkMenu.destaque === true,
+          visivel:  true
+        }))
+      ];
+
       /* Cria um elemento botão de menu a partir de um objeto botao */
       function obacriarBtnMenu(b) {
         const btn = document.createElement('button');
@@ -3510,7 +3549,7 @@ async function hidratarTemaDoModeloMestre() {
          Cada página tem "Ver mais →" se houver próxima página,
          e "← Voltar ao menu" se for overflow.
       ────────────────────────────────────────────────────────────── */
-      const botoesVisiveis = botoes.filter(b => b.visivel !== false);
+      const botoesVisiveis = botoesComSecoesCustom.filter(b => b.visivel !== false);
       const grupos = [];
       for (let i = 0; i < botoesVisiveis.length; i += MAX_POR_PAGINA) {
         grupos.push(botoesVisiveis.slice(i, i + MAX_POR_PAGINA));
@@ -3631,6 +3670,140 @@ async function hidratarTemaDoModeloMestre() {
       if (alvo) { alvo.classList.remove('hidden'); alvo.classList.add('flex'); }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
+
+    /* ── R10C: SEÇÕES CUSTOMIZADAS ────────────────────────────────────
+       Renderiza páginas criadas pelo usuário na Central a partir de
+       paginas_customizadas[] do theme.json.
+       Templates:
+         informativa     → logo, título, texto livre, botão CTA opcional
+         lista_produtos  → logo, título, cards com imagem/nome/descrição/preço
+         menu_botoes     → logo, título, lista de sub-botões (igual ao pag-3)
+    ────────────────────────────────────────────────────────────────── */
+
+    /* Remove seções customizadas antigas antes de re-renderizar */
+    document.querySelectorAll('[data-oba-secao-custom]').forEach(el => el.remove());
+
+    /* Atualiza o acaoMap com as novas seções ANTES de expandir o array */
+    const secoesCustom = Array.isArray(tema.paginas_customizadas)
+      ? tema.paginas_customizadas.filter(s => s && s.id && s.template)
+      : [];
+
+    /* Registra ações dinâmicas 'sec-{id}' para cada seção customizada */
+    secoesCustom.forEach(sec => {
+      const secId = 'pag-custom-' + sec.id;
+      acaoMap['sec-' + sec.id] = () => {
+        ['pag-1','pag-2','pag-3','fluxo-principal'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) { el.classList.add('hidden'); el.classList.remove('flex'); }
+        });
+        document.querySelectorAll('[data-oba-overflow-menu],[data-oba-secao-custom]').forEach(el => {
+          el.classList.add('hidden'); el.classList.remove('flex');
+        });
+        const alvoSec = document.getElementById(secId);
+        if (alvoSec) { alvoSec.classList.remove('hidden'); alvoSec.classList.add('flex'); }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+    });
+
+    /* Renderiza cada seção customizada */
+    const fluxoPrincipalEl = document.getElementById('fluxo-principal');
+    const logoSrcPag3 = document.getElementById('oba-pag3-logo')?.src || '';
+
+    secoesCustom.forEach(sec => {
+      const secId = 'pag-custom-' + sec.id;
+      let secao = document.getElementById(secId);
+      if (!secao) {
+        secao = document.createElement('section');
+        secao.id = secId;
+        secao.dataset.obaSecaoCustom = '1';
+        if (fluxoPrincipalEl) {
+          fluxoPrincipalEl.parentNode.insertBefore(secao, fluxoPrincipalEl);
+        }
+      }
+      secao.className = 'min-h-screen hidden flex-col items-center justify-start px-6 py-10 pb-28 fade-page max-w-md mx-auto';
+
+      const cfg = sec.config || {};
+      const titulo = sec.titulo || '';
+      const subtitulo = sec.subtitulo || '';
+      const logoSec = cfg.logo ? resolverAssetModeloMestre(cfg.logo) : logoSrcPag3;
+
+      /* Header comum a todos os templates */
+      const headerHtml = `
+        <header class="text-center mb-8 w-full">
+          <img src="${logoSec}" class="w-36 h-auto mx-auto mb-6 object-contain" alt="Logo">
+          ${titulo ? `<h2 class="text-lg font-light tracking-[0.15em] text-[#8B4513] uppercase mb-2">${titulo}</h2>` : ''}
+          ${subtitulo ? `<p class="text-sm text-gray-500 font-light leading-relaxed">${subtitulo}</p>` : ''}
+        </header>`;
+
+      const voltarBtn = `<button onclick="obaVoltarMenuOverflow('pag-3')"
+        class="mt-10 py-3 px-6 text-[10px] font-bold text-[#8B4513]/50 uppercase tracking-widest border border-transparent hover:border-[#8B4513]/20 rounded-full transition-all">← Voltar</button>`;
+
+      /* ─── TEMPLATE: INFORMATIVA ─── */
+      if (sec.template === 'informativa') {
+        const texto = cfg.texto || '';
+        const citacao = cfg.citacao || '';
+        const ctaLabel = cfg.ctaLabel || '';
+        const ctaAcao  = cfg.ctaAcao  || '';
+        const ctaUrl   = cfg.ctaUrl   || '';
+
+        let ctaHtml = '';
+        if (ctaLabel) {
+          const ctaOnclick = ctaAcao === 'url' && ctaUrl
+            ? `onclick="window.open('${ctaUrl}','_blank','noopener,noreferrer')"`
+            : ctaAcao === 'whatsapp'
+              ? `onclick="window.open('https://wa.me/${typeof whatsappLoja==='function'?whatsappLoja():'5555999117626'}','_blank','noopener,noreferrer')"`
+              : '';
+          ctaHtml = `<button ${ctaOnclick} class="w-full py-4 mt-4 bg-[#8B4513] text-white rounded-[1.25rem] font-medium text-[11px] uppercase tracking-[0.2em] shadow-xl active:scale-95">${ctaLabel}</button>`;
+        }
+
+        secao.innerHTML = `
+          ${headerHtml}
+          <div class="w-full glass-card p-8 rounded-[2.5rem] text-center space-y-5 shadow-sm">
+            ${texto ? `<p class="text-[13px] text-gray-600 leading-relaxed font-light px-1">${texto}</p>` : ''}
+            ${citacao ? `<p class="text-xs text-[#8B4513]/70 italic font-medium">"${citacao}"</p>` : ''}
+          </div>
+          ${ctaHtml}
+          ${voltarBtn}`;
+
+      /* ─── TEMPLATE: LISTA DE PRODUTOS ─── */
+      } else if (sec.template === 'lista_produtos') {
+        const itens = Array.isArray(cfg.itens) ? cfg.itens : [];
+        const itensHtml = itens.map(item => {
+          const imgSrc = item.imagem ? resolverAssetModeloMestre(item.imagem) : '';
+          return `
+            <div class="bg-white rounded-[1.5rem] shadow-sm border border-[#E8D5B5] flex flex-col overflow-hidden hover:border-[#8B4513] transition-all">
+              ${imgSrc ? `<div class="w-full h-44 bg-gray-50 border-b border-[#E8D5B5] overflow-hidden"><img src="${imgSrc}" class="h-full w-full object-cover" onerror="this.parentElement.style.display='none'" alt="${item.nome||''}"></div>` : ''}
+              <div class="p-5 flex flex-col gap-1">
+                ${item.nome ? `<h3 class="font-black text-sm text-[#3B2A1E]">${item.nome}</h3>` : ''}
+                ${item.descricao ? `<p class="text-[10px] text-gray-500 leading-tight">${item.descricao}</p>` : ''}
+                ${item.preco ? `<p class="text-sm text-[#8B4513] font-black mt-1">R$ ${item.preco}</p>` : ''}
+              </div>
+            </div>`;
+        }).join('');
+
+        secao.innerHTML = `
+          ${headerHtml}
+          <div class="w-full grid grid-cols-1 sm:grid-cols-2 gap-5">
+            ${itensHtml || '<p class="text-sm text-gray-400 text-center py-8">Nenhum item adicionado ainda.</p>'}
+          </div>
+          ${voltarBtn}`;
+
+      /* ─── TEMPLATE: MENU DE BOTÕES ─── */
+      } else if (sec.template === 'menu_botoes') {
+        const botoesCustom = Array.isArray(cfg.botoes) ? cfg.botoes : [];
+        secao.innerHTML = `
+          ${headerHtml}
+          <div class="w-full space-y-4" id="${secId}-botoes"></div>
+          ${voltarBtn}`;
+
+        const botoesContainer = secao.querySelector(`#${secId}-botoes`);
+        if (botoesContainer && typeof obacriarBtnMenu === 'function') {
+          botoesCustom.filter(b => b.visivel !== false).forEach(b => {
+            botoesContainer.appendChild(obacriarBtnMenu(b));
+          });
+        }
+      }
+    });
 
     /* Vitrine de Presentes */
     const vp = p.vitrine_presentes || {};
