@@ -1,773 +1,663 @@
 [
-    {
-        "id":  "cappuccino",
-        "nome":  "Cappuccino",
-        "categoriaId":  "tradicionais-1",
-        "preco":  2.5,
-        "imagem":  "Images/Sabores_Doces/Cappuccino.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  10,
-        "sazonal":  false,
-        "tags":  [
-
-                 ],
-        "descricao":  "Brigadeiro artesanal com sabor suave de cappuccino, cremoso e equilibrado."
-    },
-    {
-        "id":  "casadinho",
-        "nome":  "Casadinho",
-        "categoriaId":  "tradicionais-1",
-        "preco":  2.5,
-        "imagem":  "Images/Sabores_Doces/Casadinho.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  20,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "coco",
-        "nome":  "Coco",
-        "categoriaId":  "tradicionais-1",
-        "preco":  2.5,
-        "imagem":  "Images/Sabores_Doces/Coco.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  30,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "coco-queimado",
-        "nome":  "Coco Queimado",
-        "categoriaId":  "tradicionais-1",
-        "preco":  2.5,
-        "imagem":  "Images/Sabores_Doces/Coco Queimado.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  40,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "dois-amores",
-        "nome":  "Dois Amores",
-        "categoriaId":  "tradicionais-1",
-        "preco":  2.5,
-        "imagem":  "Images/Sabores_Doces/Dois Amores.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  50,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "leite-ninho",
-        "nome":  "Leite Ninho",
-        "categoriaId":  "tradicionais-1",
-        "preco":  2.5,
-        "imagem":  "Images/Sabores_Doces/Leite Ninho.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  60,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "napolitano",
-        "nome":  "Napolitano",
-        "categoriaId":  "tradicionais-1",
-        "preco":  2.5,
-        "imagem":  "Images/Sabores_Doces/Napolitano.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  70,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "nesquik",
-        "nome":  "Nesquik",
-        "categoriaId":  "tradicionais-1",
-        "preco":  2.5,
-        "imagem":  "Images/Sabores_Doces/Nesquik.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  80,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "amendoim",
-        "nome":  "Amendoim",
-        "categoriaId":  "tradicionais-2",
-        "preco":  2.6,
-        "imagem":  "Images/Sabores_Doces/Amendoim.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  90,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "amargo",
-        "nome":  "Amargo",
-        "categoriaId":  "tradicionais-2",
-        "preco":  2.6,
-        "imagem":  "Images/Sabores_Doces/Amargo.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  100,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "ao-leite",
-        "nome":  "Ao Leite",
-        "categoriaId":  "tradicionais-2",
-        "preco":  2.6,
-        "imagem":  "Images/Sabores_Doces/Ao Leite.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  110,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "branco",
-        "nome":  "Branco",
-        "categoriaId":  "tradicionais-2",
-        "preco":  2.6,
-        "imagem":  "Images/Sabores_Doces/Branco.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  120,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "cafe",
-        "nome":  "Café",
-        "categoriaId":  "tradicionais-2",
-        "preco":  2.6,
-        "imagem":  "Images/Sabores_Doces/Café.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  130,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "caramelo",
-        "nome":  "Caramelo",
-        "categoriaId":  "tradicionais-2",
-        "preco":  2.6,
-        "imagem":  "Images/Sabores_Doces/Caramelo.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  140,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "duo-amargo",
-        "nome":  "Duo Amargo",
-        "categoriaId":  "tradicionais-2",
-        "preco":  2.6,
-        "imagem":  "Images/Sabores_Doces/Duo Amargo.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  150,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "duo-ao-leite",
-        "nome":  "Duo Ao Leite",
-        "categoriaId":  "tradicionais-2",
-        "preco":  2.6,
-        "imagem":  "Images/Sabores_Doces/Duo Ao Leite.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  160,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "meio-amargo",
-        "nome":  "Meio Amargo",
-        "categoriaId":  "tradicionais-2",
-        "preco":  2.6,
-        "imagem":  "Images/Sabores_Doces/Meio Amargo.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  170,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "ameixa",
-        "nome":  "Ameixa",
-        "categoriaId":  "classicos",
-        "preco":  2.75,
-        "imagem":  "Images/Sabores_Doces/Ameixa.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  180,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "charge",
-        "nome":  "Charge",
-        "categoriaId":  "classicos",
-        "preco":  2.75,
-        "imagem":  "Images/Sabores_Doces/Charge.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  190,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "cocadinha",
-        "nome":  "Cocadinha",
-        "categoriaId":  "classicos",
-        "preco":  2.75,
-        "imagem":  "Images/Sabores_Doces/Cocadinha.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  200,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "confete",
-        "nome":  "Confete",
-        "categoriaId":  "classicos",
-        "preco":  2.75,
-        "imagem":  "Images/Sabores_Doces/Confete.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  210,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "damasco",
-        "nome":  "Damasco",
-        "categoriaId":  "classicos",
-        "preco":  2.75,
-        "imagem":  "Images/Sabores_Doces/Damasco.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  220,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "nesquik-com-nutella",
-        "nome":  "Nesquik com Nutella",
-        "categoriaId":  "classicos",
-        "preco":  2.75,
-        "imagem":  "Images/Sabores_Doces/Nesquik com Nutella.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  230,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "ninho-com-nutella",
-        "nome":  "Ninho com Nutella",
-        "categoriaId":  "classicos",
-        "preco":  2.75,
-        "imagem":  "Images/Sabores_Doces/Ninho com Nutella.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  240,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "oreo",
-        "nome":  "Oreo",
-        "categoriaId":  "classicos",
-        "preco":  2.75,
-        "imagem":  "Images/Sabores_Doces/Oreo.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  250,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "prestigio",
-        "nome":  "Prestígio",
-        "categoriaId":  "classicos",
-        "preco":  2.75,
-        "imagem":  "Images/Sabores_Doces/Prestígio.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  260,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "queijadinha",
-        "nome":  "Queijadinha",
-        "categoriaId":  "classicos",
-        "preco":  2.75,
-        "imagem":  "Images/Sabores_Doces/Queijadinha.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  270,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "damasco-e-amendoas",
-        "nome":  "Damasco e Amêndoas",
-        "categoriaId":  "especiais-1",
-        "preco":  3,
-        "imagem":  "Images/Sabores_Doces/Damasco e Amêndoas.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  280,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "maracuja",
-        "nome":  "Maracujá",
-        "categoriaId":  "especiais-1",
-        "preco":  3,
-        "imagem":  "Images/Sabores_Doces/Maracujá.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  290,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "maracuja-ao-leite",
-        "nome":  "Maracujá ao Leite",
-        "categoriaId":  "especiais-1",
-        "preco":  3,
-        "imagem":  "Images/Sabores_Doces/Maracujá ao Leite.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  300,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "maracuja-com-nutella",
-        "nome":  "Maracujá com Nutella",
-        "categoriaId":  "especiais-1",
-        "preco":  3,
-        "imagem":  "Images/Sabores_Doces/Maracujá e Nutella.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  310,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "mega",
-        "nome":  "Mega",
-        "categoriaId":  "especiais-1",
-        "preco":  3,
-        "imagem":  "Images/Sabores_Doces/Mega.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  320,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "nozes",
-        "nome":  "Nozes",
-        "categoriaId":  "especiais-1",
-        "preco":  3,
-        "imagem":  "Images/Sabores_Doces/Nozes.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  330,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "queijo-e-doce-de-leite",
-        "nome":  "Queijo e Doce de Leite",
-        "categoriaId":  "especiais-1",
-        "preco":  3,
-        "imagem":  "Images/Sabores_Doces/Queijo e Doce de Leite.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  340,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "queijo-e-goiabada",
-        "nome":  "Queijo e Goiabada",
-        "categoriaId":  "especiais-1",
-        "preco":  3,
-        "imagem":  "Images/Sabores_Doces/Queijo e Goiabada.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  350,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "abacaxi-com-coco",
-        "nome":  "Abacaxi com Coco",
-        "categoriaId":  "especiais-2",
-        "preco":  3.5,
-        "imagem":  "Images/Sabores_Doces/Abacaxi com Coco.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  360,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "bacon-com-abacaxi",
-        "nome":  "Bacon com Abacaxi",
-        "categoriaId":  "especiais-2",
-        "preco":  3.5,
-        "imagem":  "Images/Sabores_Doces/Bacon com Abacaxi.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  370,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "bacon-com-chocolate",
-        "nome":  "Bacon com Chocolate",
-        "categoriaId":  "especiais-2",
-        "preco":  3.5,
-        "imagem":  "Images/Sabores_Doces/Bacon com Chocolate.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  380,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "caramelo-salgado",
-        "nome":  "Caramelo Salgado",
-        "categoriaId":  "especiais-2",
-        "preco":  3.5,
-        "imagem":  "Images/Sabores_Doces/Caramelo Salgado.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  390,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "cheesecake",
-        "nome":  "Cheesecake",
-        "categoriaId":  "especiais-2",
-        "preco":  3.5,
-        "imagem":  "Images/Sabores_Doces/Cheesecake.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  400,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "crocante-de-nutella",
-        "nome":  "Crocante de Nutella",
-        "categoriaId":  "especiais-2",
-        "preco":  3.5,
-        "imagem":  "Images/Sabores_Doces/Crocante de Nutella.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  410,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "ferrero",
-        "nome":  "Ferrero",
-        "categoriaId":  "especiais-2",
-        "preco":  3.5,
-        "imagem":  "Images/Sabores_Doces/Ferrero.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  420,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "gorgonzola-e-damasco",
-        "nome":  "Gorgonzola e Damasco",
-        "categoriaId":  "especiais-2",
-        "preco":  3.5,
-        "imagem":  "Images/Sabores_Doces/Gorgonzola e Damasco.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  430,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "gorgonzola-e-geleia",
-        "nome":  "Gorgonzola e Geléia",
-        "categoriaId":  "especiais-2",
-        "preco":  3.5,
-        "imagem":  "Images/Sabores_Doces/Gorgonzola e Geleia.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  440,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "laranja-com-amendoas",
-        "nome":  "Laranja com Amêndoas",
-        "categoriaId":  "especiais-2",
-        "preco":  3.5,
-        "imagem":  "Images/Sabores_Doces/Laranja com Amêndoas.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  450,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "laranja-com-coco",
-        "nome":  "Laranja com Coco",
-        "categoriaId":  "especiais-2",
-        "preco":  3.5,
-        "imagem":  "Images/Sabores_Doces/Laranja com Coco.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  460,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "nozes-e-figo",
-        "nome":  "Nozes e Figo",
-        "categoriaId":  "especiais-2",
-        "preco":  3.5,
-        "imagem":  "Images/Sabores_Doces/Nozes e Figo.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  470,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "uva-com-brigadeiro-branco",
-        "nome":  "Uva com Brigadeiro Branco",
-        "categoriaId":  "especiais-2",
-        "preco":  3.5,
-        "imagem":  "Images/Sabores_Doces/Uva com Brigadeiro Branco.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  480,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "uva-com-brigadeiro-ao-leite",
-        "nome":  "Uva com Brigadeiro ao Leite",
-        "categoriaId":  "especiais-2",
-        "preco":  3.5,
-        "imagem":  "Images/Sabores_Doces/Uva com Brigadeiro ao Leite.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  490,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "uva-com-brigadeiro-meio-amargo",
-        "nome":  "Uva com Brigadeiro Meio Amargo",
-        "categoriaId":  "especiais-2",
-        "preco":  3.5,
-        "imagem":  "Images/Sabores_Doces/Uva com Brigadeiro Meio Amargo.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  500,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "morango-com-brigadeiro-ao-leite",
-        "nome":  "Morango com Brigadeiro ao Leite",
-        "categoriaId":  "especiais-3",
-        "preco":  4,
-        "imagem":  "Images/Sabores_Doces/Morango - Ao Leite.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  510,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "morango-com-brigadeiro-branco",
-        "nome":  "Morango com Brigadeiro Branco",
-        "categoriaId":  "especiais-3",
-        "preco":  4,
-        "imagem":  "Images/Sabores_Doces/Morango - Branco.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  520,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "morango-com-brigadeiro-meio-amargo",
-        "nome":  "Morango com Brigadeiro Meio Amargo",
-        "categoriaId":  "especiais-3",
-        "preco":  4,
-        "imagem":  "Images/Sabores_Doces/Morango - Meio Amargo.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  530,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "pistache",
-        "nome":  "Pistache",
-        "categoriaId":  "especiais-3",
-        "preco":  4,
-        "imagem":  "Images/Sabores_Doces/Pistache.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  540,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    },
-    {
-        "id":  "pistache-com-geleia",
-        "nome":  "Pistache com Geléia",
-        "categoriaId":  "especiais-3",
-        "preco":  4,
-        "imagem":  "Images/Sabores_Doces/Pistache com Geleia.jpeg",
-        "ativo":  true,
-        "disponivel":  true,
-        "ordem":  550,
-        "sazonal":  false,
-        "tags":  [
-
-                 ]
-    }
+  {
+    "ativo": true,
+    "categoriaId": "tradicionais-1",
+    "descricao": "Brigadeiro artesanal com sabor suave de cappuccino, cremoso e equilibrado.",
+    "disponivel": true,
+    "id": "cappuccino",
+    "imagem": "Images/Sabores_Doces/Cappuccino.jpeg",
+    "nome": "Cappuccino",
+    "ordem": 10,
+    "preco": 2.5,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "tradicionais-1",
+    "disponivel": true,
+    "id": "casadinho",
+    "imagem": "Images/Sabores_Doces/Casadinho.jpeg",
+    "nome": "Casadinho",
+    "ordem": 20,
+    "preco": 2.5,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "tradicionais-1",
+    "disponivel": true,
+    "id": "coco",
+    "imagem": "Images/Sabores_Doces/Coco.jpeg",
+    "nome": "Coco",
+    "ordem": 30,
+    "preco": 2.5,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "tradicionais-1",
+    "disponivel": true,
+    "id": "coco-queimado",
+    "imagem": "Images/Sabores_Doces/Coco Queimado.jpeg",
+    "nome": "Coco Queimado",
+    "ordem": 40,
+    "preco": 2.5,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "tradicionais-1",
+    "disponivel": true,
+    "id": "dois-amores",
+    "imagem": "Images/Sabores_Doces/Dois Amores.jpeg",
+    "nome": "Dois Amores",
+    "ordem": 50,
+    "preco": 2.5,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "tradicionais-1",
+    "disponivel": true,
+    "id": "leite-ninho",
+    "imagem": "Images/Sabores_Doces/Leite Ninho.jpeg",
+    "nome": "Leite Ninho",
+    "ordem": 60,
+    "preco": 2.5,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "tradicionais-1",
+    "disponivel": true,
+    "id": "napolitano",
+    "imagem": "Images/Sabores_Doces/Napolitano.jpeg",
+    "nome": "Napolitano",
+    "ordem": 70,
+    "preco": 2.5,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "tradicionais-1",
+    "disponivel": true,
+    "id": "nesquik",
+    "imagem": "Images/Sabores_Doces/Nesquik.jpeg",
+    "nome": "Nesquik",
+    "ordem": 80,
+    "preco": 2.5,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "tradicionais-2",
+    "disponivel": true,
+    "id": "amendoim",
+    "imagem": "Images/Sabores_Doces/Amendoim.jpeg",
+    "nome": "Amendoim",
+    "ordem": 90,
+    "preco": 2.6,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "tradicionais-2",
+    "disponivel": true,
+    "id": "amargo",
+    "imagem": "Images/Sabores_Doces/Amargo.jpeg",
+    "nome": "Amargo",
+    "ordem": 100,
+    "preco": 2.6,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "tradicionais-2",
+    "disponivel": true,
+    "id": "ao-leite",
+    "imagem": "Images/Sabores_Doces/Ao Leite.jpeg",
+    "nome": "Ao Leite",
+    "ordem": 110,
+    "preco": 2.6,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "tradicionais-2",
+    "disponivel": true,
+    "id": "branco",
+    "imagem": "Images/Sabores_Doces/Branco.jpeg",
+    "nome": "Branco",
+    "ordem": 120,
+    "preco": 2.6,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "tradicionais-2",
+    "disponivel": true,
+    "id": "cafe",
+    "imagem": "Images/Sabores_Doces/Café.jpeg",
+    "nome": "Café",
+    "ordem": 130,
+    "preco": 2.6,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "tradicionais-2",
+    "disponivel": true,
+    "id": "caramelo",
+    "imagem": "Images/Sabores_Doces/Caramelo.jpeg",
+    "nome": "Caramelo",
+    "ordem": 140,
+    "preco": 2.6,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "tradicionais-2",
+    "disponivel": true,
+    "id": "duo-amargo",
+    "imagem": "Images/Sabores_Doces/Duo Amargo.jpeg",
+    "nome": "Duo Amargo",
+    "ordem": 150,
+    "preco": 2.6,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "tradicionais-2",
+    "disponivel": true,
+    "id": "duo-ao-leite",
+    "imagem": "Images/Sabores_Doces/Duo Ao Leite.jpeg",
+    "nome": "Duo Ao Leite",
+    "ordem": 160,
+    "preco": 2.6,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "tradicionais-2",
+    "disponivel": true,
+    "id": "meio-amargo",
+    "imagem": "Images/Sabores_Doces/Meio Amargo.jpeg",
+    "nome": "Meio Amargo",
+    "ordem": 170,
+    "preco": 2.6,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "classicos",
+    "disponivel": true,
+    "id": "ameixa",
+    "imagem": "Images/Sabores_Doces/Ameixa.jpeg",
+    "nome": "Ameixa",
+    "ordem": 180,
+    "preco": 2.75,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "classicos",
+    "disponivel": true,
+    "id": "charge",
+    "imagem": "Images/Sabores_Doces/Charge.jpeg",
+    "nome": "Charge",
+    "ordem": 190,
+    "preco": 2.75,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "classicos",
+    "disponivel": true,
+    "id": "cocadinha",
+    "imagem": "Images/Sabores_Doces/Cocadinha.jpeg",
+    "nome": "Cocadinha",
+    "ordem": 200,
+    "preco": 2.75,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "classicos",
+    "disponivel": true,
+    "id": "confete",
+    "imagem": "Images/Sabores_Doces/Confete.jpeg",
+    "nome": "Confete",
+    "ordem": 210,
+    "preco": 2.75,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "classicos",
+    "disponivel": true,
+    "id": "damasco",
+    "imagem": "Images/Sabores_Doces/Damasco.jpeg",
+    "nome": "Damasco",
+    "ordem": 220,
+    "preco": 2.75,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "classicos",
+    "disponivel": true,
+    "id": "nesquik-com-nutella",
+    "imagem": "Images/Sabores_Doces/Nesquik com Nutella.jpeg",
+    "nome": "Nesquik com Nutella",
+    "ordem": 230,
+    "preco": 2.75,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "classicos",
+    "disponivel": true,
+    "id": "ninho-com-nutella",
+    "imagem": "Images/Sabores_Doces/Ninho com Nutella.jpeg",
+    "nome": "Ninho com Nutella",
+    "ordem": 240,
+    "preco": 2.75,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "classicos",
+    "disponivel": true,
+    "id": "oreo",
+    "imagem": "Images/Sabores_Doces/Oreo.jpeg",
+    "nome": "Oreo",
+    "ordem": 250,
+    "preco": 2.75,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "classicos",
+    "disponivel": true,
+    "id": "prestigio",
+    "imagem": "Images/Sabores_Doces/Prestígio.jpeg",
+    "nome": "Prestígio",
+    "ordem": 260,
+    "preco": 2.75,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "classicos",
+    "disponivel": true,
+    "id": "queijadinha",
+    "imagem": "Images/Sabores_Doces/Queijadinha.jpeg",
+    "nome": "Queijadinha",
+    "ordem": 270,
+    "preco": 2.75,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "especiais-1",
+    "disponivel": true,
+    "id": "damasco-e-amendoas",
+    "imagem": "Images/Sabores_Doces/Damasco e Amêndoas.jpeg",
+    "nome": "Damasco e Amêndoas",
+    "ordem": 280,
+    "preco": 3,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "especiais-1",
+    "disponivel": true,
+    "id": "maracuja",
+    "imagem": "Images/Sabores_Doces/Maracujá.jpeg",
+    "nome": "Maracujá",
+    "ordem": 290,
+    "preco": 3,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "especiais-1",
+    "disponivel": true,
+    "id": "maracuja-ao-leite",
+    "imagem": "Images/Sabores_Doces/Maracujá ao Leite.jpeg",
+    "nome": "Maracujá ao Leite",
+    "ordem": 300,
+    "preco": 3,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "especiais-1",
+    "disponivel": true,
+    "id": "maracuja-com-nutella",
+    "imagem": "Images/Sabores_Doces/Maracujá e Nutella.jpeg",
+    "nome": "Maracujá com Nutella",
+    "ordem": 310,
+    "preco": 3,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "especiais-1",
+    "disponivel": true,
+    "id": "mega",
+    "imagem": "Images/Sabores_Doces/Mega.jpeg",
+    "nome": "Mega",
+    "ordem": 320,
+    "preco": 3,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "especiais-1",
+    "disponivel": true,
+    "id": "nozes",
+    "imagem": "Images/Sabores_Doces/Nozes.jpeg",
+    "nome": "Nozes",
+    "ordem": 330,
+    "preco": 3,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "especiais-1",
+    "disponivel": true,
+    "id": "queijo-e-doce-de-leite",
+    "imagem": "Images/Sabores_Doces/Queijo e Doce de Leite.jpeg",
+    "nome": "Queijo e Doce de Leite",
+    "ordem": 340,
+    "preco": 3,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "especiais-1",
+    "disponivel": true,
+    "id": "queijo-e-goiabada",
+    "imagem": "Images/Sabores_Doces/Queijo e Goiabada.jpeg",
+    "nome": "Queijo e Goiabada",
+    "ordem": 350,
+    "preco": 3,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "especiais-2",
+    "disponivel": true,
+    "id": "abacaxi-com-coco",
+    "imagem": "Images/Sabores_Doces/Abacaxi com Coco.jpeg",
+    "nome": "Abacaxi com Coco",
+    "ordem": 360,
+    "preco": 3.5,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "especiais-2",
+    "disponivel": true,
+    "id": "bacon-com-abacaxi",
+    "imagem": "Images/Sabores_Doces/Bacon com Abacaxi.jpeg",
+    "nome": "Bacon com Abacaxi",
+    "ordem": 370,
+    "preco": 3.5,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "especiais-2",
+    "disponivel": true,
+    "id": "bacon-com-chocolate",
+    "imagem": "Images/Sabores_Doces/Bacon com Chocolate.jpeg",
+    "nome": "Bacon com Chocolate",
+    "ordem": 380,
+    "preco": 3.5,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "especiais-2",
+    "disponivel": true,
+    "id": "caramelo-salgado",
+    "imagem": "Images/Sabores_Doces/Caramelo Salgado.jpeg",
+    "nome": "Caramelo Salgado",
+    "ordem": 390,
+    "preco": 3.5,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "especiais-2",
+    "disponivel": true,
+    "id": "cheesecake",
+    "imagem": "Images/Sabores_Doces/Cheesecake.jpeg",
+    "nome": "Cheesecake",
+    "ordem": 400,
+    "preco": 3.5,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "especiais-2",
+    "disponivel": true,
+    "id": "crocante-de-nutella",
+    "imagem": "Images/Sabores_Doces/Crocante de Nutella.jpeg",
+    "nome": "Crocante de Nutella",
+    "ordem": 410,
+    "preco": 3.5,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "especiais-2",
+    "disponivel": true,
+    "id": "ferrero",
+    "imagem": "Images/Sabores_Doces/Ferrero.jpeg",
+    "nome": "Ferrero",
+    "ordem": 420,
+    "preco": 3.5,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "especiais-2",
+    "disponivel": true,
+    "id": "gorgonzola-e-damasco",
+    "imagem": "Images/Sabores_Doces/Gorgonzola e Damasco.jpeg",
+    "nome": "Gorgonzola e Damasco",
+    "ordem": 430,
+    "preco": 3.5,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "especiais-2",
+    "disponivel": true,
+    "id": "gorgonzola-e-geleia",
+    "imagem": "Images/Sabores_Doces/Gorgonzola e Geleia.jpeg",
+    "nome": "Gorgonzola e Geléia",
+    "ordem": 440,
+    "preco": 3.5,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "especiais-2",
+    "disponivel": true,
+    "id": "laranja-com-amendoas",
+    "imagem": "Images/Sabores_Doces/Laranja com Amêndoas.jpeg",
+    "nome": "Laranja com Amêndoas",
+    "ordem": 450,
+    "preco": 3.5,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "especiais-2",
+    "disponivel": true,
+    "id": "laranja-com-coco",
+    "imagem": "Images/Sabores_Doces/Laranja com Coco.jpeg",
+    "nome": "Laranja com Coco",
+    "ordem": 460,
+    "preco": 3.5,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "especiais-2",
+    "disponivel": true,
+    "id": "nozes-e-figo",
+    "imagem": "Images/Sabores_Doces/Nozes e Figo.jpeg",
+    "nome": "Nozes e Figo",
+    "ordem": 470,
+    "preco": 3.5,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "especiais-2",
+    "disponivel": true,
+    "id": "uva-com-brigadeiro-branco",
+    "imagem": "Images/Sabores_Doces/Uva com Brigadeiro Branco.jpeg",
+    "nome": "Uva com Brigadeiro Branco",
+    "ordem": 480,
+    "preco": 3.5,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "especiais-2",
+    "disponivel": true,
+    "id": "uva-com-brigadeiro-ao-leite",
+    "imagem": "Images/Sabores_Doces/Uva com Brigadeiro ao Leite.jpeg",
+    "nome": "Uva com Brigadeiro ao Leite",
+    "ordem": 490,
+    "preco": 3.5,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "especiais-2",
+    "disponivel": true,
+    "id": "uva-com-brigadeiro-meio-amargo",
+    "imagem": "Images/Sabores_Doces/Uva com Brigadeiro Meio Amargo.jpeg",
+    "nome": "Uva com Brigadeiro Meio Amargo",
+    "ordem": 500,
+    "preco": 3.5,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "especiais-3",
+    "disponivel": true,
+    "id": "morango-com-brigadeiro-ao-leite",
+    "imagem": "Images/Sabores_Doces/Morango - Ao Leite.jpeg",
+    "nome": "Morango com Brigadeiro ao Leite",
+    "ordem": 510,
+    "preco": 4,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "especiais-3",
+    "disponivel": true,
+    "id": "morango-com-brigadeiro-branco",
+    "imagem": "Images/Sabores_Doces/Morango - Branco.jpeg",
+    "nome": "Morango com Brigadeiro Branco",
+    "ordem": 520,
+    "preco": 4,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "especiais-3",
+    "disponivel": true,
+    "id": "morango-com-brigadeiro-meio-amargo",
+    "imagem": "Images/Sabores_Doces/Morango - Meio Amargo.jpeg",
+    "nome": "Morango com Brigadeiro Meio Amargo",
+    "ordem": 530,
+    "preco": 4,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "especiais-3",
+    "disponivel": true,
+    "id": "pistache",
+    "imagem": "Images/Sabores_Doces/Pistache.jpeg",
+    "nome": "Pistache",
+    "ordem": 540,
+    "preco": 4,
+    "sazonal": false,
+    "tags": []
+  },
+  {
+    "ativo": true,
+    "categoriaId": "especiais-3",
+    "disponivel": true,
+    "id": "pistache-com-geleia",
+    "imagem": "Images/Sabores_Doces/Pistache com Geleia.jpeg",
+    "nome": "Pistache com Geléia",
+    "ordem": 550,
+    "preco": 4,
+    "sazonal": false,
+    "tags": []
+  }
 ]
