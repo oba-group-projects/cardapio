@@ -1,0 +1,85 @@
+{
+  "paginas": {
+    "boas_vindas": {
+      "botaoCTA": "",
+      "corFundo": "",
+      "corTitulo": "",
+      "exibirCTA": true,
+      "exibirSubtitulo": true,
+      "logo": "",
+      "subtitulo": "",
+      "tamanhoLogo": "medio",
+      "titulo": "Seja Bem-Vinda!"
+    },
+    "eventos_modal": {
+      "titulo": ""
+    },
+    "menu_principal": {
+      "corFundo": "",
+      "corSubtitulo": "",
+      "logo": "",
+      "opcoes": {
+        "caixas": {
+          "label": "",
+          "sublabel": "",
+          "visivel": true
+        },
+        "eventos": {
+          "label": "",
+          "sublabel": "",
+          "visivel": true
+        },
+        "personalizados": {
+          "label": "",
+          "sublabel": "",
+          "visivel": true
+        },
+        "presenteaveis": {
+          "label": "",
+          "sublabel": "",
+          "visivel": true
+        }
+      },
+      "subtitulo": "",
+      "tamanhoLogo": "medio"
+    },
+    "nossa_essencia": {
+      "citacao": "",
+      "corFundo": "",
+      "corTitulo": "",
+      "exibirCitacao": true,
+      "exibirSeparador": true,
+      "logo": "",
+      "tamanhoLogo": "grande",
+      "texto": "",
+      "titulo": ""
+    },
+    "personalizados_modal": {
+      "info_items": [],
+      "info_titulo": "",
+      "pacotes_titulo": "",
+      "titulo": ""
+    },
+    "vitrine_presentes": {
+      "subtitulo": "",
+      "titulo": ""
+    }
+  },
+  "schemaVersion": 2,
+  "tema": {
+    "arredondamento": "20",
+    "corBorda": "#e8d5b5",
+    "corFundo": "#faf5f0",
+    "corFundoCard": "#fff8f0",
+    "corPrimaria": "#8b4513",
+    "corTexto": "#3b2a1e",
+    "espacamento": "normal",
+    "fonte": "Poppins",
+    "pesoCorpo": "400",
+    "pesoTitulo": "300",
+    "tamanhoCorpo": "13",
+    "tamanhoTitulo": "24"
+  },
+  "updatedAt": "2026-09-15",
+  "variante": "classica"
+}
