@@ -1436,20 +1436,21 @@ async function obaHandlePreviewApi(request, env, url) {
  */
 
 const OBA_GITHUB_REPO  = "oba-group-projects/cardapio";
-const OBA_GITHUB_BRANCH = "main";
+const OBA_GITHUB_BRANCH = "feature/gestao-online-segura";
 
 /*
  * Mapa: chave do payload → caminho do arquivo no repositório
+ * Os JSONs que o cardápio público lê ficam em data/catalog-v1/ na raiz do branch.
  */
 const OBA_GITHUB_FILE_MAP = Object.freeze({
-  loja:       "online/gestao/public/data/catalog-v1/config.json",
-  categorias: "online/gestao/public/data/catalog-v1/categories.json",
-  caixas:     "online/gestao/public/data/catalog-v1/boxes.json",
-  sabores:    "online/gestao/public/data/catalog-v1/flavors.json",
-  produtos:   "online/gestao/public/data/catalog-v1/products.json",
-  opcionais:  "online/gestao/public/data/catalog-v1/options.json",
-  combos:     "online/gestao/public/data/catalog-v1/combos.json",
-  tema:       "online/gestao/public/data/catalog-v1/theme.json"
+  loja:       "data/catalog-v1/config.json",
+  categorias: "data/catalog-v1/categories.json",
+  caixas:     "data/catalog-v1/boxes.json",
+  sabores:    "data/catalog-v1/flavors.json",
+  produtos:   "data/catalog-v1/products.json",
+  opcionais:  "data/catalog-v1/options.json",
+  combos:     "data/catalog-v1/combos.json",
+  tema:       "data/catalog-v1/theme.json"
 });
 
 async function obaGitHubGetFileSha(token, path) {
