@@ -2158,7 +2158,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
     </div>
   </section>
 
-  <section id="pag-3" class="min-h-screen hidden flex-col items-center justify-center px-6 py-10 fade-page max-w-md mx-auto">
+  <section id="pag-3" class="min-h-screen hidden flex-col items-center justify-center px-6 py-10 pb-28 fade-page max-w-md mx-auto">
     <header class="text-center mb-10 w-full">
       <img id="oba-pag3-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png" class="w-36 h-auto mx-auto mb-6 object-contain" alt="Logo">
       <h2 id="oba-pag3-subtitulo" class="text-[11px] text-[#8B4513]/60 font-semibold uppercase tracking-[0.2em]">Escolha sua Experiência</h2>
@@ -3461,8 +3461,7 @@ async function hidratarTemaDoModeloMestre() {
         personalizados:() => typeof abrirModalEspecial === 'function' && abrirModalEspecial('personalizados'),
         eventos:       () => typeof abrirModalEspecial === 'function' && abrirModalEspecial('eventos'),
         whatsapp:      () => window.open(`https://wa.me/${typeof whatsappLoja === 'function' ? whatsappLoja() : '5555999117626'}`, '_blank', 'noopener,noreferrer'),
-        degustacao:    () => typeof abrirPaginaDegustacao === 'function' && abrirPaginaDegustacao(),
-        historia:      () => typeof navegarPara === 'function' && navegarPara(2)
+        degustacao:    () => typeof abrirPaginaDegustacao === 'function' && abrirPaginaDegustacao()
       };
 
       const bcAcoes = new Set(['personalizados', 'eventos']);
@@ -3542,8 +3541,9 @@ async function hidratarTemaDoModeloMestre() {
             if (p3b) { p3b.classList.remove('hidden'); p3b.classList.add('flex'); }
             window.scrollTo({ top: 0, behavior: 'smooth' });
           };
-          verMais.className = 'w-full p-6 bg-white border-2 border-dashed border-[#8B4513]/30 text-[#8B4513]/60 rounded-[2rem] text-left flex justify-between items-center active:scale-95 transition-all';
-          verMais.innerHTML = `<div><span class="block text-[9px] uppercase tracking-widest opacity-50 mb-1">Mais opções</span><span class="text-sm font-medium">Ver mais →</span></div><i class="fa-solid fa-chevron-right text-xl opacity-30"></i>`;
+          verMais.className = 'w-full p-5 bg-amber-50 border-2 border-[#8B4513]/40 text-[#8B4513] rounded-[2rem] text-left flex justify-between items-center active:scale-95 transition-all shadow-sm';
+          const proximasOpcoes = botoesVisiveis.length - MAX_POR_PAGINA;
+          verMais.innerHTML = `<div><span class="block text-[9px] uppercase tracking-widest font-bold opacity-60 mb-1">Mais opções</span><span class="text-sm font-semibold">Ver mais (${proximasOpcoes} ${proximasOpcoes === 1 ? 'opção' : 'opções'}) →</span></div><i class="fa-solid fa-chevron-right text-lg text-[#8B4513] opacity-50"></i>`;
           container.appendChild(verMais);
         }
       }
@@ -3569,7 +3569,7 @@ async function hidratarTemaDoModeloMestre() {
         }
 
         /* Copiar classes do pag-3 para layout idêntico */
-        secao.className = 'min-h-screen hidden flex-col items-center justify-center px-6 py-10 fade-page max-w-md mx-auto';
+        secao.className = 'min-h-screen hidden flex-col items-center justify-center px-6 py-10 pb-28 fade-page max-w-md mx-auto';
 
         /* Header com mesma logo e subtítulo */
         const logoSrc = pag3 ? (pag3.querySelector('#oba-pag3-logo')?.src || '') : '';
@@ -3593,8 +3593,10 @@ async function hidratarTemaDoModeloMestre() {
         if (nextPageId) {
           const verMaisOverflow = document.createElement('button');
           verMaisOverflow.onclick = () => obaNavOverflow(nextPageId);
-          verMaisOverflow.className = 'w-full p-6 bg-white border-2 border-dashed border-[#8B4513]/30 text-[#8B4513]/60 rounded-[2rem] text-left flex justify-between items-center active:scale-95 transition-all';
-          verMaisOverflow.innerHTML = `<div><span class="block text-[9px] uppercase tracking-widest opacity-50 mb-1">Mais opções</span><span class="text-sm font-medium">Ver mais →</span></div><i class="fa-solid fa-chevron-right text-xl opacity-30"></i>`;
+          verMaisOverflow.className = 'w-full p-5 bg-amber-50 border-2 border-[#8B4513]/40 text-[#8B4513] rounded-[2rem] text-left flex justify-between items-center active:scale-95 transition-all shadow-sm';
+          const restanteOverflow = botoesVisiveis.length - (idx + 2) * MAX_POR_PAGINA;
+          const contOverflow = Math.max(restanteOverflow, botoesVisiveis.slice((idx + 2) * MAX_POR_PAGINA).length);
+          verMaisOverflow.innerHTML = `<div><span class="block text-[9px] uppercase tracking-widest font-bold opacity-60 mb-1">Mais opções</span><span class="text-sm font-semibold">Ver mais (${contOverflow > 0 ? contOverflow : ''} ${contOverflow === 1 ? 'opção' : 'opções'}) →</span></div><i class="fa-solid fa-chevron-right text-lg text-[#8B4513] opacity-50"></i>`;
           botoesContainer.appendChild(verMaisOverflow);
         }
       });

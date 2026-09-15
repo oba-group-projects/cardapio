@@ -251,7 +251,7 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
           <button type="button" class="secondary" onclick="obaAdicionarBotaoMenu()" style="font-size:12px">+ Adicionar botão</button>
           <button type="button" class="secondary" onclick="obaRestaurarBotoesMenu()" style="font-size:12px">↺ Restaurar padrão</button>
         </div>
-        <p class="hint" style="grid-column:1/-1;margin:4px 0 0">Ações disponíveis: Caixas, Presenteáveis, Personalizados, Eventos, Degustação, WhatsApp, Nossa História, Link externo.</p>
+        <p class="hint" style="grid-column:1/-1;margin:4px 0 0">Ações disponíveis: Caixas, Presenteáveis, Personalizados, Eventos, Degustação, WhatsApp, Link externo.</p>
 
         <!-- R10B: Indicador de paginação automática -->
         <div id="pg3-paginacao-info" style="grid-column:1/-1;display:none;margin-top:8px;padding:12px 14px;border-radius:10px;background:#fff8f0;border:1px solid #f5c89a">
@@ -1191,7 +1191,6 @@ $('formConfig').onsubmit=async e=>{
             <option value="eventos"        ${(b&&b.acao==='eventos')        ?'selected':''}>Grandes Eventos (modal)</option>
             <option value="degustacao"     ${(b&&b.acao==='degustacao')     ?'selected':''}>Caixa Degustação</option>
             <option value="whatsapp"       ${(b&&b.acao==='whatsapp')       ?'selected':''}>Abrir WhatsApp da loja</option>
-            <option value="historia"       ${(b&&b.acao==='historia')       ?'selected':''}>Nossa História (Página 2)</option>
             <option value="url"            ${(b&&b.acao==='url')            ?'selected':''}>Link externo (URL)</option>
           </select>
         </div>
