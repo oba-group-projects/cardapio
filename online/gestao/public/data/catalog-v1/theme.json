@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 3,
-  "updatedAt": "2026-09-14",
+  "schemaVersion": 4,
+  "updatedAt": "2026-09-15",
   "variante": "classica",
   "paginas": {
     "boas_vindas": {
@@ -31,12 +31,44 @@
       "subtitulo": "Escolha sua Experiência",
       "corFundo": "",
       "corSubtitulo": "",
-      "opcoes": {
-        "caixas":         { "label": "Caixas de Doces",           "sublabel": "Montagem",        "visivel": true },
-        "presenteaveis":  { "label": "Presenteáveis / Especiais", "sublabel": "Kits & Presentes","visivel": true },
-        "personalizados": { "label": "Doces Personalizados",       "sublabel": "Exclusivo",       "visivel": true },
-        "eventos":        { "label": "Grandes Eventos",            "sublabel": "Proposta",        "visivel": true }
-      }
+      "botoes": [
+        {
+          "id": "caixas",
+          "label": "Caixas de Doces",
+          "sublabel": "Montagem",
+          "icone": "fa-solid fa-box-open",
+          "acao": "caixas",
+          "destaque": true,
+          "visivel": true
+        },
+        {
+          "id": "presenteaveis",
+          "label": "Presenteáveis / Especiais",
+          "sublabel": "Kits & Presentes",
+          "icone": "fa-solid fa-gift",
+          "acao": "presenteaveis",
+          "destaque": false,
+          "visivel": true
+        },
+        {
+          "id": "personalizados",
+          "label": "Doces Personalizados",
+          "sublabel": "Exclusivo",
+          "icone": "fa-solid fa-wand-magic-sparkles",
+          "acao": "personalizados",
+          "destaque": false,
+          "visivel": true
+        },
+        {
+          "id": "eventos",
+          "label": "Grandes Eventos",
+          "sublabel": "Proposta",
+          "icone": "fa-solid fa-champagne-glasses",
+          "acao": "eventos",
+          "destaque": false,
+          "visivel": true
+        }
+      ]
     },
     "vitrine_presentes": {
       "titulo": "Vitrine de Presentes",
@@ -53,17 +85,17 @@
     }
   },
   "tema": {
-    "corPrimaria":   "#8B4513",
-    "corFundo":      "#FAF5F0",
-    "corBorda":      "#E8D5B5",
-    "corTexto":      "#3B2A1E",
-    "corFundoCard":  "#FFF8F0",
-    "fonte":         "Poppins",
-    "tamanhoTitulo": "24",
-    "tamanhoCorpo":  "13",
-    "pesoTitulo":    "300",
-    "pesoCorpo":     "400",
+    "corPrimaria":    "#8B4513",
+    "corFundo":       "#FAF5F0",
+    "corBorda":       "#E8D5B5",
+    "corTexto":       "#3B2A1E",
+    "corFundoCard":   "#FFF8F0",
+    "fonte":          "Poppins",
+    "tamanhoTitulo":  "24",
+    "tamanhoCorpo":   "13",
+    "pesoTitulo":     "300",
+    "pesoCorpo":      "400",
     "arredondamento": "20",
-    "espacamento":   "normal"
+    "espacamento":    "normal"
   }
 }

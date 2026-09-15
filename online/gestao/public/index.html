@@ -237,24 +237,21 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
           </div>
         </div>
 
-        <div style="grid-column:1/-1"><p class="oba-secao-titulo">👁️ Visibilidade dos botões do menu</p></div>
-        <div class="field full" style="display:flex;gap:20px;flex-wrap:wrap">
-          <label class="oba-toggle-label"><input type="checkbox" id="pg3-vis-caixas" checked> Caixas de Doces</label>
-          <label class="oba-toggle-label"><input type="checkbox" id="pg3-vis-presenteaveis" checked> Presenteáveis / Especiais</label>
-          <label class="oba-toggle-label"><input type="checkbox" id="pg3-vis-personalizados" checked> Doces Personalizados</label>
-          <label class="oba-toggle-label"><input type="checkbox" id="pg3-vis-eventos" checked> Grandes Eventos</label>
+        <!-- R10A: EDITOR DINÂMICO DE BOTÕES -->
+        <div style="grid-column:1/-1">
+          <p class="oba-secao-titulo">🔘 Botões do menu</p>
+          <p class="hint" style="margin:-4px 0 10px">Adicione, edite, reordene ou remova botões. O primeiro marcado como "Destaque" fica com fundo marrom.</p>
         </div>
-        <p class="hint" style="grid-column:1/-1;margin:0 0 4px">Desmarcar oculta o botão no cardápio sem desativar o canal de negócio.</p>
 
-        <div style="grid-column:1/-1"><p class="oba-secao-titulo">✏️ Labels dos botões</p></div>
-        <div class="field"><label>Label — Caixas de Doces</label><input id="pg3-label-caixas" placeholder="Caixas de Doces"></div>
-        <div class="field"><label>Sublabel — Caixas</label><input id="pg3-sub-caixas" placeholder="Montagem"></div>
-        <div class="field"><label>Label — Presenteáveis</label><input id="pg3-label-presenteaveis" placeholder="Presenteáveis / Especiais"></div>
-        <div class="field"><label>Sublabel — Presenteáveis</label><input id="pg3-sub-presenteaveis" placeholder="Kits &amp; Presentes"></div>
-        <div class="field"><label>Label — Personalizados</label><input id="pg3-label-personalizados" placeholder="Doces Personalizados"></div>
-        <div class="field"><label>Sublabel — Personalizados</label><input id="pg3-sub-personalizados" placeholder="Exclusivo"></div>
-        <div class="field"><label>Label — Eventos</label><input id="pg3-label-eventos" placeholder="Grandes Eventos"></div>
-        <div class="field"><label>Sublabel — Eventos</label><input id="pg3-sub-eventos" placeholder="Proposta"></div>
+        <!-- Lista de botões editáveis -->
+        <div id="pg3-botoes-lista" style="grid-column:1/-1;display:flex;flex-direction:column;gap:10px"></div>
+
+        <!-- Ações da lista -->
+        <div style="grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+          <button type="button" class="secondary" onclick="obaAdicionarBotaoMenu()" style="font-size:12px">+ Adicionar botão</button>
+          <button type="button" class="secondary" onclick="obaRestaurarBotoesMenu()" style="font-size:12px">↺ Restaurar padrão</button>
+        </div>
+        <p class="hint" style="grid-column:1/-1;margin:4px 0 0">Máximo recomendado: 6 botões. Ações disponíveis: Caixas, Presenteáveis, Personalizados, Eventos.</p>
 
         <div class="field full actions"><button class="primary" type="submit">Salvar Menu Principal</button></div>
       </form>
@@ -1067,6 +1064,200 @@ $('formConfig').onsubmit=async e=>{
     const hx=$(baseId+'-hex');if(hx)hx.value='';
   };
 
+  /* ================================================================
+     R10A — EDITOR DINÂMICO DE BOTÕES DO MENU
+  ================================================================ */
+
+  /* Ícones disponíveis para seleção */
+  const obaIconesMenu=[
+    {valor:'fa-solid fa-box-open',       label:'Caixa'},
+    {valor:'fa-solid fa-gift',           label:'Presente'},
+    {valor:'fa-solid fa-wand-magic-sparkles', label:'Personalizado'},
+    {valor:'fa-solid fa-champagne-glasses',   label:'Eventos'},
+    {valor:'fa-solid fa-star',           label:'Estrela'},
+    {valor:'fa-solid fa-heart',          label:'Coração'},
+    {valor:'fa-solid fa-cake-candles',   label:'Bolo'},
+    {valor:'fa-solid fa-cookie-bite',    label:'Biscoito'},
+    {valor:'fa-solid fa-ice-cream',      label:'Sorvete'},
+    {valor:'fa-solid fa-candy-cane',     label:'Doce'},
+    {valor:'fa-solid fa-tag',            label:'Etiqueta'},
+    {valor:'fa-solid fa-percent',        label:'Desconto'},
+    {valor:'fa-solid fa-calendar',       label:'Agenda'},
+    {valor:'fa-solid fa-phone',          label:'Contato'},
+    {valor:'fa-solid fa-circle-info',    label:'Info'}
+  ];
+
+  /* Botões padrão para restaurar */
+  window.obaDefaultBotoes=function(){
+    return [
+      {id:'caixas',        label:'Caixas de Doces',           sublabel:'Montagem',         icone:'fa-solid fa-box-open',            acao:'caixas',         destaque:true,  visivel:true},
+      {id:'presenteaveis', label:'Presenteáveis / Especiais', sublabel:'Kits & Presentes', icone:'fa-solid fa-gift',                acao:'presenteaveis',  destaque:false, visivel:true},
+      {id:'personalizados',label:'Doces Personalizados',       sublabel:'Exclusivo',        icone:'fa-solid fa-wand-magic-sparkles', acao:'personalizados', destaque:false, visivel:true},
+      {id:'eventos',       label:'Grandes Eventos',            sublabel:'Proposta',         icone:'fa-solid fa-champagne-glasses',   acao:'eventos',        destaque:false, visivel:true}
+    ];
+  };
+
+  /* Renderiza a lista de cards de botão na Central */
+  window.obaRenderizarListaBotoes=function(botoes){
+    const lista=$('pg3-botoes-lista');
+    if(!lista)return;
+    lista.innerHTML='';
+    (botoes||[]).forEach((b,i)=>obaAdicionarCardBotao(b,i));
+  };
+
+  /* Cria um card de edição para um botão */
+  function obaAdicionarCardBotao(b,idx){
+    const lista=$('pg3-botoes-lista');if(!lista)return;
+    const total=lista.children.length;
+    const card=document.createElement('div');
+    card.className='oba-botao-card';
+    card.dataset.idx=String(idx!=null?idx:total);
+
+    /* Seletor de ícone: mini-botões */
+    const iconesHtml=obaIconesMenu.map(ic=>`
+      <button type="button" class="oba-icone-btn${(b&&b.icone===ic.valor)?' oba-icone-ativo':''}"
+        title="${ic.label}" onclick="obaEscolherIcone(this,'${ic.valor.replace(/'/g,'&#39;')}')"
+        data-icone="${ic.valor}">
+        <i class="${ic.valor}"></i>
+      </button>`).join('');
+
+    card.innerHTML=`
+      <div class="oba-botao-card-header">
+        <span class="oba-botao-num">${total+1}</span>
+        <span class="oba-botao-preview-label">${b&&b.label||'Novo botão'}</span>
+        <div style="margin-left:auto;display:flex;gap:6px">
+          <button type="button" class="secondary" style="padding:4px 8px;font-size:11px" onclick="obaMoverBotao(this,-1)" title="Mover para cima">↑</button>
+          <button type="button" class="secondary" style="padding:4px 8px;font-size:11px" onclick="obaMoverBotao(this,1)"  title="Mover para baixo">↓</button>
+          <button type="button" class="danger"    style="padding:4px 8px;font-size:11px" onclick="obaRemoverBotao(this)"  title="Remover">✕</button>
+        </div>
+      </div>
+      <div class="oba-botao-card-body grid">
+        <div class="field"><label>Label (nome principal)</label>
+          <input class="pg3-btn-label" value="${b&&b.label||''}" placeholder="Ex: Caixas de Doces"
+            oninput="this.closest('.oba-botao-card').querySelector('.oba-botao-preview-label').textContent=this.value||'Novo botão'">
+        </div>
+        <div class="field"><label>Sublabel (subtítulo pequeno)</label>
+          <input class="pg3-btn-sublabel" value="${b&&b.sublabel||''}" placeholder="Ex: Montagem">
+        </div>
+        <div class="field full"><label>Ação ao clicar</label>
+          <select class="pg3-btn-acao" onchange="obaToggleUrlField(this)">
+            <option value="caixas"         ${(b&&b.acao==='caixas')         ?'selected':''}>Caixas de Doces</option>
+            <option value="presenteaveis"  ${(b&&b.acao==='presenteaveis')  ?'selected':''}>Presenteáveis / Especiais</option>
+            <option value="personalizados" ${(b&&b.acao==='personalizados') ?'selected':''}>Doces Personalizados (modal)</option>
+            <option value="eventos"        ${(b&&b.acao==='eventos')        ?'selected':''}>Grandes Eventos (modal)</option>
+            <option value="url"            ${(b&&b.acao==='url')            ?'selected':''}>Link externo (URL)</option>
+          </select>
+        </div>
+        <div class="field full pg3-btn-url-row" style="display:${(b&&b.acao==='url')?'':'none'}">
+          <label>URL do link externo</label>
+          <input class="pg3-btn-url" value="${b&&b.url||''}" placeholder="https://...">
+        </div>
+        <div class="field full"><label>Ícone</label>
+          <div class="oba-icones-grid">${iconesHtml}</div>
+          <input type="hidden" class="pg3-btn-icone" value="${b&&b.icone||'fa-solid fa-star'}">
+        </div>
+        <div class="field full" style="display:flex;gap:20px;flex-wrap:wrap">
+          <label class="oba-toggle-label">
+            <input type="checkbox" class="pg3-btn-destaque" ${(b&&b.destaque)?'checked':''}> Botão em destaque (fundo marrom)
+          </label>
+          <label class="oba-toggle-label">
+            <input type="checkbox" class="pg3-btn-visivel" ${(!b||b.visivel!==false)?'checked':''}> Visível no cardápio
+          </label>
+        </div>
+      </div>`;
+
+    lista.appendChild(card);
+    obaAtualizarNumeracaoBotoes();
+  }
+
+  /* Adiciona novo botão vazio */
+  window.obaAdicionarBotaoMenu=function(){
+    const lista=$('pg3-botoes-lista');
+    if(lista&&lista.children.length>=6){
+      alert('Máximo de 6 botões atingido.');return;
+    }
+    obaAdicionarCardBotao({label:'',sublabel:'',icone:'fa-solid fa-star',acao:'caixas',destaque:false,visivel:true});
+  };
+
+  /* Restaura os 4 botões padrão */
+  window.obaRestaurarBotoesMenu=function(){
+    if(!confirm('Restaurar os 4 botões padrão do menu?'))return;
+    obaRenderizarListaBotoes(obaDefaultBotoes());
+  };
+
+  /* Remove um botão */
+  window.obaRemoverBotao=function(btn){
+    const card=btn.closest('.oba-botao-card');
+    if(!card)return;
+    const lista=card.parentElement;
+    if(lista&&lista.children.length<=1){alert('O menu precisa de pelo menos 1 botão.');return;}
+    if(!confirm('Remover este botão?'))return;
+    card.remove();
+    obaAtualizarNumeracaoBotoes();
+  };
+
+  /* Move um botão para cima ou para baixo */
+  window.obaMoverBotao=function(btn,dir){
+    const card=btn.closest('.oba-botao-card');
+    if(!card)return;
+    const lista=card.parentElement;
+    if(dir===-1&&card.previousElementSibling){lista.insertBefore(card,card.previousElementSibling);}
+    else if(dir===1&&card.nextElementSibling){lista.insertBefore(card.nextElementSibling,card);}
+    obaAtualizarNumeracaoBotoes();
+  };
+
+  /* Atualiza os números dos cards */
+  function obaAtualizarNumeracaoBotoes(){
+    const cards=document.querySelectorAll('#pg3-botoes-lista .oba-botao-card');
+    cards.forEach((c,i)=>{const n=c.querySelector('.oba-botao-num');if(n)n.textContent=i+1;});
+  }
+
+  /* Seleciona ícone */
+  window.obaEscolherIcone=function(btn,valor){
+    const card=btn.closest('.oba-botao-card');
+    card.querySelectorAll('.oba-icone-btn').forEach(b=>b.classList.remove('oba-icone-ativo'));
+    btn.classList.add('oba-icone-ativo');
+    const hidden=card.querySelector('.pg3-btn-icone');
+    if(hidden)hidden.value=valor;
+  };
+
+  /* Mostra/oculta campo de URL */
+  window.obaToggleUrlField=function(sel){
+    const row=sel.closest('.oba-botao-card-body').querySelector('.pg3-btn-url-row');
+    if(row)row.style.display=sel.value==='url'?'':'none';
+  };
+
+  /* Lê todos os botões da lista */
+  window.obaLerBotoesMenu=function(){
+    const cards=document.querySelectorAll('#pg3-botoes-lista .oba-botao-card');
+    return Array.from(cards).map((card,i)=>({
+      id:'btn-'+i,
+      label:card.querySelector('.pg3-btn-label')?.value.trim()||'',
+      sublabel:card.querySelector('.pg3-btn-sublabel')?.value.trim()||'',
+      acao:card.querySelector('.pg3-btn-acao')?.value||'caixas',
+      url:card.querySelector('.pg3-btn-url')?.value.trim()||'',
+      icone:card.querySelector('.pg3-btn-icone')?.value||'fa-solid fa-star',
+      destaque:card.querySelector('.pg3-btn-destaque')?.checked===true,
+      visivel:card.querySelector('.pg3-btn-visivel')?.checked!==false
+    }));
+  };
+
+  /* CSS do editor dinâmico de botões */
+  const style9B = document.getElementById('oba-central-9b-css');
+  if(style9B){
+    style9B.textContent += `
+    .oba-botao-card{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden;margin-bottom:0}
+    .oba-botao-card-header{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#f9f4ef;border-bottom:1px solid var(--line)}
+    .oba-botao-num{width:22px;height:22px;border-radius:50%;background:var(--brand);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .oba-botao-preview-label{font-size:13px;font-weight:700;color:var(--text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .oba-botao-card-body{padding:12px 14px 8px}
+    .oba-icones-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+    .oba-icone-btn{width:36px;height:36px;border-radius:8px;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:var(--muted);transition:all 0.15s}
+    .oba-icone-btn:hover{border-color:var(--brand);color:var(--brand);background:#fff8f2}
+    .oba-icone-btn.oba-icone-ativo{border-color:var(--brand);background:var(--brand);color:#fff}
+    `;
+  }
+
   /* Preview inline de cores + tipografia */
   function obaAtualizarPreviewCores(){
     const corP=$('tema-corPrimaria')?.value||temaDefault.corPrimaria;
@@ -1148,19 +1339,9 @@ $('formConfig').onsubmit=async e=>{
     obaSetSelect('pg3-tamanhoLogo',mp.tamanhoLogo,'medio');
     obaSetCorPagina('pg3-corFundo',mp.corFundo);
     obaSetCorPagina('pg3-corSubtitulo',mp.corSubtitulo);
-    obaSetCheck('pg3-vis-caixas',(op.caixas||{}).visivel!==false);
-    obaSetCheck('pg3-vis-presenteaveis',(op.presenteaveis||{}).visivel!==false);
-    obaSetCheck('pg3-vis-personalizados',(op.personalizados||{}).visivel!==false);
-    obaSetCheck('pg3-vis-eventos',(op.eventos||{}).visivel!==false);
     obaAtualizarLogoPreview('pg3-logo','pg3-logo-preview');
-    obaSetVal('pg3-label-caixas',(op.caixas||{}).label);
-    obaSetVal('pg3-sub-caixas',(op.caixas||{}).sublabel);
-    obaSetVal('pg3-label-presenteaveis',(op.presenteaveis||{}).label);
-    obaSetVal('pg3-sub-presenteaveis',(op.presenteaveis||{}).sublabel);
-    obaSetVal('pg3-label-personalizados',(op.personalizados||{}).label);
-    obaSetVal('pg3-sub-personalizados',(op.personalizados||{}).sublabel);
-    obaSetVal('pg3-label-eventos',(op.eventos||{}).label);
-    obaSetVal('pg3-sub-eventos',(op.eventos||{}).sublabel);
+    /* R10A: popular lista dinâmica de botões */
+    obaRenderizarListaBotoes(Array.isArray(mp.botoes) ? mp.botoes : obaDefaultBotoes());
 
     /* Vitrine */
     const vp=pg.vitrine_presentes||{};
@@ -1264,12 +1445,7 @@ $('formConfig').onsubmit=async e=>{
           subtitulo:$('pg3-subtitulo')?.value.trim()||'',
           corFundo:$('pg3-corFundo-hex')?.value.trim()||'',
           corSubtitulo:$('pg3-corSubtitulo-hex')?.value.trim()||'',
-          opcoes:{
-            caixas:{label:$('pg3-label-caixas')?.value.trim()||'',sublabel:$('pg3-sub-caixas')?.value.trim()||'',visivel:$('pg3-vis-caixas')?.checked!==false},
-            presenteaveis:{label:$('pg3-label-presenteaveis')?.value.trim()||'',sublabel:$('pg3-sub-presenteaveis')?.value.trim()||'',visivel:$('pg3-vis-presenteaveis')?.checked!==false},
-            personalizados:{label:$('pg3-label-personalizados')?.value.trim()||'',sublabel:$('pg3-sub-personalizados')?.value.trim()||'',visivel:$('pg3-vis-personalizados')?.checked!==false},
-            eventos:{label:$('pg3-label-eventos')?.value.trim()||'',sublabel:$('pg3-sub-eventos')?.value.trim()||'',visivel:$('pg3-vis-eventos')?.checked!==false}
-          }
+          botoes:obaLerBotoesMenu()
         },
         vitrine_presentes:{
           titulo:$('vit-titulo')?.value.trim()||'',

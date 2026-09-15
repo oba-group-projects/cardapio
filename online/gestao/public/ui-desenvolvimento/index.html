@@ -2163,21 +2163,22 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
       <img id="oba-pag3-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png" class="w-36 h-auto mx-auto mb-6 object-contain" alt="Logo">
       <h2 id="oba-pag3-subtitulo" class="text-[11px] text-[#8B4513]/60 font-semibold uppercase tracking-[0.2em]">Escolha sua Experiência</h2>
     </header>
-    <div class="w-full space-y-4">
+    <div id="oba-menu-botoes" class="w-full space-y-4">
+      <!-- R10A: botões renderizados dinamicamente por hidratarTemaDoModeloMestre() -->
       <button onclick="entFluxoCaixas()" class="w-full p-6 bg-[#8B4513] text-white rounded-[2rem] shadow-xl shadow-[#8B4513]/20 text-left flex justify-between items-center active:scale-95 transition-all">
-        <div><span id="oba-pag3-sub-caixas" class="block text-[9px] uppercase tracking-widest opacity-70 mb-1">Montagem</span><span id="oba-pag3-label-caixas" class="text-sm font-medium">Caixas de Doces</span></div>
+        <div><span class="block text-[9px] uppercase tracking-widest opacity-70 mb-1">Montagem</span><span class="text-sm font-medium">Caixas de Doces</span></div>
         <i class="fa-solid fa-box-open text-xl opacity-40"></i>
       </button>
       <button onclick="entFluxoPresenteaveis()" class="w-full p-6 bg-white border border-[#8B4513]/10 text-[#8B4513] rounded-[2rem] text-left flex justify-between items-center active:scale-95 transition-all shadow-sm">
-        <div><span id="oba-pag3-sub-presenteaveis" class="block text-[9px] uppercase tracking-widest opacity-50 mb-1">Kits & Presentes</span><span id="oba-pag3-label-presenteaveis" class="text-sm font-medium">Presenteáveis / Especiais</span></div>
+        <div><span class="block text-[9px] uppercase tracking-widest opacity-50 mb-1">Kits & Presentes</span><span class="text-sm font-medium">Presenteáveis / Especiais</span></div>
         <i class="fa-solid fa-gift text-xl opacity-20"></i>
       </button>
       <button data-oba-business-channel="personalizados" onclick="abrirModalEspecial('personalizados')" class="w-full p-6 bg-white border border-[#8B4513]/10 text-[#8B4513] rounded-[2rem] text-left flex justify-between items-center active:scale-95 transition-all shadow-sm">
-        <div><span id="oba-pag3-sub-personalizados" class="block text-[9px] uppercase tracking-widest opacity-50 mb-1">Exclusivo</span><span id="oba-pag3-label-personalizados" class="text-sm font-medium">Doces Personalizados</span></div>
+        <div><span class="block text-[9px] uppercase tracking-widest opacity-50 mb-1">Exclusivo</span><span class="text-sm font-medium">Doces Personalizados</span></div>
         <i class="fa-solid fa-wand-magic-sparkles text-xl opacity-20"></i>
       </button>
       <button data-oba-business-channel="eventos" onclick="abrirModalEspecial('eventos')" class="w-full p-6 bg-white border border-[#8B4513]/10 text-[#8B4513] rounded-[2rem] text-left flex justify-between items-center active:scale-95 transition-all shadow-sm">
-        <div><span id="oba-pag3-sub-eventos" class="block text-[9px] uppercase tracking-widest opacity-50 mb-1">Proposta</span><span id="oba-pag3-label-eventos" class="text-sm font-medium">Grandes Eventos</span></div>
+        <div><span class="block text-[9px] uppercase tracking-widest opacity-50 mb-1">Proposta</span><span class="text-sm font-medium">Grandes Eventos</span></div>
         <i class="fa-solid fa-champagne-glasses text-xl opacity-20"></i>
       </button>
     </div>
@@ -3447,37 +3448,82 @@ async function hidratarTemaDoModeloMestre() {
     const elSub3 = document.getElementById('oba-pag3-subtitulo');
     if (elSub3 && mp.corSubtitulo) elSub3.style.color = mp.corSubtitulo;
 
-    const opcoes = mp.opcoes || {};
-    if (opcoes.caixas) {
-      _set('oba-pag3-label-caixas',        opcoes.caixas.label);
-      _set('oba-pag3-sub-caixas',          opcoes.caixas.sublabel);
-    }
-    if (opcoes.presenteaveis) {
-      _set('oba-pag3-label-presenteaveis', opcoes.presenteaveis.label);
-      _set('oba-pag3-sub-presenteaveis',   opcoes.presenteaveis.sublabel);
-    }
-    if (opcoes.personalizados) {
-      _set('oba-pag3-label-personalizados', opcoes.personalizados.label);
-      _set('oba-pag3-sub-personalizados',   opcoes.personalizados.sublabel);
-    }
-    if (opcoes.eventos) {
-      _set('oba-pag3-label-eventos', opcoes.eventos.label);
-      _set('oba-pag3-sub-eventos',   opcoes.eventos.sublabel);
-    }
+    /* R10A — Renderização dinâmica dos botões do menu */
+    const botoes = Array.isArray(mp.botoes) && mp.botoes.length > 0
+      ? mp.botoes
+      : null; /* fallback: mantém os botões estáticos do HTML */
 
-    /* Visibilidade botões pag3 (data-oba-business-channel é para lógica de negócio,
-       aqui apenas ocultamos visualmente via display se visivel===false) */
-    const visBotoes = {
-      caixas: document.querySelector('#pag-3 button[onclick="entFluxoCaixas()"]'),
-      presenteaveis: document.querySelector('#pag-3 button[onclick="entFluxoPresenteaveis()"]'),
-      personalizados: document.querySelector('#pag-3 [data-oba-business-channel="personalizados"]'),
-      eventos: document.querySelector('#pag-3 [data-oba-business-channel="eventos"]')
-    };
-    Object.entries(visBotoes).forEach(([key, el]) => {
-      if (!el) return;
-      const vis = opcoes[key];
-      if (vis && vis.visivel === false) el.style.display = 'none';
-    });
+    if (botoes) {
+      /* Mapa de ações para funções JS existentes */
+      const acaoMap = {
+        caixas:        () => typeof entFluxoCaixas === 'function' && entFluxoCaixas(),
+        presenteaveis: () => typeof entFluxoPresenteaveis === 'function' && entFluxoPresenteaveis(),
+        personalizados:() => typeof abrirModalEspecial === 'function' && abrirModalEspecial('personalizados'),
+        eventos:       () => typeof abrirModalEspecial === 'function' && abrirModalEspecial('eventos')
+      };
+
+      /* Garante que business channels são tratados corretamente */
+      const bcAcoes = new Set(['personalizados', 'eventos']);
+
+      const container = document.getElementById('oba-menu-botoes');
+      if (container) {
+        container.innerHTML = '';
+
+        botoes
+          .filter(b => b.visivel !== false)
+          .forEach(b => {
+            const btn = document.createElement('button');
+
+            /* Estilo destaque (primeiro / marcado como destaque) ou secundário */
+            if (b.destaque) {
+              btn.className = 'w-full p-6 bg-[#8B4513] text-white rounded-[2rem] shadow-xl shadow-[#8B4513]/20 text-left flex justify-between items-center active:scale-95 transition-all';
+            } else {
+              btn.className = 'w-full p-6 bg-white border border-[#8B4513]/10 text-[#8B4513] rounded-[2rem] text-left flex justify-between items-center active:scale-95 transition-all shadow-sm';
+            }
+
+            /* Business channel para lógica de visibilidade existente */
+            if (bcAcoes.has(b.acao)) {
+              btn.dataset.obaBusinessChannel = b.acao;
+            }
+
+            /* Conteúdo textual */
+            const div = document.createElement('div');
+            const sublabelEl = document.createElement('span');
+            sublabelEl.className = b.destaque
+              ? 'block text-[9px] uppercase tracking-widest opacity-70 mb-1'
+              : 'block text-[9px] uppercase tracking-widest opacity-50 mb-1';
+            sublabelEl.textContent = b.sublabel || '';
+
+            const labelEl = document.createElement('span');
+            labelEl.className = 'text-sm font-medium';
+            labelEl.textContent = b.label || '';
+
+            div.appendChild(sublabelEl);
+            div.appendChild(labelEl);
+
+            /* Ícone */
+            const icone = document.createElement('i');
+            icone.className = (b.icone || 'fa-solid fa-star') + (b.destaque ? ' text-xl opacity-40' : ' text-xl opacity-20');
+
+            btn.appendChild(div);
+            btn.appendChild(icone);
+
+            /* Ação ao clicar */
+            if (b.acao === 'url' && b.url) {
+              btn.onclick = () => window.open(b.url, '_blank', 'noopener,noreferrer');
+            } else if (acaoMap[b.acao]) {
+              btn.onclick = acaoMap[b.acao];
+            }
+
+            container.appendChild(btn);
+          });
+
+        /* Re-aplica hidratarBusinessChannelsDoModeloMestre para os novos elementos */
+        if (typeof hidratarBusinessChannelsDoModeloMestre === 'function') {
+          hidratarBusinessChannelsDoModeloMestre();
+        }
+      }
+    }
 
     /* Vitrine de Presentes */
     const vp = p.vitrine_presentes || {};
