@@ -1661,8 +1661,9 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
 </head>
 <body class="antialiased selection:bg-[#8B4513] selection:text-white pb-24">
 
-<!-- BOTÃO WPP FLUTUANTE — disponível durante toda a jornada -->
+<!-- BOTÃO WPP FLUTUANTE — visível a partir da Página 2 -->
 <a id="btn-wpp-flutuante" href="https://wa.me/5555999117626" data-oba-whatsapp-link target="_blank"
+   style="display:none"
    class="fixed bottom-24 lg:bottom-6 right-4 lg:right-6 z-[60] bg-[#25D366] text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-2xl hover:bg-green-600 transition-all" rel="noopener noreferrer">
   <i class="fa-brands fa-whatsapp"></i>
 </a>
@@ -3473,7 +3474,7 @@ async function hidratarTemaDoModeloMestre() {
          manualmente na Página 3.
       ────────────────────────────────────────────────────────────────── */
       const secoesComLink = Array.isArray(tema.paginas_customizadas)
-        ? tema.paginas_customizadas.filter(s => s && s.id && s.linkMenu && s.linkMenu.ativo !== false && s.linkMenu.label)
+        ? tema.paginas_customizadas.filter(s => s && s.id && s.linkMenu && s.linkMenu.ativo !== false)
         : [];
 
       /* Pré-registra ações sec-* no acaoMap para que obacriarBtnMenu funcione */
@@ -3919,8 +3920,9 @@ function navegarPara(num) {
   const alvo = num === 4 ? 'fluxo-principal' : `pag-${num}`;
   document.getElementById(alvo).classList.remove('hidden');
   document.getElementById(alvo).classList.add('flex');
+  /* WhatsApp flutuante: oculto na Página 1, visível da Página 2 em diante */
   const wpp = document.getElementById('btn-wpp-flutuante');
-  if (wpp) wpp.style.display = 'flex';
+  if (wpp) wpp.style.display = num >= 2 ? 'flex' : 'none';
   window.scrollTo({ top:0, behavior:'smooth' });
 }
 
