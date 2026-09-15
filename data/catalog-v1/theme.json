@@ -119,6 +119,28 @@
       "titulo": ""
     }
   },
+  "paginas_customizadas": [
+    {
+      "config": {
+        "citacao": "como você está?",
+        "ctaAcao": "whatsapp",
+        "ctaLabel": "Vamos juntos?",
+        "ctaUrl": "",
+        "texto": "olá, tudo bem?"
+      },
+      "id": "secmu370pge",
+      "linkMenu": {
+        "ativo": true,
+        "destaque": false,
+        "icone": "fa-solid fa-star",
+        "label": "",
+        "sublabel": ""
+      },
+      "subtitulo": "TESTE",
+      "template": "informativa",
+      "titulo": "TESTE"
+    }
+  ],
   "schemaVersion": 2,
   "tema": {
     "arredondamento": "20",
