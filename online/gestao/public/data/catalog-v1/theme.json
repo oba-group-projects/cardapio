@@ -78,7 +78,12 @@
       "titulo": "Doces Personalizados",
       "info_titulo": "Informações",
       "info_items": ["Modelagem artesanal.", "Mínimo: 20 unidades."],
-      "pacotes_titulo": "Pacotes Especiais"
+      "pacotes_titulo": "Pacotes Especiais",
+      "pacotes": [
+        { "quantidade": 20, "preco": "196,00" },
+        { "quantidade": 35, "preco": "280,00" },
+        { "quantidade": 50, "preco": "375,00" }
+      ]
     },
     "eventos_modal": {
       "titulo": "Orçamentos de Eventos"
