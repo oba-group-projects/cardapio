@@ -15,31 +15,61 @@
       "titulo": ""
     },
     "menu_principal": {
+      "botoes": [
+        {
+          "acao": "caixas",
+          "destaque": true,
+          "icone": "fa-solid fa-box-open",
+          "id": "btn-0",
+          "label": "Caixas de Doces",
+          "sublabel": "Montagem",
+          "url": "",
+          "visivel": true
+        },
+        {
+          "acao": "presenteaveis",
+          "destaque": false,
+          "icone": "fa-solid fa-gift",
+          "id": "btn-1",
+          "label": "Presenteáveis / Especiais",
+          "sublabel": "Kits & Presentes",
+          "url": "",
+          "visivel": true
+        },
+        {
+          "acao": "personalizados",
+          "destaque": false,
+          "icone": "fa-solid fa-wand-magic-sparkles",
+          "id": "btn-2",
+          "label": "Doces Personalizados",
+          "sublabel": "Exclusivo",
+          "url": "",
+          "visivel": true
+        },
+        {
+          "acao": "eventos",
+          "destaque": false,
+          "icone": "fa-solid fa-champagne-glasses",
+          "id": "btn-3",
+          "label": "Grandes Eventos",
+          "sublabel": "Proposta",
+          "url": "",
+          "visivel": true
+        },
+        {
+          "acao": "historia",
+          "destaque": false,
+          "icone": "fa-solid fa-star",
+          "id": "btn-4",
+          "label": "TESTE",
+          "sublabel": "TESTE 2",
+          "url": "",
+          "visivel": true
+        }
+      ],
       "corFundo": "",
       "corSubtitulo": "",
       "logo": "",
-      "opcoes": {
-        "caixas": {
-          "label": "",
-          "sublabel": "",
-          "visivel": true
-        },
-        "eventos": {
-          "label": "",
-          "sublabel": "",
-          "visivel": true
-        },
-        "personalizados": {
-          "label": "",
-          "sublabel": "",
-          "visivel": true
-        },
-        "presenteaveis": {
-          "label": "",
-          "sublabel": "",
-          "visivel": true
-        }
-      },
       "subtitulo": "",
       "tamanhoLogo": "medio"
     },
@@ -57,6 +87,20 @@
     "personalizados_modal": {
       "info_items": [],
       "info_titulo": "",
+      "pacotes": [
+        {
+          "preco": "196,00",
+          "quantidade": 20
+        },
+        {
+          "preco": "280,00",
+          "quantidade": 35
+        },
+        {
+          "preco": "375,00",
+          "quantidade": 50
+        }
+      ],
       "pacotes_titulo": "",
       "titulo": ""
     },
