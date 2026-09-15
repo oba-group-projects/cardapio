@@ -1,66 +1,46 @@
 # HANDOFF
 
-Atualizado: 2026-09-14 00:00:00
+Atualizado: 2026-09-15
 
-Projeto: Oba Doceria - Cardapio Virtual + Central de Gestao.
 Branch: feature/gestao-online-segura
-Commit HEAD: 2ad4329
+HEAD: 1c860e5
 
-## Ultima fase aprovada
-9C — Controles visuais por página na Central de Gestão.
+## Ultima fase entregue
+10A — Menu dinâmico + complementos (botões configuráveis, novas ações, preços editáveis, preview ao vivo)
 
-## Histórico das fases desta sessão
+## Commits desta sessão (mais recente primeiro)
+| Commit   | Fase     | O que fez |
+|----------|----------|-----------|
+| 1c860e5  | 10A-fix  | Corrige template literal CSS não fechado (SyntaxError no browser) |
+| ccd96fc  | 10A-comp | +3 ações (whatsapp/degustacao/historia), preços Personalizados editáveis, preview ao vivo |
+| 108a5fc  | 10A      | Menu dinâmico: array botoes[], editor de cards na Central |
+| 9d5ff30  | 9D-fix2  | Corrige encoding do script CONFIGURAR_PAT |
+| eeef5a3  | 9D-fix1  | Corrige branch e caminhos dos JSONs no sync |
+| 418512f  | 9D       | Sync automático GitHub Pages após publicação |
+| 6a68445  | docs     | Handoff 9B-fix + 9C |
+| 2ad4329  | 9C       | Controles visuais por página |
 
-| Commit   | Fase     | Resumo |
-|----------|----------|--------|
-| 1a2afd6  | 9A       | Infraestrutura theme.json + hidratarTemaDoModeloMestre |
-| 79bf902  | 9B       | Aba Edição Visual na Central (formulários de texto) |
-| 4b073c3  | 9B-fix   | Bug vtab + variantes visuais + tipografia + sliders |
-| 2ad4329  | 9C       | Controles visuais por página (cores, tamanho logo, visibilidade) |
+## O que está funcionando
+- Central privada: autenticada, operacional, deploy automático via EXECUTAR-9AB-DEPLOY.cmd
+- Aba Edição Visual completa:
+  - Páginas: 6 formulários com textos, logo, cores por página, visibilidade
+  - Tema Global: 6 variantes, tipografia, layout, preview ao vivo
+  - Menu Principal (Página 3): editor dinâmico de botões (adicionar/remover/reordenar)
+- Preços dos pacotes de Personalizados editáveis na Central
+- 8 ações disponíveis para botões do menu
+- Preview ao vivo por botão no editor
+- Sync GitHub Pages via obaGitHubSyncPublished() — requer GITHUB_PAT no Worker
 
-## Estado do sistema
+## O que precisa de atenção
+- Confirmar se GITHUB_PAT foi configurado e sync está funcionando
+- Homologar: publicar algo → aguardar ~1min → verificar no cardápio público
 
-### Central de Gestão — Aba Edição Visual
-Dois sub-painéis:
+## Arquivos críticos alterados nesta sessão
+- online/gestao/public/data/catalog-v1/theme.json (schemaVersion 4)
+- online/gestao/public/index.html (Central — editor dinâmico de botões)
+- online/gestao/public/ui-desenvolvimento/index.html (cardápio — renderização dinâmica)
+- online/gestao/src/index.js (Worker — obaGitHubSyncPublished)
+- .scripts/8E9/EXECUTAR_9D_CONFIGURAR_PAT.ps1
+- EXECUTAR-9D-CONFIGURAR-PAT.cmd
 
-**📄 Páginas** — 6 formulários colapsáveis:
-- Página 1 (Boas-vindas): título, subtítulo, CTA, logo+tamanho, corFundo, corTítulo, toggles exibir
-- Página 2 (Nossa Essência): título, texto, citação, logo+tamanho, corFundo, corTítulo, toggles exibir
-- Página 3 (Menu Principal): subtítulo, logo+tamanho, corFundo, corSubtítulo, 4 toggles de botão, labels
-- Vitrine de Presentes: título, subtítulo
-- Modal Doces Personalizados: título, informações, pacotes
-- Modal Eventos: título
-
-**🎨 Tema Global** — afeta o cardápio inteiro:
-- 6 variantes visuais com swatches (Clássica, Elegante, Moderna, Suave, Minimalista, Festiva)
-- 5 color pickers com sincronização picker↔hex + botão Limpar
-- Tipografia: 10 fontes, tamanho título (18–40px), tamanho corpo (11–18px), peso título, peso corpo
-- Layout: arredondamento (0–40px), espaçamento (compacto/normal/espaçado)
-- Preview ao vivo refletindo todas as configurações
-- Botão "Restaurar padrão" (aplica variante Clássica Oba)
-
-### theme.json (schemaVersion 3)
-Localização: `online/gestao/public/data/catalog-v1/theme.json`
-Campos na raiz: schemaVersion, updatedAt, variante
-Campos em paginas.*: logo, tamanhoLogo, titulo/subtitulo/texto/citacao/etc,
-  corFundo, corTitulo/corSubtitulo, toggles de visibilidade (exibirCTA etc),
-  opcoes.*.visivel (pag3)
-Campos em tema: 12 tokens (cores, fonte, tamanhoTitulo, tamanhoCorpo,
-  pesoTitulo, pesoCorpo, arredondamento, espacamento)
-
-### Fluxo de publicação
-Igual ao fluxo original: edição na Central → salva no DRAFT → Preview → Publicar.
-theme.json viaja dentro do payload do DRAFT automaticamente.
-preview-bootstrap.js intercepta theme.json para o slot PREVIEW.
-
-## Observação visual (menor)
-Os color pickers da seção "Cores desta página" exibem o marrom da marca como
-valor padrão do picker, mas o campo hex fica vazio (= usa tema global). Isso é
-correto funcionalmente mas pode parecer inconsistente. Pode ser ajustado se o
-usuário reportar confusão: basta mudar obaSetCorPagina() para deixar o picker
-cinza quando vazio.
-
-## Próximo passo recomendado
-Homologar ao vivo + fase 9D (preview iframe de celular dentro da Central).
-
-Leia AGENTS.md, docs/CURRENT_STATE.md, docs/DECISIONS.md e docs/ROADMAP.md antes de alterar codigo.
+Leia AGENTS.md, CURRENT_STATE.md, DECISIONS.md e ROADMAP.md antes de alterar código.

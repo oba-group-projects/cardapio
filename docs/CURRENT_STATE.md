@@ -1,65 +1,47 @@
 ﻿# CURRENT STATE
 
-Atualizado: 2026-09-14 00:00:00
+Atualizado: 2026-09-15
 
 ## Git
 Branch: feature/gestao-online-segura
-Commit HEAD: 2ad4329
+Commit HEAD: 1c860e5
 
-## Estado funcional
-- Central privada autenticada e 100% isolada da exposição pública.
-- D1 operacional com schemas 0001_catalog_states.sql e 0002_catalog_media.sql.
-- Fluxo DRAFT → PREVIEW → PUBLISHED operacional com rollback e histórico de versões.
-- Pipeline de mídia online operacional (upload, D1, servimento com cache imutável).
-- Slot PUBLISHED preservado e intacto (baseline pub_c3b7ee083866bb26a7a0b881).
+## Fases concluídas nesta sessão
 
-## Fase 9A (commit 1a2afd6) — Infraestrutura de Tema Visual
-- catalog-v1/theme.json: textos de 6 páginas + tokens de cor e tipografia.
-- Worker: "tema":"theme.json" em OBA_CATALOG_FILES, aliases tema/theme.
-- preview-bootstrap.js: theme.json interceptado para o slot PREVIEW do D1.
-- Cardápio: 31 IDs oba-*, hidratarTemaDoModeloMestre(), style#oba-tema-vars.
+### 9A (1a2afd6) — Infraestrutura de Tema Visual
+- theme.json, hidratarTemaDoModeloMestre(), IDs no cardápio, Worker, preview-bootstrap
 
-## Fase 9B (commit 79bf902) — Aba de Edição Visual na Central
-- Nova aba "✏️ Edição Visual" na Central com sub-abas Páginas e Tema Global.
-- 6 formulários colapsáveis por página/modal com edição de textos e logo.
-- obaNormalizeCatalog e obaDraftPayload incluem campo tema.
+### 9B (79bf902) + 9B-fix (4b073c3) — Aba Edição Visual
+- Sub-aba Páginas: 6 formulários colapsáveis (textos + logo)
+- Sub-aba Tema Global: 6 variantes, 5 cores, 10 fontes, sliders, preview ao vivo
+- Fix: bug vtab/vtab-active corrigido
 
-## Fase 9B-fix + expansão (commit 4b073c3) — Bug fix + Tipografia + Variantes
-- Corrigido bug tela branca: sub-abas internas usam class vtab/vtab-active.
-- Sub-aba Tema Global expandida: 6 variantes visuais (swatches clicáveis),
-  sliders de tamanho de fonte (título 18–40px, corpo 11–18px), peso do título
-  e do texto, slider de arredondamento (0–40px), seletor de espaçamento,
-  10 fontes disponíveis, preview ao vivo refletindo todos os controles.
-- theme.json schemaVersion 2: tokens tamanhoTitulo, tamanhoCorpo, pesoTitulo,
-  pesoCorpo, arredondamento, espacamento, variante.
-- hidratarTemaDoModeloMestre() injeta --oba-tam-titulo, --oba-tam-corpo,
-  --oba-peso-titulo, --oba-peso-corpo, --oba-radius, --oba-espacamento.
+### 9C (2ad4329) — Controles visuais por página
+- corFundo, corTítulo, tamanhoLogo, toggles de visibilidade por página
 
-## Fase 9C (commit 2ad4329) — Controles visuais por página
-- Formulários pag1/pag2/pag3 expandidos com 4 seções cada:
-  Textos | Imagem | Cores desta página | Visibilidade
-- Pag1: tamanhoLogo, corFundo, corTitulo, toggle exibirSubtitulo, toggle exibirCTA
-- Pag2: tamanhoLogo, corFundo (card), corTitulo, toggle exibirCitacao, toggle exibirSeparador
-- Pag3: tamanhoLogo, corFundo, corSubtitulo, 4 toggles de visibilidade de botões
-- Botão "✕ Limpar" por cor de página (volta ao tema global)
-- theme.json schemaVersion 3: todos os novos campos por página com defaults seguros
-- hidratarTemaDoModeloMestre() aplica tamanho de logo (mapa px), cores por seção
-  via element.style, e visibilidade via display none/'' para todos os elementos.
+### 9D (418512f + eeef5a3 + 9d5ff30) — Sync GitHub Pages
+- Worker: obaGitHubSyncPublished() — após publicação, atualiza JSONs no GitHub
+- Branch correto: feature/gestao-online-segura, paths: data/catalog-v1/*.json
+- EXECUTAR-9D-CONFIGURAR-PAT.cmd para configurar o secret GITHUB_PAT
 
-## Ultima fase aprovada
-9C — Controles visuais por página (commit 2ad4329).
+### 10A (108a5fc + ccd96fc + 1c860e5) — Menu dinâmico Página 3
+- theme.json v4: menu_principal.botoes[] (array) substitui opcoes{}
+- Cardápio renderiza botões dinamicamente a partir do array
+- Central: editor dinâmico com cards — adicionar, remover, reordenar
+- 8 ações: caixas, presenteaveis, personalizados, eventos, degustacao, whatsapp, historia, url
+- 15 ícones Font Awesome selecionáveis com clique visual
+- Preview ao vivo por botão: label, sublabel, ícone, destaque, visibilidade
+- Preços dos pacotes de Personalizados editáveis (3 campos + theme.json + cardápio)
+- Fix: template literal CSS não fechado no style9B
 
-## Próximo passo recomendado
-Homologar ao vivo na Central:
-  1. Abrir aba Edição Visual → sub-aba Páginas
-  2. Alterar cor de fundo da Página 1, salvar
-  3. Visualizar cardápio (Preview) → confirmar cor aplicada
-  4. Publicar
+## Estado funcional atual
+- Central online e operacional: https://oba-cardapio-gestao.obadoceria.workers.dev/
+- Aba Edição Visual completa (Páginas + Tema Global + Menu dinâmico)
+- Fluxo DRAFT → PREVIEW → PUBLISHED com rollback e histórico
+- Sync automático GitHub Pages na publicação (requer GITHUB_PAT configurado)
+- Cardápio público: https://oba-group-projects.github.io/cardapio/
 
-Fase 9D (futura): Preview ao vivo com iframe simulando celular dentro da Central.
-
-## Estado atual do ciclo
-Produção Estável & Central de Edição Visual Completa.
-- Central Privada Online: https://oba-cardapio-gestao.obadoceria.workers.dev/
-- Repositório Oficial: https://github.com/oba-group-projects/cardapio
-- Cardápio Público: https://oba-group-projects.github.io/cardapio/
+## Próximos candidatos
+- Homologar sync GitHub Pages ao vivo (confirmar GITHUB_PAT funcionando)
+- Fase 10B: templates de nova seção/página
+- Preview ao vivo com iframe de celular dentro da Central (9D planejado)
