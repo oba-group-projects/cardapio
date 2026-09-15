@@ -14,7 +14,8 @@
     "secrets": {
     "required": [
       "AUTH_PASSWORD",
-      "AUTH_SESSION_SECRET"
+      "AUTH_SESSION_SECRET",
+      "GITHUB_PAT"
     ]
   },
 "assets": {

@@ -1423,6 +1423,127 @@ async function obaHandlePreviewApi(request, env, url) {
 }
 
 
+/* OBA_GITHUB_SYNC_BEGIN */
+
+/*
+ * Sincroniza o payload PUBLISHED com o repositório GitHub.
+ * Chamada após gravação bem-sucedida no D1.
+ * Falha silenciosa: não impede a publicação se o GitHub estiver
+ * indisponível ou o GITHUB_PAT não estiver configurado.
+ *
+ * Requer secret GITHUB_PAT com permissão Contents: Read and write
+ * no repositório oba-group-projects/cardapio.
+ */
+
+const OBA_GITHUB_REPO  = "oba-group-projects/cardapio";
+const OBA_GITHUB_BRANCH = "main";
+
+/*
+ * Mapa: chave do payload → caminho do arquivo no repositório
+ */
+const OBA_GITHUB_FILE_MAP = Object.freeze({
+  loja:       "online/gestao/public/data/catalog-v1/config.json",
+  categorias: "online/gestao/public/data/catalog-v1/categories.json",
+  caixas:     "online/gestao/public/data/catalog-v1/boxes.json",
+  sabores:    "online/gestao/public/data/catalog-v1/flavors.json",
+  produtos:   "online/gestao/public/data/catalog-v1/products.json",
+  opcionais:  "online/gestao/public/data/catalog-v1/options.json",
+  combos:     "online/gestao/public/data/catalog-v1/combos.json",
+  tema:       "online/gestao/public/data/catalog-v1/theme.json"
+});
+
+async function obaGitHubGetFileSha(token, path) {
+  const url =
+    `https://api.github.com/repos/${OBA_GITHUB_REPO}/contents/${path}` +
+    `?ref=${OBA_GITHUB_BRANCH}`;
+
+  const resp = await fetch(url, {
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Accept": "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+      "User-Agent": "oba-cardapio-worker"
+    }
+  });
+
+  if (resp.status === 404) return null;
+  if (!resp.ok) throw new Error(`GitHub GET ${path}: HTTP ${resp.status}`);
+
+  const data = await resp.json();
+  return data.sha || null;
+}
+
+async function obaGitHubPutFile(token, path, content, sha, message) {
+  const body = {
+    message,
+    content: btoa(unescape(encodeURIComponent(content))),
+    branch: OBA_GITHUB_BRANCH
+  };
+  if (sha) body.sha = sha;
+
+  const resp = await fetch(
+    `https://api.github.com/repos/${OBA_GITHUB_REPO}/contents/${path}`,
+    {
+      method: "PUT",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/vnd.github+json",
+        "Content-Type": "application/json",
+        "X-GitHub-Api-Version": "2022-11-28",
+        "User-Agent": "oba-cardapio-worker"
+      },
+      body: JSON.stringify(body)
+    }
+  );
+
+  if (!resp.ok) {
+    const err = await resp.text().catch(() => "");
+    throw new Error(`GitHub PUT ${path}: HTTP ${resp.status} — ${err.slice(0, 200)}`);
+  }
+  return true;
+}
+
+async function obaGitHubSyncPublished(env, payload, revisionId) {
+  const token = env.GITHUB_PAT;
+
+  if (!token) {
+    console.warn("[9D] GITHUB_PAT nao configurado — sync ignorado.");
+    return { ok: false, reason: "pat_missing" };
+  }
+
+  if (!payload || typeof payload !== "object") {
+    console.warn("[9D] Payload invalido — sync ignorado.");
+    return { ok: false, reason: "payload_invalid" };
+  }
+
+  const message =
+    `chore(sync): publicacao via Central [${revisionId?.slice(0, 12) || "unknown"}]`;
+
+  const results = {};
+  let errors = 0;
+
+  for (const [key, filePath] of Object.entries(OBA_GITHUB_FILE_MAP)) {
+    const value = payload[key];
+    if (value === undefined) continue;
+
+    try {
+      const content = JSON.stringify(value, null, 2);
+      const sha = await obaGitHubGetFileSha(token, filePath);
+      await obaGitHubPutFile(token, filePath, content, sha, message);
+      results[key] = "ok";
+    } catch (err) {
+      console.error(`[9D] Erro ao sincronizar ${key}:`, String(err));
+      results[key] = "error";
+      errors++;
+    }
+  }
+
+  console.info(`[9D] Sync GitHub concluido. Erros: ${errors}`, results);
+  return { ok: errors === 0, errors, results };
+}
+
+/* OBA_GITHUB_SYNC_END */
+
 /* OBA_PUBLISH_API_BEGIN */
 
 async function obaHandlePublishApi(request, env, url) {
@@ -1634,6 +1755,17 @@ async function obaHandlePublishApi(request, env, url) {
       throw new Error("published_post_write_mismatch");
     }
 
+    /* R9D — Sincronizar JSONs do cardápio público no GitHub após publicação */
+    const syncResult = await obaGitHubSyncPublished(
+      env,
+      after.payload,
+      after.revision_id
+    ).catch(err => {
+      /* Falha silenciosa: publicação no D1 já ocorreu com sucesso */
+      console.error("[9D] Sync GitHub falhou:", String(err));
+      return { ok: false, reason: "sync_exception", detail: String(err) };
+    });
+
     return obaApiJson({
       ok: true,
       slot: "PUBLISHED",
@@ -1642,6 +1774,7 @@ async function obaHandlePublishApi(request, env, url) {
       previous_revision_id: published.revision_id,
       promotion_id: promotionId,
       reused: false,
+      github_sync: syncResult,
       slots: await obaCatalogSlotsState(env)
     });
   }
