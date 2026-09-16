@@ -55,26 +55,6 @@
           "sublabel": "Proposta",
           "url": "",
           "visivel": true
-        },
-        {
-          "acao": "caixas",
-          "destaque": false,
-          "icone": "fa-solid fa-star",
-          "id": "btn-4",
-          "label": "TESTE",
-          "sublabel": "TESTE 2",
-          "url": "",
-          "visivel": true
-        },
-        {
-          "acao": "caixas",
-          "destaque": false,
-          "icone": "fa-solid fa-heart",
-          "id": "btn-5",
-          "label": "TESTE 2",
-          "sublabel": "TESTE 3",
-          "url": "",
-          "visivel": true
         }
       ],
       "corFundo": "",
@@ -119,50 +99,7 @@
       "titulo": ""
     }
   },
-  "paginas_customizadas": [
-    {
-      "config": {
-        "citacao": "como você está?",
-        "ctaAcao": "whatsapp",
-        "ctaLabel": "Vamos juntos?",
-        "ctaUrl": "",
-        "texto": "olá, tudo bem?"
-      },
-      "id": "secmu370pge",
-      "linkMenu": {
-        "ativo": true,
-        "destaque": false,
-        "icone": "fa-solid fa-cake-candles",
-        "label": "",
-        "sublabel": ""
-      },
-      "posicao": "apos-pag2",
-      "subtitulo": "TESTE",
-      "template": "informativa",
-      "titulo": "TESTE"
-    },
-    {
-      "config": {
-        "citacao": "DELICIOSOS!",
-        "ctaAcao": "",
-        "ctaLabel": "CLIQUE AQUI",
-        "ctaUrl": "",
-        "texto": "Q TAL ESCOLHER UM DOCE?"
-      },
-      "id": "secmu42p4eq",
-      "linkMenu": {
-        "ativo": true,
-        "destaque": false,
-        "icone": "fa-solid fa-cookie-bite",
-        "label": "",
-        "sublabel": ""
-      },
-      "posicao": "apos-pag3",
-      "subtitulo": "SABORES",
-      "template": "informativa",
-      "titulo": "DOCES"
-    }
-  ],
+  "paginas_customizadas": [],
   "schemaVersion": 2,
   "tema": {
     "arredondamento": "20",
