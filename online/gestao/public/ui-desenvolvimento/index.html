@@ -22,6 +22,28 @@
        R9A - VARIÁVEIS DE TEMA VISUAL (preenchidas por hidratarTemaDoModeloMestre)
        ================================================================ -->
   <style id="oba-tema-vars"></style>
+  <!-- ================================================================
+       R9A-TIPOGRAFIA — aplica variáveis de tema aos elementos com ID
+       Usa !important para sobrescrever classes Tailwind inline.
+       ================================================================ -->
+  <style id="oba-tipografia-vars">
+    #oba-pag1-titulo {
+      font-size: var(--oba-tam-titulo, 1.5rem) !important;
+      font-weight: var(--oba-peso-titulo, 300) !important;
+    }
+    #oba-pag2-titulo {
+      font-size: var(--oba-tam-titulo, 0.875rem) !important;
+      font-weight: var(--oba-peso-titulo, 300) !important;
+    }
+    #oba-pag2-texto {
+      font-size: var(--oba-tam-corpo, 13px) !important;
+      font-weight: var(--oba-peso-corpo, 400) !important;
+    }
+    #oba-pag1-subtitulo, #oba-pag2-citacao {
+      font-size: var(--oba-tam-corpo, 0.875rem) !important;
+      font-weight: var(--oba-peso-corpo, 400) !important;
+    }
+  </style>
 <style id="r117a-mobile-flow">
 
   /* ==========================================================
