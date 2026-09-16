@@ -136,10 +136,31 @@
         "label": "",
         "sublabel": ""
       },
-      "posicao": "apos-pag3",
+      "posicao": "apos-pag2",
       "subtitulo": "TESTE",
       "template": "informativa",
       "titulo": "TESTE"
+    },
+    {
+      "config": {
+        "citacao": "DELICIOSOS!",
+        "ctaAcao": "",
+        "ctaLabel": "CLIQUE AQUI",
+        "ctaUrl": "",
+        "texto": "Q TAL ESCOLHER UM DOCE?"
+      },
+      "id": "secmu42p4eq",
+      "linkMenu": {
+        "ativo": true,
+        "destaque": false,
+        "icone": "fa-solid fa-cookie-bite",
+        "label": "",
+        "sublabel": ""
+      },
+      "posicao": "apos-pag3",
+      "subtitulo": "SABORES",
+      "template": "informativa",
+      "titulo": "DOCES"
     }
   ],
   "schemaVersion": 2,
