@@ -2137,7 +2137,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
     <div class="text-center space-y-5 w-full max-w-xs">
       <h1 id="oba-pag1-titulo" class="text-2xl font-light tracking-[0.2em] text-[#8B4513] uppercase">Bem-vindo</h1>
       <p id="oba-pag1-subtitulo" class="text-sm text-gray-500 font-light leading-relaxed px-2">Prepare-se para descobrir o verdadeiro sabor artesanal em cada detalhe.</p>
-      <button onclick="navegarPara(2)" class="w-full py-4 mt-4 bg-[#8B4513] text-white rounded-[1.25rem] font-medium text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-[#8B4513]/20 active:scale-95 flex justify-center items-center gap-3">
+      <button id="oba-pag1-btn-cta" onclick="navegarPara(2)" class="w-full py-4 mt-4 bg-[#8B4513] text-white rounded-[1.25rem] font-medium text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-[#8B4513]/20 active:scale-95 flex justify-center items-center gap-3">
         <span id="oba-pag1-cta">Descobrir Nossa História</span> <i class="fa-solid fa-chevron-right text-[9px]"></i>
       </button>
     </div>
@@ -2153,7 +2153,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
     </div>
     <div class="flex gap-3 w-full mt-6">
       <button onclick="navegarPara(1)" class="w-1/3 py-4 border border-[#8B4513]/20 rounded-[1.25rem] text-[10px] text-[#8B4513] font-semibold uppercase tracking-widest bg-white/50 active:scale-95">Voltar</button>
-      <button onclick="navegarPara(3)" class="flex-1 py-4 bg-[#8B4513] text-white rounded-[1.25rem] font-medium text-[11px] uppercase tracking-widest shadow-lg shadow-[#8B4513]/20 active:scale-95 flex justify-center items-center gap-2">
+      <button id="oba-pag2-btn-cta" onclick="navegarPara(3)" class="flex-1 py-4 bg-[#8B4513] text-white rounded-[1.25rem] font-medium text-[11px] uppercase tracking-widest shadow-lg shadow-[#8B4513]/20 active:scale-95 flex justify-center items-center gap-2">
         Ver o Cardápio <i class="fa-solid fa-chevron-right text-[9px]"></i>
       </button>
     </div>
@@ -3806,6 +3806,115 @@ async function hidratarTemaDoModeloMestre() {
       }
     });
 
+    /* ── R10D: POSICIONAMENTO DAS SEÇÕES NA SEQUÊNCIA DE NAVEGAÇÃO ─────
+       Seções com posicao != 'menu' são injetadas na sequência linear
+       e os botões CTA das páginas adjacentes são redirecionados.
+       posicao valores:
+         'menu'      → botão automático no menu (R10C, já renderizado)
+         'apos-pag1' → entre Página 1 e Página 2
+         'apos-pag2' → entre Página 2 e Página 3
+         'apos-pag3' → após o menu principal, antes dos fluxos
+    ─────────────────────────────────────────────────────────────────── */
+
+    /* Seções posicionadas na sequência (posicao != 'menu' ou não definido como menu) */
+    const secoesSequencia = secoesCustom.filter(s => s.posicao && s.posicao !== 'menu');
+
+    /* Mapas de próxima/anterior por posição */
+    const proximaPorPosicao = {
+      'apos-pag1': 2,  /* próxima padrão: pag-2 */
+      'apos-pag2': 3,  /* próxima padrão: pag-3 */
+      'apos-pag3': 4   /* próxima padrão: fluxo-principal */
+    };
+
+    /* Função para navegar para uma seção customizada por ID de seção */
+    function obaNavSecao(secId) {
+      ['pag-1','pag-2','pag-3','fluxo-principal'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.classList.add('hidden'); el.classList.remove('flex'); }
+      });
+      document.querySelectorAll('[data-oba-overflow-menu],[data-oba-secao-custom]').forEach(el => {
+        el.classList.add('hidden'); el.classList.remove('flex');
+      });
+      const alvo = document.getElementById(secId);
+      if (alvo) { alvo.classList.remove('hidden'); alvo.classList.add('flex'); }
+      const wpp = document.getElementById('btn-wpp-flutuante');
+      if (wpp) wpp.style.display = 'flex';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* Restaura CTAs para valores padrão antes de re-aplicar */
+    const btnCta1 = document.getElementById('oba-pag1-btn-cta');
+    const btnCta2 = document.getElementById('oba-pag2-btn-cta');
+    if (btnCta1) btnCta1.onclick = () => navegarPara(2);
+    if (btnCta2) btnCta2.onclick = () => navegarPara(3);
+
+    /* Para cada posição, encontra a PRIMEIRA seção com aquela posição
+       (múltiplas seções na mesma posição formam uma cadeia) */
+    ['apos-pag1','apos-pag2','apos-pag3'].forEach(pos => {
+      const secoesNaPos = secoesSequencia.filter(s => s.posicao === pos);
+      if (secoesNaPos.length === 0) return;
+
+      /* Monta a cadeia: pag-anterior → sec[0] → sec[1] → ... → pag-próxima */
+      secoesNaPos.forEach((sec, idx) => {
+        const secId = 'pag-custom-' + sec.id;
+        const secEl = document.getElementById(secId);
+        if (!secEl) return;
+
+        /* Determina de onde viemos */
+        const anteriorId = idx === 0
+          ? (pos === 'apos-pag1' ? 'pag-1' : pos === 'apos-pag2' ? 'pag-2' : 'pag-3')
+          : 'pag-custom-' + secoesNaPos[idx - 1].id;
+
+        /* Determina para onde vamos */
+        const proximaId = idx < secoesNaPos.length - 1
+          ? 'pag-custom-' + secoesNaPos[idx + 1].id
+          : null; /* última da cadeia → vai para a página seguinte padrão */
+        const proximaNumPadrao = proximaPorPosicao[pos];
+
+        /* Atualiza o botão Voltar da seção */
+        const voltarBtn = secEl.querySelector('button[onclick*="obaVoltarMenuOverflow"]');
+        if (voltarBtn) {
+          if (anteriorId === 'pag-1' || anteriorId === 'pag-2' || anteriorId === 'pag-3') {
+            const anteriorNum = anteriorId === 'pag-1' ? 1 : anteriorId === 'pag-2' ? 2 : 3;
+            voltarBtn.onclick = () => navegarPara(anteriorNum);
+          } else {
+            voltarBtn.onclick = () => obaNavSecao(anteriorId);
+          }
+        }
+
+        /* Adiciona (ou atualiza) botão "Continuar →" na seção customizada */
+        let continuarBtn = secEl.querySelector('.oba-continuar-btn');
+        if (!continuarBtn) {
+          continuarBtn = document.createElement('button');
+          continuarBtn.className = 'oba-continuar-btn w-full py-4 mt-4 bg-[#8B4513] text-white rounded-[1.25rem] font-medium text-[11px] uppercase tracking-[0.2em] shadow-xl active:scale-95 flex justify-center items-center gap-3';
+          continuarBtn.innerHTML = `<span>${sec.config?.ctaContinuar || 'Continuar'}</span> <i class="fa-solid fa-chevron-right text-[9px]"></i>`;
+          secEl.insertBefore(continuarBtn, secEl.querySelector('button[onclick*="obaVoltarMenuOverflow"]') || null);
+        }
+
+        if (proximaId) {
+          continuarBtn.onclick = () => obaNavSecao(proximaId);
+        } else {
+          continuarBtn.onclick = () => {
+            if (proximaNumPadrao === 4) {
+              /* fluxo principal — mantém última seleção ou vai para pag-3 */
+              navegarPara(3);
+            } else {
+              navegarPara(proximaNumPadrao);
+            }
+          };
+        }
+      });
+
+      /* Redireciona o CTA da página que antecede esta posição */
+      const primeiraSecId = 'pag-custom-' + secoesNaPos[0].id;
+      if (pos === 'apos-pag1' && btnCta1) {
+        btnCta1.onclick = () => obaNavSecao(primeiraSecId);
+      } else if (pos === 'apos-pag2' && btnCta2) {
+        btnCta2.onclick = () => obaNavSecao(primeiraSecId);
+      }
+      /* apos-pag3: não há CTA fixo na Pág 3, a seção aparece naturalmente após o menu */
+    });
+
     /* Vitrine de Presentes */
     const vp = p.vitrine_presentes || {};
     _set('oba-vitrine-titulo',     vp.titulo);
@@ -3920,9 +4029,9 @@ function navegarPara(num) {
   const alvo = num === 4 ? 'fluxo-principal' : `pag-${num}`;
   document.getElementById(alvo).classList.remove('hidden');
   document.getElementById(alvo).classList.add('flex');
-  /* WhatsApp flutuante: oculto na Página 1, visível da Página 2 em diante */
+  /* WhatsApp flutuante: oculto nas Páginas 1 e 2, visível da Página 3 em diante */
   const wpp = document.getElementById('btn-wpp-flutuante');
-  if (wpp) wpp.style.display = num >= 2 ? 'flex' : 'none';
+  if (wpp) wpp.style.display = num >= 3 ? 'flex' : 'none';
   window.scrollTo({ top:0, behavior:'smooth' });
 }
 
