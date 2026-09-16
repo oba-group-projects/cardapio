@@ -3473,12 +3473,22 @@ async function hidratarTemaDoModeloMestre() {
          no array de botões do menu, sem que o usuário precise adicioná-lo
          manualmente na Página 3.
       ────────────────────────────────────────────────────────────────── */
+      /* Seções que geram botão automático no menu:
+         APENAS as com posicao='menu' (ou sem posicao definida, fallback = menu).
+         Seções com posicao='apos-pag1/2/3' aparecem na sequência (R10D) — sem botão no menu. */
       const secoesComLink = Array.isArray(tema.paginas_customizadas)
-        ? tema.paginas_customizadas.filter(s => s && s.id && s.linkMenu && s.linkMenu.ativo !== false)
+        ? tema.paginas_customizadas.filter(s =>
+            s && s.id && s.linkMenu && s.linkMenu.ativo !== false &&
+            (!s.posicao || s.posicao === 'menu')
+          )
         : [];
 
-      /* Pré-registra ações sec-* no acaoMap para que obacriarBtnMenu funcione */
-      secoesComLink.forEach(sec => {
+      /* Pré-registra ações sec-* no acaoMap para TODAS as seções customizadas
+         (inclui as de sequência, para que o R10D e o acaoMap funcionem) */
+      const todasSecoesCustom = Array.isArray(tema.paginas_customizadas)
+        ? tema.paginas_customizadas.filter(s => s && s.id)
+        : [];
+      todasSecoesCustom.forEach(sec => {
         acaoMap['sec-' + sec.id] = () => {
           ['pag-1','pag-2','pag-3','fluxo-principal'].forEach(id => {
             const el = document.getElementById(id);
@@ -3489,6 +3499,8 @@ async function hidratarTemaDoModeloMestre() {
           });
           const alvoSec = document.getElementById('pag-custom-' + sec.id);
           if (alvoSec) { alvoSec.classList.remove('hidden'); alvoSec.classList.add('flex'); }
+          const wpp = document.getElementById('btn-wpp-flutuante');
+          if (wpp) wpp.style.display = 'flex';
           window.scrollTo({ top: 0, behavior: 'smooth' });
         };
       });
@@ -3684,27 +3696,10 @@ async function hidratarTemaDoModeloMestre() {
     /* Remove seções customizadas antigas antes de re-renderizar */
     document.querySelectorAll('[data-oba-secao-custom]').forEach(el => el.remove());
 
-    /* Atualiza o acaoMap com as novas seções ANTES de expandir o array */
+    /* secoesCustom: todas as seções com template definido para renderizar */
     const secoesCustom = Array.isArray(tema.paginas_customizadas)
       ? tema.paginas_customizadas.filter(s => s && s.id && s.template)
       : [];
-
-    /* Registra ações dinâmicas 'sec-{id}' para cada seção customizada */
-    secoesCustom.forEach(sec => {
-      const secId = 'pag-custom-' + sec.id;
-      acaoMap['sec-' + sec.id] = () => {
-        ['pag-1','pag-2','pag-3','fluxo-principal'].forEach(id => {
-          const el = document.getElementById(id);
-          if (el) { el.classList.add('hidden'); el.classList.remove('flex'); }
-        });
-        document.querySelectorAll('[data-oba-overflow-menu],[data-oba-secao-custom]').forEach(el => {
-          el.classList.add('hidden'); el.classList.remove('flex');
-        });
-        const alvoSec = document.getElementById(secId);
-        if (alvoSec) { alvoSec.classList.remove('hidden'); alvoSec.classList.add('flex'); }
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      };
-    });
 
     /* Renderiza cada seção customizada */
     const fluxoPrincipalEl = document.getElementById('fluxo-principal');
