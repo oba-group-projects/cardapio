@@ -1749,13 +1749,8 @@ $('formConfig').onsubmit=async e=>{
 
         <div class="field full">
           <label>📍 Posição no cardápio</label>
-          <select class="secao-posicao" onchange="obaAlterarPosicaoSecao(this)">
-            <option value="menu"      ${(sec.posicao||'menu')==='menu'      ?'selected':''}>Menu Principal — aparece como botão na Página 3</option>
-            <option value="apos-pag1" ${sec.posicao==='apos-pag1'          ?'selected':''}>Após Boas-vindas — nova etapa entre Página 1 e Página 2</option>
-            <option value="apos-pag2" ${sec.posicao==='apos-pag2'          ?'selected':''}>Após Nossa Essência — nova etapa entre Página 2 e Página 3</option>
-            <option value="apos-pag3" ${sec.posicao==='apos-pag3'          ?'selected':''}>Após o Menu — nova etapa após a Página 3 de escolha</option>
-          </select>
-          <p class="hint" style="margin:4px 0 0" id="${sec.id}-pos-hint">${obaHintPosicao(sec.posicao||'menu')}</p>
+          <p class="hint" style="margin:4px 0 0">Esta seção aparece como botão no Menu Principal. O sistema distribui automaticamente se houver mais de 4 botões.</p>
+          <input type="hidden" class="secao-posicao" value="menu">
         </div>
 
         <div class="field"><label>Título da seção</label>
@@ -1766,16 +1761,16 @@ $('formConfig').onsubmit=async e=>{
           <input class="secao-subtitulo" value="${sec.subtitulo||''}" placeholder="Ex: Sabores especiais da estação">
         </div>
 
-        <div id="${sec.id}-link-bloco" style="grid-column:1/-1;display:${(sec.posicao||'menu')==='menu'?'':'none'}"><p class="oba-secao-titulo">🔘 Botão no menu principal</p></div>
-        <div class="field full" id="${sec.id}-link-ativo-row" style="display:${(sec.posicao||'menu')==='menu'?'flex':'none'};gap:16px;flex-wrap:wrap;align-items:center">
+        <div style="grid-column:1/-1"><p class="oba-secao-titulo">🔘 Botão no menu principal</p></div>
+        <div class="field full" style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">
           <label class="oba-toggle-label">
             <input type="checkbox" class="secao-link-ativo" ${lm.ativo!==false?'checked':''}> Adicionar botão automático no menu
           </label>
         </div>
-        <div class="field" id="${sec.id}-link-label-row" style="display:${(sec.posicao||'menu')==='menu'?'':'none'}"><label>Label do botão</label>
+        <div class="field"><label>Label do botão</label>
           <input class="secao-link-label" value="${lm.label||''}" placeholder="Ex: Doces Sazonais">
         </div>
-        <div class="field" id="${sec.id}-link-sublabel-row" style="display:${(sec.posicao||'menu')==='menu'?'':'none'}"><label>Sublabel do botão</label>
+        <div class="field"><label>Sublabel do botão</label>
           <input class="secao-link-sublabel" value="${lm.sublabel||''}" placeholder="Ex: Novidades">
         </div>
         <div class="field full"><label>Ícone do botão</label>
@@ -2030,38 +2025,6 @@ $('formConfig').onsubmit=async e=>{
     }
     return { id, template:tmpl, titulo, subtitulo, posicao, linkMenu:{ativo:linkAtivo,label:linkLabel,sublabel:linkSublabel,icone:linkIcone,destaque:linkDestaque}, config };
   }
-
-  /* Texto de ajuda contextual por posição */
-  window.obaHintPosicao = function(pos) {
-    const hints = {
-      'menu':      'O botão do menu leva o cliente para esta seção.',
-      'apos-pag1': 'O botão "Descobrir Nossa História" levará para esta seção. Ao sair, o cliente vai para a Página 2.',
-      'apos-pag2': 'O botão "Ver o Cardápio" levará para esta seção. Ao sair, o cliente vai para o Menu Principal.',
-      'apos-pag3': 'Esta seção aparece como etapa extra após o Menu de Escolha.'
-    };
-    return hints[pos] || hints['menu'];
-  };
-
-  /* Atualiza o hint e mostra/oculta os campos de link do menu */
-  window.obaAlterarPosicaoSecao = function(sel) {
-    const card = sel.closest('.oba-secao-card');
-    if (!card) return;
-    const pos = sel.value;
-    const secId = card.querySelector('.secao-id-hidden')?.value || '';
-    const hint = card.querySelector(`#${secId}-pos-hint`);
-    if (hint) hint.textContent = obaHintPosicao(pos);
-
-    const isMenu = pos === 'menu';
-    const blocoLink    = card.querySelector(`#${secId}-link-bloco`);
-    const ativoRow     = card.querySelector(`#${secId}-link-ativo-row`);
-    const labelRow     = card.querySelector(`#${secId}-link-label-row`);
-    const sublabelRow  = card.querySelector(`#${secId}-link-sublabel-row`);
-
-    if (blocoLink)   blocoLink.style.display    = isMenu ? '' : 'none';
-    if (ativoRow)    ativoRow.style.display      = isMenu ? 'flex' : 'none';
-    if (labelRow)    labelRow.style.display      = isMenu ? '' : 'none';
-    if (sublabelRow) sublabelRow.style.display   = isMenu ? '' : 'none';
-  };
 
 })();/* fim FASE 9B */
 
