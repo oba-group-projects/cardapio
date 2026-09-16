@@ -69,7 +69,7 @@
         {
           "acao": "caixas",
           "destaque": false,
-          "icone": "fa-solid fa-star",
+          "icone": "fa-solid fa-heart",
           "id": "btn-5",
           "label": "TESTE 2",
           "sublabel": "TESTE 3",
@@ -132,10 +132,11 @@
       "linkMenu": {
         "ativo": true,
         "destaque": false,
-        "icone": "fa-solid fa-star",
+        "icone": "fa-solid fa-cake-candles",
         "label": "",
         "sublabel": ""
       },
+      "posicao": "apos-pag3",
       "subtitulo": "TESTE",
       "template": "informativa",
       "titulo": "TESTE"
@@ -156,6 +157,6 @@
     "tamanhoCorpo": "13",
     "tamanhoTitulo": "24"
   },
-  "updatedAt": "2026-09-15",
+  "updatedAt": "2026-09-16",
   "variante": "classica"
 }
