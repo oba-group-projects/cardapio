@@ -1927,13 +1927,23 @@ $('formConfig').onsubmit=async e=>{
   };
 
   /* Remove seção */
-  window.obaRemoverSecaoCustom = function(btn) {
+  window.obaRemoverSecaoCustom = async function(btn) {
     if (!confirm('Remover esta seção do cardápio?')) return;
     const card = btn.closest('.oba-secao-card');
+    const titulo = card.querySelector('.secao-titulo')?.value.trim() || 'seção';
     card.remove();
     const lista = $('secoes-extras-lista');
     const vazio = $('secoes-extras-vazio');
     if (lista && vazio) vazio.style.display = lista.children.length === 0 ? '' : 'none';
+
+    /* Salva automaticamente no DRAFT após remover */
+    try {
+      const temaAtual = obaLerFormTema();
+      const res = await obaSaveDraftWith('tema', temaAtual);
+      catalogo.tema = temaAtual;
+      addPendencia('Seção removida: ' + titulo);
+      msg('Seção "' + titulo + '" removida e salva no Rascunho. Backup: ' + res.backup);
+    } catch(err) { msg(String(err.message||err), 'erro'); }
   };
 
   /* Lê uma seção do card e salva tudo no DRAFT */
