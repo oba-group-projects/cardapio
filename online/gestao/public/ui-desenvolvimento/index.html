@@ -3843,6 +3843,9 @@ async function hidratarTemaDoModeloMestre() {
     if (btnCta1) btnCta1.onclick = () => navegarPara(2);
     if (btnCta2) btnCta2.onclick = () => navegarPara(3);
 
+    /* Remove botão continuar-pag3 anterior (será recriado se necessário) */
+    document.querySelectorAll('.oba-continuar-pag3').forEach(el => el.remove());
+
     /* Para cada posição, encontra a PRIMEIRA seção com aquela posição
        (múltiplas seções na mesma posição formam uma cadeia) */
     ['apos-pag1','apos-pag2','apos-pag3'].forEach(pos => {
@@ -3906,8 +3909,22 @@ async function hidratarTemaDoModeloMestre() {
         btnCta1.onclick = () => obaNavSecao(primeiraSecId);
       } else if (pos === 'apos-pag2' && btnCta2) {
         btnCta2.onclick = () => obaNavSecao(primeiraSecId);
+      } else if (pos === 'apos-pag3') {
+        /* Para apos-pag3: adiciona botão "Continuar →" no final do menu da Pág 3 */
+        const menuBotoes = document.getElementById('oba-menu-botoes');
+        if (menuBotoes) {
+          /* Remove botão anterior se existir */
+          const existente = menuBotoes.querySelector('.oba-continuar-pag3');
+          if (existente) existente.remove();
+          const continuarPag3 = document.createElement('button');
+          continuarPag3.className = 'oba-continuar-pag3 w-full p-5 bg-amber-50 border-2 border-[#8B4513]/40 text-[#8B4513] rounded-[2rem] text-left flex justify-between items-center active:scale-95 transition-all shadow-sm';
+          const secTitulo = secoesNaPos[0].titulo || 'Continuar';
+          const secSub    = secoesNaPos[0].subtitulo || '';
+          continuarPag3.innerHTML = `<div><span class="block text-[9px] uppercase tracking-widest font-bold opacity-60 mb-1">${secSub||'Próxima etapa'}</span><span class="text-sm font-semibold">${secTitulo} →</span></div><i class="fa-solid fa-chevron-right text-lg text-[#8B4513] opacity-50"></i>`;
+          continuarPag3.onclick = () => obaNavSecao(primeiraSecId);
+          menuBotoes.appendChild(continuarPag3);
+        }
       }
-      /* apos-pag3: não há CTA fixo na Pág 3, a seção aparece naturalmente após o menu */
     });
 
     /* Vitrine de Presentes */
@@ -4020,6 +4037,11 @@ function navegarPara(num) {
   ['pag-1','pag-2','pag-3','fluxo-principal'].forEach(id => {
     document.getElementById(id).classList.add('hidden');
     document.getElementById(id).classList.remove('flex');
+  });
+  /* Esconde também páginas de overflow e seções customizadas */
+  document.querySelectorAll('[data-oba-overflow-menu],[data-oba-secao-custom]').forEach(el => {
+    el.classList.add('hidden');
+    el.classList.remove('flex');
   });
   const alvo = num === 4 ? 'fluxo-principal' : `pag-${num}`;
   document.getElementById(alvo).classList.remove('hidden');
