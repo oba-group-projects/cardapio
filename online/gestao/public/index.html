@@ -344,12 +344,18 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
       <form id="formPers" class="oba-pg-form grid">
         <div class="field"><label>Título do modal</label><input id="pers-m-titulo" placeholder="Doces Personalizados"></div>
         <div class="field"><label>Título do bloco Informações</label><input id="pers-m-info-titulo" placeholder="Informações"></div>
-        <div class="field full"><label>Item 1 das Informações</label><input id="pers-m-info-1" placeholder="Modelagem artesanal."></div>
-        <div class="field full"><label>Item 2 das Informações</label><input id="pers-m-info-2" placeholder="Mínimo: 20 unidades."></div>
+
+        <div style="grid-column:1/-1"><p class="oba-secao-titulo">📋 Itens do bloco Informações</p></div>
+        <div style="grid-column:1/-1">
+          <div id="pers-info-lista" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px"></div>
+          <button type="button" class="secondary" style="font-size:12px" onclick="obaAdicionarInfoItem()">+ Adicionar item</button>
+          <p class="hint" style="margin:4px 0 0">Cada item aparece com "•" à frente no modal.</p>
+        </div>
+
         <div class="field full"><label>Título do bloco Pacotes</label><input id="pers-m-pacotes-titulo" placeholder="Pacotes Especiais"></div>
         <div style="grid-column:1/-1"><p class="oba-secao-titulo">💰 Preços dos pacotes</p></div>
         <div class="field">
-          <label>Pacote 20 doces — preço <span class="hint">(apenas números e vírgula, ex: 196,00)</span></label>
+          <label>Pacote 20 doces — preço <span class="hint">(ex: 196,00)</span></label>
           <div style="display:flex;align-items:center;gap:6px">
             <span style="font-size:13px;color:var(--muted)">R$</span>
             <input id="pers-m-preco-20" placeholder="196,00" style="max-width:120px">
@@ -378,6 +384,14 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
       <summary class="oba-pg-summary">Modal — Orçamentos de Eventos</summary>
       <form id="formEventos" class="oba-pg-form grid">
         <div class="field full"><label>Título do modal</label><input id="eventos-m-titulo" placeholder="Orçamentos de Eventos"></div>
+
+        <div style="grid-column:1/-1"><p class="oba-secao-titulo">🏷️ Labels dos campos</p></div>
+        <div class="field"><label>Label — Campo Nome</label><input id="eventos-m-label-nome" placeholder="Seu Nome Completo"></div>
+        <div class="field"><label>Label — Campo Tipo de Evento</label><input id="eventos-m-label-tipo" placeholder="Tipo (Casamento, Formatura...)"></div>
+        <div class="field"><label>Label — Campo Data</label><input id="eventos-m-label-data" placeholder="Data"></div>
+        <div class="field"><label>Label — Campo Convidados</label><input id="eventos-m-label-convidados" placeholder="Nº Convidados"></div>
+        <div class="field"><label>Label — Botão de envio</label><input id="eventos-m-label-botao" placeholder="Solicitar Proposta"></div>
+
         <div class="field full actions"><button class="primary" type="submit">Salvar Modal Eventos</button></div>
       </form>
     </details>
@@ -1613,8 +1627,8 @@ $('formConfig').onsubmit=async e=>{
     const pm=pg.personalizados_modal||{};
     obaSetVal('pers-m-titulo',pm.titulo);obaSetVal('pers-m-info-titulo',pm.info_titulo);
     obaSetVal('pers-m-pacotes-titulo',pm.pacotes_titulo);
-    obaSetVal('pers-m-info-1',Array.isArray(pm.info_items)?pm.info_items[0]||'':'');
-    obaSetVal('pers-m-info-2',Array.isArray(pm.info_items)?pm.info_items[1]||'':'');
+    /* R11B: lista dinâmica de info_items */
+    obaRenderizarInfoItems(Array.isArray(pm.info_items) ? pm.info_items : ['Modelagem artesanal.', 'Mínimo: 20 unidades.']);
     /* R10A: preços dos pacotes */
     if(Array.isArray(pm.pacotes)){
       const p20=pm.pacotes.find(p=>p.quantidade===20);const p35=pm.pacotes.find(p=>p.quantidade===35);const p50=pm.pacotes.find(p=>p.quantidade===50);
@@ -1626,6 +1640,11 @@ $('formConfig').onsubmit=async e=>{
     /* Modal Eventos */
     const em=pg.eventos_modal||{};
     obaSetVal('eventos-m-titulo',em.titulo);
+    obaSetVal('eventos-m-label-nome',em.label_nome||'');
+    obaSetVal('eventos-m-label-tipo',em.label_tipo||'');
+    obaSetVal('eventos-m-label-data',em.label_data||'');
+    obaSetVal('eventos-m-label-convidados',em.label_convidados||'');
+    obaSetVal('eventos-m-label-botao',em.label_botao||'');
 
     /* R10C: Seções extras */
     obaRenderizarSecoesExtras(Array.isArray(t.paginas_customizadas) ? t.paginas_customizadas : []);
@@ -1746,10 +1765,7 @@ $('formConfig').onsubmit=async e=>{
         personalizados_modal:{
           titulo:$('pers-m-titulo')?.value.trim()||'',
           info_titulo:$('pers-m-info-titulo')?.value.trim()||'',
-          info_items:[
-            $('pers-m-info-1')?.value.trim()||'',
-            $('pers-m-info-2')?.value.trim()||''
-          ].filter(Boolean),
+          info_items: obaLerInfoItems(),
           pacotes_titulo:$('pers-m-pacotes-titulo')?.value.trim()||'',
           pacotes:[
             {quantidade:20,preco:$('pers-m-preco-20')?.value.trim()||'196,00'},
@@ -1758,7 +1774,12 @@ $('formConfig').onsubmit=async e=>{
           ]
         },
         eventos_modal:{
-          titulo:$('eventos-m-titulo')?.value.trim()||''
+          titulo:$('eventos-m-titulo')?.value.trim()||'',
+          label_nome:$('eventos-m-label-nome')?.value.trim()||'',
+          label_tipo:$('eventos-m-label-tipo')?.value.trim()||'',
+          label_data:$('eventos-m-label-data')?.value.trim()||'',
+          label_convidados:$('eventos-m-label-convidados')?.value.trim()||'',
+          label_botao:$('eventos-m-label-botao')?.value.trim()||''
         }
       },
       tema:{
@@ -1824,6 +1845,49 @@ $('formConfig').onsubmit=async e=>{
   if(resetBtn)resetBtn.onclick=()=>{
     if(!confirm('Restaurar todas as configurações visuais para o padrão da Oba Doceria?'))return;
     obaAplicarVariante('classica');
+  };
+
+  /* ================================================================
+     R11B — EDITOR DINÂMICO DE INFO_ITEMS (Modal Personalizados)
+  ================================================================ */
+
+  /* Renderiza a lista de itens de informação */
+  window.obaRenderizarInfoItems = function(itens) {
+    const lista = $('pers-info-lista');
+    if (!lista) return;
+    lista.innerHTML = '';
+    (itens || []).forEach(item => obaAdicionarInfoItemEl(item));
+  };
+
+  /* Cria um elemento de item de informação */
+  function obaAdicionarInfoItemEl(valor) {
+    const lista = $('pers-info-lista');
+    if (!lista) return;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:6px;align-items:center';
+    row.innerHTML = `
+      <input type="text" class="pers-info-item-input" value="${(valor||'').replace(/^•\s*/,'')}"
+        placeholder="Ex: Modelagem artesanal."
+        style="flex:1;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:#fff;font:inherit">
+      <button type="button" class="danger" style="padding:6px 10px;font-size:11px;flex-shrink:0"
+        onclick="this.closest('div').remove()" title="Remover">✕</button>`;
+    lista.appendChild(row);
+  }
+
+  /* Adiciona novo item vazio */
+  window.obaAdicionarInfoItem = function() {
+    obaAdicionarInfoItemEl('');
+    /* Foca no novo campo */
+    const lista = $('pers-info-lista');
+    const ultimo = lista?.lastElementChild?.querySelector('input');
+    if (ultimo) ultimo.focus();
+  };
+
+  /* Lê todos os itens da lista */
+  window.obaLerInfoItems = function() {
+    return Array.from(document.querySelectorAll('#pers-info-lista .pers-info-item-input'))
+      .map(inp => inp.value.trim())
+      .filter(Boolean);
   };
 
   /* ================================================================

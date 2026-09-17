@@ -2153,7 +2153,13 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
     <div id="pers-view-info" class="space-y-5">
       <div class="text-center"><h2 id="oba-pers-titulo" class="text-xl font-black text-[#8B4513] uppercase tracking-tight">Doces Personalizados</h2></div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs leading-relaxed">
-        <div class="p-4 bg-orange-50 rounded-2xl border border-orange-100"><h4 id="oba-pers-info-titulo" class="font-bold mb-2 uppercase text-[10px]">Informações</h4><p id="oba-pers-info-1">• Modelagem artesanal.</p><p id="oba-pers-info-2">• Mínimo: 20 unidades.</p></div>
+        <div class="p-4 bg-orange-50 rounded-2xl border border-orange-100">
+          <h4 id="oba-pers-info-titulo" class="font-bold mb-2 uppercase text-[10px]">Informações</h4>
+          <div id="oba-pers-info-lista">
+            <p id="oba-pers-info-1">• Modelagem artesanal.</p>
+            <p id="oba-pers-info-2">• Mínimo: 20 unidades.</p>
+          </div>
+        </div>
         <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100"><h4 id="oba-pers-pacotes-titulo" class="font-bold mb-2 uppercase text-[10px]">Pacotes Especiais</h4><p>• 20 doces: <b id="oba-pers-preco-20">R$ 196,00</b></p><p>• 35 doces: <b id="oba-pers-preco-35">R$ 280,00</b></p><p>• 50 doces: <b id="oba-pers-preco-50">R$ 375,00</b></p></div>
       </div>
       <button onclick="avancarFormularioPersonalizados()" class="w-full py-4 bg-[#8B4513] text-white rounded-2xl font-bold text-xs uppercase tracking-widest active:scale-95">Preencher Reserva</button>
@@ -2181,7 +2187,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
         <input type="number" id="eve-convidados" placeholder="Nº Convidados" class="p-3.5 bg-gray-50 border rounded-xl outline-none">
       </div>
     </div>
-    <button onclick="enviarOrcamentoEspecial('eventos')" class="w-full mt-6 py-4 bg-green-600 text-white rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg active:scale-95">Solicitar Proposta</button>
+    <button onclick="enviarOrcamentoEspecial('eventos')" id="oba-eve-btn" class="w-full mt-6 py-4 bg-green-600 text-white rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg active:scale-95">Solicitar Proposta</button>
   </div>
 </div>
 
@@ -3905,9 +3911,18 @@ async function hidratarTemaDoModeloMestre() {
     _set('oba-pers-titulo',        pm.titulo);
     _set('oba-pers-info-titulo',   pm.info_titulo);
     _set('oba-pers-pacotes-titulo',pm.pacotes_titulo);
-    if (Array.isArray(pm.info_items)) {
-      _set('oba-pers-info-1', pm.info_items[0] ? '• ' + pm.info_items[0] : null);
-      _set('oba-pers-info-2', pm.info_items[1] ? '• ' + pm.info_items[1] : null);
+    /* R11B: info_items dinâmicos — substitui os <p> no bloco de Informações */
+    const infoLista = document.getElementById('oba-pers-info-lista');
+    if (infoLista && Array.isArray(pm.info_items) && pm.info_items.length > 0) {
+      infoLista.innerHTML = '';
+      pm.info_items.forEach(item => {
+        if (!item) return;
+        const p = document.createElement('p');
+        p.textContent = '• ' + item;
+        infoLista.appendChild(p);
+      });
+    } else if (infoLista && Array.isArray(pm.info_items) && pm.info_items.length === 0) {
+      infoLista.innerHTML = '';
     }
     /* R10A: preços dos pacotes de personalizados */
     if (Array.isArray(pm.pacotes)) {
@@ -3920,6 +3935,20 @@ async function hidratarTemaDoModeloMestre() {
     /* Modal Eventos */
     const em = p.eventos_modal || {};
     _set('oba-eventos-titulo', em.titulo);
+    /* R11B: labels editáveis dos campos */
+    const evNome = document.getElementById('eve-nome');
+    const evTipo = document.getElementById('eve-tipo');
+    const evData = document.getElementById('eve-data');
+    const evConv = document.getElementById('eve-convidados');
+    const evBtn  = document.getElementById('oba-eve-btn');
+    if (evNome && em.label_nome) evNome.placeholder = em.label_nome;
+    if (evTipo && em.label_tipo) evTipo.placeholder = em.label_tipo;
+    if (evData) {
+      /* O campo date não tem placeholder visível — usa label antes se definido */
+      if (em.label_data) evData.title = em.label_data;
+    }
+    if (evConv && em.label_convidados) evConv.placeholder = em.label_convidados;
+    if (evBtn  && em.label_botao)  evBtn.textContent  = em.label_botao;
 
     /* --- TEMA VISUAL (CSS variables) --- */
     const t = tema.tema || {};

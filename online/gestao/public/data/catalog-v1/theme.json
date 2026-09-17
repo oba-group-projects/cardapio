@@ -60,7 +60,12 @@
       ]
     },
     "eventos_modal": {
-      "titulo": "Orçamentos de Eventos"
+      "titulo": "Orçamentos de Eventos",
+      "label_nome": "Seu Nome Completo",
+      "label_tipo": "Tipo (Casamento, Formatura...)",
+      "label_data": "Data",
+      "label_convidados": "Nº Convidados",
+      "label_botao": "Solicitar Proposta"
     }
   },
   "paginas_customizadas": [],
