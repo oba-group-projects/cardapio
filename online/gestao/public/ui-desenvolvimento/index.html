@@ -27,6 +27,7 @@
        Usa !important para sobrescrever classes Tailwind inline.
        ================================================================ -->
   <style id="oba-tipografia-vars">
+    /* Títulos principais de página */
     #oba-pag1-titulo {
       font-size: var(--oba-tam-titulo, 1.5rem) !important;
       font-weight: var(--oba-peso-titulo, 300) !important;
@@ -35,6 +36,7 @@
       font-size: var(--oba-tam-titulo, 0.875rem) !important;
       font-weight: var(--oba-peso-titulo, 300) !important;
     }
+    /* Texto de corpo */
     #oba-pag2-texto {
       font-size: var(--oba-tam-corpo, 13px) !important;
       font-weight: var(--oba-peso-corpo, 400) !important;
@@ -42,6 +44,40 @@
     #oba-pag1-subtitulo, #oba-pag2-citacao {
       font-size: var(--oba-tam-corpo, 0.875rem) !important;
       font-weight: var(--oba-peso-corpo, 400) !important;
+    }
+    /* Subtítulos e labels */
+    #oba-pag3-subtitulo {
+      font-size: var(--oba-tam-subtitulo, 0.6875rem) !important;
+      font-weight: var(--oba-peso-subtitulo, 600) !important;
+    }
+    /* Títulos de modal */
+    #oba-pers-titulo, #oba-eventos-titulo,
+    #oba-vitrine-titulo {
+      font-size: var(--oba-tam-modal, 18px) !important;
+      font-weight: var(--oba-peso-modal, 800) !important;
+    }
+    /* Blocos de informação dos modais */
+    #oba-pers-info-titulo, #oba-pers-pacotes-titulo {
+      font-size: var(--oba-tam-subtitulo, 0.6875rem) !important;
+      font-weight: var(--oba-peso-subtitulo, 600) !important;
+    }
+    /* Preços */
+    #oba-pers-preco-20, #oba-pers-preco-35, #oba-pers-preco-50 {
+      font-size: var(--oba-tam-preco, 14px) !important;
+      font-weight: var(--oba-peso-preco, 700) !important;
+    }
+    /* Overrides de tipografia por página (aplicados via JS quando definidos) */
+    .oba-pag1-tipografia-override #oba-pag1-titulo {
+      font-size: var(--oba-pag1-tam-titulo) !important;
+      font-weight: var(--oba-pag1-peso-titulo) !important;
+    }
+    .oba-pag2-tipografia-override #oba-pag2-titulo {
+      font-size: var(--oba-pag2-tam-titulo) !important;
+      font-weight: var(--oba-pag2-peso-titulo) !important;
+    }
+    .oba-pag3-tipografia-override #oba-pag3-subtitulo {
+      font-size: var(--oba-pag3-tam-subtitulo) !important;
+      font-weight: var(--oba-pag3-peso-subtitulo) !important;
     }
   </style>
 <style id="r117a-mobile-flow">
@@ -3423,6 +3459,21 @@ async function hidratarTemaDoModeloMestre() {
     const elTit1 = document.getElementById('oba-pag1-titulo');
     if (elTit1 && bv.corTitulo) elTit1.style.color = bv.corTitulo;
 
+    /* R11A: tipografia por página — Pág 1 */
+    const rootStyle = document.documentElement.style;
+    if (bv.tamTitulo) {
+      rootStyle.setProperty('--oba-pag1-tam-titulo', bv.tamTitulo + 'px');
+      document.getElementById('pag-1')?.classList.add('oba-pag1-tipografia-override');
+    } else {
+      rootStyle.removeProperty('--oba-pag1-tam-titulo');
+      document.getElementById('pag-1')?.classList.remove('oba-pag1-tipografia-override');
+    }
+    if (bv.pesoTitulo) {
+      rootStyle.setProperty('--oba-pag1-peso-titulo', bv.pesoTitulo);
+    } else {
+      rootStyle.removeProperty('--oba-pag1-peso-titulo');
+    }
+
     /* Visibilidade pag1 */
     const elSub1 = document.getElementById('oba-pag1-subtitulo');
     if (elSub1) elSub1.style.display = bv.exibirSubtitulo === false ? 'none' : '';
@@ -3449,6 +3500,20 @@ async function hidratarTemaDoModeloMestre() {
     const elTit2 = document.getElementById('oba-pag2-titulo');
     if (elTit2 && ne.corTitulo) elTit2.style.color = ne.corTitulo;
 
+    /* R11A: tipografia por página — Pág 2 */
+    if (ne.tamTitulo) {
+      rootStyle.setProperty('--oba-pag2-tam-titulo', ne.tamTitulo + 'px');
+      document.getElementById('pag-2')?.classList.add('oba-pag2-tipografia-override');
+    } else {
+      rootStyle.removeProperty('--oba-pag2-tam-titulo');
+      document.getElementById('pag-2')?.classList.remove('oba-pag2-tipografia-override');
+    }
+    if (ne.pesoTitulo) {
+      rootStyle.setProperty('--oba-pag2-peso-titulo', ne.pesoTitulo);
+    } else {
+      rootStyle.removeProperty('--oba-pag2-peso-titulo');
+    }
+
     /* Visibilidade pag2 */
     const elCitacao2 = document.getElementById('oba-pag2-citacao');
     if (elCitacao2) elCitacao2.style.display = ne.exibirCitacao === false ? 'none' : '';
@@ -3470,6 +3535,17 @@ async function hidratarTemaDoModeloMestre() {
     if (elPag3 && mp.corFundo) elPag3.style.backgroundColor = mp.corFundo;
     const elSub3 = document.getElementById('oba-pag3-subtitulo');
     if (elSub3 && mp.corSubtitulo) elSub3.style.color = mp.corSubtitulo;
+
+    /* R11A: tipografia por página — Pág 3 subtítulo, labels e sublabels */
+    if (mp.tamSubtitulo) {
+      rootStyle.setProperty('--oba-pag3-tam-subtitulo', mp.tamSubtitulo + 'px');
+      document.getElementById('pag-3')?.classList.add('oba-pag3-tipografia-override');
+    } else {
+      rootStyle.removeProperty('--oba-pag3-tam-subtitulo');
+      document.getElementById('pag-3')?.classList.remove('oba-pag3-tipografia-override');
+    }
+    if (mp.pesoSubtitulo) rootStyle.setProperty('--oba-pag3-peso-subtitulo', mp.pesoSubtitulo);
+    else rootStyle.removeProperty('--oba-pag3-peso-subtitulo');
 
     /* R10A — Renderização dinâmica dos botões do menu */
     const botoes = Array.isArray(mp.botoes) && mp.botoes.length > 0
@@ -3860,6 +3936,13 @@ async function hidratarTemaDoModeloMestre() {
     if (t.pesoTitulo)    vars.push(`--oba-peso-titulo: ${t.pesoTitulo}`);
     if (t.pesoCorpo)     vars.push(`--oba-peso-corpo: ${t.pesoCorpo}`);
     if (t.arredondamento) vars.push(`--oba-radius: ${t.arredondamento}px`);
+    /* R11A: novos tokens de tipografia por categoria */
+    if (t.tamanhoSubtitulo) vars.push(`--oba-tam-subtitulo: ${t.tamanhoSubtitulo}px`);
+    if (t.pesoSubtitulo)    vars.push(`--oba-peso-subtitulo: ${t.pesoSubtitulo}`);
+    if (t.tamanhoModal)     vars.push(`--oba-tam-modal: ${t.tamanhoModal}px`);
+    if (t.pesoModal)        vars.push(`--oba-peso-modal: ${t.pesoModal}`);
+    if (t.tamanhoPreco)     vars.push(`--oba-tam-preco: ${t.tamanhoPreco}px`);
+    if (t.pesoPreco)        vars.push(`--oba-peso-preco: ${t.pesoPreco}`);
 
     if (vars.length > 0) {
       const styleEl = document.getElementById('oba-tema-vars');

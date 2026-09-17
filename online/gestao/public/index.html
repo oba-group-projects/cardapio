@@ -137,6 +137,25 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
           <label class="oba-toggle-label"><input type="checkbox" id="pg1-exibirCTA" checked> Exibir botão CTA</label>
         </div>
 
+        <div style="grid-column:1/-1"><p class="oba-secao-titulo">🔤 Tipografia desta página <span class="hint">(vazio = usa o Tema Global)</span></p></div>
+        <div class="field">
+          <label>Tamanho do título <span class="hint">px — ex: 28</span></label>
+          <input id="pg1-tamTitulo" placeholder="Tema global" maxlength="4" style="max-width:120px">
+        </div>
+        <div class="field">
+          <label>Peso do título</label>
+          <select id="pg1-pesoTitulo">
+            <option value="">Tema global</option>
+            <option value="200">200 — Ultra fino</option>
+            <option value="300">300 — Fino</option>
+            <option value="400">400 — Normal</option>
+            <option value="500">500 — Médio</option>
+            <option value="600">600 — Semibold</option>
+            <option value="700">700 — Negrito</option>
+            <option value="800">800 — Extrabold</option>
+          </select>
+        </div>
+
         <div class="field full actions"><button class="primary" type="submit">Salvar Boas-vindas</button></div>
       </form>
     </details>
@@ -189,6 +208,25 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
         <div class="field full" style="display:flex;gap:20px;flex-wrap:wrap">
           <label class="oba-toggle-label"><input type="checkbox" id="pg2-exibirCitacao" checked> Exibir citação em itálico</label>
           <label class="oba-toggle-label"><input type="checkbox" id="pg2-exibirSeparador" checked> Exibir separador decorativo</label>
+        </div>
+
+        <div style="grid-column:1/-1"><p class="oba-secao-titulo">🔤 Tipografia desta página <span class="hint">(vazio = usa o Tema Global)</span></p></div>
+        <div class="field">
+          <label>Tamanho do título <span class="hint">px — ex: 16</span></label>
+          <input id="pg2-tamTitulo" placeholder="Tema global" maxlength="4" style="max-width:120px">
+        </div>
+        <div class="field">
+          <label>Peso do título</label>
+          <select id="pg2-pesoTitulo">
+            <option value="">Tema global</option>
+            <option value="200">200 — Ultra fino</option>
+            <option value="300">300 — Fino</option>
+            <option value="400">400 — Normal</option>
+            <option value="500">500 — Médio</option>
+            <option value="600">600 — Semibold</option>
+            <option value="700">700 — Negrito</option>
+            <option value="800">800 — Extrabold</option>
+          </select>
         </div>
 
         <div class="field full actions"><button class="primary" type="submit">Salvar Nossa Essência</button></div>
@@ -258,6 +296,32 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
           <p style="margin:0 0 6px;font-size:12px;font-weight:700;color:#8B4513">📄 Paginação automática ativa</p>
           <p style="margin:0 0 8px;font-size:12px;color:#666">Com mais de 4 botões, o cardápio distribui automaticamente em páginas de 4:</p>
           <div id="pg3-paginacao-preview" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+        </div>
+
+        <div style="grid-column:1/-1"><p class="oba-secao-titulo">🔤 Tipografia desta página <span class="hint">(vazio = usa o Tema Global)</span></p></div>
+        <div class="field">
+          <label>Tamanho do subtítulo <span class="hint">px — ex: 13</span></label>
+          <input id="pg3-tamSubtitulo" placeholder="Tema global" maxlength="4" style="max-width:120px">
+        </div>
+        <div class="field">
+          <label>Peso do subtítulo</label>
+          <select id="pg3-pesoSubtitulo">
+            <option value="">Tema global</option>
+            <option value="400">400 — Normal</option>
+            <option value="500">500 — Médio</option>
+            <option value="600">600 — Semibold</option>
+            <option value="700">700 — Negrito</option>
+            <option value="800">800 — Extrabold</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Tamanho dos labels de botão <span class="hint">px — ex: 14</span></label>
+          <input id="pg3-tamLabel" placeholder="Tema global" maxlength="4" style="max-width:120px">
+        </div>
+        <div class="field">
+          <label>Tamanho dos sublabels de botão <span class="hint">px — ex: 9</span></label>
+          <input id="pg3-tamSublabel" placeholder="Tema global" maxlength="4" style="max-width:120px">
         </div>
 
         <div class="field full actions"><button class="primary" type="submit">Salvar Menu Principal</button></div>
@@ -452,6 +516,74 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
           <option value="400" selected>400 — Normal (atual)</option>
           <option value="500">500 — Médio</option>
           <option value="600">600 — Semibold</option>
+        </select>
+      </div>
+
+      <!-- ── SUBTÍTULOS E LABELS ── -->
+      <div style="grid-column:1/-1"><p class="oba-secao-titulo">🔤 Subtítulos e Labels</p></div>
+      <p class="hint" style="grid-column:1/-1;margin:-8px 0 8px">Labels pequenos, sublabels de botões, subtítulos de seção (ex: "ESCOLHA SUA EXPERIÊNCIA").</p>
+
+      <div class="field">
+        <label>Tamanho dos Subtítulos <span class="hint" id="tema-tamanhoSubtitulo-label">11px</span></label>
+        <div class="oba-slider-row">
+          <input type="range" id="tema-tamanhoSubtitulo" min="9" max="18" step="1" value="11">
+          <span class="oba-slider-val" id="tema-tamanhoSubtitulo-val">11px</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Peso dos Subtítulos</label>
+        <select id="tema-pesoSubtitulo">
+          <option value="400">400 — Normal</option>
+          <option value="500">500 — Médio</option>
+          <option value="600" selected>600 — Semibold (atual)</option>
+          <option value="700">700 — Negrito</option>
+          <option value="800">800 — Extrabold</option>
+        </select>
+      </div>
+
+      <!-- ── TÍTULOS DE MODAL ── -->
+      <div style="grid-column:1/-1"><p class="oba-secao-titulo">🔤 Títulos de Modal</p></div>
+      <p class="hint" style="grid-column:1/-1;margin:-8px 0 8px">Títulos dos modais (ex: "DOCES PERSONALIZADOS", "ORÇAMENTOS DE EVENTOS") e títulos de vitrine.</p>
+
+      <div class="field">
+        <label>Tamanho dos Títulos de Modal <span class="hint" id="tema-tamanhoModal-label">18px</span></label>
+        <div class="oba-slider-row">
+          <input type="range" id="tema-tamanhoModal" min="14" max="28" step="1" value="18">
+          <span class="oba-slider-val" id="tema-tamanhoModal-val">18px</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Peso dos Títulos de Modal</label>
+        <select id="tema-pesoModal">
+          <option value="600">600 — Semibold</option>
+          <option value="700">700 — Negrito</option>
+          <option value="800" selected>800 — Extrabold (atual)</option>
+          <option value="900">900 — Black</option>
+        </select>
+      </div>
+
+      <!-- ── PREÇOS ── -->
+      <div style="grid-column:1/-1"><p class="oba-secao-titulo">💰 Preços</p></div>
+      <p class="hint" style="grid-column:1/-1;margin:-8px 0 8px">Valores monetários exibidos nos kits, pacotes de personalizados e caixa degustação.</p>
+
+      <div class="field">
+        <label>Tamanho dos Preços <span class="hint" id="tema-tamanhoPreco-label">14px</span></label>
+        <div class="oba-slider-row">
+          <input type="range" id="tema-tamanhoPreco" min="11" max="24" step="1" value="14">
+          <span class="oba-slider-val" id="tema-tamanhoPreco-val">14px</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Peso dos Preços</label>
+        <select id="tema-pesoPreco">
+          <option value="500">500 — Médio</option>
+          <option value="600">600 — Semibold</option>
+          <option value="700" selected>700 — Negrito (atual)</option>
+          <option value="800">800 — Extrabold</option>
+          <option value="900">900 — Black</option>
         </select>
       </div>
 
@@ -997,6 +1129,9 @@ $('formConfig').onsubmit=async e=>{
     corTexto:'#3B2A1E',corFundoCard:'#FFF8F0',fonte:'Poppins',
     tamanhoTitulo:'24',tamanhoCorpo:'13',
     pesoTitulo:'300',pesoCorpo:'400',
+    tamanhoSubtitulo:'11',pesoSubtitulo:'600',
+    tamanhoModal:'18',pesoModal:'800',
+    tamanhoPreco:'14',pesoPreco:'700',
     arredondamento:'20',espacamento:'normal'
   };
 
@@ -1070,9 +1205,10 @@ $('formConfig').onsubmit=async e=>{
     if(sl){sl.value=val;} if(lbl){lbl.textContent=val+'px';}
   }
 
-  ['tamanhoTitulo','tamanhoCorpo','arredondamento'].forEach(obaBindSlider);
+  ['tamanhoTitulo','tamanhoCorpo','arredondamento','tamanhoSubtitulo','tamanhoModal','tamanhoPreco'].forEach(obaBindSlider);
   $('tema-pesoTitulo')&&($('tema-pesoTitulo').onchange=obaAtualizarPreviewCores);
   $('tema-pesoCorpo')&&($('tema-pesoCorpo').onchange=obaAtualizarPreviewCores);
+  ['pesoSubtitulo','pesoModal','pesoPreco'].forEach(id=>{$('tema-'+id)&&($('tema-'+id).onchange=obaAtualizarPreviewCores)});
   $('tema-espacamento')&&($('tema-espacamento').onchange=obaAtualizarPreviewCores);
 
   /* Sincroniza color-picker <-> input texto */
@@ -1509,6 +1645,18 @@ $('formConfig').onsubmit=async e=>{
     const pt=$('tema-pesoTitulo');if(pt)pt.value=tm.pesoTitulo||temaDefault.pesoTitulo;
     const pc=$('tema-pesoCorpo');if(pc)pc.value=tm.pesoCorpo||temaDefault.pesoCorpo;
     const se=$('tema-espacamento');if(se)se.value=tm.espacamento||temaDefault.espacamento;
+    /* Novas categorias */
+    obaSetSlider('tema-tamanhoSubtitulo',tm.tamanhoSubtitulo||temaDefault.tamanhoSubtitulo);
+    obaSetSlider('tema-tamanhoModal',tm.tamanhoModal||temaDefault.tamanhoModal);
+    obaSetSlider('tema-tamanhoPreco',tm.tamanhoPreco||temaDefault.tamanhoPreco);
+    const ps=$('tema-pesoSubtitulo');if(ps)ps.value=tm.pesoSubtitulo||temaDefault.pesoSubtitulo;
+    const pmod=$('tema-pesoModal');if(pmod)pmod.value=tm.pesoModal||temaDefault.pesoModal;
+    const pp=$('tema-pesoPreco');if(pp)pp.value=tm.pesoPreco||temaDefault.pesoPreco;
+    /* Tipografia por página */
+    obaSetVal('pg1-tamTitulo',bv.tamTitulo||'');obaSetSelect('pg1-pesoTitulo',bv.pesoTitulo,'');
+    obaSetVal('pg2-tamTitulo',ne.tamTitulo||'');obaSetSelect('pg2-pesoTitulo',ne.pesoTitulo,'');
+    obaSetVal('pg3-tamSubtitulo',mp.tamSubtitulo||'');obaSetSelect('pg3-pesoSubtitulo',mp.pesoSubtitulo,'');
+    obaSetVal('pg3-tamLabel',mp.tamLabel||'');obaSetVal('pg3-tamSublabel',mp.tamSublabel||'');
     /* Variantes */
     obaRenderizarVariantes(t.variante||'classica');
     obaAtualizarPreviewCores();
@@ -1561,6 +1709,8 @@ $('formConfig').onsubmit=async e=>{
           botaoCTA:$('pg1-cta')?.value.trim()||'',
           corFundo:$('pg1-corFundo-hex')?.value.trim()||'',
           corTitulo:$('pg1-corTitulo-hex')?.value.trim()||'',
+          tamTitulo:$('pg1-tamTitulo')?.value.trim()||'',
+          pesoTitulo:$('pg1-pesoTitulo')?.value||'',
           exibirSubtitulo:$('pg1-exibirSubtitulo')?.checked!==false,
           exibirCTA:$('pg1-exibirCTA')?.checked!==false
         },
@@ -1572,6 +1722,8 @@ $('formConfig').onsubmit=async e=>{
           citacao:$('pg2-citacao')?.value.trim()||'',
           corFundo:$('pg2-corFundo-hex')?.value.trim()||'',
           corTitulo:$('pg2-corTitulo-hex')?.value.trim()||'',
+          tamTitulo:$('pg2-tamTitulo')?.value.trim()||'',
+          pesoTitulo:$('pg2-pesoTitulo')?.value||'',
           exibirCitacao:$('pg2-exibirCitacao')?.checked!==false,
           exibirSeparador:$('pg2-exibirSeparador')?.checked!==false
         },
@@ -1581,6 +1733,10 @@ $('formConfig').onsubmit=async e=>{
           subtitulo:$('pg3-subtitulo')?.value.trim()||'',
           corFundo:$('pg3-corFundo-hex')?.value.trim()||'',
           corSubtitulo:$('pg3-corSubtitulo-hex')?.value.trim()||'',
+          tamSubtitulo:$('pg3-tamSubtitulo')?.value.trim()||'',
+          pesoSubtitulo:$('pg3-pesoSubtitulo')?.value||'',
+          tamLabel:$('pg3-tamLabel')?.value.trim()||'',
+          tamSublabel:$('pg3-tamSublabel')?.value.trim()||'',
           botoes:obaLerBotoesMenu()
         },
         vitrine_presentes:{
@@ -1616,6 +1772,12 @@ $('formConfig').onsubmit=async e=>{
         tamanhoCorpo:$('tema-tamanhoCorpo')?.value||temaDefault.tamanhoCorpo,
         pesoTitulo:$('tema-pesoTitulo')?.value||temaDefault.pesoTitulo,
         pesoCorpo:$('tema-pesoCorpo')?.value||temaDefault.pesoCorpo,
+        tamanhoSubtitulo:$('tema-tamanhoSubtitulo')?.value||temaDefault.tamanhoSubtitulo,
+        pesoSubtitulo:$('tema-pesoSubtitulo')?.value||temaDefault.pesoSubtitulo,
+        tamanhoModal:$('tema-tamanhoModal')?.value||temaDefault.tamanhoModal,
+        pesoModal:$('tema-pesoModal')?.value||temaDefault.pesoModal,
+        tamanhoPreco:$('tema-tamanhoPreco')?.value||temaDefault.tamanhoPreco,
+        pesoPreco:$('tema-pesoPreco')?.value||temaDefault.pesoPreco,
         arredondamento:$('tema-arredondamento')?.value||temaDefault.arredondamento,
         espacamento:$('tema-espacamento')?.value||temaDefault.espacamento
       },
