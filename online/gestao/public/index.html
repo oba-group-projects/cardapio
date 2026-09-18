@@ -405,17 +405,19 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
     <!-- Modal Eventos -->
     <details class="oba-pg-details">
       <summary class="oba-pg-summary">Modal — Orçamentos de Eventos</summary>
-      <form id="formEventos" class="oba-pg-form grid">
-        <div class="field full"><label>Título do modal</label><input id="eventos-m-titulo" placeholder="Orçamentos de Eventos"></div>
+      <form id="formEventos" class="oba-pg-form" style="display:flex;flex-direction:column;gap:11px">
+        <div class="field"><label>Título do modal</label><input id="eventos-m-titulo" placeholder="Orçamentos de Eventos"></div>
 
-        <div style="grid-column:1/-1"><p class="oba-secao-titulo">🏷️ Labels dos campos</p></div>
-        <div class="field full"><label>Label — Campo Nome</label><input id="eventos-m-label-nome" placeholder="Seu Nome Completo"></div>
-        <div class="field full"><label>Label — Campo Tipo de Evento</label><input id="eventos-m-label-tipo" placeholder="Tipo (Casamento, Formatura...)"></div>
-        <div class="field"><label>Label — Campo Data</label><input id="eventos-m-label-data" placeholder="Data"></div>
-        <div class="field"><label>Label — Campo Convidados</label><input id="eventos-m-label-convidados" placeholder="Nº Convidados"></div>
-        <div class="field full"><label>Label — Botão de envio</label><input id="eventos-m-label-botao" placeholder="Solicitar Proposta"></div>
+        <p class="oba-secao-titulo">🏷️ Labels dos campos</p>
+        <div class="field"><label>Label — Campo Nome</label><input id="eventos-m-label-nome" placeholder="Seu Nome Completo"></div>
+        <div class="field"><label>Label — Campo Tipo de Evento</label><input id="eventos-m-label-tipo" placeholder="Tipo (Casamento, Formatura...)"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
+          <div class="field"><label>Label — Campo Data</label><input id="eventos-m-label-data" placeholder="Data"></div>
+          <div class="field"><label>Label — Campo Convidados</label><input id="eventos-m-label-convidados" placeholder="Nº Convidados"></div>
+        </div>
+        <div class="field"><label>Label — Botão de envio</label><input id="eventos-m-label-botao" placeholder="Solicitar Proposta"></div>
 
-        <div class="field full actions"><button class="primary" type="submit">Salvar Modal Eventos</button></div>
+        <div class="actions"><button class="primary" type="submit">Salvar Modal Eventos</button></div>
       </form>
     </details>
 
@@ -1652,9 +1654,15 @@ $('formConfig').onsubmit=async e=>{
     obaSetVal('pers-m-titulo',pm.titulo);obaSetVal('pers-m-info-titulo',pm.info_titulo);
     obaSetVal('pers-m-pacotes-titulo',pm.pacotes_titulo);
     /* R11B: lista dinâmica de info_items */
-    obaRenderizarInfoItems(Array.isArray(pm.info_items) ? pm.info_items : ['Modelagem artesanal.', 'Mínimo: 20 unidades.']);
+    const infoItemsParaRenderizar = (Array.isArray(pm.info_items) && pm.info_items.some(Boolean))
+      ? pm.info_items
+      : ['Modelagem artesanal.', 'Mínimo: 20 unidades.'];
+    obaRenderizarInfoItems(infoItemsParaRenderizar);
     /* R11B: pacotes dinâmicos */
-    obaRenderizarPacotes(Array.isArray(pm.pacotes) ? pm.pacotes : [{quantidade:20,preco:'196,00'},{quantidade:35,preco:'280,00'},{quantidade:50,preco:'375,00'}]);
+    const pacotesParaRenderizar = (Array.isArray(pm.pacotes) && pm.pacotes.length > 0)
+      ? pm.pacotes
+      : [{quantidade:20,preco:'196,00'},{quantidade:35,preco:'280,00'},{quantidade:50,preco:'375,00'}];
+    obaRenderizarPacotes(pacotesParaRenderizar);
     /* Modal Eventos */
     const em=pg.eventos_modal||{};
     obaSetVal('eventos-m-titulo',em.titulo);
