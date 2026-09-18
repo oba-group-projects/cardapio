@@ -62,7 +62,8 @@
       font-weight: var(--oba-peso-subtitulo, 600) !important;
     }
     /* Preços */
-    #oba-pers-preco-20, #oba-pers-preco-35, #oba-pers-preco-50 {
+    #oba-pers-preco-20, #oba-pers-preco-35, #oba-pers-preco-50,
+    #oba-pers-pacotes-lista b {
       font-size: var(--oba-tam-preco, 14px) !important;
       font-weight: var(--oba-peso-preco, 700) !important;
     }
@@ -79,6 +80,16 @@
       font-size: var(--oba-pag3-tam-subtitulo) !important;
       font-weight: var(--oba-pag3-peso-subtitulo) !important;
     }
+    /* Labels e sublabels dos botões da Pág 3 */
+    #pag-3 .oba-btn-label {
+      font-size: var(--oba-pag3-tam-label, var(--oba-tam-corpo, 13px)) !important;
+      font-weight: var(--oba-pag3-peso-label, var(--oba-peso-corpo, 400)) !important;
+    }
+    #pag-3 .oba-btn-sublabel {
+      font-size: var(--oba-pag3-tam-sublabel, 9px) !important;
+      font-weight: var(--oba-pag3-peso-sublabel, 600) !important;
+    }
+    /* Cor do texto principal da Pág 2 — controlada por JS via element.style */
   </style>
 <style id="r117a-mobile-flow">
 
@@ -2160,7 +2171,14 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
             <p id="oba-pers-info-2">• Mínimo: 20 unidades.</p>
           </div>
         </div>
-        <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100"><h4 id="oba-pers-pacotes-titulo" class="font-bold mb-2 uppercase text-[10px]">Pacotes Especiais</h4><p>• 20 doces: <b id="oba-pers-preco-20">R$ 196,00</b></p><p>• 35 doces: <b id="oba-pers-preco-35">R$ 280,00</b></p><p>• 50 doces: <b id="oba-pers-preco-50">R$ 375,00</b></p></div>
+        <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100">
+          <h4 id="oba-pers-pacotes-titulo" class="font-bold mb-2 uppercase text-[10px]">Pacotes Especiais</h4>
+          <div id="oba-pers-pacotes-lista">
+            <p>• 20 doces: <b id="oba-pers-preco-20">R$ 196,00</b></p>
+            <p>• 35 doces: <b id="oba-pers-preco-35">R$ 280,00</b></p>
+            <p>• 50 doces: <b id="oba-pers-preco-50">R$ 375,00</b></p>
+          </div>
+        </div>
       </div>
       <button onclick="avancarFormularioPersonalizados()" class="w-full py-4 bg-[#8B4513] text-white rounded-2xl font-bold text-xs uppercase tracking-widest active:scale-95">Preencher Reserva</button>
     </div>
@@ -3505,6 +3523,8 @@ async function hidratarTemaDoModeloMestre() {
     if (elCard2 && ne.corFundo) elCard2.style.background = ne.corFundo;
     const elTit2 = document.getElementById('oba-pag2-titulo');
     if (elTit2 && ne.corTitulo) elTit2.style.color = ne.corTitulo;
+    const elTxt2 = document.getElementById('oba-pag2-texto');
+    if (elTxt2 && ne.corTexto) elTxt2.style.color = ne.corTexto;
 
     /* R11A: tipografia por página — Pág 2 */
     if (ne.tamTitulo) {
@@ -3552,6 +3572,15 @@ async function hidratarTemaDoModeloMestre() {
     }
     if (mp.pesoSubtitulo) rootStyle.setProperty('--oba-pag3-peso-subtitulo', mp.pesoSubtitulo);
     else rootStyle.removeProperty('--oba-pag3-peso-subtitulo');
+    /* R11B: pesos de labels e sublabels dos botões */
+    if (mp.tamLabel)       rootStyle.setProperty('--oba-pag3-tam-label', mp.tamLabel + 'px');
+    else                   rootStyle.removeProperty('--oba-pag3-tam-label');
+    if (mp.pesoLabel)      rootStyle.setProperty('--oba-pag3-peso-label', mp.pesoLabel);
+    else                   rootStyle.removeProperty('--oba-pag3-peso-label');
+    if (mp.tamSublabel)    rootStyle.setProperty('--oba-pag3-tam-sublabel', mp.tamSublabel + 'px');
+    else                   rootStyle.removeProperty('--oba-pag3-tam-sublabel');
+    if (mp.pesoSublabel)   rootStyle.setProperty('--oba-pag3-peso-sublabel', mp.pesoSublabel);
+    else                   rootStyle.removeProperty('--oba-pag3-peso-sublabel');
 
     /* R10A — Renderização dinâmica dos botões do menu */
     const botoes = Array.isArray(mp.botoes) && mp.botoes.length > 0
@@ -3632,11 +3661,11 @@ async function hidratarTemaDoModeloMestre() {
         const div = document.createElement('div');
         const sub = document.createElement('span');
         sub.className = b.destaque
-          ? 'block text-[9px] uppercase tracking-widest opacity-70 mb-1'
-          : 'block text-[9px] uppercase tracking-widest opacity-50 mb-1';
+          ? 'oba-btn-sublabel block text-[9px] uppercase tracking-widest opacity-70 mb-1'
+          : 'oba-btn-sublabel block text-[9px] uppercase tracking-widest opacity-50 mb-1';
         sub.textContent = b.sublabel || '';
         const lbl = document.createElement('span');
-        lbl.className = 'text-sm font-medium';
+        lbl.className = 'oba-btn-label text-sm font-medium';
         lbl.textContent = b.label || '';
         div.appendChild(sub); div.appendChild(lbl);
 
@@ -3923,6 +3952,20 @@ async function hidratarTemaDoModeloMestre() {
       });
     } else if (infoLista && Array.isArray(pm.info_items) && pm.info_items.length === 0) {
       infoLista.innerHTML = '';
+    }
+    /* R11B: pacotes dinâmicos */
+    const pacotesLista = document.getElementById('oba-pers-pacotes-lista');
+    if (pacotesLista && Array.isArray(pm.pacotes) && pm.pacotes.length > 0) {
+      pacotesLista.innerHTML = '';
+      pm.pacotes.forEach(pk => {
+        if (!pk || !pk.preco) return;
+        const p = document.createElement('p');
+        const b = document.createElement('b');
+        b.textContent = 'R$ ' + pk.preco;
+        p.textContent = '• ' + pk.quantidade + ' doces: ';
+        p.appendChild(b);
+        pacotesLista.appendChild(p);
+      });
     }
     /* R10A: preços dos pacotes de personalizados */
     if (Array.isArray(pm.pacotes)) {

@@ -24,6 +24,7 @@
       "citacao": "Feito à mão, com amor e precisão.",
       "corFundo": "",
       "corTitulo": "",
+      "corTexto": "",
       "tamTitulo": "",
       "pesoTitulo": "",
       "exibirCitacao": true,
@@ -37,6 +38,10 @@
       "corSubtitulo": "",
       "tamSubtitulo": "",
       "pesoSubtitulo": "",
+      "tamLabel": "",
+      "pesoLabel": "",
+      "tamSublabel": "",
+      "pesoSublabel": "",
       "botoes": [
         { "id": "caixas",         "label": "Caixas de Doces",           "sublabel": "Montagem",         "icone": "fa-solid fa-box-open",            "acao": "caixas",         "destaque": true,  "visivel": true },
         { "id": "presenteaveis",  "label": "Presenteáveis / Especiais", "sublabel": "Kits & Presentes", "icone": "fa-solid fa-gift",                "acao": "presenteaveis",  "destaque": false, "visivel": true },

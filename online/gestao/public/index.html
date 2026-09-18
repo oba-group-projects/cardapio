@@ -204,6 +204,15 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
           </div>
         </div>
 
+        <div class="field">
+          <label>Cor do texto principal <span class="hint">(vazio = tema global)</span></label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="color" id="pg2-corTexto" value="#374151" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
+            <input type="text" id="pg2-corTexto-hex" value="" maxlength="7" placeholder="Tema global" style="width:110px">
+            <button type="button" class="secondary" style="padding:6px 10px;font-size:11px" onclick="obaClearCorPagina('pg2-corTexto')">✕ Limpar</button>
+          </div>
+        </div>
+
         <div style="grid-column:1/-1"><p class="oba-secao-titulo">👁️ Visibilidade</p></div>
         <div class="field full" style="display:flex;gap:20px;flex-wrap:wrap">
           <label class="oba-toggle-label"><input type="checkbox" id="pg2-exibirCitacao" checked> Exibir citação em itálico</label>
@@ -320,8 +329,28 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
           <input id="pg3-tamLabel" placeholder="Tema global" maxlength="4" style="max-width:120px">
         </div>
         <div class="field">
+          <label>Peso dos labels de botão</label>
+          <select id="pg3-pesoLabel">
+            <option value="">Tema global</option>
+            <option value="400">400 — Normal</option>
+            <option value="500">500 — Médio</option>
+            <option value="600">600 — Semibold</option>
+            <option value="700">700 — Negrito</option>
+          </select>
+        </div>
+        <div class="field">
           <label>Tamanho dos sublabels de botão <span class="hint">px — ex: 9</span></label>
           <input id="pg3-tamSublabel" placeholder="Tema global" maxlength="4" style="max-width:120px">
+        </div>
+        <div class="field">
+          <label>Peso dos sublabels de botão</label>
+          <select id="pg3-pesoSublabel">
+            <option value="">Tema global</option>
+            <option value="400">400 — Normal</option>
+            <option value="500">500 — Médio</option>
+            <option value="600">600 — Semibold</option>
+            <option value="700">700 — Negrito</option>
+          </select>
         </div>
 
         <div class="field full actions"><button class="primary" type="submit">Salvar Menu Principal</button></div>
@@ -334,6 +363,16 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
       <form id="formVitrine" class="oba-pg-form grid">
         <div class="field"><label>Título da seção</label><input id="vit-titulo" placeholder="Vitrine de Presentes"></div>
         <div class="field full"><label>Subtítulo descritivo</label><input id="vit-subtitulo" placeholder="Nossas opções exclusivas já vêm montadas com carinho."></div>
+        <div class="field full" style="background:#fff8f0;border:1px solid #f5c89a;border-radius:10px;padding:10px 12px">
+          <p style="margin:0;font-size:12px;color:#8B4513">
+            💡 <b>Para editar os produtos da vitrine</b> (nomes, preços, imagens), vá para a aba
+            <button type="button" class="secondary" style="padding:3px 8px;font-size:11px;margin:0 2px"
+              onclick="document.querySelectorAll('.tab').forEach(b=>{b.classList.toggle('active',b.dataset.tab==='products')});document.querySelectorAll('.panel').forEach(p=>{p.classList.remove('active')});document.getElementById('panel-products').classList.add('active');window.scrollTo({top:0,behavior:'smooth'})">
+              Produtos
+            </button>
+            no menu principal da Central.
+          </p>
+        </div>
         <div class="field full actions"><button class="primary" type="submit">Salvar Vitrine</button></div>
       </form>
     </details>
@@ -353,27 +392,11 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
         </div>
 
         <div class="field full"><label>Título do bloco Pacotes</label><input id="pers-m-pacotes-titulo" placeholder="Pacotes Especiais"></div>
-        <div style="grid-column:1/-1"><p class="oba-secao-titulo">💰 Preços dos pacotes</p></div>
-        <div class="field">
-          <label>Pacote 20 doces — preço <span class="hint">(ex: 196,00)</span></label>
-          <div style="display:flex;align-items:center;gap:6px">
-            <span style="font-size:13px;color:var(--muted)">R$</span>
-            <input id="pers-m-preco-20" placeholder="196,00" style="max-width:120px">
-          </div>
-        </div>
-        <div class="field">
-          <label>Pacote 35 doces — preço</label>
-          <div style="display:flex;align-items:center;gap:6px">
-            <span style="font-size:13px;color:var(--muted)">R$</span>
-            <input id="pers-m-preco-35" placeholder="280,00" style="max-width:120px">
-          </div>
-        </div>
-        <div class="field">
-          <label>Pacote 50 doces — preço</label>
-          <div style="display:flex;align-items:center;gap:6px">
-            <span style="font-size:13px;color:var(--muted)">R$</span>
-            <input id="pers-m-preco-50" placeholder="375,00" style="max-width:120px">
-          </div>
+        <div style="grid-column:1/-1"><p class="oba-secao-titulo">💰 Pacotes de preços</p></div>
+        <div style="grid-column:1/-1">
+          <div id="pers-pacotes-lista" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px"></div>
+          <button type="button" class="secondary" style="font-size:12px" onclick="obaAdicionarPacoteItem()">+ Adicionar pacote</button>
+          <p class="hint" style="margin:4px 0 0">Cada pacote tem uma quantidade (nº de doces) e um preço. Adicione ou remova livremente.</p>
         </div>
         <div class="field full actions"><button class="primary" type="submit">Salvar Modal Personalizados</button></div>
       </form>
@@ -386,11 +409,11 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
         <div class="field full"><label>Título do modal</label><input id="eventos-m-titulo" placeholder="Orçamentos de Eventos"></div>
 
         <div style="grid-column:1/-1"><p class="oba-secao-titulo">🏷️ Labels dos campos</p></div>
-        <div class="field"><label>Label — Campo Nome</label><input id="eventos-m-label-nome" placeholder="Seu Nome Completo"></div>
-        <div class="field"><label>Label — Campo Tipo de Evento</label><input id="eventos-m-label-tipo" placeholder="Tipo (Casamento, Formatura...)"></div>
+        <div class="field full"><label>Label — Campo Nome</label><input id="eventos-m-label-nome" placeholder="Seu Nome Completo"></div>
+        <div class="field full"><label>Label — Campo Tipo de Evento</label><input id="eventos-m-label-tipo" placeholder="Tipo (Casamento, Formatura...)"></div>
         <div class="field"><label>Label — Campo Data</label><input id="eventos-m-label-data" placeholder="Data"></div>
         <div class="field"><label>Label — Campo Convidados</label><input id="eventos-m-label-convidados" placeholder="Nº Convidados"></div>
-        <div class="field"><label>Label — Botão de envio</label><input id="eventos-m-label-botao" placeholder="Solicitar Proposta"></div>
+        <div class="field full"><label>Label — Botão de envio</label><input id="eventos-m-label-botao" placeholder="Solicitar Proposta"></div>
 
         <div class="field full actions"><button class="primary" type="submit">Salvar Modal Eventos</button></div>
       </form>
@@ -1243,7 +1266,7 @@ $('formConfig').onsubmit=async e=>{
   /* Bindings de cor por página (picker <-> hex, com campo hex opcional) */
   const obaCorPaginas=[
     'pg1-corFundo','pg1-corTitulo',
-    'pg2-corFundo','pg2-corTitulo',
+    'pg2-corFundo','pg2-corTitulo','pg2-corTexto',
     'pg3-corFundo','pg3-corSubtitulo'
   ];
   obaCorPaginas.forEach(baseId=>{
@@ -1605,6 +1628,7 @@ $('formConfig').onsubmit=async e=>{
     obaSetSelect('pg2-tamanhoLogo',ne.tamanhoLogo,'medio');
     obaSetCorPagina('pg2-corFundo',ne.corFundo);
     obaSetCorPagina('pg2-corTitulo',ne.corTitulo);
+    obaSetCorPagina('pg2-corTexto',ne.corTexto);
     obaSetCheck('pg2-exibirCitacao',ne.exibirCitacao!==false);
     obaSetCheck('pg2-exibirSeparador',ne.exibirSeparador!==false);
     obaAtualizarLogoPreview('pg2-logo','pg2-logo-preview');
@@ -1629,14 +1653,8 @@ $('formConfig').onsubmit=async e=>{
     obaSetVal('pers-m-pacotes-titulo',pm.pacotes_titulo);
     /* R11B: lista dinâmica de info_items */
     obaRenderizarInfoItems(Array.isArray(pm.info_items) ? pm.info_items : ['Modelagem artesanal.', 'Mínimo: 20 unidades.']);
-    /* R10A: preços dos pacotes */
-    if(Array.isArray(pm.pacotes)){
-      const p20=pm.pacotes.find(p=>p.quantidade===20);const p35=pm.pacotes.find(p=>p.quantidade===35);const p50=pm.pacotes.find(p=>p.quantidade===50);
-      if(p20)obaSetVal('pers-m-preco-20',p20.preco);
-      if(p35)obaSetVal('pers-m-preco-35',p35.preco);
-      if(p50)obaSetVal('pers-m-preco-50',p50.preco);
-    }
-
+    /* R11B: pacotes dinâmicos */
+    obaRenderizarPacotes(Array.isArray(pm.pacotes) ? pm.pacotes : [{quantidade:20,preco:'196,00'},{quantidade:35,preco:'280,00'},{quantidade:50,preco:'375,00'}]);
     /* Modal Eventos */
     const em=pg.eventos_modal||{};
     obaSetVal('eventos-m-titulo',em.titulo);
@@ -1676,6 +1694,7 @@ $('formConfig').onsubmit=async e=>{
     obaSetVal('pg2-tamTitulo',ne.tamTitulo||'');obaSetSelect('pg2-pesoTitulo',ne.pesoTitulo,'');
     obaSetVal('pg3-tamSubtitulo',mp.tamSubtitulo||'');obaSetSelect('pg3-pesoSubtitulo',mp.pesoSubtitulo,'');
     obaSetVal('pg3-tamLabel',mp.tamLabel||'');obaSetVal('pg3-tamSublabel',mp.tamSublabel||'');
+    obaSetSelect('pg3-pesoLabel',mp.pesoLabel,'');obaSetSelect('pg3-pesoSublabel',mp.pesoSublabel,'');
     /* Variantes */
     obaRenderizarVariantes(t.variante||'classica');
     obaAtualizarPreviewCores();
@@ -1741,6 +1760,7 @@ $('formConfig').onsubmit=async e=>{
           citacao:$('pg2-citacao')?.value.trim()||'',
           corFundo:$('pg2-corFundo-hex')?.value.trim()||'',
           corTitulo:$('pg2-corTitulo-hex')?.value.trim()||'',
+          corTexto:$('pg2-corTexto-hex')?.value.trim()||'',
           tamTitulo:$('pg2-tamTitulo')?.value.trim()||'',
           pesoTitulo:$('pg2-pesoTitulo')?.value||'',
           exibirCitacao:$('pg2-exibirCitacao')?.checked!==false,
@@ -1756,6 +1776,8 @@ $('formConfig').onsubmit=async e=>{
           pesoSubtitulo:$('pg3-pesoSubtitulo')?.value||'',
           tamLabel:$('pg3-tamLabel')?.value.trim()||'',
           tamSublabel:$('pg3-tamSublabel')?.value.trim()||'',
+          pesoLabel:$('pg3-pesoLabel')?.value||'',
+          pesoSublabel:$('pg3-pesoSublabel')?.value||'',
           botoes:obaLerBotoesMenu()
         },
         vitrine_presentes:{
@@ -1766,12 +1788,8 @@ $('formConfig').onsubmit=async e=>{
           titulo:$('pers-m-titulo')?.value.trim()||'',
           info_titulo:$('pers-m-info-titulo')?.value.trim()||'',
           info_items: obaLerInfoItems(),
+          pacotes: obaLerPacotes(),
           pacotes_titulo:$('pers-m-pacotes-titulo')?.value.trim()||'',
-          pacotes:[
-            {quantidade:20,preco:$('pers-m-preco-20')?.value.trim()||'196,00'},
-            {quantidade:35,preco:$('pers-m-preco-35')?.value.trim()||'280,00'},
-            {quantidade:50,preco:$('pers-m-preco-50')?.value.trim()||'375,00'}
-          ]
         },
         eventos_modal:{
           titulo:$('eventos-m-titulo')?.value.trim()||'',
@@ -1888,6 +1906,54 @@ $('formConfig').onsubmit=async e=>{
     return Array.from(document.querySelectorAll('#pers-info-lista .pers-info-item-input'))
       .map(inp => inp.value.trim())
       .filter(Boolean);
+  };
+
+  /* ================================================================
+     R11B — EDITOR DINÂMICO DE PACOTES (Modal Personalizados)
+  ================================================================ */
+
+  window.obaRenderizarPacotes = function(pacotes) {
+    const lista = $('pers-pacotes-lista');
+    if (!lista) return;
+    lista.innerHTML = '';
+    (pacotes || []).forEach(p => obaAdicionarPacoteItemEl(p));
+  };
+
+  function obaAdicionarPacoteItemEl(p) {
+    const lista = $('pers-pacotes-lista');
+    if (!lista) return;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:6px;align-items:center;flex-wrap:wrap';
+    row.innerHTML = `
+      <div style="display:flex;align-items:center;gap:4px;flex:1;min-width:120px">
+        <input type="number" class="pers-pacote-qtd" value="${p&&p.quantidade||''}" placeholder="Qtd" min="1"
+          style="width:70px;padding:9px 8px;border:1px solid var(--line);border-radius:9px;background:#fff;font:inherit;text-align:center">
+        <span style="font-size:12px;color:var(--muted);white-space:nowrap">doces</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px;flex:1;min-width:120px">
+        <span style="font-size:13px;color:var(--muted)">R$</span>
+        <input type="text" class="pers-pacote-preco" value="${p&&p.preco||''}" placeholder="Ex: 196,00"
+          style="flex:1;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:#fff;font:inherit">
+      </div>
+      <button type="button" class="danger" style="padding:6px 10px;font-size:11px;flex-shrink:0"
+        onclick="this.closest('div').remove()" title="Remover">✕</button>`;
+    lista.appendChild(row);
+  }
+
+  window.obaAdicionarPacoteItem = function() {
+    obaAdicionarPacoteItemEl({});
+    const lista = $('pers-pacotes-lista');
+    const ultimo = lista?.lastElementChild?.querySelector('.pers-pacote-qtd');
+    if (ultimo) ultimo.focus();
+  };
+
+  window.obaLerPacotes = function() {
+    return Array.from(document.querySelectorAll('#pers-pacotes-lista > div'))
+      .map(row => ({
+        quantidade: parseInt(row.querySelector('.pers-pacote-qtd')?.value) || 0,
+        preco: row.querySelector('.pers-pacote-preco')?.value.trim() || ''
+      }))
+      .filter(p => p.quantidade > 0 && p.preco);
   };
 
   /* ================================================================
