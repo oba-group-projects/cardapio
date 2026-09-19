@@ -2063,7 +2063,7 @@ async function obaHandleGithubImagesApi(request, env, url) {
   if (!token) return obaApiJson({ ok: false, error: "github_pat_missing" }, 500);
 
   const repo   = "oba-group-projects/cardapio";
-  const branch = "feature/gestao-online-segura";
+  const branch = "main";
   const folder = "Images";
 
   async function listarRecursivo(path) {
