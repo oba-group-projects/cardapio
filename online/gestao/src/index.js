@@ -1475,9 +1475,11 @@ async function obaGitHubGetFileSha(token, path) {
 }
 
 async function obaGitHubPutFile(token, path, content, sha, message) {
+  const utf8Bytes = new TextEncoder().encode(content);
+  const binStr = Array.from(utf8Bytes, b => String.fromCharCode(b)).join('');
   const body = {
     message,
-    content: btoa(unescape(encodeURIComponent(content))),
+    content: btoa(binStr),
     branch: OBA_GITHUB_BRANCH
   };
   if (sha) body.sha = sha;
@@ -1520,27 +1522,83 @@ async function obaGitHubSyncPublished(env, payload, revisionId) {
   const message =
     `chore(sync): publicacao via Central [${revisionId?.slice(0, 12) || "unknown"}]`;
 
+  /* Helper que faz PUT para um branch específico (reutilizável) */
+  async function putFileToBranch(branch, filePath, content) {
+    const shaUrl = `https://api.github.com/repos/${OBA_GITHUB_REPO}/contents/${filePath}?ref=${branch}`;
+    const shaResp = await fetch(shaUrl, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+        "User-Agent": "oba-cardapio-worker"
+      }
+    });
+    const shaData = shaResp.ok ? await shaResp.json() : {};
+    const sha = shaData.sha || null;
+
+    const utf8Bytes = new TextEncoder().encode(content);
+    const binStr = Array.from(utf8Bytes, b => String.fromCharCode(b)).join('');
+    const body = { message, content: btoa(binStr), branch };
+    if (sha) body.sha = sha;
+
+    const resp = await fetch(
+      `https://api.github.com/repos/${OBA_GITHUB_REPO}/contents/${filePath}`,
+      {
+        method: "PUT",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Accept": "application/vnd.github+json",
+          "Content-Type": "application/json",
+          "X-GitHub-Api-Version": "2022-11-28",
+          "User-Agent": "oba-cardapio-worker"
+        },
+        body: JSON.stringify(body)
+      }
+    );
+    if (!resp.ok) {
+      const err = await resp.text().catch(() => "");
+      throw new Error(`GitHub PUT ${filePath}@${branch}: HTTP ${resp.status} — ${err.slice(0, 200)}`);
+    }
+  }
+
   const results = {};
   let errors = 0;
 
+  /* Sync para o branch de trabalho (feature) — mantém histórico de desenvolvimento */
   for (const [key, filePath] of Object.entries(OBA_GITHUB_FILE_MAP)) {
     const value = payload[key];
     if (value === undefined) continue;
-
     try {
       const content = JSON.stringify(value, null, 2);
       const sha = await obaGitHubGetFileSha(token, filePath);
       await obaGitHubPutFile(token, filePath, content, sha, message);
       results[key] = "ok";
     } catch (err) {
-      console.error(`[9D] Erro ao sincronizar ${key}:`, String(err));
+      console.error(`[9D] Erro ao sincronizar ${key} no feature:`, String(err));
       results[key] = "error";
       errors++;
     }
   }
 
-  console.info(`[9D] Sync GitHub concluido. Erros: ${errors}`, results);
-  return { ok: errors === 0, errors, results };
+  /* Sync para o main — onde o GitHub Pages serve o cardápio público */
+  const mainResults = {};
+  let mainErrors = 0;
+  for (const [key, filePath] of Object.entries(OBA_GITHUB_FILE_MAP)) {
+    const value = payload[key];
+    if (value === undefined) continue;
+    try {
+      const content = JSON.stringify(value, null, 2);
+      await putFileToBranch("main", filePath, content);
+      mainResults[key] = "ok";
+    } catch (err) {
+      console.error(`[9D] Erro ao sincronizar ${key} no main:`, String(err));
+      mainResults[key] = "error";
+      mainErrors++;
+    }
+  }
+
+  console.info(`[9D] Sync feature: erros=${errors} | Sync main: erros=${mainErrors}`);
+  return { ok: errors === 0 && mainErrors === 0, errors, mainErrors, results, mainResults };
 }
 
 /* OBA_GITHUB_SYNC_CARDAPIO_HTML — sincroniza ui-desenvolvimento/index.html para main */
@@ -1575,8 +1633,10 @@ async function obaGitHubSyncCardapioHtml(env, request) {
     const shaData = shaResp.ok ? await shaResp.json() : {};
     const sha = shaData.sha || null;
 
-    // Codifica o HTML em base64
-    const encoded = btoa(unescape(encodeURIComponent(htmlContent)));
+    // Codifica o HTML em base64 com suporte completo a UTF-8 (TextEncoder é nativo no Workers)
+    const utf8Bytes = new TextEncoder().encode(htmlContent);
+    const binStr = Array.from(utf8Bytes, b => String.fromCharCode(b)).join('');
+    const encoded = btoa(binStr);
 
     const body = { message, content: encoded, branch: targetBranch };
     if (sha) body.sha = sha;

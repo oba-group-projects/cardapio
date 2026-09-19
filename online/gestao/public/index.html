@@ -952,6 +952,10 @@ async function api(url,opts={}){
   const text=await r.text();
   let j={};
   if(text){try{j=JSON.parse(text)}catch{j={error:text}}}
+  if(r.status===401){
+    // Sessão expirada — avisa mas não redireciona automaticamente para não interromper fluxos
+    throw new Error('unauthorized');
+  }
   if(!r.ok)throw new Error(j.error||('HTTP '+r.status));
   return j;
 }
@@ -4240,7 +4244,14 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     }
     catch (err) {
       const msgErr = err && err.message ? err.message : String(err);
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--danger);padding:16px">Erro ao carregar historico: ${msgErr}</td></tr>`;
+      const isUnauth = msgErr.toLowerCase().includes('unauthorized') || msgErr.includes('401');
+      tbody.innerHTML = isUnauth
+        ? `<tr><td colspan="5" style="text-align:center;padding:16px">
+            <p style="color:var(--danger);font-weight:700;margin:0 0 8px">Sessão expirada.</p>
+            <p style="color:var(--muted);font-size:13px;margin:0 0 10px">Faça login novamente para acessar o histórico.</p>
+            <a href="/__auth/login" style="display:inline-block;padding:8px 18px;background:var(--brand);color:#fff;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none">🔑 Entrar novamente</a>
+           </td></tr>`
+        : `<tr><td colspan="5" style="text-align:center;color:var(--danger);padding:16px">Erro ao carregar historico: ${msgErr}</td></tr>`;
     }
   }
 
