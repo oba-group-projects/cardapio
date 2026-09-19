@@ -4,7 +4,7 @@ Atualizado: 2026-09-15
 
 ## Git
 Branch: feature/gestao-online-segura
-Commit HEAD: 048dd21
+Commit HEAD: 21258ff
 
 ## Estado funcional
 - Central privada autenticada e operacional.
@@ -16,7 +16,9 @@ Commit HEAD: 048dd21
 - 9A-9C: Infraestrutura de tema, aba Edição Visual, controles por página
 - 9D: Sync automático GitHub Pages
 - 10A: Menu dinâmico (botões configuráveis, 7 ações, preview ao vivo, preços Personalizados editáveis)
-- 10B: Overflow automático de botões (máx 4/tela → páginas 3B, 3C...) + polish (Ver mais destacado, pb-28, remove ação historia)
+- 10B: Overflow automático de botões (máx 4/tela → páginas 3B, 3C...) + polish
+- 11D: Seletores de tamanho nomeados (pg1/pg2/pg3) + botão Galeria nos campos de logo
+- 11E: Galeria unificada GitHub+D1 com abas + tipografia completa por elemento (subtítulo pag1, texto e citação pag2)
 
 ## Estado do cardápio público
 - Página 3 (Menu): array dinâmico de botões, overflow automático com paginação
