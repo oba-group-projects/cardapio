@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>OBA Doceria | Experiência Gourmet Interativa</title>
+  <title>OBA Doceria | ExperiÃªncia Gourmet Interativa</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
@@ -14,7 +14,7 @@
     input[type=number]{-moz-appearance:textfield;appearance:textfield}
     .fade-page{animation:fadeIn 0.25s ease-out forwards}
     @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-    /* Fluxo principal e pages de overflow mantêm o slide sutil */
+    /* Fluxo principal e pages de overflow mantÃªm o slide sutil */
     #fluxo-principal.fade-page,[data-oba-overflow-menu].fade-page,[data-oba-secao-custom].fade-page{animation:fadeInSlide 0.35s ease-out forwards}
     @keyframes fadeInSlide{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
     .glass-card{background:rgba(255,255,255,0.65);backdrop-filter:blur(12px);border:1px solid rgba(139,69,19,0.08)}
@@ -22,15 +22,15 @@
     .btn-step-icon{background-color:#8B4513;color:white;width:22px;height:22px;border-radius:9999px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
   </style>
   <!-- ================================================================
-       R9A - VARIÁVEIS DE TEMA VISUAL (preenchidas por hidratarTemaDoModeloMestre)
+       R9A - VARIÃVEIS DE TEMA VISUAL (preenchidas por hidratarTemaDoModeloMestre)
        ================================================================ -->
   <style id="oba-tema-vars"></style>
   <!-- ================================================================
-       R9A-TIPOGRAFIA — aplica variáveis de tema aos elementos com ID
+       R9A-TIPOGRAFIA â€” aplica variÃ¡veis de tema aos elementos com ID
        Usa !important para sobrescrever classes Tailwind inline.
        ================================================================ -->
   <style id="oba-tipografia-vars">
-    /* Títulos principais de página */
+    /* TÃ­tulos principais de pÃ¡gina */
     #oba-pag1-titulo {
       font-size: var(--oba-tam-titulo, 1.5rem) !important;
       font-weight: var(--oba-peso-titulo, 300) !important;
@@ -48,34 +48,34 @@
       font-size: var(--oba-tam-corpo, 0.875rem) !important;
       font-weight: var(--oba-peso-corpo, 400) !important;
     }
-    /* Subtítulos e labels */
+    /* SubtÃ­tulos e labels */
     #oba-pag3-subtitulo {
       font-size: var(--oba-tam-subtitulo, 0.6875rem) !important;
       font-weight: var(--oba-peso-subtitulo, 600) !important;
     }
-    /* Títulos de modal */
+    /* TÃ­tulos de modal */
     #oba-pers-titulo, #oba-eventos-titulo,
     #oba-vitrine-titulo {
       font-size: var(--oba-tam-modal, 18px) !important;
       font-weight: var(--oba-peso-modal, 800) !important;
     }
-    /* Blocos de informação dos modais */
+    /* Blocos de informaÃ§Ã£o dos modais */
     #oba-pers-info-titulo, #oba-pers-pacotes-titulo {
       font-size: var(--oba-tam-subtitulo, 0.6875rem) !important;
       font-weight: var(--oba-peso-subtitulo, 600) !important;
     }
-    /* Preços */
+    /* PreÃ§os */
     #oba-pers-preco-20, #oba-pers-preco-35, #oba-pers-preco-50,
     #oba-pers-pacotes-lista b {
       font-size: var(--oba-tam-preco, 14px) !important;
       font-weight: var(--oba-peso-preco, 700) !important;
     }
-    /* Overrides de tipografia por página (aplicados via JS quando definidos) */
+    /* Overrides de tipografia por pÃ¡gina (aplicados via JS quando definidos) */
     .oba-pag1-tipografia-override #oba-pag1-titulo {
       font-size: var(--oba-pag1-tam-titulo) !important;
       font-weight: var(--oba-pag1-peso-titulo) !important;
     }
-    /* Subtítulo pag1 — override direto */
+    /* SubtÃ­tulo pag1 â€” override direto */
     #oba-pag1-subtitulo {
       font-size: var(--oba-pag1-tam-subtitulo, var(--oba-tam-corpo, 0.875rem)) !important;
       font-weight: var(--oba-pag1-peso-subtitulo, var(--oba-peso-corpo, 400)) !important;
@@ -84,12 +84,12 @@
       font-size: var(--oba-pag2-tam-titulo) !important;
       font-weight: var(--oba-pag2-peso-titulo) !important;
     }
-    /* Botão CTA pag1 */
+    /* BotÃ£o CTA pag1 */
     #oba-pag1-btn-cta {
       font-size: var(--oba-pag1-tam-cta, var(--oba-tam-corpo, 11px)) !important;
       font-weight: var(--oba-pag1-peso-cta, var(--oba-peso-corpo, 500)) !important;
     }
-    /* Texto principal e citação pag2 */
+    /* Texto principal e citaÃ§Ã£o pag2 */
     #oba-pag2-texto {
       font-size: var(--oba-pag2-tam-texto, var(--oba-tam-corpo, 13px)) !important;
       font-weight: var(--oba-pag2-peso-texto, var(--oba-peso-corpo, 400)) !important;
@@ -102,7 +102,7 @@
       font-size: var(--oba-pag3-tam-subtitulo) !important;
       font-weight: var(--oba-pag3-peso-subtitulo) !important;
     }
-    /* Labels e sublabels dos botões da Pág 3 */
+    /* Labels e sublabels dos botÃµes da PÃ¡g 3 */
     #pag-3 .oba-btn-label {
       font-size: var(--oba-pag3-tam-label, var(--oba-tam-corpo, 13px)) !important;
       font-weight: var(--oba-pag3-peso-label, var(--oba-peso-corpo, 400)) !important;
@@ -111,7 +111,7 @@
       font-size: var(--oba-pag3-tam-sublabel, 9px) !important;
       font-weight: var(--oba-pag3-peso-sublabel, 600) !important;
     }
-    /* Cor do texto principal da Pág 2 — controlada por JS via element.style */
+    /* Cor do texto principal da PÃ¡g 2 â€” controlada por JS via element.style */
   </style>
 <style id="r117a-mobile-flow">
 
@@ -1168,7 +1168,7 @@
     #r117c-checkout-header::after {
 
         content:
-            "Carrinho  →  Entrega  →  WhatsApp";
+            "Carrinho  â†’  Entrega  â†’  WhatsApp";
 
         display: block;
 
@@ -1192,7 +1192,7 @@
     #r117b-cart-header::after {
 
         content:
-            "Revise os itens e avance para a finalização";
+            "Revise os itens e avance para a finalizaÃ§Ã£o";
 
         display: block;
 
@@ -1584,7 +1584,7 @@
 }
 
 
-/* ação principal dentro do modal final */
+/* aÃ§Ã£o principal dentro do modal final */
 #modal-caixa-concluida.r120-ux2-review
 button[onclick*="salvarCaixaEContinuar"] {
   background: #a34b08 !important;
@@ -1734,11 +1734,11 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
 <!-- OBA PRODUCTION DEBUG GUARD -->
 <style id="oba-production-debug-guard">
   /*
-   * Produção:
-   * infraestrutura R13 permanece disponível para diagnóstico,
-   * porém nunca aparece para o cliente normal.
+   * ProduÃ§Ã£o:
+   * infraestrutura R13 permanece disponÃ­vel para diagnÃ³stico,
+   * porÃ©m nunca aparece para o cliente normal.
    *
-   * Ativação técnica explícita:
+   * AtivaÃ§Ã£o tÃ©cnica explÃ­cita:
    * ?obaDebug=1
    */
   #r120-r13-checkpoint {
@@ -1752,7 +1752,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
 </head>
 <body class="antialiased selection:bg-[#8B4513] selection:text-white pb-24">
 
-<!-- BOTÃO WPP FLUTUANTE — visível a partir da Página 2 -->
+<!-- BOTÃƒO WPP FLUTUANTE â€” visÃ­vel a partir da PÃ¡gina 2 -->
 <a id="btn-wpp-flutuante" href="https://wa.me/5555999117626" data-oba-whatsapp-link target="_blank"
    style="display:none"
    class="fixed bottom-24 lg:bottom-6 right-4 lg:right-6 z-[60] bg-[#25D366] text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-2xl hover:bg-green-600 transition-all" rel="noopener noreferrer">
@@ -1765,20 +1765,20 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
 </div>
 
 <!-- ================================================================
-  MODAL 1: CONFIGURAÇÃO DE TAMANHO (Caixas normais + Degustação)
+  MODAL 1: CONFIGURAÃ‡ÃƒO DE TAMANHO (Caixas normais + DegustaÃ§Ã£o)
   z-[120]
 ================================================================ -->
 <div id="modal-tamanho-caixa" class="fixed inset-0 bg-black/80 hidden z-[120] flex items-center justify-center p-4" onclick="fecharModalTamanhoCaixa()">
   <div class="bg-white max-w-sm w-full rounded-[2rem] p-7 relative shadow-2xl text-center space-y-5" onclick="event.stopPropagation()">
-    <button onclick="fecharModalTamanhoCaixa()" class="absolute top-4 right-4 bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center text-gray-500 font-bold">✕</button>
+    <button onclick="fecharModalTamanhoCaixa()" class="absolute top-4 right-4 bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center text-gray-500 font-bold">âœ•</button>
     <div class="w-14 h-14 bg-orange-50 rounded-full flex items-center justify-center mx-auto">
       <i class="fa-solid fa-box-open text-[#8B4513] text-2xl"></i>
     </div>
     <div>
       <h2 id="mtc-titulo" class="text-lg font-black text-[#8B4513]">Caixa de 25 Doces</h2>
-      <p id="mtc-desc" class="text-sm text-gray-500 mt-2 leading-relaxed">Escolha 25 doces com até 7 sabores diferentes.</p>
+      <p id="mtc-desc" class="text-sm text-gray-500 mt-2 leading-relaxed">Escolha 25 doces com atÃ© 7 sabores diferentes.</p>
     </div>
-    <!-- Seletor de tamanho (só degustação) -->
+    <!-- Seletor de tamanho (sÃ³ degustaÃ§Ã£o) -->
     <div id="mtc-deg-opcoes" class="hidden space-y-4">
       <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Selecione o tamanho:</p>
       <div class="grid grid-cols-2 gap-3">
@@ -1796,7 +1796,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
         </button>
       </div>
     </div>
-    <!-- Botões de ação -->
+    <!-- BotÃµes de aÃ§Ã£o -->
     <div id="mtc-botoes" class="flex flex-col gap-2">
       <button id="mtc-btn-confirmar" onclick="confirmarTamanhoCaixa()"
               class="w-full py-3.5 bg-[#8B4513] text-white font-bold text-[11px] rounded-xl shadow-md uppercase tracking-widest active:scale-95">
@@ -1823,7 +1823,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
             aria-label="Fechar imagem ampliada"
             class="absolute top-2 right-2 z-30 w-11 h-11 rounded-full bg-white text-gray-500 shadow-xl flex items-center justify-center text-lg font-black">
 
-      ✕
+      âœ•
 
     </button>
 
@@ -1845,7 +1845,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
 
         <h3 id="lightbox-degustacao-titulo"
             class="text-base md:text-lg font-black text-[#8B4513]">
-          Caixa Degustação
+          Caixa DegustaÃ§Ã£o
         </h3>
 
         <p id="lightbox-degustacao-detalhe"
@@ -1860,7 +1860,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
 
 
       <p class="text-[7px] md:text-[8px] uppercase tracking-widest font-black text-gray-400 text-center mt-3 mb-2">
-        Compare as opções
+        Compare as opÃ§Ãµes
       </p>
 
 
@@ -1872,7 +1872,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
                 class="p-3 rounded-xl border-2 border-[#E8D5B5] bg-white text-left transition-all">
 
           <p class="font-black text-[#8B4513] text-[10px] md:text-xs">
-            Degustação 12
+            DegustaÃ§Ã£o 12
           </p>
 
           <p class="text-[9px] text-gray-500 mt-1">
@@ -1892,7 +1892,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
                 class="p-3 rounded-xl border-2 border-[#E8D5B5] bg-white text-left transition-all">
 
           <p class="font-black text-[#8B4513] text-[10px] md:text-xs">
-            Degustação 25
+            DegustaÃ§Ã£o 25
           </p>
 
           <p class="text-[9px] text-gray-500 mt-1">
@@ -1912,7 +1912,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
               onclick="selecionarDegustacaoDoLightbox()"
               class="mt-3 w-full py-3.5 bg-[#8B4513] text-white rounded-xl font-bold text-[9px] md:text-[10px] uppercase tracking-widest shadow-md active:scale-95">
 
-        Selecionar esta opção
+        Selecionar esta opÃ§Ã£o
 
       </button>
 
@@ -1944,7 +1944,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
     <button type="button"
             onclick="fecharModalQuantidadeDoce()"
             class="absolute top-4 right-4 z-10 bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center text-gray-500 font-bold">
-      ✕
+      âœ•
     </button>
 
     <div class="w-full h-56 sm:h-64 rounded-2xl overflow-hidden bg-gray-50 border border-orange-100">
@@ -1976,7 +1976,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
       <button type="button"
               onclick="ajustarQuantidadeModalDoce(-1)"
               class="w-12 h-12 rounded-xl bg-white border-2 border-[#E8D5B5] text-[#8B4513] text-xl font-black active:scale-95">
-        −
+        âˆ’
       </button>
 
       <input id="mdq-qtd"
@@ -1997,7 +1997,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
 
     <div>
       <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">
-        Quantidade rápida
+        Quantidade rÃ¡pida
       </p>
 
       <div class="grid grid-cols-4 gap-2">
@@ -2044,19 +2044,19 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
   </div>
 </div>
 <!-- ================================================================
-  MODAL 2: CONFIGURAÇÃO DE KIT (Presenteáveis — opcionais + ações)
+  MODAL 2: CONFIGURAÃ‡ÃƒO DE KIT (PresenteÃ¡veis â€” opcionais + aÃ§Ãµes)
   z-[120]
 ================================================================ -->
 <div id="modal-config-kit" class="fixed inset-0 bg-black/80 hidden z-[120] flex items-center justify-center p-4" onclick="fecharModalConfigKit()">
   <div class="bg-white max-w-md w-full rounded-[2rem] p-6 relative shadow-2xl text-center space-y-4" onclick="event.stopPropagation()">
-    <button onclick="fecharModalConfigKit()" class="absolute top-4 right-4 bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center text-gray-500 font-bold">✕</button>
+    <button onclick="fecharModalConfigKit()" class="absolute top-4 right-4 bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center text-gray-500 font-bold">âœ•</button>
     <!-- Imagem do kit -->
     <div class="w-full h-40 rounded-2xl overflow-hidden bg-gray-50">
       <img id="mck-img" src="" alt="" class="w-full h-full object-cover">
     </div>
     <div>
       <h2 id="mck-titulo" class="text-lg font-black text-[#8B4513]">Nome do Kit</h2>
-      <p id="mck-desc" class="text-[11px] text-gray-500 mt-1 leading-tight px-2">Descrição</p>
+      <p id="mck-desc" class="text-[11px] text-gray-500 mt-1 leading-tight px-2">DescriÃ§Ã£o</p>
       <p class="text-xl font-black text-[#8B4513] mt-2" id="mck-preco">R$ 0,00</p>
     </div>
     <!-- Opcionais -->
@@ -2065,7 +2065,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
       <div id="opt-laco-card" onclick="toggleOpcional('laco')" class="border border-orange-100 p-3 rounded-2xl flex items-center justify-between cursor-pointer select-none hover:border-orange-300 transition-all active:scale-[0.98]">
         <div class="flex items-center gap-3">
           <div id="chk-laco" class="w-5 h-5 rounded border-2 border-[#8B4513] flex items-center justify-center text-white text-xs bg-white"><i class="fa-solid fa-check opacity-0 transition-opacity"></i></div>
-          <h4 id="opt-laco-titulo" class="text-[11px] font-bold text-[#8B4513] uppercase">Laço Decorativo</h4>
+          <h4 id="opt-laco-titulo" class="text-[11px] font-bold text-[#8B4513] uppercase">LaÃ§o Decorativo</h4>
         </div>
         <span id="opt-laco-preco" class="text-[11px] font-black text-[#8B4513]">+ R$ 4,50</span>
       </div>
@@ -2077,7 +2077,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
         <span id="opt-placa-preco" class="text-[11px] font-black text-[#8B4513]">+ R$ 3,50</span>
       </div>
     </div>
-    <!-- Botões -->
+    <!-- BotÃµes -->
     <div class="flex flex-col gap-2 pt-1">
       <button onclick="adicionarKitAoCarrinho('continuar')"
               class="w-full py-3.5 bg-green-600 text-white font-bold text-[10px] rounded-xl shadow-md uppercase tracking-widest active:scale-95">
@@ -2092,17 +2092,17 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
 </div>
 
 <!-- ================================================================
-  MODAL 3: CONCLUSÃO DE CAIXA (caixa de doces completa + degustação confirmada)
+  MODAL 3: CONCLUSÃƒO DE CAIXA (caixa de doces completa + degustaÃ§Ã£o confirmada)
   z-[130]
 ================================================================ -->
 <div id="modal-caixa-concluida" class="fixed inset-0 bg-black/80 hidden z-[130] flex items-center justify-center p-4" onclick="fecharModalCaixaConcluida()">
   <div class="bg-white max-w-sm w-full rounded-[2rem] p-7 relative shadow-2xl text-center space-y-4" onclick="event.stopPropagation()">
-    <button onclick="fecharModalCaixaConcluida()" class="absolute top-4 right-4 bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center text-gray-500 font-bold">✕</button>
+    <button onclick="fecharModalCaixaConcluida()" class="absolute top-4 right-4 bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center text-gray-500 font-bold">âœ•</button>
     <div class="w-14 h-14 bg-green-50 rounded-full flex items-center justify-center mx-auto">
       <i class="fa-solid fa-circle-check text-green-600 text-2xl"></i>
     </div>
     <div>
-      <h2 id="mcc-titulo" class="text-lg font-black text-[#8B4513]">Caixa Completa! 🎉</h2>
+      <h2 id="mcc-titulo" class="text-lg font-black text-[#8B4513]">Caixa Completa! ðŸŽ‰</h2>
       <p id="mcc-desc" class="text-sm text-gray-500 mt-1">25 doces escolhidos</p>
       <p class="text-2xl font-black text-[#8B4513] mt-2" id="mcc-valor">R$ 0,00</p>
     </div>
@@ -2125,7 +2125,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
 </div>
 
 <!-- ================================================================
-  MODAL 4: CARRINHO UNIFICADO + FORMULÁRIO DE ENTREGA
+  MODAL 4: CARRINHO UNIFICADO + FORMULÃRIO DE ENTREGA
   z-[140]
 ================================================================ -->
 <div id="modal-carrinho" class="fixed inset-0 bg-black/80 hidden z-[140] flex items-end sm:items-center justify-center sm:p-4" onclick="fecharModalCarrinho()">
@@ -2134,17 +2134,17 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
       <h2 class="text-lg font-black text-[#8B4513] flex items-center gap-2 uppercase tracking-widest">
         <i class="fa-solid fa-basket-shopping"></i> Seu Carrinho
       </h2>
-      <button onclick="fecharModalCarrinho()" class="bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center text-gray-500 font-bold">✕</button>
+      <button onclick="fecharModalCarrinho()" class="bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center text-gray-500 font-bold">âœ•</button>
     </div>
     <!-- Lista de itens -->
     <div id="mc-lista" class="flex-1 overflow-y-auto no-scrollbar space-y-3 pb-2"></div>
-    <!-- Rodapé -->
+    <!-- RodapÃ© -->
     <div class="border-t border-[#E8D5B5] pt-4 mt-2 space-y-3">
       <div class="flex justify-between items-center bg-[#FAF5F0] p-4 rounded-xl border border-orange-100">
         <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Total do Pedido:</span>
         <span class="text-2xl font-black text-[#8B4513]" id="mc-total">R$ 0,00</span>
       </div>
-      <!-- Formulário — aparece quando há itens -->
+      <!-- FormulÃ¡rio â€” aparece quando hÃ¡ itens -->
       <div id="mc-form" class="space-y-2 hidden">
         <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Dados para Entrega</p>
         <input type="text" id="nome-cliente" placeholder="Seu nome completo *"
@@ -2170,7 +2170,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
       </div>
       <div class="text-center">
         <a href="https://wa.me/5555999117626" data-oba-whatsapp-link target="_blank" class="text-[10px] text-green-600 font-bold uppercase tracking-widest hover:underline flex items-center justify-center gap-1" rel="noopener noreferrer">
-          <i class="fa-brands fa-whatsapp text-sm"></i> Dúvidas? Fale com a gente
+          <i class="fa-brands fa-whatsapp text-sm"></i> DÃºvidas? Fale com a gente
         </a>
       </div>
     </div>
@@ -2182,23 +2182,23 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
 ================================================================ -->
 <div id="modal-decorados" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center p-4" onclick="fecharModalPersonalizados()">
   <div class="bg-white max-w-xl w-full rounded-[2rem] p-6 relative shadow-2xl" onclick="event.stopPropagation()">
-    <button onclick="fecharModalPersonalizados()" class="absolute top-4 right-4 bg-gray-100 rounded-full w-8 h-8 font-bold text-gray-500">✕</button>
+    <button onclick="fecharModalPersonalizados()" class="absolute top-4 right-4 bg-gray-100 rounded-full w-8 h-8 font-bold text-gray-500">âœ•</button>
     <div id="pers-view-info" class="space-y-5">
       <div class="text-center"><h2 id="oba-pers-titulo" class="text-xl font-black text-[#8B4513] uppercase tracking-tight">Doces Personalizados</h2></div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs leading-relaxed">
         <div class="p-4 bg-orange-50 rounded-2xl border border-orange-100">
-          <h4 id="oba-pers-info-titulo" class="font-bold mb-2 uppercase text-[10px]">Informações</h4>
+          <h4 id="oba-pers-info-titulo" class="font-bold mb-2 uppercase text-[10px]">InformaÃ§Ãµes</h4>
           <div id="oba-pers-info-lista">
-            <p id="oba-pers-info-1">• Modelagem artesanal.</p>
-            <p id="oba-pers-info-2">• Mínimo: 20 unidades.</p>
+            <p id="oba-pers-info-1">â€¢ Modelagem artesanal.</p>
+            <p id="oba-pers-info-2">â€¢ MÃ­nimo: 20 unidades.</p>
           </div>
         </div>
         <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100">
           <h4 id="oba-pers-pacotes-titulo" class="font-bold mb-2 uppercase text-[10px]">Pacotes Especiais</h4>
           <div id="oba-pers-pacotes-lista">
-            <p>• 20 doces: <b id="oba-pers-preco-20">R$ 196,00</b></p>
-            <p>• 35 doces: <b id="oba-pers-preco-35">R$ 280,00</b></p>
-            <p>• 50 doces: <b id="oba-pers-preco-50">R$ 375,00</b></p>
+            <p>â€¢ 20 doces: <b id="oba-pers-preco-20">R$ 196,00</b></p>
+            <p>â€¢ 35 doces: <b id="oba-pers-preco-35">R$ 280,00</b></p>
+            <p>â€¢ 50 doces: <b id="oba-pers-preco-50">R$ 375,00</b></p>
           </div>
         </div>
       </div>
@@ -2217,14 +2217,14 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
 </div>
 <div id="modal-eventos" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center p-4" onclick="fecharModalEventos()">
   <div class="bg-white max-w-xl w-full rounded-[2rem] p-6 relative shadow-2xl text-center" onclick="event.stopPropagation()">
-    <button onclick="fecharModalEventos()" class="absolute top-4 right-4 w-8 h-8 bg-gray-100 rounded-full font-bold text-gray-500">✕</button>
-    <h2 id="oba-eventos-titulo" class="text-xl font-black text-[#8B4513] mb-6 uppercase">Orçamentos de Eventos</h2>
+    <button onclick="fecharModalEventos()" class="absolute top-4 right-4 w-8 h-8 bg-gray-100 rounded-full font-bold text-gray-500">âœ•</button>
+    <h2 id="oba-eventos-titulo" class="text-xl font-black text-[#8B4513] mb-6 uppercase">OrÃ§amentos de Eventos</h2>
     <div class="space-y-3 text-left">
       <input type="text" id="eve-nome" placeholder="Seu Nome Completo" class="w-full p-3.5 bg-gray-50 border rounded-xl outline-none">
       <input type="text" id="eve-tipo" placeholder="Tipo (Casamento, Formatura...)" class="w-full p-3.5 bg-gray-50 border rounded-xl outline-none">
       <div class="grid grid-cols-2 gap-3">
         <input type="date" id="eve-data" class="p-3.5 bg-gray-50 border rounded-xl outline-none">
-        <input type="number" id="eve-convidados" placeholder="Nº Convidados" class="p-3.5 bg-gray-50 border rounded-xl outline-none">
+        <input type="number" id="eve-convidados" placeholder="NÂº Convidados" class="p-3.5 bg-gray-50 border rounded-xl outline-none">
       </div>
     </div>
     <button onclick="enviarOrcamentoEspecial('eventos')" id="oba-eve-btn" class="w-full mt-6 py-4 bg-green-600 text-white rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg active:scale-95">Solicitar Proposta</button>
@@ -2232,7 +2232,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
 </div>
 
 <!-- ================================================================
-  PÁGINAS 1, 2, 3 + FLUXO PRINCIPAL
+  PÃGINAS 1, 2, 3 + FLUXO PRINCIPAL
 ================================================================ -->
 <div id="app-container" class="w-full max-w-6xl mx-auto overflow-hidden relative min-h-screen">
 
@@ -2242,7 +2242,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
       <h1 id="oba-pag1-titulo" class="text-2xl font-light tracking-[0.2em] text-[#8B4513] uppercase">Bem-vindo</h1>
       <p id="oba-pag1-subtitulo" class="text-sm text-gray-500 font-light leading-relaxed px-2">Prepare-se para descobrir o verdadeiro sabor artesanal em cada detalhe.</p>
       <button id="oba-pag1-btn-cta" onclick="navegarPara(2)" class="w-full py-4 mt-4 bg-[#8B4513] text-white rounded-[1.25rem] font-medium text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-[#8B4513]/20 active:scale-95 flex justify-center items-center gap-3">
-        <span id="oba-pag1-cta">Descobrir Nossa História</span> <i class="fa-solid fa-chevron-right text-[9px]"></i>
+        <span id="oba-pag1-cta">Descobrir Nossa HistÃ³ria</span> <i class="fa-solid fa-chevron-right text-[9px]"></i>
       </button>
     </div>
   </section>
@@ -2250,15 +2250,15 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
   <section id="pag-2" class="min-h-screen hidden flex-col items-center justify-center px-5 py-8 fade-page max-w-md mx-auto">
     <div class="w-full glass-card p-8 rounded-[2.5rem] text-center space-y-6 shadow-sm">
       <img id="oba-pag2-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-circular.png" class="w-28 h-28 object-contain mx-auto mb-2 drop-shadow-sm" alt="Logo">
-      <h2 id="oba-pag2-titulo" class="text-sm sm:text-base font-semibold tracking-[0.15em] text-[#8B4513] uppercase">Nossa Essência</h2>
+      <h2 id="oba-pag2-titulo" class="text-sm sm:text-base font-semibold tracking-[0.15em] text-[#8B4513] uppercase">Nossa EssÃªncia</h2>
       <div class="w-10 h-[2px] bg-orange-200/60 mx-auto rounded-full"></div>
-      <p id="oba-pag2-texto" class="text-[13px] text-gray-600 leading-relaxed font-light px-1">Na OBA Doceria, cada brigadeiro é uma obra de arte. Criamos receitas exclusivas com rigor técnico e os melhores insumos, resultando em doces menos açucarados e intensamente cremosos.</p>
-      <p id="oba-pag2-citacao" class="text-xs text-[#8B4513]/70 italic font-medium">"Feito à mão, com amor e precisão."</p>
+      <p id="oba-pag2-texto" class="text-[13px] text-gray-600 leading-relaxed font-light px-1">Na OBA Doceria, cada brigadeiro Ã© uma obra de arte. Criamos receitas exclusivas com rigor tÃ©cnico e os melhores insumos, resultando em doces menos aÃ§ucarados e intensamente cremosos.</p>
+      <p id="oba-pag2-citacao" class="text-xs text-[#8B4513]/70 italic font-medium">"Feito Ã  mÃ£o, com amor e precisÃ£o."</p>
     </div>
     <div class="flex gap-3 w-full mt-6">
       <button onclick="navegarPara(1)" class="w-1/3 py-4 border border-[#8B4513]/20 rounded-[1.25rem] text-[10px] text-[#8B4513] font-semibold uppercase tracking-widest bg-white/50 active:scale-95">Voltar</button>
       <button id="oba-pag2-btn-cta" onclick="navegarPara(3)" class="flex-1 py-4 bg-[#8B4513] text-white rounded-[1.25rem] font-medium text-[11px] uppercase tracking-widest shadow-lg shadow-[#8B4513]/20 active:scale-95 flex justify-center items-center gap-2">
-        Ver o Cardápio <i class="fa-solid fa-chevron-right text-[9px]"></i>
+        Ver o CardÃ¡pio <i class="fa-solid fa-chevron-right text-[9px]"></i>
       </button>
     </div>
   </section>
@@ -2266,16 +2266,16 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
   <section id="pag-3" class="min-h-screen hidden flex-col items-center justify-center px-6 py-10 pb-28 fade-page max-w-md mx-auto">
     <header class="text-center mb-10 w-full">
       <img id="oba-pag3-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png" class="w-36 h-auto mx-auto mb-6 object-contain" alt="Logo">
-      <h2 id="oba-pag3-subtitulo" class="text-[11px] text-[#8B4513]/60 font-semibold uppercase tracking-[0.2em]">Escolha sua Experiência</h2>
+      <h2 id="oba-pag3-subtitulo" class="text-[11px] text-[#8B4513]/60 font-semibold uppercase tracking-[0.2em]">Escolha sua ExperiÃªncia</h2>
     </header>
     <div id="oba-menu-botoes" class="w-full space-y-4">
-      <!-- R10A: botões renderizados dinamicamente por hidratarTemaDoModeloMestre() -->
+      <!-- R10A: botÃµes renderizados dinamicamente por hidratarTemaDoModeloMestre() -->
       <button onclick="entFluxoCaixas()" class="w-full p-6 bg-[#8B4513] text-white rounded-[2rem] shadow-xl shadow-[#8B4513]/20 text-left flex justify-between items-center active:scale-95 transition-all">
         <div><span class="block text-[9px] uppercase tracking-widest opacity-70 mb-1">Montagem</span><span class="text-sm font-medium">Caixas de Doces</span></div>
         <i class="fa-solid fa-box-open text-xl opacity-40"></i>
       </button>
       <button onclick="entFluxoPresenteaveis()" class="w-full p-6 bg-white border border-[#8B4513]/10 text-[#8B4513] rounded-[2rem] text-left flex justify-between items-center active:scale-95 transition-all shadow-sm">
-        <div><span class="block text-[9px] uppercase tracking-widest opacity-50 mb-1">Kits & Presentes</span><span class="text-sm font-medium">Presenteáveis / Especiais</span></div>
+        <div><span class="block text-[9px] uppercase tracking-widest opacity-50 mb-1">Kits & Presentes</span><span class="text-sm font-medium">PresenteÃ¡veis / Especiais</span></div>
         <i class="fa-solid fa-gift text-xl opacity-20"></i>
       </button>
       <button data-oba-business-channel="personalizados" onclick="abrirModalEspecial('personalizados')" class="w-full p-6 bg-white border border-[#8B4513]/10 text-[#8B4513] rounded-[2rem] text-left flex justify-between items-center active:scale-95 transition-all shadow-sm">
@@ -2287,14 +2287,14 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
         <i class="fa-solid fa-champagne-glasses text-xl opacity-20"></i>
       </button>
     </div>
-    <button onclick="navegarPara(2)" class="mt-10 py-3 px-6 text-[10px] font-bold text-[#8B4513]/50 uppercase tracking-widest border border-transparent hover:border-[#8B4513]/20 rounded-full transition-all">← Voltar</button>
+    <button onclick="navegarPara(2)" class="mt-10 py-3 px-6 text-[10px] font-bold text-[#8B4513]/50 uppercase tracking-widest border border-transparent hover:border-[#8B4513]/20 rounded-full transition-all">â† Voltar</button>
   </section>
 
   <!-- FLUXO PRINCIPAL -->
   <section id="fluxo-principal" class="min-h-screen hidden flex-col px-4 py-8 fade-page max-w-5xl mx-auto">
     <header class="text-center mb-8">
       <img id="oba-fluxo-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png" class="w-32 mx-auto mb-4" alt="Logo">
-      <button onclick="retornarParaMenuSeletor()" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest border border-gray-200 px-4 py-1.5 rounded-full">← Voltar às Opções</button>
+      <button onclick="retornarParaMenuSeletor()" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest border border-gray-200 px-4 py-1.5 rounded-full">â† Voltar Ã s OpÃ§Ãµes</button>
     </header>
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-10">
@@ -2304,7 +2304,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
         <div id="secao-kits" class="hidden space-y-6">
           <div class="bg-white p-6 md:p-8 rounded-[2rem] border border-[#E8D5B5] shadow-sm">
             <h3 id="oba-vitrine-titulo" class="step-title mb-2"><i class="fa-solid fa-gift text-[#8B4513]"></i> Vitrine de Presentes</h3>
-            <p id="oba-vitrine-subtitulo" class="text-xs text-gray-500">Nossas opções exclusivas já vêm montadas com carinho.</p>
+            <p id="oba-vitrine-subtitulo" class="text-xs text-gray-500">Nossas opÃ§Ãµes exclusivas jÃ¡ vÃªm montadas com carinho.</p>
           </div>
           <div id="kits-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full"></div>
         </div>
@@ -2316,11 +2316,11 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
             <button id="btn-alterar-caixa" onclick="resetarSelecaoCaixa()" class="text-[10px] font-bold text-[#8B4513] uppercase tracking-widest hidden bg-orange-50 px-3 py-1 rounded-lg">Alterar</button>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3" id="opcoes-caixas">
-            <button onclick="abrirModalTamanhoCaixa('25')" class="p-4 bg-white border border-[#E8D5B5] rounded-[1.5rem] text-left shadow-sm transition-all hover:border-[#8B4513] h-full"><h3 class="font-black text-xs text-[#8B4513]">Caixa de 25 Doces</h3><p class="text-[10px] text-gray-400 mt-1">até 7 sabores</p></button>
-            <button onclick="abrirModalTamanhoCaixa('35')" class="p-4 bg-white border border-[#E8D5B5] rounded-[1.5rem] text-left shadow-sm transition-all hover:border-[#8B4513] h-full"><h3 class="font-black text-xs text-[#8B4513]">Caixa de 35 Doces</h3><p class="text-[10px] text-gray-400 mt-1">até 7 sabores</p></button>
-            <button onclick="abrirModalTamanhoCaixa('50')" class="p-4 bg-white border border-[#E8D5B5] rounded-[1.5rem] text-left shadow-sm transition-all hover:border-[#8B4513] h-full"><h3 class="font-black text-xs text-[#8B4513]">Caixa de 50 Doces</h3><p class="text-[10px] text-gray-400 mt-1">até 10 sabores</p></button>
-            <button onclick="abrirModalTamanhoCaixa('100')" class="p-4 bg-white border border-[#E8D5B5] rounded-[1.5rem] text-left shadow-sm transition-all hover:border-[#8B4513] h-full"><h3 class="font-black text-xs text-[#8B4513]">Caixa de 100 Doces</h3><p class="text-[10px] text-gray-400 mt-1">até 14 sabores</p></button>
-            <button onclick="abrirPaginaDegustacao()" class="p-4 bg-gradient-to-br from-amber-50 to-orange-50 border border-orange-200 rounded-[1.5rem] text-left shadow-sm transition-all hover:border-[#8B4513] hover:shadow-md h-full"><h3 class="font-black text-xs text-orange-800">Caixa Degustação</h3><p class="text-[10px] text-orange-500 font-bold mt-1">Escolha entre 12 ou 25 sabores</p></button>
+            <button onclick="abrirModalTamanhoCaixa('25')" class="p-4 bg-white border border-[#E8D5B5] rounded-[1.5rem] text-left shadow-sm transition-all hover:border-[#8B4513] h-full"><h3 class="font-black text-xs text-[#8B4513]">Caixa de 25 Doces</h3><p class="text-[10px] text-gray-400 mt-1">atÃ© 7 sabores</p></button>
+            <button onclick="abrirModalTamanhoCaixa('35')" class="p-4 bg-white border border-[#E8D5B5] rounded-[1.5rem] text-left shadow-sm transition-all hover:border-[#8B4513] h-full"><h3 class="font-black text-xs text-[#8B4513]">Caixa de 35 Doces</h3><p class="text-[10px] text-gray-400 mt-1">atÃ© 7 sabores</p></button>
+            <button onclick="abrirModalTamanhoCaixa('50')" class="p-4 bg-white border border-[#E8D5B5] rounded-[1.5rem] text-left shadow-sm transition-all hover:border-[#8B4513] h-full"><h3 class="font-black text-xs text-[#8B4513]">Caixa de 50 Doces</h3><p class="text-[10px] text-gray-400 mt-1">atÃ© 10 sabores</p></button>
+            <button onclick="abrirModalTamanhoCaixa('100')" class="p-4 bg-white border border-[#E8D5B5] rounded-[1.5rem] text-left shadow-sm transition-all hover:border-[#8B4513] h-full"><h3 class="font-black text-xs text-[#8B4513]">Caixa de 100 Doces</h3><p class="text-[10px] text-gray-400 mt-1">atÃ© 14 sabores</p></button>
+            <button onclick="abrirPaginaDegustacao()" class="p-4 bg-gradient-to-br from-amber-50 to-orange-50 border border-orange-200 rounded-[1.5rem] text-left shadow-sm transition-all hover:border-[#8B4513] hover:shadow-md h-full"><h3 class="font-black text-xs text-orange-800">Caixa DegustaÃ§Ã£o</h3><p class="text-[10px] text-orange-500 font-bold mt-1">Escolha entre 12 ou 25 sabores</p></button>
           </div>
           <div id="resumo-caixa-selecionada" class="hidden p-4 bg-[#FAF5F0] rounded-[1.5rem] border border-orange-100 text-center font-bold text-[#8B4513] text-xs mt-4"></div>
         </div>
@@ -2358,7 +2358,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
                 onclick="voltarDaDegustacao()"
                 class="h-10 px-3 bg-white border border-[#E8D5B5] rounded-xl text-[8px] font-black uppercase tracking-widest text-gray-400">
 
-          ← Voltar
+          â† Voltar
 
         </button>
 
@@ -2366,7 +2366,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
         <div class="text-center min-w-0">
 
           <p class="text-[8px] uppercase tracking-widest font-black text-gray-400">
-            Caixa Degustação
+            Caixa DegustaÃ§Ã£o
           </p>
 
           <h2 class="text-[#8B4513] font-black text-sm leading-tight">
@@ -2387,7 +2387,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
 
         <img id="deg-preview-img"
              src="./Images/Caixa_Degustacao/Degustacao_12_Sabores.jpeg"
-             alt="Caixa Degustação"
+             alt="Caixa DegustaÃ§Ã£o"
              onclick="abrirLightboxDegustacao(degustacaoSelecionadaId || 'degustacao_12')"
              class="cursor-zoom-in">
 
@@ -2489,7 +2489,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
           <p id="deg-preview-title"
              class="text-[11px] font-black text-[#8B4513] truncate">
 
-            Selecione uma opção
+            Selecione uma opÃ§Ã£o
 
           </p>
 
@@ -2521,7 +2521,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
                 disabled
                 class="h-10 px-4 rounded-xl bg-gray-200 text-gray-400 text-[8px] font-black uppercase tracking-widest flex-shrink-0">
 
-          Continuar →
+          Continuar â†’
 
         </button>
 
@@ -2574,7 +2574,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
           <h2 id="r117-deg-review-title"
               class="text-xl font-black text-[#8B4513] mt-2">
 
-            Caixa Degustação
+            Caixa DegustaÃ§Ã£o
 
           </h2>
 
@@ -2594,7 +2594,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
         <div class="mt-5 bg-[#FFF8F0] rounded-xl px-4 py-3 text-center">
 
           <p class="text-[10px] text-gray-500">
-            Sua escolha está pronta para ser adicionada ao carrinho.
+            Sua escolha estÃ¡ pronta para ser adicionada ao carrinho.
           </p>
 
         </div>
@@ -2638,7 +2638,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
                   onclick="voltarParaEscolhaDegustacaoR117()"
                   class="w-full py-3 text-gray-400 text-[8px] font-black uppercase tracking-widest">
 
-            ← Voltar e alterar
+            â† Voltar e alterar
 
           </button>
 
@@ -2917,8 +2917,8 @@ function resolverAssetModeloMestre(caminho) {
 const S = LEGACY_ASSET_BASE_URL + 'Sabores_Doces/';
 
 const kitsPresenteaveis = [
-  { id:'kit_tabua',   nome:'Tábua Doce Artesanal',    desc:'Mini naked cake de brigadeiro, uva verde, morangos e doces variados em tábua redonda de MDF.', precoFixo:180.00, img:LEGACY_ASSET_BASE_URL+'Presenteaveis/Opcao_1.png' },
-  { id:'kit_classico', nome:'Caixa Presente Clássica', desc:'12 brigadeiros em caixa com laço.', precoFixo:75.00, img:LEGACY_ASSET_BASE_URL+'Presenteaveis/Opcao_2.png' }
+  { id:'kit_tabua',   nome:'TÃ¡bua Doce Artesanal',    desc:'Mini naked cake de brigadeiro, uva verde, morangos e doces variados em tÃ¡bua redonda de MDF.', precoFixo:180.00, img:LEGACY_ASSET_BASE_URL+'Presenteaveis/Opcao_1.png' },
+  { id:'kit_classico', nome:'Caixa Presente ClÃ¡ssica', desc:'12 brigadeiros em caixa com laÃ§o.', precoFixo:75.00, img:LEGACY_ASSET_BASE_URL+'Presenteaveis/Opcao_2.png' }
 ];
 
 // ============================================================
@@ -3028,7 +3028,7 @@ hidratarKitsDoModeloMestre();
 const opcionaisConfigs = {
   laco: {
     id: 'laco',
-    nome: 'Laço Decorativo',
+    nome: 'LaÃ§o Decorativo',
     preco: 4.50,
     ativo: true,
     disponivel: true
@@ -3189,7 +3189,7 @@ hidratarOpcionaisDoModeloMestre();
 const caixasConfigs = {
     degustacao: {
         id: 'degustacao',
-        titulo: 'Caixa Degustação',
+        titulo: 'Caixa DegustaÃ§Ã£o',
         totalDoces: 0,
         maxSabores: null,
         precoFixo: null,
@@ -3322,13 +3322,13 @@ const catalogo = [
     {id:"amargo_260",      nome:"Amargo",      preco:2.60, img:S+"Amargo.jpeg"},
     {id:"ao_leite_260",    nome:"Ao Leite",    preco:2.60, img:S+"Ao Leite.jpeg"},
     {id:"branco_260",      nome:"Branco",      preco:2.60, img:S+"Branco.jpeg"},
-    {id:"cafe_260",        nome:"Café",        preco:2.60, img:S+"Café.jpeg"},
+    {id:"cafe_260",        nome:"CafÃ©",        preco:2.60, img:S+"CafÃ©.jpeg"},
     {id:"caramelo_260",    nome:"Caramelo",    preco:2.60, img:S+"Caramelo.jpeg"},
     {id:"duo_amargo_260",  nome:"Duo Amargo",  preco:2.60, img:S+"Duo Amargo.jpeg"},
     {id:"duo_ao_leite_260",nome:"Duo Ao Leite",preco:2.60, img:S+"Duo Ao Leite.jpeg"},
     {id:"meio_amargo_260", nome:"Meio Amargo", preco:2.60, img:S+"Meio Amargo.jpeg"}
   ]},
-  { categoria:"Clássicos (R$ 2,75)", idFiltro:"classicos", itens:[
+  { categoria:"ClÃ¡ssicos (R$ 2,75)", idFiltro:"classicos", itens:[
     {id:"ameixa_275",         nome:"Ameixa",              preco:2.75, img:S+"Ameixa.jpeg"},
     {id:"charge_275",         nome:"Charge",              preco:2.75, img:S+"Charge.jpeg"},
     {id:"cocadinha_275",      nome:"Cocadinha",           preco:2.75, img:S+"Cocadinha.jpeg"},
@@ -3337,14 +3337,14 @@ const catalogo = [
     {id:"nesquik_nutella_275",nome:"Nesquik com Nutella", preco:2.75, img:S+"Nesquik com Nutella.jpeg"},
     {id:"ninho_nutella_275",  nome:"Ninho com Nutella",   preco:2.75, img:S+"Ninho com Nutella.jpeg"},
     {id:"oreo_275",           nome:"Oreo",                preco:2.75, img:S+"Oreo.jpeg"},
-    {id:"prestigio_275",      nome:"Prestígio",           preco:2.75, img:S+"Prestígio.jpeg"},
+    {id:"prestigio_275",      nome:"PrestÃ­gio",           preco:2.75, img:S+"PrestÃ­gio.jpeg"},
     {id:"queijadinha_275",    nome:"Queijadinha",         preco:2.75, img:S+"Queijadinha.jpeg"}
   ]},
   { categoria:"Especiais I (R$ 3,00)", idFiltro:"especiais_1", itens:[
-    {id:"damasco_amendoas_300", nome:"Damasco e Amêndoas",     preco:3.00, img:S+"Damasco e Amêndoas.jpeg"},
-    {id:"maracuja_300",         nome:"Maracujá",               preco:3.00, img:S+"Maracujá.jpeg"},
-    {id:"maracuja_leite_300",   nome:"Maracujá ao Leite",      preco:3.00, img:S+"Maracujá ao Leite.jpeg"},
-    {id:"maracuja_nutella_300", nome:"Maracujá com Nutella",   preco:3.00, img:S+"Maracujá e Nutella.jpeg"},
+    {id:"damasco_amendoas_300", nome:"Damasco e AmÃªndoas",     preco:3.00, img:S+"Damasco e AmÃªndoas.jpeg"},
+    {id:"maracuja_300",         nome:"MaracujÃ¡",               preco:3.00, img:S+"MaracujÃ¡.jpeg"},
+    {id:"maracuja_leite_300",   nome:"MaracujÃ¡ ao Leite",      preco:3.00, img:S+"MaracujÃ¡ ao Leite.jpeg"},
+    {id:"maracuja_nutella_300", nome:"MaracujÃ¡ com Nutella",   preco:3.00, img:S+"MaracujÃ¡ e Nutella.jpeg"},
     {id:"mega_300",             nome:"Mega",                   preco:3.00, img:S+"Mega.jpeg"},
     {id:"nozes_300",            nome:"Nozes",                  preco:3.00, img:S+"Nozes.jpeg"},
     {id:"queijo_doce_300",      nome:"Queijo e Doce de Leite", preco:3.00, img:S+"Queijo e Doce de Leite.jpeg"},
@@ -3359,8 +3359,8 @@ const catalogo = [
     {id:"crocante_nutella_350",  nome:"Crocante de Nutella",           preco:3.50, img:S+"Crocante de Nutella.jpeg"},
     {id:"ferrero_350",           nome:"Ferrero",                       preco:3.50, img:S+"Ferrero.jpeg"},
     {id:"gorgonzola_damasco_350",nome:"Gorgonzola e Damasco",          preco:3.50, img:S+"Gorgonzola e Damasco.jpeg"},
-    {id:"gorgonzola_geleia_350", nome:"Gorgonzola e Geléia",           preco:3.50, img:S+"Gorgonzola e Geleia.jpeg"},
-    {id:"laranja_amendoas_350",  nome:"Laranja com Amêndoas",          preco:3.50, img:S+"Laranja com Amêndoas.jpeg"},
+    {id:"gorgonzola_geleia_350", nome:"Gorgonzola e GelÃ©ia",           preco:3.50, img:S+"Gorgonzola e Geleia.jpeg"},
+    {id:"laranja_amendoas_350",  nome:"Laranja com AmÃªndoas",          preco:3.50, img:S+"Laranja com AmÃªndoas.jpeg"},
     {id:"laranja_coco_350",      nome:"Laranja com Coco",              preco:3.50, img:S+"Laranja com Coco.jpeg"},
     {id:"nozes_figo_350",        nome:"Nozes e Figo",                  preco:3.50, img:S+"Nozes e Figo.jpeg"},
     {id:"uva_branco_350",        nome:"Uva com Brigadeiro Branco",     preco:3.50, img:S+"Uva com Brigadeiro Branco.jpeg"},
@@ -3372,7 +3372,7 @@ const catalogo = [
     {id:"morango_branco_400",   nome:"Morango com Brigadeiro Branco",     preco:4.00, img:S+"Morango - Branco.jpeg"},
     {id:"morango_amargo_400",   nome:"Morango com Brigadeiro Meio Amargo",preco:4.00, img:S+"Morango - Meio Amargo.jpeg"},
     {id:"pistache_400",         nome:"Pistache",                          preco:4.00, img:S+"Pistache.jpeg"},
-    {id:"pistache_geleia_400",  nome:"Pistache com Geléia",               preco:4.00, img:S+"Pistache com Geleia.jpeg"}
+    {id:"pistache_geleia_400",  nome:"Pistache com GelÃ©ia",               preco:4.00, img:S+"Pistache com Geleia.jpeg"}
   ]}
 ];
 
@@ -3464,17 +3464,17 @@ hidratarCatalogoDoModeloMestre();
 
 /* ================================================================
    R9A - HIDRATAR TEMA VISUAL DO MODELO MESTRE
-   Carrega theme.json e aplica textos + variáveis CSS.
-   Fallback: mantém os valores hardcoded no HTML.
+   Carrega theme.json e aplica textos + variÃ¡veis CSS.
+   Fallback: mantÃ©m os valores hardcoded no HTML.
    ================================================================ */
 async function hidratarTemaDoModeloMestre() {
   try {
     const resp = await fetch('../data/catalog-v1/theme.json', { cache: 'no-store' });
     if (!resp.ok) throw new Error('Falha HTTP theme.json: ' + resp.status);
     const tema = await resp.json();
-    if (!tema || typeof tema !== 'object') throw new Error('theme.json inválido.');
+    if (!tema || typeof tema !== 'object') throw new Error('theme.json invÃ¡lido.');
 
-    /* --- TEXTOS DAS PÁGINAS --- */
+    /* --- TEXTOS DAS PÃGINAS --- */
     function _set(id, valor) {
       const el = document.getElementById(id);
       if (el && typeof valor === 'string' && valor.trim()) el.textContent = valor;
@@ -3499,13 +3499,13 @@ async function hidratarTemaDoModeloMestre() {
     const elLogo1 = document.getElementById('oba-pag1-logo');
     if (elLogo1 && bv.tamanhoLogo) elLogo1.style.width = logoTamMap[bv.tamanhoLogo] || '176px';
 
-    /* Cores específicas da pag1 */
+    /* Cores especÃ­ficas da pag1 */
     const elPag1 = document.getElementById('pag-1');
     if (elPag1 && bv.corFundo) elPag1.style.backgroundColor = bv.corFundo;
     const elTit1 = document.getElementById('oba-pag1-titulo');
     if (elTit1 && bv.corTitulo) elTit1.style.color = bv.corTitulo;
 
-    /* R11A: tipografia por página — Pág 1 */
+    /* R11A: tipografia por pÃ¡gina â€” PÃ¡g 1 */
     const rootStyle = document.documentElement.style;
     if (bv.tamTitulo) {
       rootStyle.setProperty('--oba-pag1-tam-titulo', bv.tamTitulo + 'px');
@@ -3519,12 +3519,12 @@ async function hidratarTemaDoModeloMestre() {
     } else {
       rootStyle.removeProperty('--oba-pag1-peso-titulo');
     }
-    /* R11E: subtítulo pag1 */
+    /* R11E: subtÃ­tulo pag1 */
     if (bv.tamSubtitulo)  rootStyle.setProperty('--oba-pag1-tam-subtitulo', bv.tamSubtitulo + 'px');
     else                  rootStyle.removeProperty('--oba-pag1-tam-subtitulo');
     if (bv.pesoSubtitulo) rootStyle.setProperty('--oba-pag1-peso-subtitulo', bv.pesoSubtitulo);
     else                  rootStyle.removeProperty('--oba-pag1-peso-subtitulo');
-    /* R11F: botão CTA pag1 */
+    /* R11F: botÃ£o CTA pag1 */
     if (bv.tamCTA)  rootStyle.setProperty('--oba-pag1-tam-cta', bv.tamCTA + 'px');
     else            rootStyle.removeProperty('--oba-pag1-tam-cta');
     if (bv.pesoCTA) rootStyle.setProperty('--oba-pag1-peso-cta', bv.pesoCTA);
@@ -3536,7 +3536,7 @@ async function hidratarTemaDoModeloMestre() {
     const elCTA1 = document.querySelector('#pag-1 button[onclick="navegarPara(2)"]');
     if (elCTA1) elCTA1.style.display = bv.exibirCTA === false ? 'none' : '';
 
-    /* Nossa Essência */
+    /* Nossa EssÃªncia */
     const ne = p.nossa_essencia || {};
     _setSrc('oba-pag2-logo',       ne.logo);
     _set('oba-pag2-titulo',        ne.titulo);
@@ -3550,7 +3550,7 @@ async function hidratarTemaDoModeloMestre() {
       elLogo2.style.width = s; elLogo2.style.height = s;
     }
 
-    /* Cores específicas da pag2 */
+    /* Cores especÃ­ficas da pag2 */
     const elCard2 = document.querySelector('#pag-2 .glass-card');
     if (elCard2 && ne.corFundo) elCard2.style.background = ne.corFundo;
     const elTit2 = document.getElementById('oba-pag2-titulo');
@@ -3558,7 +3558,7 @@ async function hidratarTemaDoModeloMestre() {
     const elTxt2 = document.getElementById('oba-pag2-texto');
     if (elTxt2 && ne.corTexto) elTxt2.style.color = ne.corTexto;
 
-    /* R11A: tipografia por página — Pág 2 */
+    /* R11A: tipografia por pÃ¡gina â€” PÃ¡g 2 */
     if (ne.tamTitulo) {
       rootStyle.setProperty('--oba-pag2-tam-titulo', ne.tamTitulo + 'px');
       document.getElementById('pag-2')?.classList.add('oba-pag2-tipografia-override');
@@ -3571,7 +3571,7 @@ async function hidratarTemaDoModeloMestre() {
     } else {
       rootStyle.removeProperty('--oba-pag2-peso-titulo');
     }
-    /* R11E: texto principal e citação pag2 */
+    /* R11E: texto principal e citaÃ§Ã£o pag2 */
     if (ne.tamTexto)    rootStyle.setProperty('--oba-pag2-tam-texto', ne.tamTexto + 'px');
     else                rootStyle.removeProperty('--oba-pag2-tam-texto');
     if (ne.pesoTexto)   rootStyle.setProperty('--oba-pag2-peso-texto', ne.pesoTexto);
@@ -3597,13 +3597,13 @@ async function hidratarTemaDoModeloMestre() {
     const elLogo3 = document.getElementById('oba-pag3-logo');
     if (elLogo3 && mp.tamanhoLogo) elLogo3.style.width = logoTamMap[mp.tamanhoLogo] || '144px';
 
-    /* Cores específicas da pag3 */
+    /* Cores especÃ­ficas da pag3 */
     const elPag3 = document.getElementById('pag-3');
     if (elPag3 && mp.corFundo) elPag3.style.backgroundColor = mp.corFundo;
     const elSub3 = document.getElementById('oba-pag3-subtitulo');
     if (elSub3 && mp.corSubtitulo) elSub3.style.color = mp.corSubtitulo;
 
-    /* R11A: tipografia por página — Pág 3 subtítulo, labels e sublabels */
+    /* R11A: tipografia por pÃ¡gina â€” PÃ¡g 3 subtÃ­tulo, labels e sublabels */
     if (mp.tamSubtitulo) {
       rootStyle.setProperty('--oba-pag3-tam-subtitulo', mp.tamSubtitulo + 'px');
       document.getElementById('pag-3')?.classList.add('oba-pag3-tipografia-override');
@@ -3613,7 +3613,7 @@ async function hidratarTemaDoModeloMestre() {
     }
     if (mp.pesoSubtitulo) rootStyle.setProperty('--oba-pag3-peso-subtitulo', mp.pesoSubtitulo);
     else rootStyle.removeProperty('--oba-pag3-peso-subtitulo');
-    /* R11B: pesos de labels e sublabels dos botões */
+    /* R11B: pesos de labels e sublabels dos botÃµes */
     if (mp.tamLabel)       rootStyle.setProperty('--oba-pag3-tam-label', mp.tamLabel + 'px');
     else                   rootStyle.removeProperty('--oba-pag3-tam-label');
     if (mp.pesoLabel)      rootStyle.setProperty('--oba-pag3-peso-label', mp.pesoLabel);
@@ -3623,13 +3623,13 @@ async function hidratarTemaDoModeloMestre() {
     if (mp.pesoSublabel)   rootStyle.setProperty('--oba-pag3-peso-sublabel', mp.pesoSublabel);
     else                   rootStyle.removeProperty('--oba-pag3-peso-sublabel');
 
-    /* R10A — Renderização dinâmica dos botões do menu */
+    /* R10A â€” RenderizaÃ§Ã£o dinÃ¢mica dos botÃµes do menu */
     const botoes = Array.isArray(mp.botoes) && mp.botoes.length > 0
       ? mp.botoes
-      : null; /* fallback: mantém os botões estáticos do HTML */
+      : null; /* fallback: mantÃ©m os botÃµes estÃ¡ticos do HTML */
 
     if (botoes) {
-      /* Mapa de ações para funções JS existentes */
+      /* Mapa de aÃ§Ãµes para funÃ§Ãµes JS existentes */
       const acaoMap = {
         caixas:        () => typeof entFluxoCaixas === 'function' && entFluxoCaixas(),
         presenteaveis: () => typeof entFluxoPresenteaveis === 'function' && entFluxoPresenteaveis(),
@@ -3642,19 +3642,19 @@ async function hidratarTemaDoModeloMestre() {
       const bcAcoes = new Set(['personalizados', 'eventos']);
       const MAX_POR_PAGINA = 4;
 
-      /* ── R10C: Botões automáticos de seções customizadas ────────────
-         Seções com linkMenu.ativo=true geram um botão automaticamente
-         no array de botões do menu, sem que o usuário precise adicioná-lo
-         manualmente na Página 3.
-      ────────────────────────────────────────────────────────────────── */
-      /* Seções customizadas com linkMenu.ativo geram botão no menu.
-         O overflow (R10B) cuida automaticamente do limite de 4 por página. */
+      /* â”€â”€ R10C: BotÃµes automÃ¡ticos de seÃ§Ãµes customizadas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+         SeÃ§Ãµes com linkMenu.ativo=true geram um botÃ£o automaticamente
+         no array de botÃµes do menu, sem que o usuÃ¡rio precise adicionÃ¡-lo
+         manualmente na PÃ¡gina 3.
+      â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+      /* SeÃ§Ãµes customizadas com linkMenu.ativo geram botÃ£o no menu.
+         O overflow (R10B) cuida automaticamente do limite de 4 por pÃ¡gina. */
       const secoesComLink = Array.isArray(tema.paginas_customizadas)
         ? tema.paginas_customizadas.filter(s => s && s.id && s.linkMenu && s.linkMenu.ativo !== false)
         : [];
 
-      /* Pré-registra ações sec-* no acaoMap para TODAS as seções customizadas
-         (inclui as de sequência, para que o R10D e o acaoMap funcionem) */
+      /* PrÃ©-registra aÃ§Ãµes sec-* no acaoMap para TODAS as seÃ§Ãµes customizadas
+         (inclui as de sequÃªncia, para que o R10D e o acaoMap funcionem) */
       const todasSecoesCustom = Array.isArray(tema.paginas_customizadas)
         ? tema.paginas_customizadas.filter(s => s && s.id)
         : [];
@@ -3675,7 +3675,7 @@ async function hidratarTemaDoModeloMestre() {
         };
       });
 
-      /* Monta lista completa: botões manuais + botões automáticos das seções */
+      /* Monta lista completa: botÃµes manuais + botÃµes automÃ¡ticos das seÃ§Ãµes */
       const botoesComSecoesCustom = [
         ...botoes,
         ...secoesComLink.map(sec => ({
@@ -3689,7 +3689,7 @@ async function hidratarTemaDoModeloMestre() {
         }))
       ];
 
-      /* Cria um elemento botão de menu a partir de um objeto botao */
+      /* Cria um elemento botÃ£o de menu a partir de um objeto botao */
       function obacriarBtnMenu(b) {
         const btn = document.createElement('button');
         if (b.destaque) {
@@ -3723,22 +3723,22 @@ async function hidratarTemaDoModeloMestre() {
         return btn;
       }
 
-      /* ── R10B: OVERFLOW AUTOMÁTICO ──────────────────────────────────
-         Divide os botões em grupos de MAX_POR_PAGINA.
-         Grupo 0 → #pag-3 (já existe no HTML)
-         Grupo 1 → #pag-3b (criado dinamicamente)
-         Grupo 2 → #pag-3c (criado dinamicamente)
+      /* â”€â”€ R10B: OVERFLOW AUTOMÃTICO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+         Divide os botÃµes em grupos de MAX_POR_PAGINA.
+         Grupo 0 â†’ #pag-3 (jÃ¡ existe no HTML)
+         Grupo 1 â†’ #pag-3b (criado dinamicamente)
+         Grupo 2 â†’ #pag-3c (criado dinamicamente)
          ...
-         Cada página tem "Ver mais →" se houver próxima página,
-         e "← Voltar ao menu" se for overflow.
-      ────────────────────────────────────────────────────────────── */
+         Cada pÃ¡gina tem "Ver mais â†’" se houver prÃ³xima pÃ¡gina,
+         e "â† Voltar ao menu" se for overflow.
+      â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
       const botoesVisiveis = botoesComSecoesCustom.filter(b => b.visivel !== false);
       const grupos = [];
       for (let i = 0; i < botoesVisiveis.length; i += MAX_POR_PAGINA) {
         grupos.push(botoesVisiveis.slice(i, i + MAX_POR_PAGINA));
       }
 
-      /* Limpa páginas de overflow anteriores (3b, 3c...) para re-render */
+      /* Limpa pÃ¡ginas de overflow anteriores (3b, 3c...) para re-render */
       document.querySelectorAll('[data-oba-overflow-menu]').forEach(el => el.remove());
 
       /* Renderiza grupo 0 no #oba-menu-botoes (#pag-3) */
@@ -3747,11 +3747,11 @@ async function hidratarTemaDoModeloMestre() {
         container.innerHTML = '';
         (grupos[0] || []).forEach(b => container.appendChild(obacriarBtnMenu(b)));
 
-        /* Se houver mais grupos, adiciona botão "Ver mais →" */
+        /* Se houver mais grupos, adiciona botÃ£o "Ver mais â†’" */
         if (grupos.length > 1) {
           const verMais = document.createElement('button');
           verMais.onclick = () => {
-            /* Navega para a primeira página de overflow */
+            /* Navega para a primeira pÃ¡gina de overflow */
             ['pag-1','pag-2','pag-3','fluxo-principal'].forEach(id => {
               const el = document.getElementById(id);
               if (el) { el.classList.add('hidden'); el.classList.remove('flex'); }
@@ -3765,12 +3765,12 @@ async function hidratarTemaDoModeloMestre() {
           };
           verMais.className = 'w-full p-5 bg-amber-50 border-2 border-[#8B4513]/40 text-[#8B4513] rounded-[2rem] text-left flex justify-between items-center active:scale-95 transition-all shadow-sm';
           const proximasOpcoes = botoesVisiveis.length - MAX_POR_PAGINA;
-          verMais.innerHTML = `<div><span class="block text-[9px] uppercase tracking-widest font-bold opacity-60 mb-1">Mais opções</span><span class="text-sm font-semibold">Ver mais (${proximasOpcoes} ${proximasOpcoes === 1 ? 'opção' : 'opções'}) →</span></div><i class="fa-solid fa-chevron-right text-lg text-[#8B4513] opacity-50"></i>`;
+          verMais.innerHTML = `<div><span class="block text-[9px] uppercase tracking-widest font-bold opacity-60 mb-1">Mais opÃ§Ãµes</span><span class="text-sm font-semibold">Ver mais (${proximasOpcoes} ${proximasOpcoes === 1 ? 'opÃ§Ã£o' : 'opÃ§Ãµes'}) â†’</span></div><i class="fa-solid fa-chevron-right text-lg text-[#8B4513] opacity-50"></i>`;
           container.appendChild(verMais);
         }
       }
 
-      /* Renderiza grupos 1, 2, 3... como novas seções antes do #fluxo-principal */
+      /* Renderiza grupos 1, 2, 3... como novas seÃ§Ãµes antes do #fluxo-principal */
       const fluxoPrincipal = document.getElementById('fluxo-principal');
       const pag3 = document.getElementById('pag-3');
 
@@ -3779,7 +3779,7 @@ async function hidratarTemaDoModeloMestre() {
         const prevPageId = idx === 0 ? 'pag-3' : 'pag-3' + String.fromCharCode(97 + idx);
         const nextPageId = idx + 2 < grupos.length ? 'pag-3' + String.fromCharCode(99 + idx) : null;
 
-        /* Reutiliza seção existente ou cria nova */
+        /* Reutiliza seÃ§Ã£o existente ou cria nova */
         let secao = document.getElementById(pageId);
         if (!secao) {
           secao = document.createElement('section');
@@ -3790,10 +3790,10 @@ async function hidratarTemaDoModeloMestre() {
           }
         }
 
-        /* Copiar classes do pag-3 para layout idêntico */
+        /* Copiar classes do pag-3 para layout idÃªntico */
         secao.className = 'min-h-screen hidden flex-col items-center justify-center px-6 py-10 pb-28 fade-page max-w-md mx-auto';
 
-        /* Header com mesma logo e subtítulo */
+        /* Header com mesma logo e subtÃ­tulo */
         const logoSrc = pag3 ? (pag3.querySelector('#oba-pag3-logo')?.src || '') : '';
         const subtituloTxt = pag3 ? (pag3.querySelector('#oba-pag3-subtitulo')?.textContent || '') : '';
 
@@ -3804,21 +3804,21 @@ async function hidratarTemaDoModeloMestre() {
           </header>
           <div id="${pageId}-botoes" class="w-full space-y-4"></div>
           <button class="mt-10 py-3 px-6 text-[10px] font-bold text-[#8B4513]/50 uppercase tracking-widest border border-transparent hover:border-[#8B4513]/20 rounded-full transition-all"
-            onclick="obaVoltarMenuOverflow('${prevPageId}')">← Voltar</button>
+            onclick="obaVoltarMenuOverflow('${prevPageId}')">â† Voltar</button>
         `;
 
-        /* Botões do grupo */
+        /* BotÃµes do grupo */
         const botoesContainer = secao.querySelector(`#${pageId}-botoes`);
         grupo.forEach(b => botoesContainer.appendChild(obacriarBtnMenu(b)));
 
-        /* Se houver próxima página de overflow */
+        /* Se houver prÃ³xima pÃ¡gina de overflow */
         if (nextPageId) {
           const verMaisOverflow = document.createElement('button');
           verMaisOverflow.onclick = () => obaNavOverflow(nextPageId);
           verMaisOverflow.className = 'w-full p-5 bg-amber-50 border-2 border-[#8B4513]/40 text-[#8B4513] rounded-[2rem] text-left flex justify-between items-center active:scale-95 transition-all shadow-sm';
           const restanteOverflow = botoesVisiveis.length - (idx + 2) * MAX_POR_PAGINA;
           const contOverflow = Math.max(restanteOverflow, botoesVisiveis.slice((idx + 2) * MAX_POR_PAGINA).length);
-          verMaisOverflow.innerHTML = `<div><span class="block text-[9px] uppercase tracking-widest font-bold opacity-60 mb-1">Mais opções</span><span class="text-sm font-semibold">Ver mais (${contOverflow > 0 ? contOverflow : ''} ${contOverflow === 1 ? 'opção' : 'opções'}) →</span></div><i class="fa-solid fa-chevron-right text-lg text-[#8B4513] opacity-50"></i>`;
+          verMaisOverflow.innerHTML = `<div><span class="block text-[9px] uppercase tracking-widest font-bold opacity-60 mb-1">Mais opÃ§Ãµes</span><span class="text-sm font-semibold">Ver mais (${contOverflow > 0 ? contOverflow : ''} ${contOverflow === 1 ? 'opÃ§Ã£o' : 'opÃ§Ãµes'}) â†’</span></div><i class="fa-solid fa-chevron-right text-lg text-[#8B4513] opacity-50"></i>`;
           botoesContainer.appendChild(verMaisOverflow);
         }
       });
@@ -3829,7 +3829,7 @@ async function hidratarTemaDoModeloMestre() {
       }
     }
 
-    /* Helpers de navegação para páginas de overflow */
+    /* Helpers de navegaÃ§Ã£o para pÃ¡ginas de overflow */
     window.obaNavOverflow = function(targetId) {
       ['pag-1','pag-2','pag-3','fluxo-principal'].forEach(id => {
         const el = document.getElementById(id);
@@ -3854,24 +3854,24 @@ async function hidratarTemaDoModeloMestre() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    /* ── R10C: SEÇÕES CUSTOMIZADAS ────────────────────────────────────
-       Renderiza páginas criadas pelo usuário na Central a partir de
+    /* â”€â”€ R10C: SEÃ‡Ã•ES CUSTOMIZADAS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+       Renderiza pÃ¡ginas criadas pelo usuÃ¡rio na Central a partir de
        paginas_customizadas[] do theme.json.
        Templates:
-         informativa     → logo, título, texto livre, botão CTA opcional
-         lista_produtos  → logo, título, cards com imagem/nome/descrição/preço
-         menu_botoes     → logo, título, lista de sub-botões (igual ao pag-3)
-    ────────────────────────────────────────────────────────────────── */
+         informativa     â†’ logo, tÃ­tulo, texto livre, botÃ£o CTA opcional
+         lista_produtos  â†’ logo, tÃ­tulo, cards com imagem/nome/descriÃ§Ã£o/preÃ§o
+         menu_botoes     â†’ logo, tÃ­tulo, lista de sub-botÃµes (igual ao pag-3)
+    â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
-    /* Remove seções customizadas antigas antes de re-renderizar */
+    /* Remove seÃ§Ãµes customizadas antigas antes de re-renderizar */
     document.querySelectorAll('[data-oba-secao-custom]').forEach(el => el.remove());
 
-    /* secoesCustom: todas as seções com template definido para renderizar */
+    /* secoesCustom: todas as seÃ§Ãµes com template definido para renderizar */
     const secoesCustom = Array.isArray(tema.paginas_customizadas)
       ? tema.paginas_customizadas.filter(s => s && s.id && s.template)
       : [];
 
-    /* Renderiza cada seção customizada */
+    /* Renderiza cada seÃ§Ã£o customizada */
     const fluxoPrincipalEl = document.getElementById('fluxo-principal');
     const logoSrcPag3 = document.getElementById('oba-pag3-logo')?.src || '';
 
@@ -3902,9 +3902,9 @@ async function hidratarTemaDoModeloMestre() {
         </header>`;
 
       const voltarBtn = `<button onclick="obaVoltarMenuOverflow('pag-3')"
-        class="mt-10 py-3 px-6 text-[10px] font-bold text-[#8B4513]/50 uppercase tracking-widest border border-transparent hover:border-[#8B4513]/20 rounded-full transition-all">← Voltar</button>`;
+        class="mt-10 py-3 px-6 text-[10px] font-bold text-[#8B4513]/50 uppercase tracking-widest border border-transparent hover:border-[#8B4513]/20 rounded-full transition-all">â† Voltar</button>`;
 
-      /* ─── TEMPLATE: INFORMATIVA ─── */
+      /* â”€â”€â”€ TEMPLATE: INFORMATIVA â”€â”€â”€ */
       if (sec.template === 'informativa') {
         const texto = cfg.texto || '';
         const citacao = cfg.citacao || '';
@@ -3931,7 +3931,7 @@ async function hidratarTemaDoModeloMestre() {
           ${ctaHtml}
           ${voltarBtn}`;
 
-      /* ─── TEMPLATE: LISTA DE PRODUTOS ─── */
+      /* â”€â”€â”€ TEMPLATE: LISTA DE PRODUTOS â”€â”€â”€ */
       } else if (sec.template === 'lista_produtos') {
         const itens = Array.isArray(cfg.itens) ? cfg.itens : [];
         const itensHtml = itens.map(item => {
@@ -3954,7 +3954,7 @@ async function hidratarTemaDoModeloMestre() {
           </div>
           ${voltarBtn}`;
 
-      /* ─── TEMPLATE: MENU DE BOTÕES ─── */
+      /* â”€â”€â”€ TEMPLATE: MENU DE BOTÃ•ES â”€â”€â”€ */
       } else if (sec.template === 'menu_botoes') {
         const botoesCustom = Array.isArray(cfg.botoes) ? cfg.botoes : [];
         secao.innerHTML = `
@@ -3981,20 +3981,20 @@ async function hidratarTemaDoModeloMestre() {
     _set('oba-pers-titulo',        pm.titulo);
     _set('oba-pers-info-titulo',   pm.info_titulo);
     _set('oba-pers-pacotes-titulo',pm.pacotes_titulo);
-    /* R11B: info_items dinâmicos — substitui os <p> no bloco de Informações */
+    /* R11B: info_items dinÃ¢micos â€” substitui os <p> no bloco de InformaÃ§Ãµes */
     const infoLista = document.getElementById('oba-pers-info-lista');
     if (infoLista && Array.isArray(pm.info_items) && pm.info_items.length > 0) {
       infoLista.innerHTML = '';
       pm.info_items.forEach(item => {
         if (!item) return;
         const p = document.createElement('p');
-        p.textContent = '• ' + item;
+        p.textContent = 'â€¢ ' + item;
         infoLista.appendChild(p);
       });
     } else if (infoLista && Array.isArray(pm.info_items) && pm.info_items.length === 0) {
       infoLista.innerHTML = '';
     }
-    /* R11B: pacotes dinâmicos */
+    /* R11B: pacotes dinÃ¢micos */
     const pacotesLista = document.getElementById('oba-pers-pacotes-lista');
     if (pacotesLista && Array.isArray(pm.pacotes) && pm.pacotes.length > 0) {
       pacotesLista.innerHTML = '';
@@ -4003,12 +4003,12 @@ async function hidratarTemaDoModeloMestre() {
         const p = document.createElement('p');
         const b = document.createElement('b');
         b.textContent = 'R$ ' + pk.preco;
-        p.textContent = '• ' + pk.quantidade + ' doces: ';
+        p.textContent = 'â€¢ ' + pk.quantidade + ' doces: ';
         p.appendChild(b);
         pacotesLista.appendChild(p);
       });
     }
-    /* R10A: preços dos pacotes de personalizados */
+    /* R10A: preÃ§os dos pacotes de personalizados */
     if (Array.isArray(pm.pacotes)) {
       pm.pacotes.forEach(p => {
         const el = document.getElementById('oba-pers-preco-' + p.quantidade);
@@ -4019,7 +4019,7 @@ async function hidratarTemaDoModeloMestre() {
     /* Modal Eventos */
     const em = p.eventos_modal || {};
     _set('oba-eventos-titulo', em.titulo);
-    /* R11B: labels editáveis dos campos */
+    /* R11B: labels editÃ¡veis dos campos */
     const evNome = document.getElementById('eve-nome');
     const evTipo = document.getElementById('eve-tipo');
     const evData = document.getElementById('eve-data');
@@ -4028,7 +4028,7 @@ async function hidratarTemaDoModeloMestre() {
     if (evNome && em.label_nome) evNome.placeholder = em.label_nome;
     if (evTipo && em.label_tipo) evTipo.placeholder = em.label_tipo;
     if (evData) {
-      /* O campo date não tem placeholder visível — usa label antes se definido */
+      /* O campo date nÃ£o tem placeholder visÃ­vel â€” usa label antes se definido */
       if (em.label_data) evData.title = em.label_data;
     }
     if (evConv && em.label_convidados) evConv.placeholder = em.label_convidados;
@@ -4066,9 +4066,9 @@ async function hidratarTemaDoModeloMestre() {
       }
     }
 
-    /* Espaçamento geral */
+    /* EspaÃ§amento geral */
     if (t.espacamento) {
-      const espMap = { compacto: '12px', normal: '20px', 'espaçado': '28px' };
+      const espMap = { compacto: '12px', normal: '20px', 'espaÃ§ado': '28px' };
       const espVal = espMap[t.espacamento] || '20px';
       document.documentElement.style.setProperty('--oba-espacamento', espVal);
     }
@@ -4082,7 +4082,7 @@ async function hidratarTemaDoModeloMestre() {
       document.body.style.fontFamily = `'${t.fonte}', sans-serif`;
     }
 
-    /* Aplicar tipografia via IDs já existentes no DOM */
+    /* Aplicar tipografia via IDs jÃ¡ existentes no DOM */
     const h1 = document.getElementById('oba-pag1-titulo');
     const h2 = document.getElementById('oba-pag2-titulo');
     const h3 = document.getElementById('oba-pag3-subtitulo');
@@ -4108,25 +4108,25 @@ hidratarTemaDoModeloMestre();
 // ESTADO GLOBAL
 // ================================================================
 let caixaAtiva       = null;   // caixa em montagem
-let caixaPendente    = null;   // aguardando confirmação no modal
+let caixaPendente    = null;   // aguardando confirmaÃ§Ã£o no modal
 let quantidades      = {};
 let categoryActive   = 'Todos';
 let lacoSelecionado  = false;
 let placaSelecionada = false;
 let fluxoAtivo       = 'caixas'; // 'caixas' | 'presenteaveis'
-let carrinhoDeCaixasConcluidas = []; // ÚNICO array de itens
+let carrinhoDeCaixasConcluidas = []; // ÃšNICO array de itens
 </script>
 
 <script>
 // ================================================================
-// NAVEGAÇÃO
+// NAVEGAÃ‡ÃƒO
 // ================================================================
 function navegarPara(num) {
   ['pag-1','pag-2','pag-3','fluxo-principal'].forEach(id => {
     document.getElementById(id).classList.add('hidden');
     document.getElementById(id).classList.remove('flex');
   });
-  /* Esconde também páginas de overflow e seções customizadas */
+  /* Esconde tambÃ©m pÃ¡ginas de overflow e seÃ§Ãµes customizadas */
   document.querySelectorAll('[data-oba-overflow-menu],[data-oba-secao-custom]').forEach(el => {
     el.classList.add('hidden');
     el.classList.remove('flex');
@@ -4134,10 +4134,10 @@ function navegarPara(num) {
   const alvo = num === 4 ? 'fluxo-principal' : `pag-${num}`;
   document.getElementById(alvo).classList.remove('hidden');
   document.getElementById(alvo).classList.add('flex');
-  /* WhatsApp flutuante: oculto nas Páginas 1 e 2, visível da Página 3 em diante */
+  /* WhatsApp flutuante: oculto nas PÃ¡ginas 1 e 2, visÃ­vel da PÃ¡gina 3 em diante */
   const wpp = document.getElementById('btn-wpp-flutuante');
   if (wpp) wpp.style.display = num >= 3 ? 'flex' : 'none';
-  // Fluxo (pag 4+) usa smooth; páginas fixas (1-3) usa instant para não criar sensação de scroll
+  // Fluxo (pag 4+) usa smooth; pÃ¡ginas fixas (1-3) usa instant para nÃ£o criar sensaÃ§Ã£o de scroll
   window.scrollTo({ top:0, behavior: num >= 4 ? 'smooth' : 'instant' });
 }
 
@@ -4226,8 +4226,8 @@ async function retornarParaMenuSeletor() {
 
     const mensagem =
       completa
-        ? `Sua Caixa de ${totalNecessario} Doces está completa, mas ainda não foi salva no carrinho.\n\nSe voltar agora, essa montagem será descartada.\n\nDeseja voltar mesmo assim?`
-        : `Você selecionou ${totalSelecionado} de ${totalNecessario} doces.\n\nFaltam ${Math.max(0, totalNecessario - totalSelecionado)} doces para concluir esta caixa.\n\nSe voltar agora, a montagem incompleta será descartada.\n\nDeseja continuar?`;
+        ? `Sua Caixa de ${totalNecessario} Doces estÃ¡ completa, mas ainda nÃ£o foi salva no carrinho.\n\nSe voltar agora, essa montagem serÃ¡ descartada.\n\nDeseja voltar mesmo assim?`
+        : `VocÃª selecionou ${totalSelecionado} de ${totalNecessario} doces.\n\nFaltam ${Math.max(0, totalNecessario - totalSelecionado)} doces para concluir esta caixa.\n\nSe voltar agora, a montagem incompleta serÃ¡ descartada.\n\nDeseja continuar?`;
 
     const confirmouSaidaR120B01 =
       await window.confirmarDecisaoR120B01({
@@ -4256,7 +4256,7 @@ async function retornarParaMenuSeletor() {
             : 'Descartar montagem',
 
         cancelarTexto:
-          'Voltar à montagem'
+          'Voltar Ã  montagem'
       });
 
 
@@ -4397,7 +4397,7 @@ function preencherLightboxDegustacao(id) {
 
     img.alt =
       cfg.titulo ||
-      'Caixa Degustação';
+      'Caixa DegustaÃ§Ã£o';
   }
 
 
@@ -4411,7 +4411,7 @@ function preencherLightboxDegustacao(id) {
   if (detalhe) {
 
     detalhe.textContent =
-      `Caixa sortida — ${cfg.totalDoces} doces`;
+      `Caixa sortida â€” ${cfg.totalDoces} doces`;
   }
 
 
@@ -4434,7 +4434,7 @@ function abrirLightboxDegustacao(id) {
   if (!preencherLightboxDegustacao(id)) {
 
     mostrarNotificacao(
-      'Esta opção de degustação está indisponível.'
+      'Esta opÃ§Ã£o de degustaÃ§Ã£o estÃ¡ indisponÃ­vel.'
     );
 
     return;
@@ -4504,7 +4504,7 @@ async function abrirPaginaDegustacao() {
 
   if (!deg12 || !deg25) {
     mostrarNotificacao(
-      'Caixas de degustação indisponíveis no momento.'
+      'Caixas de degustaÃ§Ã£o indisponÃ­veis no momento.'
     );
     return;
   }
@@ -4639,7 +4639,7 @@ function selecionarDegustacaoPagina(id) {
   if (!cfg) {
 
     mostrarNotificacao(
-      'Esta opção está indisponível.'
+      'Esta opÃ§Ã£o estÃ¡ indisponÃ­vel.'
     );
 
     return;
@@ -4665,7 +4665,7 @@ function selecionarDegustacaoPagina(id) {
       cfg.imgDeg || '';
 
     preview.alt =
-      cfg.titulo || 'Caixa Degustação';
+      cfg.titulo || 'Caixa DegustaÃ§Ã£o';
   }
 
 
@@ -4691,7 +4691,7 @@ function selecionarDegustacaoPagina(id) {
   if (detalhe) {
 
     detalhe.textContent =
-      `${cfg.totalDoces} doces · ${formatarMoeda(cfg.precoFixo)}`;
+      `${cfg.totalDoces} doces Â· ${formatarMoeda(cfg.precoFixo)}`;
   }
 
 
@@ -4836,7 +4836,7 @@ function abrirRevisaoDegustacao() {
   if (detalhe) {
 
     detalhe.textContent =
-      `Caixa sortida — ${cfg.totalDoces} doces`;
+      `Caixa sortida â€” ${cfg.totalDoces} doces`;
   }
 
 
@@ -4989,7 +4989,7 @@ function salvarDegustacaoEContinuarR117() {
 
 
   mostrarNotificacao(
-    `✓ ${titulo} adicionada ao carrinho`
+    `âœ“ ${titulo} adicionada ao carrinho`
   );
 }
 
@@ -5006,7 +5006,7 @@ function salvarDegustacaoEVerCarrinhoR117() {
 
 
   mostrarNotificacao(
-    `✓ ${titulo} adicionada ao carrinho`
+    `âœ“ ${titulo} adicionada ao carrinho`
   );
 
 
@@ -5026,7 +5026,7 @@ function salvarDegustacaoEFinalizarR117() {
 
 
   mostrarNotificacao(
-    `✓ ${titulo} adicionada ao carrinho`
+    `âœ“ ${titulo} adicionada ao carrinho`
   );
 
 
@@ -5072,7 +5072,7 @@ function voltarDaDegustacao() {
   });
 }
 // ================================================================
-// MODAL 1 — TAMANHO DA CAIXA
+// MODAL 1 â€” TAMANHO DA CAIXA
 // ================================================================
 async function abrirModalTamanhoCaixa(id) {
   await CAIXAS_MODELO_MESTRE_PROMISE;
@@ -5083,17 +5083,17 @@ async function abrirModalTamanhoCaixa(id) {
 
     if (!deg12 || !deg25) {
       console.info('[R1.15.5] Degustacao indisponivel: configuracao de caixas incompleta.');
-      mostrarNotificacao('Caixas de degustação indisponíveis no momento.');
+      mostrarNotificacao('Caixas de degustaÃ§Ã£o indisponÃ­veis no momento.');
       return;
     }
 
-    document.getElementById('mtc-titulo').innerText = 'Caixa Degustação';
+    document.getElementById('mtc-titulo').innerText = 'Caixa DegustaÃ§Ã£o';
     document.getElementById('mtc-desc').innerText   = 'Caixa sortida com os melhores sabores. Escolha o tamanho:';
     document.getElementById('img-deg-12').src = deg12.imgDeg || '';
     document.getElementById('img-deg-25').src = deg25.imgDeg || '';
     document.getElementById('mtc-deg-opcoes').classList.remove('hidden');
     document.getElementById('mtc-btn-confirmar').classList.add('hidden');
-    // Reseta seleção visual
+    // Reseta seleÃ§Ã£o visual
     ['btn-deg-12','btn-deg-25'].forEach(b => {
       document.getElementById(b).className = 'p-2 sm:p-3 bg-white border-2 border-[#E8D5B5] rounded-2xl text-center active:scale-95 transition-all hover:border-[#8B4513] hover:shadow-md cursor-pointer';
     });
@@ -5103,12 +5103,12 @@ async function abrirModalTamanhoCaixa(id) {
 
     if (!cfg) {
       console.info('[R1.15.5] Caixa indisponivel:', id);
-      mostrarNotificacao('Esta caixa está indisponível no momento.');
+      mostrarNotificacao('Esta caixa estÃ¡ indisponÃ­vel no momento.');
       return;
     }
 
     document.getElementById('mtc-titulo').innerText = cfg.titulo;
-    document.getElementById('mtc-desc').innerText   = `Escolha ${cfg.totalDoces} doces com até ${cfg.maxSabores} sabores diferentes.`;
+    document.getElementById('mtc-desc').innerText   = `Escolha ${cfg.totalDoces} doces com atÃ© ${cfg.maxSabores} sabores diferentes.`;
     document.getElementById('mtc-deg-opcoes').classList.add('hidden');
     document.getElementById('mtc-btn-confirmar').classList.remove('hidden');
     document.getElementById('mtc-btn-confirmar').innerHTML = '<i class="fa-solid fa-candy-cane mr-1"></i> Escolher Doces';
@@ -5122,7 +5122,7 @@ function selecionarTamanhoDeg(id) {
 
   if (!cfg) {
     console.info('[R1.15.5] Tamanho de degustacao indisponivel:', id);
-    mostrarNotificacao('Este tamanho está indisponível no momento.');
+    mostrarNotificacao('Este tamanho estÃ¡ indisponÃ­vel no momento.');
     return;
   }
 
@@ -5133,7 +5133,7 @@ function selecionarTamanhoDeg(id) {
   document.getElementById(`btn-deg-${suffix}`).className = 'p-2 sm:p-3 bg-[#FFF8F0] border-2 border-[#8B4513] rounded-2xl text-center active:scale-95 transition-all ring-2 ring-[#8B4513]/10 shadow-md cursor-pointer';
   caixaPendente = cfg;
   document.getElementById('mtc-btn-confirmar').classList.remove('hidden');
-  document.getElementById('mtc-btn-confirmar').textContent = `✓ Confirmar ${cfg.totalDoces} doces — ${formatarMoeda(cfg.precoFixo)}`;
+  document.getElementById('mtc-btn-confirmar').textContent = `âœ“ Confirmar ${cfg.totalDoces} doces â€” ${formatarMoeda(cfg.precoFixo)}`;
 }
 
 function confirmarTamanhoCaixa() {
@@ -5143,14 +5143,14 @@ function confirmarTamanhoCaixa() {
   fecharModalTamanhoCaixa();
 
   if (caixaAtiva.precoFixo) {
-    // Degustação → abre modal de conclusão direto
+    // DegustaÃ§Ã£o â†’ abre modal de conclusÃ£o direto
     abrirModalCaixaConcluida();
     return;
   }
-  // Caixa de doces → mostra passo 2
+  // Caixa de doces â†’ mostra passo 2
   document.getElementById('opcoes-caixas').classList.add('hidden');
   document.getElementById('resumo-caixa-selecionada').innerText =
-    `${caixaAtiva.titulo} — até ${caixaAtiva.maxSabores} sabores (${caixaAtiva.totalDoces} unidades)`;
+    `${caixaAtiva.titulo} â€” atÃ© ${caixaAtiva.maxSabores} sabores (${caixaAtiva.totalDoces} unidades)`;
   document.getElementById('resumo-caixa-selecionada').classList.remove('hidden');
   document.getElementById('btn-alterar-caixa').classList.remove('hidden');
   document.getElementById('secao-passo2').classList.remove('hidden');
@@ -5160,7 +5160,7 @@ function confirmarTamanhoCaixa() {
 function fecharModalTamanhoCaixa() { document.getElementById('modal-tamanho-caixa').classList.add('hidden'); }
 
 // ================================================================
-// MODAL 2 — CONFIGURAÇÃO DE KIT
+// MODAL 2 â€” CONFIGURAÃ‡ÃƒO DE KIT
 // ================================================================
 function abrirModalConfigKit(idKit) {
   const kit = kitsPresenteaveis.find(k => k.id === idKit);
@@ -5220,7 +5220,7 @@ function adicionarKitAoCarrinho(acao) {
     (lacoSelecionado ? precoOpcional('laco') : 0) +
     (placaSelecionada ? precoOpcional('placa') : 0);
   let detalhes   = 'Kit Fechado';
-  if (lacoSelecionado)  detalhes += ' + Laço Decorativo';
+  if (lacoSelecionado)  detalhes += ' + LaÃ§o Decorativo';
   if (placaSelecionada) detalhes += ' + Placa Personalizada';
   const existente = carrinhoDeCaixasConcluidas.find(i => i.titulo === nomeItem && i.detalhes === detalhes);
   if (existente) { existente.quantidade++; existente.precoCalculado = existente.precoCalculadoUnitario * existente.quantidade; }
@@ -5234,24 +5234,24 @@ function adicionarKitAoCarrinho(acao) {
 
 <script>
 // ================================================================
-// MODAL 3 — CONCLUSÃO DE CAIXA
+// MODAL 3 â€” CONCLUSÃƒO DE CAIXA
 // ================================================================
 function abrirModalCaixaConcluida() {
   if (!caixaAtiva) return;
   let valor, descricao, saboresHtml;
   if (caixaAtiva.precoFixo) {
     valor       = caixaAtiva.precoFixo;
-    descricao   = `Caixa sortida — ${caixaAtiva.totalDoces} doces`;
-    saboresHtml = '<div class="text-center text-gray-400 italic">Seleção surpresa dos melhores sabores da OBA 🍫</div>';
+    descricao   = `Caixa sortida â€” ${caixaAtiva.totalDoces} doces`;
+    saboresHtml = '<div class="text-center text-gray-400 italic">SeleÃ§Ã£o surpresa dos melhores sabores da OBA ðŸ«</div>';
   } else {
     valor       = Object.entries(quantidades).reduce((acc,[id,q])=>acc+(encontrarDoce(id)?.preco||0)*q, 0);
     descricao   = `${Object.values(quantidades).reduce((a,b)=>a+b,0)} doces escolhidos`;
     saboresHtml = Object.entries(quantidades).filter(([,q])=>q>0).map(([id,q])=>{
       const d = encontrarDoce(id);
-      return `<div class="flex justify-between"><span>${d?.nome}</span><span class="font-bold">${q}x — ${formatarMoeda((d?.preco || 0) * q)}</span></div>`;
+      return `<div class="flex justify-between"><span>${d?.nome}</span><span class="font-bold">${q}x â€” ${formatarMoeda((d?.preco || 0) * q)}</span></div>`;
     }).join('');
   }
-  document.getElementById('mcc-titulo').innerText = `${caixaAtiva.titulo} 🎉`;
+  document.getElementById('mcc-titulo').innerText = `${caixaAtiva.titulo} ðŸŽ‰`;
   document.getElementById('mcc-desc').innerText   = descricao;
   document.getElementById('mcc-valor').innerText  = formatarMoeda(valor);
   document.getElementById('mcc-sabores').innerHTML = saboresHtml;
@@ -5274,7 +5274,7 @@ function _registrarCaixaNoCarrinho() {
   let valor, detalhes;
   if (caixaAtiva.precoFixo) {
     valor    = caixaAtiva.precoFixo;
-    detalhes = `Caixa sortida — ${caixaAtiva.totalDoces} doces`;
+    detalhes = `Caixa sortida â€” ${caixaAtiva.totalDoces} doces`;
   } else {
     valor    = Object.entries(quantidades).reduce((acc,[id,q])=>acc+(encontrarDoce(id)?.preco||0)*q, 0);
     detalhes = Object.entries(quantidades).filter(([,q])=>q>0).map(([id,q])=>`${q}x ${encontrarDoce(id)?.nome}`).join(', ');
@@ -5366,7 +5366,7 @@ function salvarCaixaEVerCarrinho()  { _registrarCaixaNoCarrinho(); resetarSeleca
 function salvarCaixaEFinalizar()    { _registrarCaixaNoCarrinho(); resetarSelecaoCaixa(); fecharModalCaixaConcluida(); atualizarCarrinhoMobilePersistente(); abrirModalCarrinho(); }
 
 // ================================================================
-// MODAL 4 — CARRINHO
+// MODAL 4 â€” CARRINHO
 // ================================================================
 function abrirModalCarrinho() {
   renderizarListaCarrinho();
@@ -5499,7 +5499,7 @@ async function removerItemCarrinho(i) {
         'Remover esta caixa?',
 
       mensagem:
-        'Esta caixa será retirada do seu carrinho.',
+        'Esta caixa serÃ¡ retirada do seu carrinho.',
 
       item:
         item.titulo ||
@@ -5622,13 +5622,13 @@ function finalizarPedidoBlindado() {
     window.mostrarAvisoR120B02({
 
       titulo:
-        'Seu carrinho está vazio',
+        'Seu carrinho estÃ¡ vazio',
 
       mensagem:
         'Adicione pelo menos um produto antes de finalizar o pedido.',
 
       item:
-        'Escolha seus doces e depois volte para a finalização.'
+        'Escolha seus doces e depois volte para a finalizaÃ§Ã£o.'
     });
 
 
@@ -5675,7 +5675,7 @@ function finalizarPedidoBlindado() {
         'Faltam dados para finalizar',
 
       mensagem:
-        'Preencha os campos obrigatórios de entrega antes de continuar.',
+        'Preencha os campos obrigatÃ³rios de entrega antes de continuar.',
 
       item:
         Array.isArray(
@@ -5781,10 +5781,10 @@ function finalizarPedidoBlindado() {
   };
 
   let wppTxt =
-    `Olá, OBA Doceria! Seguem os dados do meu pedido:\n\n` +
-    `*CÓDIGO:* ${cod}\n` +
+    `OlÃ¡, OBA Doceria! Seguem os dados do meu pedido:\n\n` +
+    `*CÃ“DIGO:* ${cod}\n` +
     `*CLIENTE:* ${nome}\n` +
-    `*ENTREGA:* ${dataFmt} às ${hora}\n` +
+    `*ENTREGA:* ${dataFmt} Ã s ${hora}\n` +
     `*PAGAMENTO:* ${pag}\n\n` +
     `*ITENS:*\n`;
 
@@ -5803,7 +5803,7 @@ function finalizarPedidoBlindado() {
     OBA_CONFIG?.catalogVersion
   ) {
     wppTxt +=
-      `\n\n*VERSÃO DO CATÁLOGO:* ${OBA_CONFIG.catalogVersion}`;
+      `\n\n*VERSÃƒO DO CATÃLOGO:* ${OBA_CONFIG.catalogVersion}`;
   }
 
   const btn =
@@ -5850,7 +5850,7 @@ function finalizarPedidoBlindado() {
 
 <script>
 // ================================================================
-// CATÁLOGO DE DOCES
+// CATÃLOGO DE DOCES
 // ================================================================
 function encontrarDoce(id) { for (let g of catalogo) { for (let i of g.itens) { if (i.id===id) return i; } } return null; }
 
@@ -6042,7 +6042,7 @@ function aplicarQuantidadeDoce(
     quantidade = limite;
 
     mostrarNotificacao(
-      `Sua caixa permite no máximo ${limite} unidade(s) deste sabor neste momento.`
+      `Sua caixa permite no mÃ¡ximo ${limite} unidade(s) deste sabor neste momento.`
     );
   }
 
@@ -6077,7 +6077,7 @@ function abrirModalQuantidadeDoce(id) {
 
   if (!doce) {
     mostrarNotificacao(
-      'Doce não encontrado.'
+      'Doce nÃ£o encontrado.'
     );
     return;
   }
@@ -6237,8 +6237,8 @@ function atualizarModalQuantidadeDoce() {
       estado.faltamParaMinimo;
 
     status.textContent =
-      `${totalProjetado} doces • ` +
-      `faltam ${faltam} para o mínimo • ` +
+      `${totalProjetado} doces â€¢ ` +
+      `faltam ${faltam} para o mÃ­nimo â€¢ ` +
       `${saboresProjetados}/${estado.limiteSabores} sabores`;
 
     return;
@@ -6246,7 +6246,7 @@ function atualizarModalQuantidadeDoce() {
 
 
   let texto =
-    `${totalProjetado} doces • mínimo atingido ✓ • ` +
+    `${totalProjetado} doces â€¢ mÃ­nimo atingido âœ“ â€¢ ` +
     `${saboresProjetados}/${estado.limiteSabores} sabores`;
 
 
@@ -6263,7 +6263,7 @@ function atualizarModalQuantidadeDoce() {
 
 
     texto +=
-      ` • faltam ${faltam} doces para liberar até ` +
+      ` â€¢ faltam ${faltam} doces para liberar atÃ© ` +
       `${estado.proximaLiberacaoSabores.sabores} sabores`;
   }
 
@@ -6320,7 +6320,7 @@ function definirQuantidadeModalDoce(valor) {
       limite;
 
     mostrarNotificacao(
-      `Restam somente ${limite} espaço(s) disponíveis para este sabor.`
+      `Restam somente ${limite} espaÃ§o(s) disponÃ­veis para este sabor.`
     );
   }
 
@@ -6560,7 +6560,7 @@ function verificarCaixaCompleta() {
   ) {
 
     mostrarNotificacao(
-      `Nova faixa liberada! Agora você pode escolher até ${limiteAtual} sabores.`
+      `Nova faixa liberada! Agora vocÃª pode escolher atÃ© ${limiteAtual} sabores.`
     );
   }
 
@@ -6655,12 +6655,12 @@ function concluirCaixaDiretoNoCarrinho() {
 
 
   mostrarNotificacao(
-    `✓ ${tituloSalvo} adicionada ao carrinho`
+    `âœ“ ${tituloSalvo} adicionada ao carrinho`
   );
 
 
   // Garante que qualquer resquicio do modal antigo
-  // permaneça fechado.
+  // permaneÃ§a fechado.
   document
     .getElementById(
       'modal-caixa-concluida'
@@ -6682,7 +6682,7 @@ function resetarSelecaoCaixa() {
 function lembreteCaixa() { mostrarNotificacao('Selecione primeiro o tamanho da sua caixa.'); }
 
 // ================================================================
-// KITS PRESENTEÁVEIS
+// KITS PRESENTEÃVEIS
 // ================================================================
 function renderizarKits() {
   const grid = document.getElementById('kits-grid'); if (!grid) return;
@@ -6799,10 +6799,10 @@ function alinharCarrinhoComNavegacao() {
 
         return (
           texto.includes(
-            'VOLTAR ÀS OPÇÕES'
+            'VOLTAR Ã€S OPÃ‡Ã•ES'
           ) ||
           texto.includes(
-            'VOLTAR AS OPÇÕES'
+            'VOLTAR AS OPÃ‡Ã•ES'
           ) ||
           texto.includes(
             'VOLTAR AS OPCOES'
@@ -6985,7 +6985,7 @@ function abrirCarrinhoMobilePersistente() {
   ) {
 
     mostrarNotificacao(
-      'Seu carrinho está vazio.'
+      'Seu carrinho estÃ¡ vazio.'
     );
 
     atualizarCarrinhoMobilePersistente();
@@ -7041,7 +7041,7 @@ function atualizarPainelLateral() {
     carrinhoDeCaixasConcluidas.forEach((cx,i)=>{
       const qtd = cx.quantidade||1, sub=(cx.precoCalculadoUnitario||cx.precoCalculado)*qtd;
       lista.innerHTML += `<div class="bg-gray-50 border border-gray-200 p-2.5 rounded-xl relative text-left">
-        <button onclick="removerDoLateral(${i})" class="absolute top-1 right-2 text-red-500 font-bold text-[10px]">✕</button>
+        <button onclick="removerDoLateral(${i})" class="absolute top-1 right-2 text-red-500 font-bold text-[10px]">âœ•</button>
         <p class="font-extrabold text-[#8B4513] text-[11px] pr-4">${qtd>1?`${qtd}x `:''}${cx.titulo}</p>
         <p class="text-[10px] text-gray-500 line-clamp-2 mt-0.5 leading-tight">${cx.detalhes}</p>
         <p class="text-[11px] font-black text-gray-700 mt-1">${formatarMoeda(sub)}</p>
@@ -7227,7 +7227,7 @@ function verCarrinhoComVerificacao() {
 }
 
 // ================================================================
-// MODAIS ESPECIAIS + UTILITÁRIOS
+// MODAIS ESPECIAIS + UTILITÃRIOS
 // ================================================================
 function abrirModalEspecial(tipo) {
   if (!canalNegocioAtivo(tipo)) {
@@ -7268,7 +7268,7 @@ function enviarOrcamentoEspecial(tipo) {
           'Complete seu pedido personalizado',
 
         mensagem:
-          'Precisamos dessas informações antes de abrir o WhatsApp.',
+          'Precisamos dessas informaÃ§Ãµes antes de abrir o WhatsApp.',
 
         item:
           !tema && !data
@@ -7285,7 +7285,7 @@ function enviarOrcamentoEspecial(tipo) {
       return;
     }
     const d=data.split('-');
-    window.open(`https://api.whatsapp.com/send?phone=${whatsappLoja()}&text=${encodeURIComponent(`Olá! Solicito reserva de *Doces Personalizados*:\n\n*Tema:* ${tema}\n*Data:* ${d[2]}/${d[1]}/${d[0]}`)}`, '_blank');
+    window.open(`https://api.whatsapp.com/send?phone=${whatsappLoja()}&text=${encodeURIComponent(`OlÃ¡! Solicito reserva de *Doces Personalizados*:\n\n*Tema:* ${tema}\n*Data:* ${d[2]}/${d[1]}/${d[0]}`)}`, '_blank');
     fecharModalPersonalizados();
   } else {
     const nome=document.getElementById('eve-nome').value.trim(), tipo_ev=document.getElementById('eve-tipo').value.trim(), data=document.getElementById('eve-data').value;
@@ -7333,7 +7333,7 @@ function enviarOrcamentoEspecial(tipo) {
           'Complete os dados do evento',
 
         mensagem:
-          'Precisamos concluir essas informações antes de abrir o WhatsApp.',
+          'Precisamos concluir essas informaÃ§Ãµes antes de abrir o WhatsApp.',
 
         item:
           pendenciaEventosR120B02,
@@ -7346,7 +7346,7 @@ function enviarOrcamentoEspecial(tipo) {
       return;
     }
     const d=data.split('-');
-    window.open(`https://api.whatsapp.com/send?phone=${whatsappLoja()}&text=${encodeURIComponent(`Olá! Solicito orçamento para *Eventos*:\n\n*Nome:* ${nome}\n*Tipo:* ${tipo_ev}\n*Data:* ${d[2]}/${d[1]}/${d[0]}`)}`, '_blank');
+    window.open(`https://api.whatsapp.com/send?phone=${whatsappLoja()}&text=${encodeURIComponent(`OlÃ¡! Solicito orÃ§amento para *Eventos*:\n\n*Nome:* ${nome}\n*Tipo:* ${tipo_ev}\n*Data:* ${d[2]}/${d[1]}/${d[0]}`)}`, '_blank');
     fecharModalEventos();
   }
 }
@@ -7423,7 +7423,7 @@ function mostrarNotificacao(msg) {
           </div>
 
           <h3 class="mt-4 text-lg font-black text-[#8B4513]">
-            Seu carrinho está vazio
+            Seu carrinho estÃ¡ vazio
           </h3>
 
           <p class="mt-1 text-xs text-gray-500">
@@ -7488,7 +7488,7 @@ function mostrarNotificacao(msg) {
                 onclick="irParaFinalizacaoR117()"
                 class="min-h-12 px-3 rounded-xl bg-[#8B4513] text-white text-[8px] font-black uppercase tracking-wider shadow-md">
 
-          Ir para finalização
+          Ir para finalizaÃ§Ã£o
           <i class="fa-solid fa-arrow-right ml-1"></i>
 
         </button>
@@ -7502,7 +7502,7 @@ function mostrarNotificacao(msg) {
          class="mt-2.5 py-1.5 flex items-center justify-center gap-1.5 text-green-600 text-[8px] font-black uppercase tracking-wider" rel="noopener noreferrer">
 
         <i class="fa-brands fa-whatsapp text-sm"></i>
-        Dúvidas? Fale com a gente
+        DÃºvidas? Fale com a gente
 
       </a>
 
@@ -7663,7 +7663,7 @@ function mostrarNotificacao(msg) {
       if (resumo) {
 
         resumo.textContent =
-          `${textoItens} · ${formatarMoeda(total)}`;
+          `${textoItens} Â· ${formatarMoeda(total)}`;
       }
 
 
@@ -7801,7 +7801,7 @@ function mostrarNotificacao(msg) {
                                 onclick="alterarQuantidadeCarrinhoViewportR117(${indice}, -1)"
                                 class="r117b-qty-button">
 
-                          −
+                          âˆ’
 
                         </button>
 
@@ -7854,7 +7854,7 @@ function mostrarNotificacao(msg) {
       ) {
 
         mostrarNotificacao(
-          'Seu carrinho está vazio.'
+          'Seu carrinho estÃ¡ vazio.'
         );
 
         return;
@@ -7993,7 +7993,7 @@ function mostrarNotificacao(msg) {
         fecharCarrinhoViewportR117();
 
         mostrarNotificacao(
-          'Seu carrinho está vazio.'
+          'Seu carrinho estÃ¡ vazio.'
         );
 
         return;
@@ -8455,7 +8455,7 @@ function mostrarNotificacao(msg) {
           <div id="r117b1-more-products-pill">
 
             <span id="r117b1-more-products-count">
-              ↓ MAIS PRODUTOS
+              â†“ MAIS PRODUTOS
             </span>
 
             <span id="r117b1-more-products-help">
@@ -8582,13 +8582,13 @@ function mostrarNotificacao(msg) {
             'produto',
             'produtos'
           )
-        } · ${unidades} ${
+        } Â· ${unidades} ${
           pluralR117B1(
             unidades,
             'unidade',
             'unidades'
           )
-        } · ${formatarMoeda(total)}`;
+        } Â· ${formatarMoeda(total)}`;
     }
 
 
@@ -8691,7 +8691,7 @@ function mostrarNotificacao(msg) {
     ) {
 
       contador.textContent =
-        `↓ MAIS ${abaixo.length} ${
+        `â†“ MAIS ${abaixo.length} ${
           pluralR117B1(
             abaixo.length,
             'PRODUTO',
@@ -9197,11 +9197,11 @@ function mostrarNotificacao(msg) {
           <span class="r117b2-main">
 
             <span class="r117b2-arrow">
-              ↓
+              â†“
             </span>
 
             <span class="r117b2-label">
-              AINDA HÁ PRODUTOS
+              AINDA HÃ PRODUTOS
             </span>
 
           </span>
@@ -9241,7 +9241,7 @@ function mostrarNotificacao(msg) {
 
 
       top.textContent =
-        '↑ HÁ PRODUTOS ACIMA';
+        'â†‘ HÃ PRODUTOS ACIMA';
 
 
       viewport.appendChild(
@@ -9362,7 +9362,7 @@ function mostrarNotificacao(msg) {
       if (label) {
 
         label.textContent =
-          `AINDA HÁ ${ocultos} ${
+          `AINDA HÃ ${ocultos} ${
             ocultos === 1
               ? 'PRODUTO'
               : 'PRODUTOS'
@@ -9814,7 +9814,7 @@ function mostrarNotificacao(msg) {
 
 
       label.textContent =
-        `AINDA HÁ ${quantidade} ${
+        `AINDA HÃ ${quantidade} ${
           quantidade === 1
             ? 'PRODUTO'
             : 'PRODUTOS'
@@ -9973,7 +9973,7 @@ function mostrarNotificacao(msg) {
         <div>
 
           <p class="text-[8px] font-black uppercase tracking-widest text-gray-400">
-            Última etapa
+            Ãšltima etapa
           </p>
 
           <h2 class="mt-1 text-xl font-black text-[#8B4513]">
@@ -10038,7 +10038,7 @@ function mostrarNotificacao(msg) {
                 onclick="voltarAoCarrinhoR117C()"
                 class="mt-3 text-[8px] font-black uppercase tracking-wider text-[#8B4513]">
 
-          ← Revisar carrinho
+          â† Revisar carrinho
 
         </button>
 
@@ -10133,7 +10133,7 @@ function mostrarNotificacao(msg) {
 
         <p class="text-[9px] leading-relaxed text-gray-500">
 
-          Depois de confirmar, seu pedido seguirá pelo fluxo oficial de finalização da Oba.
+          Depois de confirmar, seu pedido seguirÃ¡ pelo fluxo oficial de finalizaÃ§Ã£o da Oba.
 
         </p>
 
@@ -10177,7 +10177,7 @@ function mostrarNotificacao(msg) {
               onclick="voltarAoCarrinhoR117C()"
               class="w-full py-3 text-[8px] font-black uppercase tracking-wider text-gray-400">
 
-        ← Voltar ao carrinho
+        â† Voltar ao carrinho
 
       </button>
 
@@ -10289,7 +10289,7 @@ function mostrarNotificacao(msg) {
           produtos === 1
             ? 'produto'
             : 'produtos'
-        } · ${unidades} ${
+        } Â· ${unidades} ${
           unidades === 1
             ? 'unidade'
             : 'unidades'
@@ -10474,7 +10474,7 @@ function mostrarNotificacao(msg) {
       ) {
 
         mostrarNotificacao(
-          'Seu carrinho está vazio.'
+          'Seu carrinho estÃ¡ vazio.'
         );
 
         return;
@@ -11037,7 +11037,7 @@ function mostrarNotificacao(msg) {
       if (!hora) {
 
         erroR117C(
-          'Informe o horário da entrega.'
+          'Informe o horÃ¡rio da entrega.'
         );
 
         return;
@@ -11267,7 +11267,7 @@ function mostrarNotificacao(msg) {
             </p>
 
             <p id="r117d-flow-message">
-                Continue para a próxima etapa.
+                Continue para a prÃ³xima etapa.
             </p>
 
         </div>
@@ -11394,7 +11394,7 @@ function mostrarNotificacao(msg) {
 
 
         hint.textContent =
-            'Próxima etapa: dados para entrega';
+            'PrÃ³xima etapa: dados para entrega';
 
 
         footer.insertBefore(
@@ -11571,7 +11571,7 @@ function mostrarNotificacao(msg) {
                         () => {
 
                             mostrarStatusR117D(
-                                'Você voltou ao carrinho. Seus dados foram preservados.'
+                                'VocÃª voltou ao carrinho. Seus dados foram preservados.'
                             );
                         },
                         40
@@ -11866,7 +11866,7 @@ function mostrarNotificacao(msg) {
     <button type="button"
             id="oba-r119d-modal-fechar"
             aria-label="Fechar">
-      ✕
+      âœ•
     </button>
 
     <div id="oba-r119d-modal-icone">
@@ -11874,7 +11874,7 @@ function mostrarNotificacao(msg) {
     </div>
 
     <h2 id="oba-r119d-modal-titulo">
-      Confirmar ação
+      Confirmar aÃ§Ã£o
     </h2>
 
     <p id="oba-r119d-modal-mensagem"></p>
@@ -12134,7 +12134,7 @@ function mostrarNotificacao(msg) {
 
       titulo.textContent =
         config.titulo ||
-        'Confirmar ação';
+        'Confirmar aÃ§Ã£o';
 
 
       mensagem.textContent =
@@ -12393,7 +12393,7 @@ function mostrarNotificacao(msg) {
         'Remover este item?',
 
       mensagem:
-        'Ao confirmar, o produto será retirado do seu carrinho.',
+        'Ao confirmar, o produto serÃ¡ retirado do seu carrinho.',
 
       item:
         nome,
@@ -12643,7 +12643,7 @@ function mostrarNotificacao(msg) {
         const textoLimpo =
           texto
             .replace(
-              /^✓\s*/,
+              /^âœ“\s*/,
               ''
             )
             .replace(
@@ -12660,7 +12660,7 @@ function mostrarNotificacao(msg) {
             'Adicionado ao carrinho!',
 
           mensagem:
-            'O item foi incluído no seu pedido com sucesso.',
+            'O item foi incluÃ­do no seu pedido com sucesso.',
 
           item:
             textoLimpo,
@@ -13088,7 +13088,7 @@ function mostrarNotificacao(msg) {
   window.confirmarDecisaoR120B01 =
     function ({
       tipo = 'info',
-      titulo = 'Confirmar ação',
+      titulo = 'Confirmar aÃ§Ã£o',
       mensagem = '',
       item = '',
       confirmarTexto = 'Confirmar',
@@ -13172,7 +13172,7 @@ function mostrarNotificacao(msg) {
 
   window.mostrarAvisoR120B02 =
     function ({
-      titulo = 'Atenção',
+      titulo = 'AtenÃ§Ã£o',
       mensagem = '',
       item = '',
       focoId = ''
@@ -13491,8 +13491,8 @@ function mostrarNotificacao(msg) {
 
 
       /*
-       * Degustações fechadas possuem precoFixo e
-       * não precisam deste recurso.
+       * DegustaÃ§Ãµes fechadas possuem precoFixo e
+       * nÃ£o precisam deste recurso.
        */
 
       if (caixaAtiva.precoFixo) {
@@ -13574,7 +13574,7 @@ function mostrarNotificacao(msg) {
         <span class="r120-ux2-trigger-left">
 
           <span class="r120-ux2-trigger-label">
-            Minha seleção
+            Minha seleÃ§Ã£o
           </span>
 
           <span id="r120-ux2-trigger-status">
@@ -13594,7 +13594,7 @@ function mostrarNotificacao(msg) {
       () => {
 
         abrirResumoSelecao(
-          'Sua seleção',
+          'Sua seleÃ§Ã£o',
           obterSelecaoAtual()
         );
       }
@@ -13667,7 +13667,7 @@ function mostrarNotificacao(msg) {
     if (status) {
 
       status.textContent =
-        `${total}/${capacidade} doces • ${itens.length} ${itens.length === 1 ? 'sabor' : 'sabores'}`;
+        `${total}/${capacidade} doces â€¢ ${itens.length} ${itens.length === 1 ? 'sabor' : 'sabores'}`;
     }
   }
 
@@ -13717,20 +13717,20 @@ function mostrarNotificacao(msg) {
             <h2
               id="r120-ux2-title"
               class="r120-ux2-title">
-              Sua seleção
+              Sua seleÃ§Ã£o
             </h2>
 
             <p
               id="r120-ux2-subtitle"
               class="r120-ux2-subtitle">
-              Sabores escolhidos até agora.
+              Sabores escolhidos atÃ© agora.
             </p>
 
             <button
               id="r120-ux2-close"
               type="button"
               aria-label="Fechar">
-              ×
+              Ã—
             </button>
 
           </div>
@@ -13746,7 +13746,7 @@ function mostrarNotificacao(msg) {
             <button
               id="r120-ux2-voltar"
               type="button">
-              Voltar à escolha
+              Voltar Ã  escolha
             </button>
 
           </div>
@@ -13888,7 +13888,7 @@ function mostrarNotificacao(msg) {
               </span>
 
               <span class="r120-ux2-item-qtd">
-                ${item.quantidade}×
+                ${item.quantidade}Ã—
               </span>
             `;
 
@@ -13908,7 +13908,7 @@ function mostrarNotificacao(msg) {
 
 
     totalEl.textContent =
-      `${total} ${total === 1 ? 'doce' : 'doces'} • ${itens.length} ${itens.length === 1 ? 'sabor' : 'sabores'}`;
+      `${total} ${total === 1 ? 'doce' : 'doces'} â€¢ ${itens.length} ${itens.length === 1 ? 'sabor' : 'sabores'}`;
 
 
     modal.hidden =
@@ -13987,7 +13987,7 @@ function mostrarNotificacao(msg) {
 
 
     /*
-     * Degustações prontas não recebem ALTERAR SABORES.
+     * DegustaÃ§Ãµes prontas nÃ£o recebem ALTERAR SABORES.
      */
 
     if (!caixaGrandeAtiva()) {
@@ -14097,7 +14097,7 @@ function mostrarNotificacao(msg) {
 
 
       alterar.textContent =
-        '← Alterar sabores';
+        'â† Alterar sabores';
 
 
       alterar.addEventListener(
@@ -14106,7 +14106,7 @@ function mostrarNotificacao(msg) {
 
           /*
            * Apenas fecha o modal.
-           * NÃO reseta caixaAtiva nem quantidades.
+           * NÃƒO reseta caixaAtiva nem quantidades.
            */
 
           fecharModalCaixaConcluida();
@@ -14239,7 +14239,7 @@ function mostrarNotificacao(msg) {
           item.detalhes
         ),
 
-        'Esta é a composição registrada desta caixa.'
+        'Esta Ã© a composiÃ§Ã£o registrada desta caixa.'
       );
     };
 
@@ -14408,7 +14408,7 @@ function mostrarNotificacao(msg) {
 
         /*
          * No template atual:
-         * lixeira -> cabeçalho do card -> card.
+         * lixeira -> cabeÃ§alho do card -> card.
          */
 
         const card =
@@ -14523,7 +14523,7 @@ function mostrarNotificacao(msg) {
 
 
   /*
-   * Atualização imediata após cliques,
+   * AtualizaÃ§Ã£o imediata apÃ³s cliques,
    * sem interferir no fluxo oficial.
    */
 
@@ -14546,7 +14546,7 @@ function mostrarNotificacao(msg) {
 
 
   /*
-   * Backup leve para renders dinâmicos.
+   * Backup leve para renders dinÃ¢micos.
    */
 
   setInterval(
@@ -14907,7 +14907,7 @@ function mostrarNotificacao(msg) {
         <span class="r120-ux4-left">
 
           <span class="r120-ux4-title">
-            Minha seleção
+            Minha seleÃ§Ã£o
           </span>
 
           <span id="r120-ux4-status">
@@ -14925,7 +14925,7 @@ function mostrarNotificacao(msg) {
     /*
      * IMPORTANTE:
      * fica diretamente no BODY.
-     * Não depende mais de secao-passo2.
+     * NÃ£o depende mais de secao-passo2.
      */
 
     document.body.appendChild(
@@ -14944,7 +14944,7 @@ function mostrarNotificacao(msg) {
 
 
         /*
-         * Reaproveita o modal já implementado no UX2.
+         * Reaproveita o modal jÃ¡ implementado no UX2.
          */
 
         if (
@@ -15015,7 +15015,7 @@ function mostrarNotificacao(msg) {
     if (status) {
 
       status.textContent =
-        `${total}/${capacidade} doces • ${sabores} ${sabores === 1 ? 'sabor' : 'sabores'}`;
+        `${total}/${capacidade} doces â€¢ ${sabores} ${sabores === 1 ? 'sabor' : 'sabores'}`;
     }
   }
 
@@ -15157,8 +15157,8 @@ function mostrarNotificacao(msg) {
       ) {
 
         definirRotuloModalR120B05(
-          'VOLTAR À ESCOLHA',
-          'Confira os sabores e quantidades selecionados até agora.'
+          'VOLTAR Ã€ ESCOLHA',
+          'Confira os sabores e quantidades selecionados atÃ© agora.'
         );
       }
 
@@ -15185,7 +15185,7 @@ function mostrarNotificacao(msg) {
 
         definirRotuloModalR120B05(
           'VOLTAR AO CARRINHO',
-          'Confira a composição registrada desta caixa.'
+          'Confira a composiÃ§Ã£o registrada desta caixa.'
         );
       }
 
@@ -15224,7 +15224,7 @@ function mostrarNotificacao(msg) {
 
 
   /*
-   * Índice da caixa que está sendo editada.
+   * Ãndice da caixa que estÃ¡ sendo editada.
    *
    * null = montagem nova.
    */
@@ -15298,7 +15298,7 @@ function mostrarNotificacao(msg) {
 
       /*
        * Clonagem:
-       * evita que alterações no montador modifiquem
+       * evita que alteraÃ§Ãµes no montador modifiquem
        * diretamente o item do carrinho antes de salvar.
        */
 
@@ -15369,7 +15369,7 @@ function mostrarNotificacao(msg) {
 <style id="r120-b05-ux2-e2-styles">
 
 /* ================================================================
-   AÇÃO PRIMÁRIA DE EDIÇÃO DENTRO DO RESUMO
+   AÃ‡ÃƒO PRIMÃRIA DE EDIÃ‡ÃƒO DENTRO DO RESUMO
 ================================================================ */
 
 #r120-b05-editar-caixa {
@@ -15427,7 +15427,7 @@ function mostrarNotificacao(msg) {
 
 
 /* ================================================================
-   AVISO DE QUE A MONTAGEM ESTÁ SENDO EDITADA
+   AVISO DE QUE A MONTAGEM ESTÃ SENDO EDITADA
 ================================================================ */
 
 #r120-b05-editando-status {
@@ -15715,7 +15715,7 @@ function mostrarNotificacao(msg) {
 
     /*
      * A tela de sabores continua montada sob o carrinho.
-     * Garante que o passo 2 esteja exposto após restaurar
+     * Garante que o passo 2 esteja exposto apÃ³s restaurar
      * caixaAtiva + quantidades.
      */
 
@@ -15754,8 +15754,8 @@ function mostrarNotificacao(msg) {
      * Alguns componentes do projeto atualizam
      * automaticamente por eventos/intervalos.
      *
-     * Estes refreshes existentes são chamados apenas
-     * quando disponíveis; nenhuma nova dependência.
+     * Estes refreshes existentes sÃ£o chamados apenas
+     * quando disponÃ­veis; nenhuma nova dependÃªncia.
      */
 
     try {
@@ -15788,7 +15788,7 @@ function mostrarNotificacao(msg) {
 
 
   /* ==============================================================
-     STATUS DA EDIÇÃO
+     STATUS DA EDIÃ‡ÃƒO
   ============================================================== */
 
 
@@ -15828,7 +15828,7 @@ function mostrarNotificacao(msg) {
           </span>
 
           <span id="r120-b05-editando-titulo">
-            Alterações ainda não salvas
+            AlteraÃ§Ãµes ainda nÃ£o salvas
           </span>
 
         </div>
@@ -15862,7 +15862,7 @@ function mostrarNotificacao(msg) {
 
 
           /*
-           * Limpa a montagem temporária.
+           * Limpa a montagem temporÃ¡ria.
            * O item original do carrinho nunca foi modificado.
            */
 
@@ -15885,7 +15885,7 @@ function mostrarNotificacao(msg) {
 
 
           /*
-           * Volta para o carrinho para que o usuário
+           * Volta para o carrinho para que o usuÃ¡rio
            * veja o item original intacto.
            */
 
@@ -15955,7 +15955,7 @@ function mostrarNotificacao(msg) {
 
       titulo.textContent =
         item?.titulo ||
-        'Alterações ainda não salvas';
+        'AlteraÃ§Ãµes ainda nÃ£o salvas';
     }
 
 
@@ -15980,7 +15980,7 @@ function mostrarNotificacao(msg) {
 
 
   /* ==============================================================
-     INICIAR EDIÇÃO REAL
+     INICIAR EDIÃ‡ÃƒO REAL
   ============================================================== */
 
 
@@ -16007,7 +16007,7 @@ function mostrarNotificacao(msg) {
 
         /*
          * Itens antigos, anteriores ao E1, continuam
-         * apenas consultáveis. Não inventamos snapshot.
+         * apenas consultÃ¡veis. NÃ£o inventamos snapshot.
          */
 
         console.info(
@@ -16060,7 +16060,7 @@ function mostrarNotificacao(msg) {
 
 
   /* ==============================================================
-     BOTÃO EDITAR DENTRO DE VER SABORES
+     BOTÃƒO EDITAR DENTRO DE VER SABORES
   ============================================================== */
 
 
@@ -16205,7 +16205,7 @@ function mostrarNotificacao(msg) {
 
 
   /* ==============================================================
-     QUANDO A EDIÇÃO FOR SALVA
+     QUANDO A EDIÃ‡ÃƒO FOR SALVA
   ============================================================== */
 
 
@@ -16523,7 +16523,7 @@ function mostrarNotificacao(msg) {
     if (resumoCaixa) {
 
       resumoCaixa.innerText =
-        `${caixaAtiva.titulo} — até ${caixaAtiva.maxSabores} sabores (${caixaAtiva.totalDoces} unidades)`;
+        `${caixaAtiva.titulo} â€” atÃ© ${caixaAtiva.maxSabores} sabores (${caixaAtiva.totalDoces} unidades)`;
 
 
       resumoCaixa.classList.remove(
@@ -16723,7 +16723,7 @@ function mostrarNotificacao(msg) {
 
         tituloStatus.textContent =
           item.titulo ||
-          'Alterações ainda não salvas';
+          'AlteraÃ§Ãµes ainda nÃ£o salvas';
       }
 
 
@@ -16827,7 +16827,7 @@ function mostrarNotificacao(msg) {
     if (titulo) {
 
       titulo.textContent =
-        'Revise suas alterações';
+        'Revise suas alteraÃ§Ãµes';
     }
 
 
@@ -16840,7 +16840,7 @@ function mostrarNotificacao(msg) {
     if (salvar) {
 
       salvar.innerHTML =
-        '<i class="fa-solid fa-floppy-disk mr-1"></i> Salvar alterações';
+        '<i class="fa-solid fa-floppy-disk mr-1"></i> Salvar alteraÃ§Ãµes';
     }
   }
 
@@ -17579,13 +17579,13 @@ function mostrarNotificacao(msg) {
         if (total < 25) {
 
           resumo.textContent =
-            `Caixa personalizada — ${total} doces • mínimo 25 • até ${limite} sabores`;
+            `Caixa personalizada â€” ${total} doces â€¢ mÃ­nimo 25 â€¢ atÃ© ${limite} sabores`;
 
         }
         else {
 
           resumo.textContent =
-            `Caixa personalizada — ${total} doces • até ${limite} sabores`;
+            `Caixa personalizada â€” ${total} doces â€¢ atÃ© ${limite} sabores`;
         }
       }
 
@@ -17627,7 +17627,7 @@ function mostrarNotificacao(msg) {
         if (detalhe) {
 
           detalhe.textContent =
-            `${total} doces • ${sabores} ` +
+            `${total} doces â€¢ ${sabores} ` +
             `${sabores === 1 ? 'sabor' : 'sabores'}`;
         }
       }
@@ -17680,15 +17680,15 @@ function mostrarNotificacao(msg) {
           <div class="r120-e4r1-head">
 
             <p class="r120-e4r1-kicker">
-              Mínimo atingido ✓
+              MÃ­nimo atingido âœ“
             </p>
 
             <h2 class="r120-e4r1-title">
-              Sua seleção já pode ser concluída
+              Sua seleÃ§Ã£o jÃ¡ pode ser concluÃ­da
             </h2>
 
             <p class="r120-e4r1-desc">
-              Você chegou ao mínimo de 25 doces.
+              VocÃª chegou ao mÃ­nimo de 25 doces.
               Pode adicionar ao carrinho agora ou
               continuar escolhendo quantos quiser.
             </p>
@@ -17722,7 +17722,7 @@ function mostrarNotificacao(msg) {
                 type="button"
                 id="r120-e4r1-revisar"
                 class="r120-e4r1-btn r120-e4r1-tertiary">
-                Revisar minha seleção
+                Revisar minha seleÃ§Ã£o
               </button>
 
             </div>
@@ -17800,7 +17800,7 @@ function mostrarNotificacao(msg) {
 
             abrirResumoSelecao(
 
-              'Sua seleção',
+              'Sua seleÃ§Ã£o',
 
               itens,
 
@@ -17851,9 +17851,9 @@ function mostrarNotificacao(msg) {
       if (resumo) {
 
         resumo.textContent =
-          `${total} doces • ` +
-          `${sabores} ${sabores === 1 ? 'sabor' : 'sabores'} • ` +
-          `até ${limite} sabores nesta faixa`;
+          `${total} doces â€¢ ` +
+          `${sabores} ${sabores === 1 ? 'sabor' : 'sabores'} â€¢ ` +
+          `atÃ© ${limite} sabores nesta faixa`;
       }
 
 
@@ -17888,7 +17888,7 @@ function mostrarNotificacao(msg) {
       if (total < 25) {
 
         mostrarNotificacao(
-          `Faltam ${25 - total} doces para atingir o mínimo.`
+          `Faltam ${25 - total} doces para atingir o mÃ­nimo.`
         );
 
         return false;
@@ -17905,7 +17905,7 @@ function mostrarNotificacao(msg) {
       if (sabores > limite) {
 
         mostrarNotificacao(
-          `Com ${total} doces, escolha no máximo ${limite} sabores.`
+          `Com ${total} doces, escolha no mÃ¡ximo ${limite} sabores.`
         );
 
         return false;
@@ -17913,7 +17913,7 @@ function mostrarNotificacao(msg) {
 
 
       caixaAtiva.titulo =
-        `Caixa Personalizada — ${total} doces`;
+        `Caixa Personalizada â€” ${total} doces`;
 
 
       caixaAtiva.maxSabores =
@@ -17991,11 +17991,11 @@ function mostrarNotificacao(msg) {
           <div class="r120-e4r1-head">
 
             <p class="r120-e4r1-kicker">
-              Adicionado ao carrinho ✓
+              Adicionado ao carrinho âœ“
             </p>
 
             <h2 class="r120-e4r1-title">
-              Sua seleção foi salva
+              Sua seleÃ§Ã£o foi salva
             </h2>
 
             <p class="r120-e4r1-desc">
@@ -18102,7 +18102,7 @@ function mostrarNotificacao(msg) {
       if (resumo) {
 
         resumo.textContent =
-          `${total} doces • ` +
+          `${total} doces â€¢ ` +
           `${sabores} ${sabores === 1 ? 'sabor' : 'sabores'}`;
       }
 
@@ -19002,7 +19002,7 @@ function mostrarNotificacao(msg) {
             <h2
               id="r120-ux4-editor-title"
               class="r120-ux4-editor-title">
-              Sua seleção
+              Sua seleÃ§Ã£o
             </h2>
 
             <p
@@ -19015,7 +19015,7 @@ function mostrarNotificacao(msg) {
               id="r120-ux4-editor-close"
               type="button"
               aria-label="Voltar">
-              ×
+              Ã—
             </button>
 
           </header>
@@ -19045,7 +19045,7 @@ function mostrarNotificacao(msg) {
                 id="r120-ux4-editor-salvar"
                 type="button"
                 class="r120-ux4-editor-btn">
-                Salvar alterações
+                Salvar alteraÃ§Ãµes
               </button>
 
               <button
@@ -19188,7 +19188,7 @@ function mostrarNotificacao(msg) {
               caixaAtiva?.titulo ||
               'Editar caixa'
             )
-          : 'Sua seleção';
+          : 'Sua seleÃ§Ã£o';
     }
 
 
@@ -19196,7 +19196,7 @@ function mostrarNotificacao(msg) {
 
       subtitulo.textContent =
         origemEditor === 'carrinho'
-          ? 'As alterações só serão aplicadas ao carrinho quando você salvar.'
+          ? 'As alteraÃ§Ãµes sÃ³ serÃ£o aplicadas ao carrinho quando vocÃª salvar.'
           : 'Aumente, diminua ou escolha outros sabores.';
     }
 
@@ -19255,7 +19255,7 @@ function mostrarNotificacao(msg) {
                   data-ux4-id="${id}"
                   data-ux4-delta="-1"
                   aria-label="Diminuir ${nomeDoceUX4(id)}">
-                  −
+                  âˆ’
                 </button>
 
                 <span class="r120-ux4-editor-qtd">
@@ -19288,31 +19288,31 @@ function mostrarNotificacao(msg) {
 
 
     let textoStatus =
-      `${total} doces • ${sabores} de até ${limite} sabores`;
+      `${total} doces â€¢ ${sabores} de atÃ© ${limite} sabores`;
 
 
     if (total < 25) {
 
       textoStatus +=
-        ` • faltam ${25 - total} doces para o mínimo`;
+        ` â€¢ faltam ${25 - total} doces para o mÃ­nimo`;
 
     }
     else {
 
       textoStatus +=
-        ' • mínimo atingido ✓';
+        ' â€¢ mÃ­nimo atingido âœ“';
 
 
       if (total < 50) {
 
         textoStatus +=
-          ` • ${50 - total} doces para liberar até 10 sabores`;
+          ` â€¢ ${50 - total} doces para liberar atÃ© 10 sabores`;
 
       }
       else if (total < 100) {
 
         textoStatus +=
-          ` • ${100 - total} doces para liberar até 14 sabores`;
+          ` â€¢ ${100 - total} doces para liberar atÃ© 14 sabores`;
       }
     }
 
@@ -19797,7 +19797,7 @@ function mostrarNotificacao(msg) {
     ) {
 
       mostrarNotificacao(
-        `Com ${total} doces, escolha no máximo ${limite} sabores.`
+        `Com ${total} doces, escolha no mÃ¡ximo ${limite} sabores.`
       );
 
 
@@ -19826,7 +19826,7 @@ function mostrarNotificacao(msg) {
        */
 
       caixaAtiva.titulo =
-        `Caixa Personalizada — ${total} doces`;
+        `Caixa Personalizada â€” ${total} doces`;
 
 
       caixaAtiva.maxSabores =
@@ -19863,12 +19863,12 @@ function mostrarNotificacao(msg) {
 
 
       mostrarNotificacao(
-        'Alterações da caixa salvas.'
+        'AlteraÃ§Ãµes da caixa salvas.'
       );
 
 
       /*
-       * Volta para o carrinho já atualizado.
+       * Volta para o carrinho jÃ¡ atualizado.
        */
 
       try {
@@ -19909,7 +19909,7 @@ function mostrarNotificacao(msg) {
 
 
     caixaAtiva.titulo =
-      `Caixa Personalizada — ${total} doces`;
+      `Caixa Personalizada â€” ${total} doces`;
 
 
     caixaAtiva.maxSabores =
@@ -19995,7 +19995,7 @@ function mostrarNotificacao(msg) {
     /*
      * Mantemos quantidades temporarias.
      * Se origem = carrinho, o indice de edicao permanece.
-     * Assim o salvamento posterior substituirá o mesmo item.
+     * Assim o salvamento posterior substituirÃ¡ o mesmo item.
      */
 
     try {
@@ -20527,7 +20527,7 @@ function mostrarNotificacao(msg) {
 
 
         badge.innerHTML =
-          `<i class="fa-solid fa-check"></i> Selecionado • ${qtd}×`;
+          `<i class="fa-solid fa-check"></i> Selecionado â€¢ ${qtd}Ã—`;
 
 
         card.appendChild(
@@ -20601,7 +20601,7 @@ function mostrarNotificacao(msg) {
     if (botao) {
 
       botao.textContent =
-        'Revisar / editar seleção';
+        'Revisar / editar seleÃ§Ã£o';
     }
   }
 
@@ -20672,7 +20672,7 @@ function mostrarNotificacao(msg) {
 <style id="r120-b05-ux5-e1-styles">
 
 /* ================================================================
-   MARCO DO MÍNIMO
+   MARCO DO MÃNIMO
 ================================================================ */
 
 #r120-ux5-marco {
@@ -20973,7 +20973,7 @@ function mostrarNotificacao(msg) {
 
 
 /* ================================================================
-   MINHA SELEÇÃO
+   MINHA SELEÃ‡ÃƒO
 ================================================================ */
 
 #r120-ux2-selection-trigger {
@@ -21089,7 +21089,7 @@ input {
 
 
 /* ================================================================
-   EDITOR UX4 - reforço visual UX5
+   EDITOR UX4 - reforÃ§o visual UX5
 ================================================================ */
 
 #r120-ux4-editor {
@@ -21292,19 +21292,19 @@ input {
       if (total < 25) {
 
         resumo.textContent =
-          `Caixa personalizada — ${total} doces • mínimo 25 • até ${limite} sabores`;
+          `Caixa personalizada â€” ${total} doces â€¢ mÃ­nimo 25 â€¢ atÃ© ${limite} sabores`;
 
       }
       else {
 
         resumo.textContent =
-          `Caixa personalizada — ${total} doces • até ${limite} sabores`;
+          `Caixa personalizada â€” ${total} doces â€¢ atÃ© ${limite} sabores`;
       }
     }
 
 
     /*
-     * BARRA MINHA SELEÇÃO
+     * BARRA MINHA SELEÃ‡ÃƒO
      */
 
     const trigger =
@@ -21360,16 +21360,16 @@ input {
 
 
           detalhe.textContent =
-            `${total} doces • ${sabores} ` +
-            `${sabores === 1 ? 'sabor' : 'sabores'} • ` +
+            `${total} doces â€¢ ${sabores} ` +
+            `${sabores === 1 ? 'sabor' : 'sabores'} â€¢ ` +
             `faltam ${faltam}`;
 
         }
         else {
 
           detalhe.textContent =
-            `${total} doces • ${sabores}/${limite} sabores • ` +
-            `mínimo atingido ✓`;
+            `${total} doces â€¢ ${sabores}/${limite} sabores â€¢ ` +
+            `mÃ­nimo atingido âœ“`;
         }
       }
     }
@@ -21512,7 +21512,7 @@ input {
 
         badge.innerHTML =
           `<i class="fa-solid fa-check"></i>` +
-          ` ESCOLHIDO • ${qtd}×`;
+          ` ESCOLHIDO â€¢ ${qtd}Ã—`;
 
 
         imagem.appendChild(
@@ -21576,23 +21576,23 @@ input {
           <div class="r120-ux5-marco-head">
 
             <div class="r120-ux5-marco-check">
-              ✓
+              âœ“
             </div>
 
             <p class="r120-ux5-marco-kicker">
-              Mínimo da caixa atingido
+              MÃ­nimo da caixa atingido
             </p>
 
             <h2
               id="r120-ux5-marco-titulo"
               class="r120-ux5-marco-title">
-              Sua caixa já pode ser concluída
+              Sua caixa jÃ¡ pode ser concluÃ­da
             </h2>
 
             <p class="r120-ux5-marco-desc">
-              Você chegou ao mínimo de 25 doces.
+              VocÃª chegou ao mÃ­nimo de 25 doces.
               Pode continuar escolhendo, revisar sua
-              seleção ou adicionar esta caixa ao carrinho.
+              seleÃ§Ã£o ou adicionar esta caixa ao carrinho.
             </p>
 
           </div>
@@ -21615,7 +21615,7 @@ input {
                 id="r120-ux5-revisar"
                 type="button"
                 class="r120-ux5-marco-btn">
-                Revisar / editar seleção
+                Revisar / editar seleÃ§Ã£o
               </button>
 
               <button
@@ -21729,7 +21729,7 @@ input {
 
       /*
        * Fecha eventual modal antigo para que haja
-       * UMA ÚNICA decisão visual.
+       * UMA ÃšNICA decisÃ£o visual.
        */
 
       const antigo =
@@ -21768,9 +21768,9 @@ input {
       if (resumo) {
 
         resumo.textContent =
-          `${total} doces • ` +
-          `${sabores} ${sabores === 1 ? 'sabor' : 'sabores'} • ` +
-          `até ${limite} sabores nesta faixa`;
+          `${total} doces â€¢ ` +
+          `${sabores} ${sabores === 1 ? 'sabor' : 'sabores'} â€¢ ` +
+          `atÃ© ${limite} sabores nesta faixa`;
       }
 
 
@@ -21805,7 +21805,7 @@ input {
 
 
   /* ==============================================================
-     GARANTIA DA TRANSIÇÃO 24 -> 25
+     GARANTIA DA TRANSIÃ‡ÃƒO 24 -> 25
   ============================================================== */
 
 
@@ -21855,7 +21855,7 @@ input {
        * Segunda garantia.
        *
        * Mesmo que qualquer runtime antigo tenha perdido
-       * a transição, 24 -> 25 abre a decisão UX5.
+       * a transiÃ§Ã£o, 24 -> 25 abre a decisÃ£o UX5.
        */
 
       if (
@@ -21884,7 +21884,7 @@ input {
 
 
       /*
-       * Se voltar abaixo do mínimo,
+       * Se voltar abaixo do mÃ­nimo,
        * um novo cruzamento pode avisar novamente.
        */
 
@@ -21908,7 +21908,7 @@ input {
 
 
   /* ==============================================================
-     TODA RENDERIZAÇÃO REAPLICA O ESTADO VISUAL
+     TODA RENDERIZAÃ‡ÃƒO REAPLICA O ESTADO VISUAL
   ============================================================== */
 
 
@@ -21943,7 +21943,7 @@ input {
 
 
   /* ==============================================================
-     MINHA SELEÇÃO / REVISAR = EDITOR
+     MINHA SELEÃ‡ÃƒO / REVISAR = EDITOR
 
      Captura no WINDOW, antes dos listeners antigos do DOCUMENT.
   ============================================================== */
@@ -22025,7 +22025,7 @@ input {
 
 
   /* ==============================================================
-     OBSERVER APENAS COMO REFORÇO
+     OBSERVER APENAS COMO REFORÃ‡O
   ============================================================== */
 
 
@@ -22073,7 +22073,7 @@ input {
 
 
   /* ==============================================================
-     REINÍCIO DE MONTAGEM
+     REINÃCIO DE MONTAGEM
   ============================================================== */
 
 
@@ -22362,7 +22362,7 @@ input {
 
 
   /* ==============================================================
-     SALVAR A CAIXA UMA ÚNICA VEZ
+     SALVAR A CAIXA UMA ÃšNICA VEZ
   ============================================================== */
 
 
@@ -22396,7 +22396,7 @@ input {
     if (total < 25) {
 
       mostrarNotificacao(
-        `Faltam ${25 - total} doces para atingir o mínimo.`
+        `Faltam ${25 - total} doces para atingir o mÃ­nimo.`
       );
 
 
@@ -22407,7 +22407,7 @@ input {
     if (sabores > limite) {
 
       mostrarNotificacao(
-        `Com ${total} doces, escolha no máximo ${limite} sabores.`
+        `Com ${total} doces, escolha no mÃ¡ximo ${limite} sabores.`
       );
 
 
@@ -22420,7 +22420,7 @@ input {
      */
 
     caixaAtiva.titulo =
-      `Caixa Personalizada — ${total} doces`;
+      `Caixa Personalizada â€” ${total} doces`;
 
 
     caixaAtiva.maxSabores =
@@ -22428,7 +22428,7 @@ input {
 
 
     /*
-     * ÚNICO ponto de gravação.
+     * ÃšNICO ponto de gravaÃ§Ã£o.
      */
 
     _registrarCaixaNoCarrinho();
@@ -22467,7 +22467,7 @@ input {
 
 
       mostrarNotificacao(
-        '✓ Caixa adicionada ao carrinho. Continue comprando quando quiser.'
+        'âœ“ Caixa adicionada ao carrinho. Continue comprando quando quiser.'
       );
 
 
@@ -22487,7 +22487,7 @@ input {
 
     /*
      * DESTINO 2:
-     * revisão/finalização.
+     * revisÃ£o/finalizaÃ§Ã£o.
      */
 
     if (
@@ -22546,16 +22546,16 @@ input {
     if (titulo) {
 
       titulo.textContent =
-        'Mínimo atingido — como deseja continuar?';
+        'MÃ­nimo atingido â€” como deseja continuar?';
     }
 
 
     if (descricao) {
 
       descricao.innerHTML =
-        'Sua caixa já possui os <strong>25 doces mínimos</strong>. ' +
-        'Você pode continuar adicionando quantos doces quiser, ' +
-        'revisar sua seleção ou seguir com o pedido.';
+        'Sua caixa jÃ¡ possui os <strong>25 doces mÃ­nimos</strong>. ' +
+        'VocÃª pode continuar adicionando quantos doces quiser, ' +
+        'revisar sua seleÃ§Ã£o ou seguir com o pedido.';
     }
 
 
@@ -22589,14 +22589,14 @@ input {
     if (revisar) {
 
       revisar.textContent =
-        'Revisar / editar seleção';
+        'Revisar / editar seleÃ§Ã£o';
     }
 
 
     /*
-     * O botão antigo ADICIONAR AO CARRINHO possuia listener
+     * O botÃ£o antigo ADICIONAR AO CARRINHO possuia listener
      * do E1. Clonamos o elemento para remover esse listener e
-     * evitar dupla gravação.
+     * evitar dupla gravaÃ§Ã£o.
      */
 
     let comprarMais =
@@ -22648,7 +22648,7 @@ input {
 
 
     /*
-     * Separador visual antes da ação final.
+     * Separador visual antes da aÃ§Ã£o final.
      */
 
     let separador =
@@ -22712,7 +22712,7 @@ input {
 
 
       finalizar.textContent =
-        'Finalizar pedido →';
+        'Finalizar pedido â†’';
 
 
       separador
@@ -22770,7 +22770,7 @@ input {
 
 
   /*
-   * O E4 continua chamando esta função.
+   * O E4 continua chamando esta funÃ§Ã£o.
    */
 
   window.abrirMinimoAtingidoR120 =
@@ -22783,8 +22783,8 @@ input {
 
   /* ==============================================================
      DEFESA:
-     se o modal já estiver criado antes deste runtime,
-     também o normalizamos.
+     se o modal jÃ¡ estiver criado antes deste runtime,
+     tambÃ©m o normalizamos.
   ============================================================== */
 
 
@@ -23401,7 +23401,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
         ) {
 
           botao.textContent =
-            'Cancelar alterações';
+            'Cancelar alteraÃ§Ãµes';
         }
       }
     );
@@ -23560,14 +23560,14 @@ button[onclick*="fecharModalQuantidadeDoce"] {
     if (qtd === 1) {
 
       mensagem.textContent =
-        '1 doce deste sabor já está adicionado à sua caixa.';
+        '1 doce deste sabor jÃ¡ estÃ¡ adicionado Ã  sua caixa.';
 
       return;
     }
 
 
     mensagem.textContent =
-      `${qtd} doces deste sabor já estão adicionados à sua caixa.`;
+      `${qtd} doces deste sabor jÃ¡ estÃ£o adicionados Ã  sua caixa.`;
   }
 
 
@@ -23967,10 +23967,10 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
     /*
-     * O editor da montagem trabalha sobre o próprio estado real.
+     * O editor da montagem trabalha sobre o prÃ³prio estado real.
      *
-     * SALVAR apenas confirma as alterações e fecha o editor.
-     * Disparamos o botão existente para não duplicar a lógica.
+     * SALVAR apenas confirma as alteraÃ§Ãµes e fecha o editor.
+     * Disparamos o botÃ£o existente para nÃ£o duplicar a lÃ³gica.
      */
 
     const salvar =
@@ -23986,8 +23986,8 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
     /*
-     * O salvar legado marca total >= 25 como "já avisado".
-     * Para este cruzamento específico, corrigimos imediatamente.
+     * O salvar legado marca total >= 25 como "jÃ¡ avisado".
+     * Para este cruzamento especÃ­fico, corrigimos imediatamente.
      */
 
     window.setTimeout(
@@ -24006,8 +24006,8 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
         /*
-         * Agora o editor já foi encerrado.
-         * Abre a decisão novamente no topo da jornada.
+         * Agora o editor jÃ¡ foi encerrado.
+         * Abre a decisÃ£o novamente no topo da jornada.
          */
 
         window
@@ -24063,7 +24063,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
           /*
-           * Saiu da faixa válida.
+           * Saiu da faixa vÃ¡lida.
            */
 
           if (depois < 25) {
@@ -24098,9 +24098,9 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
   /*
-   * Segurança adicional:
-   * se o editor for aberto já abaixo de 25,
-   * o estado começa armado.
+   * SeguranÃ§a adicional:
+   * se o editor for aberto jÃ¡ abaixo de 25,
+   * o estado comeÃ§a armado.
    */
 
   window.addEventListener(
@@ -24511,8 +24511,8 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
     dica.innerHTML =
       '<strong>Ajuste sua caixa:</strong> ' +
-      'use − e + para mudar quantidades ou a lixeira para remover um sabor. ' +
-      'Cancelar desfaz as alterações desta revisão.';
+      'use âˆ’ e + para mudar quantidades ou a lixeira para remover um sabor. ' +
+      'Cancelar desfaz as alteraÃ§Ãµes desta revisÃ£o.';
 
 
     lista.insertAdjacentElement(
@@ -24528,7 +24528,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
      O handler UX4 existente reconhece:
      [data-ux4-id][data-ux4-delta]
 
-     Então excluir = delta negativo igual à quantidade atual.
+     EntÃ£o excluir = delta negativo igual Ã  quantidade atual.
   ============================================================== */
 
 
@@ -24745,7 +24745,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
   /*
    * ESCOLHER OUTROS SABORES / SALVAR / outras transicoes
-   * também podem resultar em reabertura posterior.
+   * tambÃ©m podem resultar em reabertura posterior.
    */
 
   document.addEventListener(
@@ -25209,7 +25209,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
             class="r120-ux5-e2-r1-fechar"
             aria-label="Fechar"
           >
-            ×
+            Ã—
           </button>
 
           <div class="r120-ux5-e2-r1-icone">
@@ -25217,7 +25217,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
           </div>
 
           <p class="r120-ux5-e2-r1-eyebrow">
-            CONFIRMAR ALTERAÇÃO
+            CONFIRMAR ALTERAÃ‡ÃƒO
           </p>
 
           <h3
@@ -25228,7 +25228,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
           </h3>
 
           <p class="r120-ux5-e2-r1-texto">
-            Este sabor será retirado da sua seleção atual.
+            Este sabor serÃ¡ retirado da sua seleÃ§Ã£o atual.
           </p>
 
         </div>
@@ -25257,8 +25257,8 @@ button[onclick*="fecharModalQuantidadeDoce"] {
         </div>
 
         <p class="r120-ux5-e2-r1-observacao">
-          Se preferir, você ainda poderá cancelar toda a revisão
-          antes de salvar as alterações.
+          Se preferir, vocÃª ainda poderÃ¡ cancelar toda a revisÃ£o
+          antes de salvar as alteraÃ§Ãµes.
         </p>
 
       </div>
@@ -25393,7 +25393,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
     if (resumo) {
 
       resumo.textContent =
-        `${nome} — ${qtd} ${
+        `${nome} â€” ${qtd} ${
           qtd === 1
             ? 'doce'
             : 'doces'
@@ -25416,8 +25416,8 @@ button[onclick*="fecharModalQuantidadeDoce"] {
   /* ==============================================================
      CONFIRMAR REMOCAO
 
-     Criamos um controle temporário compatível com o handler UX4
-     já existente. Assim não duplicamos aplicarQuantidadeDoce().
+     Criamos um controle temporÃ¡rio compatÃ­vel com o handler UX4
+     jÃ¡ existente. Assim nÃ£o duplicamos aplicarQuantidadeDoce().
   ============================================================== */
 
 
@@ -25487,7 +25487,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
     /*
-     * Este clique entra no MESMO listener UX4 dos botões +/-.
+     * Este clique entra no MESMO listener UX4 dos botÃµes +/-.
      */
 
     acionador.click();
@@ -25519,8 +25519,8 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
       /*
-       * Impede o clique original de alcançar o listener UX4.
-       * A exclusão só ocorrerá após confirmação.
+       * Impede o clique original de alcanÃ§ar o listener UX4.
+       * A exclusÃ£o sÃ³ ocorrerÃ¡ apÃ³s confirmaÃ§Ã£o.
        */
 
       evento.preventDefault();
@@ -25540,7 +25540,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
   /* ==============================================================
-     AÇÕES DO MODAL
+     AÃ‡Ã•ES DO MODAL
   ============================================================== */
 
 
@@ -25928,7 +25928,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
     /*
      * O UX4 original usa origemEditor === 'carrinho'.
-     * Como essa variavel está no mesmo escopo global do bloco UX4,
+     * Como essa variavel estÃ¡ no mesmo escopo global do bloco UX4,
      * consultamos diretamente quando disponivel.
      */
 
@@ -25989,7 +25989,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
           </h3>
 
           <p class="r120-ux5-e2-r2-cancel-texto">
-            Sua seleção atual desta caixa será descartada.
+            Sua seleÃ§Ã£o atual desta caixa serÃ¡ descartada.
           </p>
 
         </div>
@@ -26052,7 +26052,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
     if (resumo) {
 
       resumo.textContent =
-        `${total} ${total === 1 ? 'doce' : 'doces'} • ` +
+        `${total} ${total === 1 ? 'doce' : 'doces'} â€¢ ` +
         `${sabores} ${sabores === 1 ? 'sabor' : 'sabores'}`;
     }
 
@@ -26132,7 +26132,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
     /*
-     * Atualiza as interfaces já existentes.
+     * Atualiza as interfaces jÃ¡ existentes.
      */
 
     try {
@@ -26181,8 +26181,8 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
     /*
-     * Na edição de caixa que já está no carrinho,
-     * não mostramos CANCELAR MONTAGEM.
+     * Na ediÃ§Ã£o de caixa que jÃ¡ estÃ¡ no carrinho,
+     * nÃ£o mostramos CANCELAR MONTAGEM.
      */
 
     if (editorCarrinhoR2B()) {
@@ -26342,11 +26342,11 @@ button[onclick*="fecharModalQuantidadeDoce"] {
  R1.20-B05-UX5-E3-R1-B
  CARRINHO INTERATIVO
 
- - VER SABORES continua disponível
- - EDITAR CAIXA também aparece diretamente no card
- - edição reutiliza snapshot/motor oficial
+ - VER SABORES continua disponÃ­vel
+ - EDITAR CAIXA tambÃ©m aparece diretamente no card
+ - ediÃ§Ã£o reutiliza snapshot/motor oficial
  - quantidade externa = quantidade de caixas iguais
- - sem duplicar ações
+ - sem duplicar aÃ§Ãµes
 ================================================================ -->
 
 <style id="r120-b05-ux5-e3-r1-b-styles">
@@ -26474,7 +26474,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 /*
  * Esclarece semanticamente o controle externo:
- * ele multiplica caixas completas, não doces internos.
+ * ele multiplica caixas completas, nÃ£o doces internos.
  */
 
 .r120-e3-qtd-caixas-label {
@@ -26690,8 +26690,8 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
     /*
      * Se houver VER SABORES antigo, escondemos somente
-     * aquela instância do card e oferecemos uma dupla
-     * consistente de ações.
+     * aquela instÃ¢ncia do card e oferecemos uma dupla
+     * consistente de aÃ§Ãµes.
      */
 
     const verAntigo =
@@ -26782,7 +26782,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
       editar.textContent =
-        'Edição indisponível';
+        'EdiÃ§Ã£o indisponÃ­vel';
 
 
       editar.style.opacity =
@@ -26814,8 +26814,8 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
     /*
-     * Procura uma posição estável próxima ao rodapé
-     * do card sem depender de um único markup.
+     * Procura uma posiÃ§Ã£o estÃ¡vel prÃ³xima ao rodapÃ©
+     * do card sem depender de um Ãºnico markup.
      */
 
     const divisoria =
@@ -26849,7 +26849,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
     /*
-     * Resumo compacto da composição.
+     * Resumo compacto da composiÃ§Ã£o.
      */
 
     const composicao =
@@ -26876,7 +26876,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
       resumo.textContent =
-        `${composicao.doces} doces • ` +
+        `${composicao.doces} doces â€¢ ` +
         `${composicao.sabores} ${
           composicao.sabores === 1
             ? 'sabor'
@@ -26892,7 +26892,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
     /*
-     * Nos cards onde há +/- externo, acrescenta o
+     * Nos cards onde hÃ¡ +/- externo, acrescenta o
      * significado correto sem alterar o motor.
      */
 
@@ -27242,7 +27242,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
 /*
- * Título principal do item.
+ * TÃ­tulo principal do item.
  */
 
 .r120-e3-card-refinado
@@ -27751,7 +27751,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
       /*
        * Movemos somente os elementos identificados pelo E3.
-       * Não destruímos os listeners existentes.
+       * NÃ£o destruÃ­mos os listeners existentes.
        */
 
       principal.appendChild(
@@ -28066,9 +28066,9 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
   /*
-   * O carrinho possui vários rerenders legados.
-   * Não usamos MutationObserver permanente.
-   * Apenas normalizamos após interações.
+   * O carrinho possui vÃ¡rios rerenders legados.
+   * NÃ£o usamos MutationObserver permanente.
+   * Apenas normalizamos apÃ³s interaÃ§Ãµes.
    */
 
   document.addEventListener(
@@ -28193,7 +28193,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
 /* ================================================================
-   RESUMO 25 DOCES • 5 SABORES
+   RESUMO 25 DOCES â€¢ 5 SABORES
 ================================================================ */
 
 #r117b-cart-list
@@ -29179,7 +29179,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
     /*
      * Defesa estrutural:
-     * garante que o viewport nao permaneça aberto
+     * garante que o viewport nao permaneÃ§a aberto
      * mesmo se algum fluxo legado o reabrir.
      */
 
@@ -29866,7 +29866,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
     const match =
       original.match(
-        /(?:at[eé]|ate)\s*(\d+)\s*sabores/i
+        /(?:at[eÃ©]|ate)\s*(\d+)\s*sabores/i
       );
 
 
@@ -29894,8 +29894,8 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
     const blocoSabores =
       Number.isInteger(sabores)
-        ? `${sabores} de até ${maxSabores} sabores`
-        : `até ${maxSabores} sabores`;
+        ? `${sabores} de atÃ© ${maxSabores} sabores`
+        : `atÃ© ${maxSabores} sabores`;
 
 
     if (total < meta) {
@@ -29911,8 +29911,8 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
       return (
-        `${total}/${meta} doces • ` +
-        `${blocoSabores} • ` +
+        `${total}/${meta} doces â€¢ ` +
+        `${blocoSabores} â€¢ ` +
         frase
       );
     }
@@ -29921,8 +29921,8 @@ button[onclick*="fecharModalQuantidadeDoce"] {
     if (total >= meta) {
 
       return (
-        `✓ Caixa completa • ` +
-        `${total}/${meta} doces • ` +
+        `âœ“ Caixa completa â€¢ ` +
+        `${total}/${meta} doces â€¢ ` +
         blocoSabores
       );
     }
@@ -29939,8 +29939,8 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
     return (
-      `${total}/${meta} doces • ` +
-      `${blocoSabores} • ` +
+      `${total}/${meta} doces â€¢ ` +
+      `${blocoSabores} â€¢ ` +
       frase
     );
   }
@@ -30086,7 +30086,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
           ) {
 
             botao.textContent =
-              'Cancelar alterações';
+              'Cancelar alteraÃ§Ãµes';
           }
         }
       );
@@ -30951,7 +30951,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
     painel.innerHTML = `
       <strong>
-        R13 · CHECKPOINT DE TESTE
+        R13 Â· CHECKPOINT DE TESTE
       </strong>
 
       <div
@@ -31467,11 +31467,11 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
     titulo.textContent =
       (
-        'TESTE · ' +
+        'TESTE Â· ' +
         tipoCheckpoint +
         (
           tipoCheckpoint !== 'NENHUM'
-            ? ' ✓'
+            ? ' âœ“'
             : ''
         )
       );
@@ -31551,7 +31551,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
     titulo.textContent =
-      'TESTE · CHECKPOINT';
+      'TESTE Â· CHECKPOINT';
 
 
     const toggle =
@@ -31569,7 +31569,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
     toggle.textContent =
-      '▾';
+      'â–¾';
 
 
     header.append(
@@ -31745,8 +31745,8 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
         toggle.textContent =
           colapsado
-            ? '▸'
-            : '▾';
+            ? 'â–¸'
+            : 'â–¾';
 
       }
     );
@@ -31762,7 +31762,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
     toggle.textContent =
-      '▸';
+      'â–¸';
 
 
     /*
@@ -31903,8 +31903,8 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
     /*
      * Defesa adicional:
-     * algumas camadas visuais preservam o cabeçalho
-     * EDITANDO CAIXA mesmo durante transições internas.
+     * algumas camadas visuais preservam o cabeÃ§alho
+     * EDITANDO CAIXA mesmo durante transiÃ§Ãµes internas.
      */
 
     return Array
@@ -32112,8 +32112,8 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
     /*
-     * Preferimos o bloco que já contém as informações
-     * de doces + sabores da própria R8.
+     * Preferimos o bloco que jÃ¡ contÃ©m as informaÃ§Ãµes
+     * de doces + sabores da prÃ³pria R8.
      */
 
     return candidatos.find(
@@ -32165,9 +32165,9 @@ button[onclick*="fecharModalQuantidadeDoce"] {
   ) {
 
     /*
-     * Não duplicamos a regra comercial das faixas.
+     * NÃ£o duplicamos a regra comercial das faixas.
      *
-     * A jornada já calcula e mostra o limite correto:
+     * A jornada jÃ¡ calcula e mostra o limite correto:
      * 7, 10, etc.
      *
      * Apenas o reaproveitamos.
@@ -32182,7 +32182,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
     const match =
       texto.match(
-        /at[eé]\s+(\d+)\s+sabores/i
+        /at[eÃ©]\s+(\d+)\s+sabores/i
       );
 
 
@@ -32317,12 +32317,12 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
         novoTexto =
           (
-            `${total} doces • ` +
-            `${sabores} de até ${limiteSabores} sabores • ` +
+            `${total} doces â€¢ ` +
+            `${sabores} de atÃ© ${limiteSabores} sabores â€¢ ` +
             (
               faltam === 1
-                ? 'falta 1 doce para atingir o mínimo'
-                : `faltam ${faltam} doces para atingir o mínimo`
+                ? 'falta 1 doce para atingir o mÃ­nimo'
+                : `faltam ${faltam} doces para atingir o mÃ­nimo`
             )
           );
 
@@ -32336,9 +32336,9 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
         novoTexto =
           (
-            `✓ Mínimo atingido • ` +
-            `${total} doces • ` +
-            `${sabores} sabores • ` +
+            `âœ“ MÃ­nimo atingido â€¢ ` +
+            `${total} doces â€¢ ` +
+            `${sabores} sabores â€¢ ` +
             (
               excedenteSabores === 1
                 ? 'remova 1 sabor para esta faixa'
@@ -32351,9 +32351,9 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
         novoTexto =
           (
-            `✓ Mínimo atingido • ` +
-            `${total} doces • ` +
-            `${sabores} de até ${limiteSabores} sabores`
+            `âœ“ MÃ­nimo atingido â€¢ ` +
+            `${total} doces â€¢ ` +
+            `${sabores} de atÃ© ${limiteSabores} sabores`
           );
       }
 
@@ -32458,8 +32458,8 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
   /*
    * Observador estreito:
-   * apenas reage a mudanças visuais necessárias
-   * para o modal Sua Seleção.
+   * apenas reage a mudanÃ§as visuais necessÃ¡rias
+   * para o modal Sua SeleÃ§Ã£o.
    */
 
   const observerR14 =
@@ -32524,7 +32524,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 <!-- ================================================================
  R15.1
- INDICADOR INTELIGENTE — MAIS SABORES ABAIXO
+ INDICADOR INTELIGENTE â€” MAIS SABORES ABAIXO
  UX SOMENTE / ZERO REGRA DE NEGOCIO
 ================================================================ -->
 
@@ -32688,7 +32688,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
     aviso.innerHTML =
-      '<span class="r151-seta" aria-hidden="true">↓</span>' +
+      '<span class="r151-seta" aria-hidden="true">â†“</span>' +
       '<span>Mais sabores abaixo</span>';
 
 
@@ -32957,10 +32957,10 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
   const MARCADORES_R152 = [
-    'R13 · CHECKPOINT DE TESTE',
+    'R13 Â· CHECKPOINT DE TESTE',
     'R13 - CHECKPOINT DE TESTE',
     'TESTE - CARRINHO',
-    'TESTE · CARRINHO'
+    'TESTE Â· CARRINHO'
   ];
 
 
@@ -33137,7 +33137,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
     if (
-      /TESTE\s*[-·]\s*CARRINHO/i.test(
+      /TESTE\s*[-Â·]\s*CARRINHO/i.test(
         texto
       )
     ) {
@@ -33468,4 +33468,3 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 </body>
 </html>
 
-<!-- sync-test -->
