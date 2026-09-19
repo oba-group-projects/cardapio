@@ -1543,7 +1543,74 @@ async function obaGitHubSyncPublished(env, payload, revisionId) {
   return { ok: errors === 0, errors, results };
 }
 
-/* OBA_GITHUB_SYNC_END */
+/* OBA_GITHUB_SYNC_CARDAPIO_HTML — sincroniza ui-desenvolvimento/index.html para main */
+
+async function obaGitHubSyncCardapioHtml(env, request) {
+  const token = env.GITHUB_PAT;
+  if (!token) return { ok: false, reason: "pat_missing" };
+
+  try {
+    // Lê o HTML atual dos assets do Worker
+    const assetUrl = new URL(request.url);
+    assetUrl.pathname = "/ui-desenvolvimento/index.html";
+    assetUrl.search = "";
+    const assetResp = await env.ASSETS.fetch(new Request(assetUrl.toString(), { method: "GET" }));
+    if (!assetResp.ok) return { ok: false, reason: "asset_not_found" };
+
+    const htmlContent = await assetResp.text();
+    const filePath = "ui-desenvolvimento/index.html";
+    const targetBranch = "main";
+    const message = "chore(auto-sync): cardapio publico atualizado via Worker [skip-sync]";
+
+    // Busca SHA atual do arquivo no main (pode não existir ainda)
+    const shaUrl = `https://api.github.com/repos/${OBA_GITHUB_REPO}/contents/${filePath}?ref=${targetBranch}`;
+    const shaResp = await fetch(shaUrl, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+        "User-Agent": "oba-cardapio-worker"
+      }
+    });
+    const shaData = shaResp.ok ? await shaResp.json() : {};
+    const sha = shaData.sha || null;
+
+    // Codifica o HTML em base64
+    const encoded = btoa(unescape(encodeURIComponent(htmlContent)));
+
+    const body = { message, content: encoded, branch: targetBranch };
+    if (sha) body.sha = sha;
+
+    const putResp = await fetch(
+      `https://api.github.com/repos/${OBA_GITHUB_REPO}/contents/${filePath}`,
+      {
+        method: "PUT",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Accept": "application/vnd.github+json",
+          "Content-Type": "application/json",
+          "X-GitHub-Api-Version": "2022-11-28",
+          "User-Agent": "oba-cardapio-worker"
+        },
+        body: JSON.stringify(body)
+      }
+    );
+
+    if (!putResp.ok) {
+      const err = await putResp.text();
+      console.error("[9D-HTML] Erro ao sincronizar HTML:", err);
+      return { ok: false, reason: "put_failed", status: putResp.status };
+    }
+
+    console.info("[9D-HTML] ui-desenvolvimento/index.html sincronizado para main.");
+    return { ok: true };
+  } catch (err) {
+    console.error("[9D-HTML] Excecao:", String(err));
+    return { ok: false, reason: String(err) };
+  }
+}
+
+/* OBA_GITHUB_SYNC_CARDAPIO_HTML_END */
 
 /* OBA_PUBLISH_API_BEGIN */
 
@@ -1762,9 +1829,14 @@ async function obaHandlePublishApi(request, env, url) {
       after.payload,
       after.revision_id
     ).catch(err => {
-      /* Falha silenciosa: publicação no D1 já ocorreu com sucesso */
       console.error("[9D] Sync GitHub falhou:", String(err));
       return { ok: false, reason: "sync_exception", detail: String(err) };
+    });
+
+    /* R9D-HTML — Sincronizar HTML do cardápio para main (GitHub Pages) */
+    const syncHtmlResult = await obaGitHubSyncCardapioHtml(env, request).catch(err => {
+      console.error("[9D-HTML] Sync HTML falhou:", String(err));
+      return { ok: false, reason: "sync_html_exception", detail: String(err) };
     });
 
     return obaApiJson({
@@ -1776,6 +1848,7 @@ async function obaHandlePublishApi(request, env, url) {
       promotion_id: promotionId,
       reused: false,
       github_sync: syncResult,
+      github_sync_html: syncHtmlResult,
       slots: await obaCatalogSlotsState(env)
     });
   }

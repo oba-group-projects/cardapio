@@ -7,7 +7,8 @@
                   "name":  "Oba Doceria",
                   "whatsapp":  "5555999117626",
                   "currency":  "BRL",
-                  "locale":  "pt-BR"
+                  "locale":  "pt-BR",
+                  "exibirPrecos": true
               },
     "assets":  {
                    "basePath":  "./",

@@ -67,7 +67,30 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
 <section id="panel-products" class="panel"><div class="toolbar"><h2>Produtos</h2><button class="primary" data-new="products">+ Novo produto</button></div><table><thead><tr><th>Nome</th><th>Tipo</th><th>Preço</th><th class="hide-mobile">Imagem</th><th>Status</th></tr></thead><tbody id="body-products"></tbody></table></section>
 <section id="panel-options" class="panel"><div class="toolbar"><h2>Opcionais</h2><button class="primary" data-new="options">+ Novo opcional</button></div><table><thead><tr><th>Nome</th><th>Preço</th><th>Ordem</th><th>Status</th></tr></thead><tbody id="body-options"></tbody></table></section>
 <section id="panel-combos" class="panel"><div class="toolbar"><h2>Combos</h2><button class="primary" data-new="combos">+ Novo combo</button></div><table><thead><tr><th>Nome</th><th>Preço</th><th>Imagem</th><th>Status</th></tr></thead><tbody id="body-combos"></tbody></table></section>
-<section id="panel-config" class="panel"><h2>Loja</h2><form id="formConfig"><div class="grid"><div class="field"><label>WhatsApp</label><input id="cfgWhatsapp" required></div><div class="field"><label>Locale</label><input id="cfgLocale"></div><div class="field"><label>Moeda</label><input id="cfgCurrency"></div><div class="field full"><label>Formas de pagamento</label><input id="cfgPayments" placeholder="Pix, Dinheiro, Cartão"></div></div><div class="actions"><button class="primary" type="submit">Salvar loja</button></div></form></section>
+<section id="panel-config" class="panel">
+  <h2>Loja</h2>
+  <form id="formConfig">
+    <div class="grid">
+      <div class="field"><label>WhatsApp</label><input id="cfgWhatsapp" required></div>
+      <div class="field"><label>Locale</label><input id="cfgLocale"></div>
+      <div class="field"><label>Moeda</label><input id="cfgCurrency"></div>
+      <div class="field full"><label>Formas de pagamento</label><input id="cfgPayments" placeholder="Pix, Dinheiro, Cartão"></div>
+
+      <!-- Toggle de visibilidade de preços -->
+      <div class="field full" style="background:#fff8f0;border:1px solid #f5c89a;border-radius:12px;padding:14px 16px;margin-top:6px">
+        <p style="margin:0 0 10px;font-size:13px;font-weight:700;color:var(--text)">💰 Visibilidade de preços no cardápio</p>
+        <label class="oba-toggle-label" style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">
+          <input type="checkbox" id="cfgExibirPrecos" checked style="margin-top:2px;width:16px;height:16px;accent-color:var(--brand)">
+          <span style="font-size:13px;color:var(--text);line-height:1.5">
+            <strong>Exibir preços para o cliente</strong><br>
+            <span class="hint">Quando desmarcado, os preços ficam ocultos no cardápio público. O sistema continua calculando internamente. Ideal para orçamentos personalizados via WhatsApp.</span>
+          </span>
+        </label>
+      </div>
+    </div>
+    <div class="actions"><button class="primary" type="submit">Salvar loja</button></div>
+  </form>
+</section>
 
 <!-- ================================================================
      FASE 9B — PAINEL DE EDIÇÃO VISUAL
@@ -1362,7 +1385,7 @@ async function carregar(){
   catalogo=await obaLoadDraftCatalog();
   const f=$('filtroCategoria');f.replaceChildren(new Option('Todas as categorias',''));catalogo.categories.forEach(c=>f.add(new Option(c.nome,c.id)));
   $('cfgWhatsapp').value=catalogo.config?.store?.whatsapp??'';$('cfgLocale').value=catalogo.config?.store?.locale??'pt-BR';$('cfgCurrency').value=catalogo.config?.store?.currency??'BRL';$('cfgPayments').value=Array.isArray(catalogo.config?.checkout?.paymentMethods)?catalogo.config.checkout.paymentMethods.join(', '):'';
-  obaPopularFormTema();
+  const cfgExibirPrecos=$('cfgExibirPrecos');if(cfgExibirPrecos)cfgExibirPrecos.checked=catalogo.config?.store?.exibirPrecos!==false;  obaPopularFormTema();
   renderTudo();await atualizarStatus();
 }
 
@@ -1379,7 +1402,7 @@ $('formConfig').onsubmit=async e=>{
   try{
     const cfg=window.structuredClone?window.structuredClone(catalogo.config):JSON.parse(JSON.stringify(catalogo.config));
     cfg.store=cfg.store||{};cfg.checkout=cfg.checkout||{};
-    cfg.store.whatsapp=$('cfgWhatsapp').value.trim();cfg.store.locale=$('cfgLocale').value.trim()||'pt-BR';cfg.store.currency=$('cfgCurrency').value.trim()||'BRL';cfg.checkout.paymentMethods=$('cfgPayments').value.split(',').map(x=>x.trim()).filter(Boolean);
+    cfg.store.whatsapp=$('cfgWhatsapp').value.trim();cfg.store.locale=$('cfgLocale').value.trim()||'pt-BR';cfg.store.currency=$('cfgCurrency').value.trim()||'BRL';cfg.store.exibirPrecos=$('cfgExibirPrecos')?.checked!==false;cfg.checkout.paymentMethods=$('cfgPayments').value.split(',').map(x=>x.trim()).filter(Boolean);
     const res=await obaSaveDraftWith('config',cfg);
     catalogo.config=cfg;addPendencia('Configurações da loja alteradas');msg('Loja salva. Backup: '+res.backup);
   }catch(err){msg(String(err.message||err),'erro')}
