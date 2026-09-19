@@ -1,0 +1,78 @@
+# ================================================================
+# sync-cardapio.yml
+# Sincroniza automaticamente o arquivo do cardápio público
+# do branch feature/gestao-online-segura para o main,
+# garantindo que o GitHub Pages fique sempre atualizado.
+#
+# Disparado em:
+#   - Push no feature branch que toque o arquivo do cardápio
+#   - Push direto no main (publicação via Central)
+# ================================================================
+
+name: Sync Cardápio → GitHub Pages
+
+on:
+  push:
+    branches:
+      - feature/gestao-online-segura
+      - main
+    paths:
+      - 'online/gestao/public/ui-desenvolvimento/index.html'
+      - 'ui-desenvolvimento/index.html'
+
+jobs:
+  sync:
+    name: Copiar cardápio para main e rebuildar Pages
+    runs-on: ubuntu-latest
+    # Não roda se o push já veio do próprio workflow (evita loop)
+    if: "!contains(github.event.head_commit.message, '[skip-sync]')"
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configurar identidade Git
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Buscar branch de origem
+        run: git fetch origin feature/gestao-online-segura
+
+      - name: Copiar arquivo do cardápio para raiz do main
+        run: |
+          # Copia o arquivo atualizado do feature branch para a raiz (GitHub Pages)
+          git checkout origin/feature/gestao-online-segura \
+            -- online/gestao/public/ui-desenvolvimento/index.html
+
+          cp online/gestao/public/ui-desenvolvimento/index.html \
+             ui-desenvolvimento/index.html
+
+          # Remove o arquivo copiado temporariamente da pasta gestao
+          git checkout HEAD -- online/gestao/public/ui-desenvolvimento/index.html 2>/dev/null || true
+          rm -f online/gestao/public/ui-desenvolvimento/index.html
+
+      - name: Verificar se há mudanças reais
+        id: check
+        run: |
+          if git diff --quiet ui-desenvolvimento/index.html; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "Sem mudancas no arquivo — nada a fazer."
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Arquivo alterado — vai commitar."
+          fi
+
+      - name: Commitar e fazer push para main
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          git add ui-desenvolvimento/index.html
+          git commit -m "chore(auto-sync): atualiza cardapio publico [skip-sync]"
+          git push origin main
