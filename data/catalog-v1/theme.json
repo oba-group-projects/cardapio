@@ -1,0 +1,120 @@
+{
+  "paginas": {
+    "boas_vindas": {
+      "botaoCTA": "",
+      "corFundo": "",
+      "corTitulo": "",
+      "exibirCTA": true,
+      "exibirSubtitulo": true,
+      "logo": "",
+      "subtitulo": "",
+      "tamanhoLogo": "medio",
+      "titulo": "Seja Bem-Vinda!"
+    },
+    "eventos_modal": {
+      "titulo": ""
+    },
+    "menu_principal": {
+      "botoes": [
+        {
+          "acao": "caixas",
+          "destaque": true,
+          "icone": "fa-solid fa-box-open",
+          "id": "btn-0",
+          "label": "Caixas de Doces",
+          "sublabel": "Montagem",
+          "url": "",
+          "visivel": true
+        },
+        {
+          "acao": "presenteaveis",
+          "destaque": false,
+          "icone": "fa-solid fa-gift",
+          "id": "btn-1",
+          "label": "Presenteáveis / Especiais",
+          "sublabel": "Kits & Presentes",
+          "url": "",
+          "visivel": true
+        },
+        {
+          "acao": "personalizados",
+          "destaque": false,
+          "icone": "fa-solid fa-wand-magic-sparkles",
+          "id": "btn-2",
+          "label": "Doces Personalizados",
+          "sublabel": "Exclusivo",
+          "url": "",
+          "visivel": true
+        },
+        {
+          "acao": "eventos",
+          "destaque": false,
+          "icone": "fa-solid fa-champagne-glasses",
+          "id": "btn-3",
+          "label": "Grandes Eventos",
+          "sublabel": "Proposta",
+          "url": "",
+          "visivel": true
+        }
+      ],
+      "corFundo": "",
+      "corSubtitulo": "",
+      "logo": "",
+      "subtitulo": "",
+      "tamanhoLogo": "medio"
+    },
+    "nossa_essencia": {
+      "citacao": "",
+      "corFundo": "",
+      "corTitulo": "",
+      "exibirCitacao": true,
+      "exibirSeparador": true,
+      "logo": "",
+      "tamanhoLogo": "medio",
+      "texto": "Na Oba Doceria, cada brigadeiro é uma obra de arte. Criamos receitas exclusivas com rigor técnico e os melhores insumos, resultando em doces menos açucarados e intensamente cremosos.",
+      "titulo": ""
+    },
+    "personalizados_modal": {
+      "info_items": [],
+      "info_titulo": "",
+      "pacotes": [
+        {
+          "preco": "196,00",
+          "quantidade": 20
+        },
+        {
+          "preco": "280,00",
+          "quantidade": 35
+        },
+        {
+          "preco": "375,00",
+          "quantidade": 50
+        }
+      ],
+      "pacotes_titulo": "",
+      "titulo": ""
+    },
+    "vitrine_presentes": {
+      "subtitulo": "",
+      "titulo": ""
+    }
+  },
+  "paginas_customizadas": [],
+  "schemaVersion": 2,
+  "tema": {
+    "arredondamento": "20",
+    "corBorda": "#e8d5b5",
+    "corFundo": "#faf5f0",
+    "corFundoCard": "#fff8f0",
+    "corPrimaria": "#8b4513",
+    "corTexto": "#3b2a1e",
+    "espacamento": "normal",
+    "fonte": "Poppins",
+    "pesoCorpo": "600",
+    "pesoTitulo": "200",
+    "tamanhoCorpo": "13",
+    "tamanhoTitulo": "26"
+  },
+  "updatedAt": "2026-09-17",
+  "variante": "classica"
+}
