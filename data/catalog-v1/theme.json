@@ -70,8 +70,8 @@
       "exibirCitacao": true,
       "exibirSeparador": true,
       "logo": "",
-      "tamanhoLogo": "grande",
-      "texto": "",
+      "tamanhoLogo": "medio",
+      "texto": "Na Oba Doceria, cada brigadeiro é uma obra de arte. Criamos receitas exclusivas com rigor técnico e os melhores insumos, resultando em doces menos açucarados e intensamente cremosos.",
       "titulo": ""
     },
     "personalizados_modal": {
@@ -110,11 +110,11 @@
     "corTexto": "#3b2a1e",
     "espacamento": "normal",
     "fonte": "Poppins",
-    "pesoCorpo": "400",
-    "pesoTitulo": "300",
+    "pesoCorpo": "600",
+    "pesoTitulo": "200",
     "tamanhoCorpo": "13",
-    "tamanhoTitulo": "24"
+    "tamanhoTitulo": "26"
   },
-  "updatedAt": "2026-09-16",
+  "updatedAt": "2026-09-17",
   "variante": "classica"
 }
