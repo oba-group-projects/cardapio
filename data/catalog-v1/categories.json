@@ -1,6 +1,7 @@
 [
   {
     "ativo": true,
+    "disponivel": true,
     "id": "tradicionais-1",
     "nome": "Tradicionais I",
     "ordem": 10,
