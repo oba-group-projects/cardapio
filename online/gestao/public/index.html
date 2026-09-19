@@ -58,6 +58,7 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
 <button class="tab" data-tab="combos">Combos</button>
 <button class="tab" data-tab="config">Loja</button>
 <button class="tab" data-tab="visual">✏️ Edição Visual</button>
+<button class="tab" data-tab="midia">🖼️ Mídia</button>
 </div>
 
 <section id="panel-flavors" class="panel active"><div class="toolbar"><h2>Sabores</h2><button class="primary" data-new="flavors">+ Novo sabor</button><input id="buscaSabor" placeholder="Buscar sabor"><select id="filtroCategoria"><option value="">Todas as categorias</option></select></div><table><thead><tr><th>Nome</th><th>Categoria</th><th>Preço</th><th class="hide-mobile">Imagem</th><th>Status</th></tr></thead><tbody id="body-flavors"></tbody></table></section>
@@ -802,6 +803,46 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
 
 </section>
 <!-- /FASE 9B -->
+
+<!-- ================================================================
+     ABA MÍDIA — Upload direto D1 + listagem + exclusão
+================================================================ -->
+<section id="panel-midia" class="panel">
+  <div class="toolbar" style="margin-bottom:18px">
+    <h2 style="margin:0 auto 0 0">🖼️ Biblioteca de Mídias</h2>
+    <button class="primary" type="button" id="midia-upload-btn" onclick="document.getElementById('midia-file-input').click()">+ Enviar imagem</button>
+    <input type="file" id="midia-file-input" accept=".jpg,.jpeg,.png,.webp,.gif" style="display:none" multiple>
+  </div>
+
+  <!-- Zona de drag & drop -->
+  <div id="midia-dropzone"
+    style="border:2px dashed var(--brand);border-radius:14px;padding:32px 20px;text-align:center;background:#fdf8f3;color:var(--muted);margin-bottom:20px;transition:background 0.2s;cursor:pointer"
+    onclick="document.getElementById('midia-file-input').click()">
+    <div style="font-size:36px;margin-bottom:8px">📂</div>
+    <p style="margin:0;font-size:14px;font-weight:600;color:var(--text)">Arraste imagens aqui ou clique para escolher</p>
+    <p style="margin:6px 0 0;font-size:12px">JPG, PNG, WEBP, GIF — máx. 15 MB por arquivo</p>
+  </div>
+
+  <!-- Barra de progresso de upload -->
+  <div id="midia-progress-wrap" style="display:none;margin-bottom:16px">
+    <p id="midia-progress-label" style="margin:0 0 6px;font-size:13px;color:var(--text)">Enviando…</p>
+    <div style="background:#e5e7eb;border-radius:99px;height:8px;overflow:hidden">
+      <div id="midia-progress-bar" style="height:100%;background:var(--brand);width:0%;transition:width 0.3s;border-radius:99px"></div>
+    </div>
+  </div>
+
+  <!-- Estatísticas -->
+  <div style="display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap">
+    <span id="midia-count" style="font-size:13px;color:var(--muted)">Carregando…</span>
+    <button type="button" class="secondary" style="padding:5px 12px;font-size:12px" onclick="obaCarregarMidias()">↺ Atualizar</button>
+  </div>
+
+  <!-- Grade de mídias -->
+  <div id="midia-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px">
+    <div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--muted)">Carregando biblioteca…</div>
+  </div>
+</section>
+<!-- /ABA MÍDIA -->
 
 </main>
 
@@ -2616,6 +2657,225 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
   };
 })();
 </script>
+
+<!-- ================================================================
+     ABA MÍDIA — JS: upload, listagem, exclusão, copiar URL
+================================================================ -->
+<script>
+(function() {
+  'use strict';
+
+  /* ---- Helpers ---- */
+  function midiaUrl(id) { return '/api/media/' + id; }
+
+  function midiaSetProgress(pct, label) {
+    const wrap = document.getElementById('midia-progress-wrap');
+    const bar  = document.getElementById('midia-progress-bar');
+    const lbl  = document.getElementById('midia-progress-label');
+    if (!wrap) return;
+    if (pct === null) { wrap.style.display = 'none'; return; }
+    wrap.style.display = '';
+    if (bar) bar.style.width = pct + '%';
+    if (lbl && label) lbl.textContent = label;
+  }
+
+  function midiaToast(msg, tipo) {
+    if (typeof obaNotify === 'function') { obaNotify(msg, tipo); return; }
+    const t = document.createElement('div');
+    t.textContent = msg;
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:' +
+      (tipo === 'erro' ? '#dc2626' : '#16a34a') +
+      ';color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;z-index:9999;box-shadow:0 4px 16px #0003;pointer-events:none';
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+  }
+
+  /* ---- Renderiza um card de mídia ---- */
+  function midiaRenderCard(item) {
+    const id  = item.media_id;
+    const url = midiaUrl(id);
+    const kb  = item.size_bytes ? Math.round(item.size_bytes / 1024) + ' KB' : '';
+    const dt  = item.created_at ? new Date(item.created_at).toLocaleDateString('pt-BR') : '';
+
+    const card = document.createElement('div');
+    card.dataset.mediaId = id;
+    card.style.cssText = 'border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;display:flex;flex-direction:column;transition:box-shadow 0.15s';
+
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = id;
+    img.style.cssText = 'width:100%;height:110px;object-fit:contain;background:#fafafa;display:block;padding:6px;box-sizing:border-box';
+    img.onerror = () => { img.style.cssText += ';opacity:0.3'; img.alt = '(sem preview)'; };
+
+    const info = document.createElement('div');
+    info.style.cssText = 'padding:6px 8px;flex:1;display:flex;flex-direction:column;gap:3px';
+
+    const meta = document.createElement('p');
+    meta.style.cssText = 'margin:0;font-size:10px;color:var(--muted);line-height:1.4;word-break:break-all';
+    meta.textContent = [kb, dt].filter(Boolean).join(' · ');
+
+    const btns = document.createElement('div');
+    btns.style.cssText = 'display:flex;gap:5px;margin-top:4px';
+
+    const btnCopiar = document.createElement('button');
+    btnCopiar.type = 'button';
+    btnCopiar.textContent = '📋 Copiar URL';
+    btnCopiar.style.cssText = 'flex:1;padding:5px 6px;font-size:11px;border-radius:7px;border:1px solid var(--line);background:#fff;cursor:pointer;color:var(--text)';
+    btnCopiar.onclick = () => obaCopiarUrlMidia(url, btnCopiar);
+
+    const btnExcluir = document.createElement('button');
+    btnExcluir.type = 'button';
+    btnExcluir.textContent = '🗑';
+    btnExcluir.title = 'Excluir mídia';
+    btnExcluir.style.cssText = 'padding:5px 8px;font-size:12px;border-radius:7px;border:1px solid #fca5a5;background:#fff5f5;color:#dc2626;cursor:pointer';
+    btnExcluir.onclick = () => obaExcluirMidia(id, card);
+
+    btns.appendChild(btnCopiar);
+    btns.appendChild(btnExcluir);
+    info.appendChild(meta);
+    info.appendChild(btns);
+    card.appendChild(img);
+    card.appendChild(info);
+    return card;
+  }
+
+  /* ---- Carrega e renderiza todas as mídias D1 ---- */
+  window.obaCarregarMidias = async function() {
+    const grid  = document.getElementById('midia-grid');
+    const count = document.getElementById('midia-count');
+    if (!grid) return;
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--muted)">Carregando…</div>';
+    try {
+      const resp = await api('/api/media', { cache: 'no-store' });
+      const items = resp?.media || resp?.items || [];
+      grid.innerHTML = '';
+      if (count) count.textContent = items.length + ' imagem' + (items.length !== 1 ? 'ns' : '') + ' na biblioteca';
+      if (!items.length) {
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--muted)">Nenhuma imagem enviada ainda. Use o botão acima para enviar.</div>';
+        return;
+      }
+      items.forEach(item => grid.appendChild(midiaRenderCard(item)));
+    } catch (err) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px;color:#dc2626">Erro ao carregar: ' + String(err.message || err) + '</div>';
+    }
+  };
+
+  /* ---- Faz upload de um arquivo ---- */
+  async function obaUploadArquivo(file, index, total) {
+    if (file.size > 15 * 1024 * 1024) {
+      midiaToast(file.name + ': excede 15 MB, ignorado.', 'erro');
+      return null;
+    }
+    midiaSetProgress(Math.round((index / total) * 90), 'Enviando ' + (index + 1) + ' de ' + total + ': ' + file.name);
+
+    let compressed;
+    try { compressed = await obaCompressImage(file, 1200, 0.88); }
+    catch (_) { compressed = file; }
+
+    const b64 = await new Promise((res, rej) => {
+      const reader = new FileReader();
+      reader.onload  = () => res(reader.result.split(',')[1]);
+      reader.onerror = rej;
+      const blob = (compressed instanceof Blob) ? compressed : new Blob([compressed], { type: file.type });
+      reader.readAsDataURL(blob);
+    });
+
+    return await api('/api/media/upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data: b64, mime: file.type, name: file.name })
+    });
+  }
+
+  window.obaUploadMidia = async function(files) {
+    if (!files || !files.length) return;
+    const arr = Array.from(files);
+    midiaSetProgress(0, 'Preparando upload…');
+    let ok = 0;
+    for (let i = 0; i < arr.length; i++) {
+      try {
+        const r = await obaUploadArquivo(arr[i], i, arr.length);
+        if (r && (r.ok || r.path || r.media_id)) ok++;
+        else midiaToast('Falha ao enviar ' + arr[i].name, 'erro');
+      } catch (err) {
+        midiaToast('Erro em ' + arr[i].name + ': ' + String(err.message || err), 'erro');
+      }
+    }
+    midiaSetProgress(100, 'Concluído!');
+    setTimeout(() => midiaSetProgress(null), 1500);
+    if (ok > 0) {
+      midiaToast(ok + ' imagem' + (ok > 1 ? 'ns' : '') + ' enviada' + (ok > 1 ? 's' : '') + ' com sucesso!', 'ok');
+      await obaCarregarMidias();
+    }
+  };
+
+  /* ---- Exclui mídia ---- */
+  window.obaExcluirMidia = async function(id, cardEl) {
+    if (!confirm('Excluir esta mídia permanentemente?')) return;
+    try {
+      const resp = await api('/api/media/' + id, { method: 'DELETE' });
+      if (resp?.ok) {
+        cardEl?.remove();
+        midiaToast('Mídia excluída.', 'ok');
+        const count = document.getElementById('midia-count');
+        const grid  = document.getElementById('midia-grid');
+        if (grid && count) {
+          const n = grid.querySelectorAll('[data-media-id]').length;
+          count.textContent = n + ' imagem' + (n !== 1 ? 'ns' : '') + ' na biblioteca';
+        }
+      } else {
+        midiaToast('Não foi possível excluir: ' + (resp?.error || 'erro desconhecido'), 'erro');
+      }
+    } catch (err) {
+      midiaToast('Erro ao excluir: ' + String(err.message || err), 'erro');
+    }
+  };
+
+  /* ---- Copia URL para área de transferência ---- */
+  window.obaCopiarUrlMidia = async function(url, btn) {
+    try {
+      await navigator.clipboard.writeText(url);
+      const orig = btn.textContent;
+      btn.textContent = '✅ Copiado!';
+      btn.style.background = '#f0fdf4';
+      setTimeout(() => { btn.textContent = orig; btn.style.background = '#fff'; }, 1800);
+    } catch (_) {
+      const ta = document.createElement('textarea');
+      ta.value = url; ta.style.cssText = 'position:fixed;opacity:0';
+      document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); ta.remove();
+      btn.textContent = '✅ Copiado!';
+      setTimeout(() => { btn.textContent = '📋 Copiar URL'; }, 1800);
+    }
+  };
+
+  /* ---- Drag & Drop ---- */
+  function initDropzone() {
+    const zone  = document.getElementById('midia-dropzone');
+    const input = document.getElementById('midia-file-input');
+    if (!zone || !input) return;
+    input.addEventListener('change', () => { if (input.files?.length) obaUploadMidia(input.files); input.value = ''; });
+    zone.addEventListener('dragover',  e => { e.preventDefault(); zone.style.background = '#fef3c7'; zone.style.borderColor = '#d97706'; });
+    zone.addEventListener('dragleave', () => { zone.style.background = '#fdf8f3'; zone.style.borderColor = 'var(--brand)'; });
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.style.background = '#fdf8f3'; zone.style.borderColor = 'var(--brand)';
+      if (e.dataTransfer?.files?.length) obaUploadMidia(e.dataTransfer.files);
+    });
+  }
+
+  /* ---- Integração com abas ---- */
+  document.addEventListener('DOMContentLoaded', () => {
+    initDropzone();
+    document.querySelectorAll('.tab[data-tab="midia"]').forEach(btn => {
+      btn.addEventListener('click', () => setTimeout(obaCarregarMidias, 50));
+    });
+  });
+
+})();
+</script>
+<!-- FIM ABA MÍDIA -->
+
 <!-- =========================================================
      FASE 7C.2B - UX OPERACIONAL SIMPLIFICADA
      Camada aditiva: preserva CRUD e contratos existentes.

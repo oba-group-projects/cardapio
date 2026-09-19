@@ -1954,6 +1954,22 @@ async function obaHandleMediaServe(request, env, url) {
 }
 
 async function obaHandleMediaApi(request, env, url) {
+  // DELETE /api/media/:id — exclusão de mídia
+  if (url.pathname.startsWith("/api/media/") && request.method === "DELETE") {
+    const mediaId = url.pathname.slice("/api/media/".length).trim();
+    if (!mediaId || mediaId === "upload" || mediaId === "github") {
+      return obaApiJson({ ok: false, error: "media_id_required" }, 400);
+    }
+    try {
+      const row = await env.DB.prepare("SELECT media_id FROM catalog_media WHERE media_id = ?").bind(mediaId).first();
+      if (!row) return obaApiJson({ ok: false, error: "media_not_found" }, 404);
+      await env.DB.prepare("DELETE FROM catalog_media WHERE media_id = ?").bind(mediaId).run();
+      return obaApiJson({ ok: true, deleted: mediaId });
+    } catch (err) {
+      return obaApiJson({ ok: false, error: String(err) }, 500);
+    }
+  }
+
   if (
     url.pathname !== "/api/media" &&
     url.pathname !== "/api/media/upload" &&
@@ -1986,11 +2002,13 @@ async function obaHandleMediaApi(request, env, url) {
       return obaApiJson({ ok: false, error: "invalid_json_body" }, 400);
     }
 
-    if (!body || !body.base64) {
+    if (!body || (!body.base64 && !body.data)) {
       return obaApiJson({ ok: false, error: "base64_data_required" }, 400);
     }
 
-    const cleanBase64 = String(body.base64).replace(/^data:image\/[a-zA-Z0-9+]+;base64,/, "").trim();
+    // aceita tanto body.base64 (legado) quanto body.data (aba Mídia)
+    const rawData = body.base64 || body.data || "";
+    const cleanBase64 = String(rawData).replace(/^data:image\/[a-zA-Z0-9+]+;base64,/, "").trim();
     if (cleanBase64.length < 10) {
       return obaApiJson({ ok: false, error: "base64_too_short" }, 400);
     }
@@ -1999,9 +2017,9 @@ async function obaHandleMediaApi(request, env, url) {
       return obaApiJson({ ok: false, error: "image_too_large_max_1mb" }, 413);
     }
 
-    let mimeType = String(body.mime_type || "").toLowerCase();
-    if (!mimeType && body.fileName) {
-      const ext = String(body.fileName).split(".").pop().toLowerCase();
+    let mimeType = String(body.mime_type || body.mime || "").toLowerCase();
+    if (!mimeType && (body.fileName || body.name)) {
+      const ext = String(body.fileName || body.name).split(".").pop().toLowerCase();
       if (ext === "jpg" || ext === "jpeg") mimeType = "image/jpeg";
       else if (ext === "png") mimeType = "image/png";
       else if (ext === "webp") mimeType = "image/webp";
@@ -2282,6 +2300,12 @@ const obaDraftResponse =
 
     if (obaCatalogReadResponse) {
       return obaCatalogReadResponse;
+    }
+
+    // Rotas de mídia autenticadas (upload POST + DELETE)
+    if (url.pathname.startsWith("/api/media") || url.pathname === "/api/upload-image") {
+      const obaMediaResponse = await obaHandleMediaApi(request, env, url);
+      if (obaMediaResponse) return obaMediaResponse;
     }
 
 return json(
