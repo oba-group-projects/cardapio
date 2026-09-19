@@ -993,7 +993,40 @@ async function obaPreparePreview(){
 
 function msg(t,tipo='ok'){const b=$('mensagem');b.textContent=t;b.className=tipo==='ok'?'okbox':'errbox';b.style.display='block';window.scrollTo({top:0,behavior:'smooth'})}
 function td(t,c=''){const x=document.createElement('td');x.textContent=t??'—';if(c)x.className=c;return x}
-function statusTd(x){const ok=x.ativo!==false&&x.disponivel!==false;return td(ok?'Disponível':'Arquivado',ok?'ok':'off')}
+
+/* Toggle de status inline — clique no badge muda ativo/disponivel sem abrir editor */
+async function obaToggleStatus(tipo, id, ev) {
+  ev.stopPropagation(); // impede abrir editor ao clicar no badge
+  const item = catalogo[tipo].find(x => String(x.id) === String(id));
+  if (!item) return;
+  const ativo = !(item.ativo !== false && item.disponivel !== false); // inverte
+  const novo = {...item, ativo, disponivel: ativo};
+  const items = catalogo[tipo].map(x => String(x.id) === String(id) ? novo : x);
+  try {
+    const res = await obaSaveDraftWith(tipo, items);
+    catalogo[tipo] = items;
+    renderTudo();
+    addPendencia((ativo ? 'Ativado: ' : 'Inativado: ') + item.nome);
+    msg((ativo ? '✅ Ativado: ' : '⏸ Inativado: ') + item.nome);
+  } catch (err) { msg(String(err.message || err), 'erro'); }
+}
+
+function statusTd(x, tipo) {
+  const ok = x.ativo !== false && x.disponivel !== false;
+  const td = document.createElement('td');
+  const badge = document.createElement('button');
+  badge.type = 'button';
+  badge.textContent = ok ? 'Disponível' : 'Inativo';
+  badge.title = ok ? 'Clique para inativar' : 'Clique para ativar';
+  badge.style.cssText = 'border:0;border-radius:20px;padding:3px 10px;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.15s;' +
+    (ok ? 'background:#d1fae5;color:#065f46' : 'background:#fee2e2;color:#991b1b');
+  badge.onmouseenter = () => badge.style.opacity = '0.75';
+  badge.onmouseleave = () => badge.style.opacity = '1';
+  badge.onclick = (ev) => obaToggleStatus(tipo, x.id, ev);
+  td.appendChild(badge);
+  return td;
+}
+
 function nextOrder(tipo){return Math.max(0,...catalogo[tipo].map(x=>Number(x.ordem)||0))+1}
 
 function slug(s){return String(s||'item').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'item'}
@@ -1053,21 +1086,45 @@ function imageUrl(path){
 }
 
 function imgField(item,tipo){
+  /* Gera campo de imagem com: texto/URL editável + botão Galeria + preview + upload local opcional */
   const wrap=document.createElement('div');wrap.className='field full';
   const l=document.createElement('label');l.textContent='Foto do item';
-  const box=document.createElement('div');box.className='image-box';
-  const cur=document.createElement('input');cur.id='edImagem';cur.type='hidden';cur.value=item.imagem??'';
-  const preview=document.createElement('img');preview.className='preview-img';preview.id='imgPreview';preview.alt='Prévia da imagem';
-  const tools=document.createElement('div');tools.className='image-tools';
+
+  // ID único por entidade para não colidir quando dois editores abrirem
+  const inputId  = 'edImagem';
+  const previewId = 'imgPreview';
+
+  // Input texto (URL ou caminho)
+  const row=document.createElement('div');row.style.cssText='display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:6px';
+  const cur=document.createElement('input');cur.id=inputId;cur.type='text';cur.value=item.imagem??'';
+  cur.placeholder='Images/Sabores_Doces/Cappuccino.jpeg ou URL';cur.style.cssText='flex:1;min-width:180px';
+  const galBtn=document.createElement('button');galBtn.type='button';galBtn.className='secondary';
+  galBtn.textContent='📁 Galeria';galBtn.style.cssText='padding:7px 10px;font-size:12px;white-space:nowrap';
+  galBtn.onclick=()=>window.obaAbrirGaleria(inputId, previewId);
+  row.append(cur,galBtn);
+
+  // Preview da imagem atual
+  const preview=document.createElement('img');preview.id=previewId;preview.alt='Prévia';
+  preview.style.cssText='width:80px;height:64px;object-fit:contain;border:1px solid var(--line);border-radius:8px;background:#fafafa;display:block;margin-bottom:6px';
+  preview.onerror=()=>{preview.style.display='none'};
+  preview.onload=()=>{preview.style.display='block'};
+  if(cur.value) preview.src=imageUrl(cur.value); else preview.style.display='none';
+  cur.addEventListener('input',()=>{if(cur.value){preview.src=imageUrl(cur.value);preview.style.display='block';}else{preview.style.display='none';}});
+
+  // Upload local (opcional — mantém compatibilidade com fluxo existente)
+  const hint=document.createElement('div');hint.className='hint';hint.style.marginBottom='4px';
+  hint.textContent='Use a Galeria para escolher imagens do repositório ou mídias enviadas. Ou escolha um arquivo local para fazer upload:';
   const file=document.createElement('input');file.id='edImagemFile';file.type='file';file.accept='.jpg,.jpeg,.png,.webp';
-  const hint=document.createElement('div');hint.className='hint';hint.textContent='Clique em "Escolher arquivo" para trocar a foto (redimensionada automaticamente para alta velocidade).';
-  const path=document.createElement('div');path.className='image-path';path.textContent=cur.value?'Arquivo atual: '+cur.value:'Nenhuma imagem cadastrada';
-  const err=document.createElement('div');err.className='image-error';err.textContent='A foto atual não foi encontrada. Você pode escolher uma nova imagem.';
-  preview.onerror=()=>{err.style.display='block';preview.style.display='none'};
-  preview.onload=()=>{err.style.display='none';preview.style.display='block'};
-  if(cur.value)preview.src=imageUrl(cur.value);else preview.style.display='none';
-  file.addEventListener('change',()=>{const f=file.files?.[0];if(!f)return;err.style.display='none';preview.style.display='block';preview.src=URL.createObjectURL(f);path.textContent='Nova foto selecionada: '+f.name});
-  tools.append(file,hint,path,err);box.append(preview,tools);wrap.append(l,cur,box);return wrap;
+  file.addEventListener('change',()=>{
+    const f=file.files?.[0];if(!f)return;
+    cur.value='';preview.src=URL.createObjectURL(f);preview.style.display='block';
+  });
+
+  // Input hidden legado — mantém compatibilidade com salvarEditor
+  const hidden=document.createElement('input');hidden.type='hidden';hidden.id='edImagemHidden';hidden.value=item.imagem??'';
+
+  wrap.append(l,preview,row,hint,file,hidden);
+  return wrap;
 }
 
 function field(id,label,value,type='text',full=false){
@@ -1200,7 +1257,9 @@ function abrirEditor(tipo,id=null,duplicar=false){
     $('editorTitulo').textContent=novo?'Novo opcional':'Editar opcional';
     box.append(field('edNome','Nome',duplicar?(item.nome+' - cópia'):item.nome,'text',true));
     box.append(field('edPreco','Preço (R$)',Number(item.preco??0).toFixed(2),'number'));
-    box.append(field('edOrdem','Ordem',item.ordem??nextOrder(tipo),'number'));box.append(checks(item));
+    box.append(field('edOrdem','Ordem',item.ordem??nextOrder(tipo),'number'));
+    box.append(imgField(item,tipo));
+    box.append(checks(item));
   }
   if(tipo==='combos'){
     $('editorTitulo').textContent=novo?'Novo combo':'Editar combo';
@@ -1247,9 +1306,17 @@ async function salvarEditor(){
   item.ativo=$('edAtivo').checked;item.disponivel=$('edDisponivel').checked;
   if(!item.nome)throw new Error('Nome obrigatório.');
 
-  if(['flavors','products','combos'].includes(tipo)){
+  if(['flavors','products','combos','options'].includes(tipo)){
     item.imagem=await uploadSeNecessario(tipo,item);
-    if(!item.imagem&&$('edImagem'))item.imagem=$('edImagem').value.trim();
+    // Se não houve upload de arquivo, usa o valor do input texto (URL/path da galeria)
+    if(!item.imagem){
+      const inp=$('edImagem');
+      item.imagem=inp?inp.value.trim():'';
+    }
+    if(!item.imagem){
+      const hidden=$('edImagemHidden');
+      if(hidden)item.imagem=hidden.value.trim();
+    }
   }
 
   const items=novo?[...catalogo[tipo],item]:catalogo[tipo].map(x=>String(x.id)===String(id)?item:x);
@@ -1282,13 +1349,13 @@ function renderTudo(){
   for(const t of ['flavors','categories','boxes','products','options','combos']){bodies[t]=$('body-'+t);bodies[t].replaceChildren()}
 
   catalogo.flavors.filter(x=>(!termo||String(x.nome).toLowerCase().includes(termo))&&(!cat||String(x.categoriaId)===cat)).forEach(x=>{
-    const tr=document.createElement('tr');tr.dataset.editable='1';tr.onclick=()=>abrirEditor('flavors',x.id);tr.append(td(x.nome),td(cats.get(String(x.categoriaId))||x.categoriaId),td(moeda(x.preco)),td(x.imagem||'—','hide-mobile'),statusTd(x));bodies.flavors.append(tr)
+    const tr=document.createElement('tr');tr.dataset.editable='1';tr.onclick=()=>abrirEditor('flavors',x.id);tr.append(td(x.nome),td(cats.get(String(x.categoriaId))||x.categoriaId),td(moeda(x.preco)),td(x.imagem||'—','hide-mobile'),statusTd(x,'flavors'));bodies.flavors.append(tr)
   });
-  catalogo.categories.forEach(x=>{const tr=document.createElement('tr');tr.dataset.editable='1';tr.onclick=()=>abrirEditor('categories',x.id);tr.append(td(x.nome),td(x.precoReferencia==null?'—':moeda(x.precoReferencia)),td(x.ordem),statusTd(x));bodies.categories.append(tr)});
-  catalogo.boxes.forEach(x=>{const tr=document.createElement('tr');tr.dataset.editable='1';tr.onclick=()=>abrirEditor('boxes',x.id);tr.append(td(x.nome),td(x.capacidade),td(x.maxSabores),td(x.precoFixo==null?'—':moeda(x.precoFixo)),statusTd(x));bodies.boxes.append(tr)});
-  catalogo.products.forEach(x=>{const tr=document.createElement('tr');tr.dataset.editable='1';tr.onclick=()=>abrirEditor('products',x.id);tr.append(td(x.nome),td(x.tipo),td(moeda(x.preco)),td(x.imagem||'—','hide-mobile'),statusTd(x));bodies.products.append(tr)});
-  catalogo.options.forEach(x=>{const tr=document.createElement('tr');tr.dataset.editable='1';tr.onclick=()=>abrirEditor('options',x.id);tr.append(td(x.nome),td(moeda(x.preco)),td(x.ordem),statusTd(x));bodies.options.append(tr)});
-  catalogo.combos.forEach(x=>{const tr=document.createElement('tr');tr.dataset.editable='1';tr.onclick=()=>abrirEditor('combos',x.id);tr.append(td(x.nome),td(moeda(x.preco)),td(x.imagem||'—'),statusTd(x));bodies.combos.append(tr)});
+  catalogo.categories.forEach(x=>{const tr=document.createElement('tr');tr.dataset.editable='1';tr.onclick=()=>abrirEditor('categories',x.id);tr.append(td(x.nome),td(x.precoReferencia==null?'—':moeda(x.precoReferencia)),td(x.ordem),statusTd(x,'categories'));bodies.categories.append(tr)});
+  catalogo.boxes.forEach(x=>{const tr=document.createElement('tr');tr.dataset.editable='1';tr.onclick=()=>abrirEditor('boxes',x.id);tr.append(td(x.nome),td(x.capacidade),td(x.maxSabores),td(x.precoFixo==null?'—':moeda(x.precoFixo)),statusTd(x,'boxes'));bodies.boxes.append(tr)});
+  catalogo.products.forEach(x=>{const tr=document.createElement('tr');tr.dataset.editable='1';tr.onclick=()=>abrirEditor('products',x.id);tr.append(td(x.nome),td(x.tipo),td(moeda(x.preco)),td(x.imagem||'—','hide-mobile'),statusTd(x,'products'));bodies.products.append(tr)});
+  catalogo.options.forEach(x=>{const tr=document.createElement('tr');tr.dataset.editable='1';tr.onclick=()=>abrirEditor('options',x.id);tr.append(td(x.nome),td(moeda(x.preco)),td(x.ordem),statusTd(x,'options'));bodies.options.append(tr)});
+  catalogo.combos.forEach(x=>{const tr=document.createElement('tr');tr.dataset.editable='1';tr.onclick=()=>abrirEditor('combos',x.id);tr.append(td(x.nome),td(moeda(x.preco)),td(x.imagem||'—'),statusTd(x,'combos'));bodies.combos.append(tr)});
 }
 
 async function carregar(){
