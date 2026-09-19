@@ -1,0 +1,45 @@
+[
+  {
+    "ativo": true,
+    "disponivel": true,
+    "id": "tradicionais-1",
+    "nome": "Tradicionais I",
+    "ordem": 10,
+    "precoReferencia": 2.5
+  },
+  {
+    "ativo": true,
+    "id": "tradicionais-2",
+    "nome": "Tradicionais II",
+    "ordem": 20,
+    "precoReferencia": 2.6
+  },
+  {
+    "ativo": true,
+    "id": "classicos",
+    "nome": "Clássicos",
+    "ordem": 30,
+    "precoReferencia": 2.75
+  },
+  {
+    "ativo": true,
+    "id": "especiais-1",
+    "nome": "Especiais I",
+    "ordem": 40,
+    "precoReferencia": 3
+  },
+  {
+    "ativo": true,
+    "id": "especiais-2",
+    "nome": "Especiais II",
+    "ordem": 50,
+    "precoReferencia": 3.5
+  },
+  {
+    "ativo": true,
+    "id": "especiais-3",
+    "nome": "Especiais III",
+    "ordem": 60,
+    "precoReferencia": 4
+  }
+]
