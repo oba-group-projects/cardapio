@@ -100,9 +100,10 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
         <div class="field full"><label>Logo (caminho ou URL da imagem)</label>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <input id="pg1-logo" placeholder="Images/Logo_Oba/logo-vertical.png" style="flex:1;min-width:200px">
+            <button type="button" class="secondary" style="padding:7px 10px;font-size:12px;white-space:nowrap" onclick="obaAbrirGaleria('pg1-logo','pg1-logo-preview')">📁 Galeria</button>
             <img id="pg1-logo-preview" src="" alt="preview" onerror="this.style.display='none'" style="width:80px;height:60px;object-fit:contain;border:1px solid var(--line);border-radius:8px;display:none">
           </div>
-          <span class="hint">Use o caminho relativo ou a URL de uma mídia já enviada.</span>
+          <span class="hint">Use o caminho relativo, uma URL externa ou escolha da galeria de mídias.</span>
         </div>
         <div class="field full">
           <label>Tamanho da logo</label>
@@ -139,8 +140,16 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
 
         <div style="grid-column:1/-1"><p class="oba-secao-titulo">🔤 Tipografia desta página <span class="hint">(vazio = usa o Tema Global)</span></p></div>
         <div class="field">
-          <label>Tamanho do título <span class="hint">px — ex: 28</span></label>
-          <input id="pg1-tamTitulo" placeholder="Tema global" maxlength="4" style="max-width:120px">
+          <label>Tamanho do título</label>
+          <select id="pg1-tamTitulo">
+            <option value="">Tema global</option>
+            <option value="14">Pequeno (14px)</option>
+            <option value="18">Médio (18px)</option>
+            <option value="22">Grande (22px)</option>
+            <option value="28">Extra grande (28px)</option>
+            <option value="34">Destaque (34px)</option>
+            <option value="40">Máximo (40px)</option>
+          </select>
         </div>
         <div class="field">
           <label>Peso do título</label>
@@ -174,6 +183,7 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
         <div class="field full"><label>Logo (caminho ou URL da imagem)</label>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <input id="pg2-logo" placeholder="Images/Logo_Oba/logo-circular.png" style="flex:1;min-width:200px">
+            <button type="button" class="secondary" style="padding:7px 10px;font-size:12px;white-space:nowrap" onclick="obaAbrirGaleria('pg2-logo','pg2-logo-preview')">📁 Galeria</button>
             <img id="pg2-logo-preview" src="" alt="preview" onerror="this.style.display='none'" style="width:80px;height:60px;object-fit:contain;border:1px solid var(--line);border-radius:8px;display:none">
           </div>
         </div>
@@ -221,8 +231,16 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
 
         <div style="grid-column:1/-1"><p class="oba-secao-titulo">🔤 Tipografia desta página <span class="hint">(vazio = usa o Tema Global)</span></p></div>
         <div class="field">
-          <label>Tamanho do título <span class="hint">px — ex: 16</span></label>
-          <input id="pg2-tamTitulo" placeholder="Tema global" maxlength="4" style="max-width:120px">
+          <label>Tamanho do título</label>
+          <select id="pg2-tamTitulo">
+            <option value="">Tema global</option>
+            <option value="12">Pequeno (12px)</option>
+            <option value="14">Médio (14px)</option>
+            <option value="16">Grande (16px)</option>
+            <option value="20">Extra grande (20px)</option>
+            <option value="24">Destaque (24px)</option>
+            <option value="28">Máximo (28px)</option>
+          </select>
         </div>
         <div class="field">
           <label>Peso do título</label>
@@ -254,6 +272,7 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
         <div class="field full"><label>Logo (caminho ou URL)</label>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <input id="pg3-logo" placeholder="Images/Logo_Oba/logo-horizontal.png" style="flex:1;min-width:200px">
+            <button type="button" class="secondary" style="padding:7px 10px;font-size:12px;white-space:nowrap" onclick="obaAbrirGaleria('pg3-logo','pg3-logo-preview')">📁 Galeria</button>
             <img id="pg3-logo-preview" src="" alt="preview" onerror="this.style.display='none'" style="width:80px;height:60px;object-fit:contain;border:1px solid var(--line);border-radius:8px;display:none">
           </div>
         </div>
@@ -309,8 +328,15 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
 
         <div style="grid-column:1/-1"><p class="oba-secao-titulo">🔤 Tipografia desta página <span class="hint">(vazio = usa o Tema Global)</span></p></div>
         <div class="field">
-          <label>Tamanho do subtítulo <span class="hint">px — ex: 13</span></label>
-          <input id="pg3-tamSubtitulo" placeholder="Tema global" maxlength="4" style="max-width:120px">
+          <label>Tamanho do subtítulo</label>
+          <select id="pg3-tamSubtitulo">
+            <option value="">Tema global</option>
+            <option value="9">Mínimo (9px)</option>
+            <option value="11">Pequeno (11px)</option>
+            <option value="13">Médio (13px)</option>
+            <option value="15">Grande (15px)</option>
+            <option value="18">Extra grande (18px)</option>
+          </select>
         </div>
         <div class="field">
           <label>Peso do subtítulo</label>
@@ -325,8 +351,15 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
         </div>
 
         <div class="field">
-          <label>Tamanho dos labels de botão <span class="hint">px — ex: 14</span></label>
-          <input id="pg3-tamLabel" placeholder="Tema global" maxlength="4" style="max-width:120px">
+          <label>Tamanho dos labels de botão</label>
+          <select id="pg3-tamLabel">
+            <option value="">Tema global</option>
+            <option value="10">Mínimo (10px)</option>
+            <option value="12">Pequeno (12px)</option>
+            <option value="14">Médio (14px)</option>
+            <option value="16">Grande (16px)</option>
+            <option value="18">Extra grande (18px)</option>
+          </select>
         </div>
         <div class="field">
           <label>Peso dos labels de botão</label>
@@ -339,8 +372,15 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
           </select>
         </div>
         <div class="field">
-          <label>Tamanho dos sublabels de botão <span class="hint">px — ex: 9</span></label>
-          <input id="pg3-tamSublabel" placeholder="Tema global" maxlength="4" style="max-width:120px">
+          <label>Tamanho dos sublabels de botão</label>
+          <select id="pg3-tamSublabel">
+            <option value="">Tema global</option>
+            <option value="8">Mínimo (8px)</option>
+            <option value="9">Pequeno (9px)</option>
+            <option value="10">Médio (10px)</option>
+            <option value="11">Grande (11px)</option>
+            <option value="12">Extra grande (12px)</option>
+          </select>
         </div>
         <div class="field">
           <label>Peso dos sublabels de botão</label>
@@ -679,6 +719,22 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
 <!-- /FASE 9B -->
 
 </main>
+
+<!-- ================================================================
+     FASE 11D — MINI-MODAL DE GALERIA DE MÍDIAS
+================================================================ -->
+<dialog id="modal-galeria-midia" style="border:0;border-radius:15px;padding:0;max-width:700px;width:calc(100% - 24px);box-shadow:0 18px 60px #0003">
+  <div style="padding:20px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h2 style="margin:0;font-size:16px;color:var(--text)">📁 Escolher imagem da galeria</h2>
+      <button class="secondary" type="button" id="fecharGaleriaBtn" style="padding:6px 10px">✕</button>
+    </div>
+    <p class="hint" style="margin:0 0 12px">Clique em uma imagem para selecioná-la. Para adicionar novas imagens, use a aba <b>Mídia</b>.</p>
+    <div id="galeria-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;max-height:400px;overflow-y:auto;border:1px solid var(--line);border-radius:9px;padding:10px;background:#fafafa">
+      <div id="galeria-loading" style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted)">Carregando imagens...</div>
+    </div>
+  </div>
+</dialog>
 
 <dialog id="editor"><form class="modal" id="formEditor"><h2 id="editorTitulo">Editar</h2><div id="editorCampos" class="grid"></div><div class="actions"><button class="danger" type="button" id="arquivarBtn">Arquivar</button><button class="secondary" type="button" id="duplicarBtn">Duplicar</button><button class="secondary" type="button" id="cancelarBtn">Cancelar</button><button class="primary" type="submit">Salvar</button></div></form></dialog>
 
@@ -1698,10 +1754,11 @@ $('formConfig').onsubmit=async e=>{
     const pmod=$('tema-pesoModal');if(pmod)pmod.value=tm.pesoModal||temaDefault.pesoModal;
     const pp=$('tema-pesoPreco');if(pp)pp.value=tm.pesoPreco||temaDefault.pesoPreco;
     /* Tipografia por página */
-    obaSetVal('pg1-tamTitulo',bv.tamTitulo||'');obaSetSelect('pg1-pesoTitulo',bv.pesoTitulo,'');
-    obaSetVal('pg2-tamTitulo',ne.tamTitulo||'');obaSetSelect('pg2-pesoTitulo',ne.pesoTitulo,'');
-    obaSetVal('pg3-tamSubtitulo',mp.tamSubtitulo||'');obaSetSelect('pg3-pesoSubtitulo',mp.pesoSubtitulo,'');
-    obaSetVal('pg3-tamLabel',mp.tamLabel||'');obaSetVal('pg3-tamSublabel',mp.tamSublabel||'');
+    obaSetSelect('pg1-tamTitulo',bv.tamTitulo,'');obaSetSelect('pg1-pesoTitulo',bv.pesoTitulo,'');
+    obaSetSelect('pg2-tamTitulo',ne.tamTitulo,'');obaSetSelect('pg2-pesoTitulo',ne.pesoTitulo,'');
+    obaSetSelect('pg3-tamSubtitulo',mp.tamSubtitulo,'');obaSetSelect('pg3-pesoSubtitulo',mp.pesoSubtitulo,'');
+    obaSetSelect('pg3-tamLabel',mp.tamLabel,'');obaSetSelect('pg3-tamSublabel',mp.tamSublabel,'');
+    obaSetSelect('pg3-pesoLabel',mp.pesoLabel,'');obaSetSelect('pg3-pesoSublabel',mp.pesoSublabel,'');
     obaSetSelect('pg3-pesoLabel',mp.pesoLabel,'');obaSetSelect('pg3-pesoSublabel',mp.pesoSublabel,'');
     /* Variantes */
     obaRenderizarVariantes(t.variante||'classica');
@@ -1755,7 +1812,7 @@ $('formConfig').onsubmit=async e=>{
           botaoCTA:$('pg1-cta')?.value.trim()||'',
           corFundo:$('pg1-corFundo-hex')?.value.trim()||'',
           corTitulo:$('pg1-corTitulo-hex')?.value.trim()||'',
-          tamTitulo:$('pg1-tamTitulo')?.value.trim()||'',
+          tamTitulo:$('pg1-tamTitulo')?.value||'',
           pesoTitulo:$('pg1-pesoTitulo')?.value||'',
           exibirSubtitulo:$('pg1-exibirSubtitulo')?.checked!==false,
           exibirCTA:$('pg1-exibirCTA')?.checked!==false
@@ -1769,7 +1826,7 @@ $('formConfig').onsubmit=async e=>{
           corFundo:$('pg2-corFundo-hex')?.value.trim()||'',
           corTitulo:$('pg2-corTitulo-hex')?.value.trim()||'',
           corTexto:$('pg2-corTexto-hex')?.value.trim()||'',
-          tamTitulo:$('pg2-tamTitulo')?.value.trim()||'',
+          tamTitulo:$('pg2-tamTitulo')?.value||'',
           pesoTitulo:$('pg2-pesoTitulo')?.value||'',
           exibirCitacao:$('pg2-exibirCitacao')?.checked!==false,
           exibirSeparador:$('pg2-exibirSeparador')?.checked!==false
@@ -1780,10 +1837,10 @@ $('formConfig').onsubmit=async e=>{
           subtitulo:$('pg3-subtitulo')?.value.trim()||'',
           corFundo:$('pg3-corFundo-hex')?.value.trim()||'',
           corSubtitulo:$('pg3-corSubtitulo-hex')?.value.trim()||'',
-          tamSubtitulo:$('pg3-tamSubtitulo')?.value.trim()||'',
+          tamSubtitulo:$('pg3-tamSubtitulo')?.value||'',
           pesoSubtitulo:$('pg3-pesoSubtitulo')?.value||'',
-          tamLabel:$('pg3-tamLabel')?.value.trim()||'',
-          tamSublabel:$('pg3-tamSublabel')?.value.trim()||'',
+          tamLabel:$('pg3-tamLabel')?.value||'',
+          tamSublabel:$('pg3-tamSublabel')?.value||'',
           pesoLabel:$('pg3-pesoLabel')?.value||'',
           pesoSublabel:$('pg3-pesoSublabel')?.value||'',
           botoes:obaLerBotoesMenu()
@@ -2356,6 +2413,70 @@ $('publicarBtn').onclick=()=>{
 $('publicarBtn').textContent='Publicar apos Preview';;
 
 carregar().catch(e=>msg(String(e.message||e),'erro'));
+
+/* ================================================================
+   FASE 11D — GALERIA DE MÍDIAS
+================================================================ */
+(function(){
+  let _galeriaCampoId = null;
+  let _galeriaPreviewId = null;
+  const modalGaleria = document.getElementById('modal-galeria-midia');
+  const fecharBtn = document.getElementById('fecharGaleriaBtn');
+  if(fecharBtn) fecharBtn.onclick = () => modalGaleria?.close();
+  modalGaleria?.addEventListener('click', e => { if(e.target===modalGaleria) modalGaleria.close(); });
+
+  window.obaAbrirGaleria = async function(campoId, previewId) {
+    _galeriaCampoId  = campoId;
+    _galeriaPreviewId = previewId;
+    const grid = document.getElementById('galeria-grid');
+    if(grid) grid.innerHTML = '<div id="galeria-loading" style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted)">Carregando imagens...</div>';
+    modalGaleria?.showModal();
+    try {
+      const resp = await api('/api/media', {cache:'no-store'});
+      const items = resp?.items || resp?.media || [];
+      if(grid){
+        grid.innerHTML = '';
+        if(!items.length){
+          grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:16px;color:var(--muted)">Nenhuma imagem encontrada. Use a aba <b>Mídia</b> para fazer upload.</p>';
+          return;
+        }
+        items.forEach(item => {
+          const url = item.url || (item.id ? '/api/media/' + item.id : '');
+          if(!url) return;
+          const card = document.createElement('div');
+          card.style.cssText = 'cursor:pointer;border:2px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;transition:border-color 0.15s';
+          card.onmouseenter = () => card.style.borderColor = 'var(--brand)';
+          card.onmouseleave = () => card.style.borderColor = 'var(--line)';
+          const img = document.createElement('img');
+          img.src = url;
+          img.alt = item.name || '';
+          img.style.cssText = 'width:100%;height:80px;object-fit:contain;background:#fafafa;display:block;padding:4px';
+          img.onerror = () => { card.style.display='none'; };
+          const nome = document.createElement('p');
+          nome.textContent = (item.name || url).split('/').pop().substring(0,18);
+          nome.style.cssText = 'margin:0;padding:3px 5px;font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-top:1px solid var(--line)';
+          card.appendChild(img);
+          card.appendChild(nome);
+          card.onclick = () => obaEscolherDaGaleria(url);
+          grid.appendChild(card);
+        });
+      }
+    } catch(err) {
+      if(grid) grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:16px;color:var(--danger)">Erro ao carregar galeria: ' + String(err.message||err) + '</p>';
+    }
+  };
+
+  window.obaEscolherDaGaleria = function(url) {
+    if(!_galeriaCampoId) return;
+    const inp = document.getElementById(_galeriaCampoId);
+    if(inp){ inp.value = url; inp.dispatchEvent(new Event('input')); }
+    if(_galeriaPreviewId){
+      const img = document.getElementById(_galeriaPreviewId);
+      if(img){ img.src = url; img.style.display = ''; }
+    }
+    modalGaleria?.close();
+  };
+})();
 </script>
 <!-- =========================================================
      FASE 7C.2B - UX OPERACIONAL SIMPLIFICADA
