@@ -70,6 +70,21 @@
       font-size: var(--oba-tam-preco, 14px) !important;
       font-weight: var(--oba-peso-preco, 700) !important;
     }
+    /* Toggle de visibilidade de precos */
+    body.oba-precos-ocultos .oba-preco,
+    body.oba-precos-ocultos [data-oba-preco] {
+      display: none !important;
+    }
+    /* Mensagem exibida quando precos estao ocultos */
+    body.oba-precos-ocultos .oba-preco-placeholder {
+      display: block !important;
+    }
+    .oba-preco-placeholder {
+      display: none;
+      font-size: 11px;
+      color: #8B4513;
+      font-style: italic;
+    }
     /* Overrides de tipografia por pÃ¡gina (aplicados via JS quando definidos) */
     .oba-pag1-tipografia-override #oba-pag1-titulo {
       font-size: var(--oba-pag1-tam-titulo) !important;
@@ -1853,7 +1868,8 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
         </p>
 
         <p id="lightbox-degustacao-preco"
-           class="text-xl font-black text-[#8B4513] mt-1">
+           data-oba-preco="1"
+           class="text-xl font-black text-[#8B4513] mt-1 oba-preco">
         </p>
 
       </div>
@@ -1962,7 +1978,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
       </h2>
 
       <p id="mdq-preco"
-         class="text-sm font-bold text-gray-400 mt-1">
+         class="text-sm font-bold text-gray-400 mt-1 oba-preco">
         R$ 0,00 / un
       </p>
 
@@ -2057,7 +2073,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
     <div>
       <h2 id="mck-titulo" class="text-lg font-black text-[#8B4513]">Nome do Kit</h2>
       <p id="mck-desc" class="text-[11px] text-gray-500 mt-1 leading-tight px-2">DescriÃ§Ã£o</p>
-      <p class="text-xl font-black text-[#8B4513] mt-2" id="mck-preco">R$ 0,00</p>
+      <p class="text-xl font-black text-[#8B4513] mt-2 oba-preco" id="mck-preco">R$ 0,00</p>
     </div>
     <!-- Opcionais -->
     <p class="text-[11px] text-amber-800 font-bold bg-amber-50 py-1.5 px-3 rounded-lg">Deseja adicionar detalhes para presente?</p>
@@ -2104,7 +2120,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
     <div>
       <h2 id="mcc-titulo" class="text-lg font-black text-[#8B4513]">Caixa Completa! ðŸŽ‰</h2>
       <p id="mcc-desc" class="text-sm text-gray-500 mt-1">25 doces escolhidos</p>
-      <p class="text-2xl font-black text-[#8B4513] mt-2" id="mcc-valor">R$ 0,00</p>
+      <p class="text-2xl font-black text-[#8B4513] mt-2 oba-preco" id="mcc-valor">R$ 0,00</p>
     </div>
     <div id="mcc-sabores" class="text-left bg-[#FAF5F0] rounded-2xl p-4 text-xs text-gray-600 space-y-1 max-h-32 overflow-y-auto no-scrollbar"></div>
     <div class="flex flex-col gap-2 pt-1">
@@ -2142,7 +2158,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
     <div class="border-t border-[#E8D5B5] pt-4 mt-2 space-y-3">
       <div class="flex justify-between items-center bg-[#FAF5F0] p-4 rounded-xl border border-orange-100">
         <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Total do Pedido:</span>
-        <span class="text-2xl font-black text-[#8B4513]" id="mc-total">R$ 0,00</span>
+        <span class="text-2xl font-black text-[#8B4513] oba-preco" id="mc-total">R$ 0,00</span>
       </div>
       <!-- FormulÃ¡rio â€” aparece quando hÃ¡ itens -->
       <div id="mc-form" class="space-y-2 hidden">
@@ -2669,7 +2685,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
           <div class="space-y-3 pt-1">
             <div class="flex justify-between items-center">
               <span class="text-xs font-bold text-gray-400 uppercase">Valor Geral:</span>
-              <span class="text-2xl font-black text-[#8B4513]" id="valor-total">R$ 0,00</span>
+              <span class="text-2xl font-black text-[#8B4513] oba-preco" id="valor-total">R$ 0,00</span>
             </div>
             <button onclick="verCarrinhoComVerificacao()" class="w-full py-4 bg-[#8B4513] text-white rounded-xl font-bold text-[11px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all">
               <i class="fa-solid fa-basket-shopping"></i> Ver Carrinho e Finalizar
@@ -2847,6 +2863,8 @@ async function carregarConfigModeloMestre() {
     atualizarLinksWhatsApp();
     hidratarBusinessChannelsDoModeloMestre();
     hidratarFormasPagamentoDoModeloMestre();
+    /* R-PRECO: aplica visibilidade de precos conforme config */
+    obaAplicarVisibilidadePrecos();
 
     const endpointPedidos = OBA_CONFIG?.integrations?.orders?.googleSheetsEndpoint;
     if (endpointPedidos) {
@@ -3093,6 +3111,7 @@ function atualizarOpcionaisDoModal() {
     if (ref.preco) {
       ref.preco.textContent =
         '+ ' + formatarMoeda(Number(opcional.preco || 0));
+      ref.preco.classList.add('oba-preco');
     }
 
     if (ref.card) {
@@ -3467,6 +3486,19 @@ hidratarCatalogoDoModeloMestre();
    Carrega theme.json e aplica textos + variÃ¡veis CSS.
    Fallback: mantÃ©m os valores hardcoded no HTML.
    ================================================================ */
+/* ================================================================
+   R-PRECO: Visibilidade global de precos
+   Controlado por OBA_CONFIG.store.exibirPrecos (default: true)
+   ================================================================ */
+function obaAplicarVisibilidadePrecos() {
+  const exibir = OBA_CONFIG?.store?.exibirPrecos !== false;
+  if (exibir) {
+    document.body.classList.remove('oba-precos-ocultos');
+  } else {
+    document.body.classList.add('oba-precos-ocultos');
+  }
+}
+
 async function hidratarTemaDoModeloMestre() {
   try {
     const resp = await fetch('../data/catalog-v1/theme.json', { cache: 'no-store' });
@@ -5248,7 +5280,7 @@ function abrirModalCaixaConcluida() {
     descricao   = `${Object.values(quantidades).reduce((a,b)=>a+b,0)} doces escolhidos`;
     saboresHtml = Object.entries(quantidades).filter(([,q])=>q>0).map(([id,q])=>{
       const d = encontrarDoce(id);
-      return `<div class="flex justify-between"><span>${d?.nome}</span><span class="font-bold">${q}x â€” ${formatarMoeda((d?.preco || 0) * q)}</span></div>`;
+      return `<div class="flex justify-between"><span>${d?.nome}</span><span class="font-bold oba-preco">${q}x â€” ${formatarMoeda((d?.preco || 0) * q)}</span></div>`;
     }).join('');
   }
   document.getElementById('mcc-titulo').innerText = `${caixaAtiva.titulo} ðŸŽ‰`;
@@ -5407,6 +5439,7 @@ function renderizarListaCarrinho() {
   });
   document.getElementById('mc-total').innerText = formatarMoeda(total);
   atualizarBotaoFinalizar();
+  obaAplicarVisibilidadePrecos();
 }
 
 async function alterarQtdCarrinho(i, delta) {
@@ -6691,10 +6724,11 @@ function renderizarKits() {
     grid.innerHTML += `<div class="bg-white rounded-[1.5rem] shadow-sm border border-[#E8D5B5] flex flex-col overflow-hidden hover:border-[#8B4513] transition-all">
       <div class="w-full h-56 sm:h-64 bg-gray-50 border-b border-[#E8D5B5] overflow-hidden"><img src="${kit.img}" class="h-full w-full object-cover" onerror="this.src='https://placehold.co/400x400?text=Oba'" alt="${kit.nome}"></div>
       <div class="p-5 flex flex-col justify-between flex-1">
-        <div><h3 class="font-black text-sm mb-1 text-[#3B2A1E]">${kit.nome}</h3><p class="text-[10px] text-gray-500 leading-tight mb-3 line-clamp-2">${kit.desc}</p><p class="text-sm text-[#8B4513] font-black mb-4">${formatarMoeda(kit.precoFixo)}</p></div>
+        <div><h3 class="font-black text-sm mb-1 text-[#3B2A1E]">${kit.nome}</h3><p class="text-[10px] text-gray-500 leading-tight mb-3 line-clamp-2">${kit.desc}</p><p class="text-sm text-[#8B4513] font-black mb-4 oba-preco">${formatarMoeda(kit.precoFixo)}</p></div>
         <button onclick="abrirModalConfigKit('${kit.id}')" class="w-full py-3 bg-[#8B4513] text-white rounded-xl text-[11px] font-bold uppercase tracking-wider shadow-sm active:scale-95">Configurar Presente</button>
       </div></div>`;
   });
+  obaAplicarVisibilidadePrecos();
 }
 
 // ================================================================
@@ -7044,7 +7078,7 @@ function atualizarPainelLateral() {
         <button onclick="removerDoLateral(${i})" class="absolute top-1 right-2 text-red-500 font-bold text-[10px]">âœ•</button>
         <p class="font-extrabold text-[#8B4513] text-[11px] pr-4">${qtd>1?`${qtd}x `:''}${cx.titulo}</p>
         <p class="text-[10px] text-gray-500 line-clamp-2 mt-0.5 leading-tight">${cx.detalhes}</p>
-        <p class="text-[11px] font-black text-gray-700 mt-1">${formatarMoeda(sub)}</p>
+        <p class="text-[11px] font-black text-gray-700 mt-1 oba-preco">${formatarMoeda(sub)}</p>
       </div>`;
     });
   }
