@@ -1,0 +1,70 @@
+[
+  {
+    "ativo": true,
+    "capacidade": 25,
+    "disponivel": true,
+    "id": "caixa-25",
+    "maxSabores": 7,
+    "nome": "Caixa de 25 Doces",
+    "ordem": 10,
+    "precoFixo": null,
+    "tipo": "montavel"
+  },
+  {
+    "ativo": true,
+    "capacidade": 35,
+    "disponivel": true,
+    "id": "caixa-35",
+    "maxSabores": 7,
+    "nome": "Caixa de 35 Doces",
+    "ordem": 20,
+    "precoFixo": null,
+    "tipo": "montavel"
+  },
+  {
+    "ativo": true,
+    "capacidade": 50,
+    "disponivel": true,
+    "id": "caixa-50",
+    "maxSabores": 10,
+    "nome": "Caixa de 50 Doces",
+    "ordem": 30,
+    "precoFixo": null,
+    "tipo": "montavel"
+  },
+  {
+    "ativo": true,
+    "capacidade": 100,
+    "disponivel": true,
+    "id": "caixa-100",
+    "maxSabores": 14,
+    "nome": "Caixa de 100 Doces",
+    "ordem": 40,
+    "precoFixo": null,
+    "tipo": "montavel"
+  },
+  {
+    "ativo": true,
+    "capacidade": 12,
+    "disponivel": true,
+    "id": "degustacao-12",
+    "imagem": "Images/Caixa_Degustacao/Degustacao_12_Sabores.jpeg",
+    "maxSabores": null,
+    "nome": "Caixa Degustação 12 Sabores",
+    "ordem": 50,
+    "precoFixo": 40,
+    "tipo": "fechada"
+  },
+  {
+    "ativo": true,
+    "capacidade": 25,
+    "disponivel": true,
+    "id": "degustacao-25",
+    "imagem": "Images/Caixa_Degustacao/Degustacao_25_Sabores.jpeg",
+    "maxSabores": null,
+    "nome": "Caixa Degustação 25 Sabores",
+    "ordem": 60,
+    "precoFixo": 75,
+    "tipo": "fechada"
+  }
+]
