@@ -2048,6 +2048,54 @@ async function obaHandleMediaApi(request, env, url) {
   return obaApiJson({ ok: false, error: "method_not_allowed" }, 405);
 }
 
+/* OBA_GITHUB_IMAGES_API_BEGIN */
+
+/*
+ * GET /api/media/github — Lista imagens do repositório GitHub (pasta Images/)
+ * Usa env.GITHUB_PAT para autenticar na GitHub Contents API.
+ * Retorna array de { name, url, path } para exibição na galeria.
+ */
+async function obaHandleGithubImagesApi(request, env, url) {
+  if (url.pathname !== "/api/media/github") return null;
+  if (request.method !== "GET") return obaApiJson({ ok: false, error: "method_not_allowed" }, 405);
+
+  const token = env.GITHUB_PAT;
+  if (!token) return obaApiJson({ ok: false, error: "github_pat_missing" }, 500);
+
+  const repo   = "oba-group-projects/cardapio";
+  const branch = "feature/gestao-online-segura";
+  const folder = "Images";
+
+  async function listarRecursivo(path) {
+    const resp = await fetch(
+      `https://api.github.com/repos/${repo}/contents/${path}?ref=${branch}`,
+      { headers: { "Authorization": `Bearer ${token}`, "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28", "User-Agent": "oba-cardapio-worker" } }
+    );
+    if (!resp.ok) return [];
+    const items = await resp.json();
+    if (!Array.isArray(items)) return [];
+    const result = [];
+    for (const item of items) {
+      if (item.type === "file" && /\.(png|jpe?g|gif|webp|svg)$/i.test(item.name)) {
+        result.push({ name: item.name, path: item.path, url: item.download_url });
+      } else if (item.type === "dir") {
+        const sub = await listarRecursivo(item.path);
+        result.push(...sub);
+      }
+    }
+    return result;
+  }
+
+  try {
+    const images = await listarRecursivo(folder);
+    return obaApiJson({ ok: true, items: images });
+  } catch (err) {
+    return obaApiJson({ ok: false, error: String(err) }, 500);
+  }
+}
+
+/* OBA_GITHUB_IMAGES_API_END */
+
 /* OBA_MEDIA_API_END */
 
 async function obaPrivatePreviewPage(request, env) {
@@ -2176,6 +2224,10 @@ export default {
     }
 
     if (url.pathname.startsWith("/api/")) {
+      const obaGithubImagesResponse =
+        await obaHandleGithubImagesApi(request, env, url);
+      if (obaGithubImagesResponse) return obaGithubImagesResponse;
+
       const obaMediaResponse =
         await obaHandleMediaApi(
           request,

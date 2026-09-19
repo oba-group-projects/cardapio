@@ -164,6 +164,28 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
             <option value="800">800 — Extrabold</option>
           </select>
         </div>
+        <div class="field">
+          <label>Tamanho do subtítulo</label>
+          <select id="pg1-tamSubtitulo">
+            <option value="">Tema global</option>
+            <option value="11">Muito pequeno (11px)</option>
+            <option value="13">Pequeno (13px)</option>
+            <option value="15">Médio (15px)</option>
+            <option value="17">Grande (17px)</option>
+            <option value="20">Extra grande (20px)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Peso do subtítulo</label>
+          <select id="pg1-pesoSubtitulo">
+            <option value="">Tema global</option>
+            <option value="300">300 — Fino</option>
+            <option value="400">400 — Normal</option>
+            <option value="500">500 — Médio</option>
+            <option value="600">600 — Semibold</option>
+            <option value="700">700 — Negrito</option>
+          </select>
+        </div>
 
         <div class="field full actions"><button class="primary" type="submit">Salvar Boas-vindas</button></div>
       </form>
@@ -253,6 +275,47 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
             <option value="600">600 — Semibold</option>
             <option value="700">700 — Negrito</option>
             <option value="800">800 — Extrabold</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Tamanho do texto principal</label>
+          <select id="pg2-tamTexto">
+            <option value="">Tema global</option>
+            <option value="11">Muito pequeno (11px)</option>
+            <option value="13">Pequeno (13px)</option>
+            <option value="15">Médio (15px)</option>
+            <option value="17">Grande (17px)</option>
+            <option value="19">Extra grande (19px)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Peso do texto principal</label>
+          <select id="pg2-pesoTexto">
+            <option value="">Tema global</option>
+            <option value="300">300 — Fino</option>
+            <option value="400">400 — Normal</option>
+            <option value="500">500 — Médio</option>
+            <option value="600">600 — Semibold</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Tamanho da citação</label>
+          <select id="pg2-tamCitacao">
+            <option value="">Tema global</option>
+            <option value="10">Muito pequeno (10px)</option>
+            <option value="12">Pequeno (12px)</option>
+            <option value="13">Médio (13px)</option>
+            <option value="15">Grande (15px)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Peso da citação</label>
+          <select id="pg2-pesoCitacao">
+            <option value="">Tema global</option>
+            <option value="300">300 — Fino</option>
+            <option value="400">400 — Normal</option>
+            <option value="500">500 — Médio</option>
+            <option value="600">600 — Semibold</option>
           </select>
         </div>
 
@@ -723,14 +786,25 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
 <!-- ================================================================
      FASE 11D — MINI-MODAL DE GALERIA DE MÍDIAS
 ================================================================ -->
-<dialog id="modal-galeria-midia" style="border:0;border-radius:15px;padding:0;max-width:700px;width:calc(100% - 24px);box-shadow:0 18px 60px #0003">
+<dialog id="modal-galeria-midia" style="border:0;border-radius:15px;padding:0;max-width:720px;width:calc(100% - 24px);box-shadow:0 18px 60px #0003">
   <div style="padding:20px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
       <h2 style="margin:0;font-size:16px;color:var(--text)">📁 Escolher imagem da galeria</h2>
       <button class="secondary" type="button" id="fecharGaleriaBtn" style="padding:6px 10px">✕</button>
     </div>
-    <p class="hint" style="margin:0 0 12px">Clique em uma imagem para selecioná-la. Para adicionar novas imagens, use a aba <b>Mídia</b>.</p>
-    <div id="galeria-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;max-height:400px;overflow-y:auto;border:1px solid var(--line);border-radius:9px;padding:10px;background:#fafafa">
+    <!-- Abas -->
+    <div id="galeria-tabs" style="display:flex;gap:6px;margin-bottom:12px">
+      <button id="galeria-tab-github" type="button"
+        style="flex:1;padding:8px 12px;border-radius:8px;border:2px solid var(--brand);background:var(--brand);color:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s">
+        📂 GitHub (repositório)
+      </button>
+      <button id="galeria-tab-d1" type="button"
+        style="flex:1;padding:8px 12px;border-radius:8px;border:2px solid var(--line);background:#fff;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s">
+        ☁️ Mídias enviadas
+      </button>
+    </div>
+    <p id="galeria-hint" class="hint" style="margin:0 0 12px">Clique em uma imagem para selecioná-la.</p>
+    <div id="galeria-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;max-height:380px;overflow-y:auto;border:1px solid var(--line);border-radius:9px;padding:10px;background:#fafafa">
       <div id="galeria-loading" style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted)">Carregando imagens...</div>
     </div>
   </div>
@@ -1755,10 +1829,12 @@ $('formConfig').onsubmit=async e=>{
     const pp=$('tema-pesoPreco');if(pp)pp.value=tm.pesoPreco||temaDefault.pesoPreco;
     /* Tipografia por página */
     obaSetSelect('pg1-tamTitulo',bv.tamTitulo,'');obaSetSelect('pg1-pesoTitulo',bv.pesoTitulo,'');
+    obaSetSelect('pg1-tamSubtitulo',bv.tamSubtitulo,'');obaSetSelect('pg1-pesoSubtitulo',bv.pesoSubtitulo,'');
     obaSetSelect('pg2-tamTitulo',ne.tamTitulo,'');obaSetSelect('pg2-pesoTitulo',ne.pesoTitulo,'');
+    obaSetSelect('pg2-tamTexto',ne.tamTexto,'');obaSetSelect('pg2-pesoTexto',ne.pesoTexto,'');
+    obaSetSelect('pg2-tamCitacao',ne.tamCitacao,'');obaSetSelect('pg2-pesoCitacao',ne.pesoCitacao,'');
     obaSetSelect('pg3-tamSubtitulo',mp.tamSubtitulo,'');obaSetSelect('pg3-pesoSubtitulo',mp.pesoSubtitulo,'');
     obaSetSelect('pg3-tamLabel',mp.tamLabel,'');obaSetSelect('pg3-tamSublabel',mp.tamSublabel,'');
-    obaSetSelect('pg3-pesoLabel',mp.pesoLabel,'');obaSetSelect('pg3-pesoSublabel',mp.pesoSublabel,'');
     obaSetSelect('pg3-pesoLabel',mp.pesoLabel,'');obaSetSelect('pg3-pesoSublabel',mp.pesoSublabel,'');
     /* Variantes */
     obaRenderizarVariantes(t.variante||'classica');
@@ -1814,6 +1890,8 @@ $('formConfig').onsubmit=async e=>{
           corTitulo:$('pg1-corTitulo-hex')?.value.trim()||'',
           tamTitulo:$('pg1-tamTitulo')?.value||'',
           pesoTitulo:$('pg1-pesoTitulo')?.value||'',
+          tamSubtitulo:$('pg1-tamSubtitulo')?.value||'',
+          pesoSubtitulo:$('pg1-pesoSubtitulo')?.value||'',
           exibirSubtitulo:$('pg1-exibirSubtitulo')?.checked!==false,
           exibirCTA:$('pg1-exibirCTA')?.checked!==false
         },
@@ -1828,6 +1906,10 @@ $('formConfig').onsubmit=async e=>{
           corTexto:$('pg2-corTexto-hex')?.value.trim()||'',
           tamTitulo:$('pg2-tamTitulo')?.value||'',
           pesoTitulo:$('pg2-pesoTitulo')?.value||'',
+          tamTexto:$('pg2-tamTexto')?.value||'',
+          pesoTexto:$('pg2-pesoTexto')?.value||'',
+          tamCitacao:$('pg2-tamCitacao')?.value||'',
+          pesoCitacao:$('pg2-pesoCitacao')?.value||'',
           exibirCitacao:$('pg2-exibirCitacao')?.checked!==false,
           exibirSeparador:$('pg2-exibirSeparador')?.checked!==false
         },
@@ -2425,45 +2507,76 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
   if(fecharBtn) fecharBtn.onclick = () => modalGaleria?.close();
   modalGaleria?.addEventListener('click', e => { if(e.target===modalGaleria) modalGaleria.close(); });
 
-  window.obaAbrirGaleria = async function(campoId, previewId) {
-    _galeriaCampoId  = campoId;
-    _galeriaPreviewId = previewId;
-    const grid = document.getElementById('galeria-grid');
-    if(grid) grid.innerHTML = '<div id="galeria-loading" style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted)">Carregando imagens...</div>';
-    modalGaleria?.showModal();
-    try {
-      const resp = await api('/api/media', {cache:'no-store'});
-      const items = resp?.items || resp?.media || [];
-      if(grid){
-        grid.innerHTML = '';
-        if(!items.length){
-          grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:16px;color:var(--muted)">Nenhuma imagem encontrada. Use a aba <b>Mídia</b> para fazer upload.</p>';
-          return;
-        }
-        items.forEach(item => {
-          const url = item.url || (item.id ? '/api/media/' + item.id : '');
-          if(!url) return;
-          const card = document.createElement('div');
-          card.style.cssText = 'cursor:pointer;border:2px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;transition:border-color 0.15s';
-          card.onmouseenter = () => card.style.borderColor = 'var(--brand)';
-          card.onmouseleave = () => card.style.borderColor = 'var(--line)';
-          const img = document.createElement('img');
-          img.src = url;
-          img.alt = item.name || '';
-          img.style.cssText = 'width:100%;height:80px;object-fit:contain;background:#fafafa;display:block;padding:4px';
-          img.onerror = () => { card.style.display='none'; };
-          const nome = document.createElement('p');
-          nome.textContent = (item.name || url).split('/').pop().substring(0,18);
-          nome.style.cssText = 'margin:0;padding:3px 5px;font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-top:1px solid var(--line)';
-          card.appendChild(img);
-          card.appendChild(nome);
-          card.onclick = () => obaEscolherDaGaleria(url);
-          grid.appendChild(card);
-        });
-      }
-    } catch(err) {
-      if(grid) grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:16px;color:var(--danger)">Erro ao carregar galeria: ' + String(err.message||err) + '</p>';
+  /* ---- Galeria unificada: GitHub (repositório) + D1 (mídias enviadas) ---- */
+  let _galeriaAbaAtiva = 'github'; // 'github' | 'd1'
+
+  function obaGaleriaRenderCards(grid, items, getUrl) {
+    grid.innerHTML = '';
+    if (!items.length) {
+      grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:16px;color:var(--muted)">Nenhuma imagem encontrada nesta origem.</p>';
+      return;
     }
+    items.forEach(item => {
+      const url = getUrl(item);
+      if (!url) return;
+      const card = document.createElement('div');
+      card.style.cssText = 'cursor:pointer;border:2px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;transition:border-color 0.15s';
+      card.onmouseenter = () => card.style.borderColor = 'var(--brand)';
+      card.onmouseleave = () => card.style.borderColor = 'var(--line)';
+      const img = document.createElement('img');
+      img.src = url;
+      img.alt = item.name || '';
+      img.style.cssText = 'width:100%;height:80px;object-fit:contain;background:#fafafa;display:block;padding:4px';
+      img.onerror = () => { card.style.opacity='0.3'; };
+      const nome = document.createElement('p');
+      nome.textContent = (item.name || url).split('/').pop().substring(0, 18);
+      nome.style.cssText = 'margin:0;padding:3px 5px;font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-top:1px solid var(--line)';
+      card.appendChild(img);
+      card.appendChild(nome);
+      card.onclick = () => obaEscolherDaGaleria(url);
+      grid.appendChild(card);
+    });
+  }
+
+  async function obaGaleriaCarregarAba(aba) {
+    _galeriaAbaAtiva = aba;
+    const tabGh  = document.getElementById('galeria-tab-github');
+    const tabD1  = document.getElementById('galeria-tab-d1');
+    const hint   = document.getElementById('galeria-hint');
+    const grid   = document.getElementById('galeria-grid');
+    // estilos das abas
+    const ATIVO  = 'border:2px solid var(--brand);background:var(--brand);color:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;flex:1;padding:8px 12px;border-radius:8px';
+    const INATIVO = 'border:2px solid var(--line);background:#fff;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;flex:1;padding:8px 12px;border-radius:8px';
+    if (tabGh)  tabGh.style.cssText  = (aba === 'github') ? ATIVO : INATIVO;
+    if (tabD1)  tabD1.style.cssText  = (aba === 'd1')     ? ATIVO : INATIVO;
+    if (grid)   grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted)">Carregando…</div>';
+    if (hint) hint.textContent = aba === 'github'
+      ? 'Imagens do repositório GitHub (pasta Images/). Clique para selecionar.'
+      : 'Imagens enviadas via upload. Para adicionar, use a aba Mídia.';
+    try {
+      if (aba === 'github') {
+        const resp = await api('/api/media/github', { cache: 'no-store' });
+        const items = resp?.items || [];
+        obaGaleriaRenderCards(grid, items, item => item.url || '');
+      } else {
+        const resp = await api('/api/media', { cache: 'no-store' });
+        const items = resp?.items || resp?.media || [];
+        obaGaleriaRenderCards(grid, items, item => item.url || (item.id ? '/api/media/' + item.id : ''));
+      }
+    } catch (err) {
+      if (grid) grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:16px;color:var(--danger)">Erro: ' + String(err.message || err) + '</p>';
+    }
+  }
+
+  // Wiring das abas
+  document.getElementById('galeria-tab-github')?.addEventListener('click', () => obaGaleriaCarregarAba('github'));
+  document.getElementById('galeria-tab-d1')?.addEventListener('click',     () => obaGaleriaCarregarAba('d1'));
+
+  window.obaAbrirGaleria = function(campoId, previewId) {
+    _galeriaCampoId   = campoId;
+    _galeriaPreviewId = previewId;
+    modalGaleria?.showModal();
+    obaGaleriaCarregarAba(_galeriaAbaAtiva); // abre na última aba usada
   };
 
   window.obaEscolherDaGaleria = function(url) {

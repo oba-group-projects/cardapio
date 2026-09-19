@@ -72,9 +72,23 @@
       font-size: var(--oba-pag1-tam-titulo) !important;
       font-weight: var(--oba-pag1-peso-titulo) !important;
     }
+    /* Subtítulo pag1 — override direto */
+    #oba-pag1-subtitulo {
+      font-size: var(--oba-pag1-tam-subtitulo, var(--oba-tam-corpo, 0.875rem)) !important;
+      font-weight: var(--oba-pag1-peso-subtitulo, var(--oba-peso-corpo, 400)) !important;
+    }
     .oba-pag2-tipografia-override #oba-pag2-titulo {
       font-size: var(--oba-pag2-tam-titulo) !important;
       font-weight: var(--oba-pag2-peso-titulo) !important;
+    }
+    /* Texto principal e citação pag2 */
+    #oba-pag2-texto {
+      font-size: var(--oba-pag2-tam-texto, var(--oba-tam-corpo, 13px)) !important;
+      font-weight: var(--oba-pag2-peso-texto, var(--oba-peso-corpo, 400)) !important;
+    }
+    #oba-pag2-citacao {
+      font-size: var(--oba-pag2-tam-citacao, var(--oba-tam-corpo, 0.875rem)) !important;
+      font-weight: var(--oba-pag2-peso-citacao, var(--oba-peso-corpo, 400)) !important;
     }
     .oba-pag3-tipografia-override #oba-pag3-subtitulo {
       font-size: var(--oba-pag3-tam-subtitulo) !important;
@@ -3497,6 +3511,11 @@ async function hidratarTemaDoModeloMestre() {
     } else {
       rootStyle.removeProperty('--oba-pag1-peso-titulo');
     }
+    /* R11E: subtítulo pag1 */
+    if (bv.tamSubtitulo)  rootStyle.setProperty('--oba-pag1-tam-subtitulo', bv.tamSubtitulo + 'px');
+    else                  rootStyle.removeProperty('--oba-pag1-tam-subtitulo');
+    if (bv.pesoSubtitulo) rootStyle.setProperty('--oba-pag1-peso-subtitulo', bv.pesoSubtitulo);
+    else                  rootStyle.removeProperty('--oba-pag1-peso-subtitulo');
 
     /* Visibilidade pag1 */
     const elSub1 = document.getElementById('oba-pag1-subtitulo');
@@ -3539,6 +3558,15 @@ async function hidratarTemaDoModeloMestre() {
     } else {
       rootStyle.removeProperty('--oba-pag2-peso-titulo');
     }
+    /* R11E: texto principal e citação pag2 */
+    if (ne.tamTexto)    rootStyle.setProperty('--oba-pag2-tam-texto', ne.tamTexto + 'px');
+    else                rootStyle.removeProperty('--oba-pag2-tam-texto');
+    if (ne.pesoTexto)   rootStyle.setProperty('--oba-pag2-peso-texto', ne.pesoTexto);
+    else                rootStyle.removeProperty('--oba-pag2-peso-texto');
+    if (ne.tamCitacao)  rootStyle.setProperty('--oba-pag2-tam-citacao', ne.tamCitacao + 'px');
+    else                rootStyle.removeProperty('--oba-pag2-tam-citacao');
+    if (ne.pesoCitacao) rootStyle.setProperty('--oba-pag2-peso-citacao', ne.pesoCitacao);
+    else                rootStyle.removeProperty('--oba-pag2-peso-citacao');
 
     /* Visibilidade pag2 */
     const elCitacao2 = document.getElementById('oba-pag2-citacao');

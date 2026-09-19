@@ -13,6 +13,8 @@
       "corTitulo": "",
       "tamTitulo": "",
       "pesoTitulo": "",
+      "tamSubtitulo": "",
+      "pesoSubtitulo": "",
       "exibirCTA": true,
       "exibirSubtitulo": true
     },
@@ -27,6 +29,10 @@
       "corTexto": "",
       "tamTitulo": "",
       "pesoTitulo": "",
+      "tamTexto": "",
+      "pesoTexto": "",
+      "tamCitacao": "",
+      "pesoCitacao": "",
       "exibirCitacao": true,
       "exibirSeparador": true
     },
