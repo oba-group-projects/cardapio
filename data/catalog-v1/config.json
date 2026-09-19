@@ -1,0 +1,40 @@
+{
+  "assets": {
+    "basePath": "./",
+    "imageRoot": "Images/"
+  },
+  "businessChannels": {
+    "eventos": true,
+    "personalizados": true
+  },
+  "catalogVersion": "2026.08.06-baseline",
+  "checkout": {
+    "includeCatalogVersionInMessage": true,
+    "paymentMethods": [
+      "Pix",
+      "Dinheiro"
+    ],
+    "requiredFields": [
+      "nome",
+      "data",
+      "hora",
+      "formaPagamento"
+    ]
+  },
+  "integrations": {
+    "orders": {
+      "googleSheetsEndpoint": "https://script.google.com/macros/s/AKfycbzvdGnmbQbcbmNVKlA34oozlTZ7tsfEt8hjVrxs3Odup1yZavzVbORj9MCvUuX2Rdlf/exec"
+    }
+  },
+  "schemaVersion": 1,
+  "status": "proposto-nao-integrado",
+  "store": {
+    "currency": "BRL",
+    "exibirPrecos": true,
+    "locale": "pt-BR",
+    "name": "Oba Doceria",
+    "whatsapp": "5555999117626"
+  },
+  "test_timestamp": "E2E_8E9F_1788388006791",
+  "updatedAt": "2026-08-12"
+}
