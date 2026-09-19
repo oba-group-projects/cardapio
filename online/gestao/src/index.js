@@ -2183,6 +2183,11 @@ export default {
       return handleLogout();
     }
 
+    // Rota pública: lista imagens do GitHub (antes de obaHandleMediaServe para não ser capturada como ID)
+    if (url.pathname === "/api/media/github" && request.method === "GET") {
+      return obaHandleGithubImagesApi(request, env, url);
+    }
+
     if (url.pathname.startsWith("/api/media/") && request.method === "GET") {
       return obaHandleMediaServe(request, env, url);
     }
@@ -2224,10 +2229,6 @@ export default {
     }
 
     if (url.pathname.startsWith("/api/")) {
-      const obaGithubImagesResponse =
-        await obaHandleGithubImagesApi(request, env, url);
-      if (obaGithubImagesResponse) return obaGithubImagesResponse;
-
       const obaMediaResponse =
         await obaHandleMediaApi(
           request,

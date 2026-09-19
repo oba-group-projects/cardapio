@@ -81,6 +81,11 @@
       font-size: var(--oba-pag2-tam-titulo) !important;
       font-weight: var(--oba-pag2-peso-titulo) !important;
     }
+    /* Botão CTA pag1 */
+    #oba-pag1-btn-cta {
+      font-size: var(--oba-pag1-tam-cta, var(--oba-tam-corpo, 11px)) !important;
+      font-weight: var(--oba-pag1-peso-cta, var(--oba-peso-corpo, 500)) !important;
+    }
     /* Texto principal e citação pag2 */
     #oba-pag2-texto {
       font-size: var(--oba-pag2-tam-texto, var(--oba-tam-corpo, 13px)) !important;
@@ -3516,6 +3521,11 @@ async function hidratarTemaDoModeloMestre() {
     else                  rootStyle.removeProperty('--oba-pag1-tam-subtitulo');
     if (bv.pesoSubtitulo) rootStyle.setProperty('--oba-pag1-peso-subtitulo', bv.pesoSubtitulo);
     else                  rootStyle.removeProperty('--oba-pag1-peso-subtitulo');
+    /* R11F: botão CTA pag1 */
+    if (bv.tamCTA)  rootStyle.setProperty('--oba-pag1-tam-cta', bv.tamCTA + 'px');
+    else            rootStyle.removeProperty('--oba-pag1-tam-cta');
+    if (bv.pesoCTA) rootStyle.setProperty('--oba-pag1-peso-cta', bv.pesoCTA);
+    else            rootStyle.removeProperty('--oba-pag1-peso-cta');
 
     /* Visibilidade pag1 */
     const elSub1 = document.getElementById('oba-pag1-subtitulo');

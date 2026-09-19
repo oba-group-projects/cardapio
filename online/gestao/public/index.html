@@ -186,6 +186,28 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
             <option value="700">700 — Negrito</option>
           </select>
         </div>
+        <div class="field">
+          <label>Tamanho do botão CTA</label>
+          <select id="pg1-tamCTA">
+            <option value="">Tema global</option>
+            <option value="9">Muito pequeno (9px)</option>
+            <option value="11">Pequeno (11px)</option>
+            <option value="13">Médio (13px)</option>
+            <option value="15">Grande (15px)</option>
+            <option value="17">Extra grande (17px)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Peso do botão CTA</label>
+          <select id="pg1-pesoCTA">
+            <option value="">Tema global</option>
+            <option value="300">300 — Fino</option>
+            <option value="400">400 — Normal</option>
+            <option value="500">500 — Médio</option>
+            <option value="600">600 — Semibold</option>
+            <option value="700">700 — Negrito</option>
+          </select>
+        </div>
 
         <div class="field full actions"><button class="primary" type="submit">Salvar Boas-vindas</button></div>
       </form>
@@ -1830,6 +1852,7 @@ $('formConfig').onsubmit=async e=>{
     /* Tipografia por página */
     obaSetSelect('pg1-tamTitulo',bv.tamTitulo,'');obaSetSelect('pg1-pesoTitulo',bv.pesoTitulo,'');
     obaSetSelect('pg1-tamSubtitulo',bv.tamSubtitulo,'');obaSetSelect('pg1-pesoSubtitulo',bv.pesoSubtitulo,'');
+    obaSetSelect('pg1-tamCTA',bv.tamCTA,'');obaSetSelect('pg1-pesoCTA',bv.pesoCTA,'');
     obaSetSelect('pg2-tamTitulo',ne.tamTitulo,'');obaSetSelect('pg2-pesoTitulo',ne.pesoTitulo,'');
     obaSetSelect('pg2-tamTexto',ne.tamTexto,'');obaSetSelect('pg2-pesoTexto',ne.pesoTexto,'');
     obaSetSelect('pg2-tamCitacao',ne.tamCitacao,'');obaSetSelect('pg2-pesoCitacao',ne.pesoCitacao,'');
@@ -1892,6 +1915,8 @@ $('formConfig').onsubmit=async e=>{
           pesoTitulo:$('pg1-pesoTitulo')?.value||'',
           tamSubtitulo:$('pg1-tamSubtitulo')?.value||'',
           pesoSubtitulo:$('pg1-pesoSubtitulo')?.value||'',
+          tamCTA:$('pg1-tamCTA')?.value||'',
+          pesoCTA:$('pg1-pesoCTA')?.value||'',
           exibirSubtitulo:$('pg1-exibirSubtitulo')?.checked!==false,
           exibirCTA:$('pg1-exibirCTA')?.checked!==false
         },
@@ -2561,7 +2586,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       } else {
         const resp = await api('/api/media', { cache: 'no-store' });
         const items = resp?.items || resp?.media || [];
-        obaGaleriaRenderCards(grid, items, item => item.url || (item.id ? '/api/media/' + item.id : ''));
+        obaGaleriaRenderCards(grid, items, item => item.url || (item.media_id ? '/api/media/' + item.media_id : ''));
       }
     } catch (err) {
       if (grid) grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:16px;color:var(--danger)">Erro: ' + String(err.message || err) + '</p>';
