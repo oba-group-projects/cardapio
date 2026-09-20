@@ -1,32 +1,32 @@
 [
   {
-    "ativo": true,
-    "descricao": "Mini naked cake de brigadeiro, uva verde, morangos e doces variados em tábua redonda de MDF.",
-    "disponivel": true,
     "id": "kit-tabua",
-    "imagem": "Images/Presenteaveis/Opcao_1.png",
+    "tipo": "kit",
     "nome": "Tábua Doce Artesanal",
+    "descricao": "Mini naked cake de brigadeiro, uva verde, morangos e doces variados em tábua redonda de MDF.",
+    "preco": 180.0,
+    "imagem": "Images/Presenteaveis/Opcao_1.png",
     "opcionaisPermitidos": [
       "laco",
       "placa"
     ],
-    "ordem": 10,
-    "preco": 180,
-    "tipo": "kit"
+    "ativo": true,
+    "disponivel": true,
+    "ordem": 10
   },
   {
-    "ativo": true,
-    "descricao": "12 brigadeiros em caixa com laço.",
-    "disponivel": true,
     "id": "kit-classico",
-    "imagem": "Images/Presenteaveis/Opcao_2.png",
+    "tipo": "kit",
     "nome": "Caixa Presente Clássica",
+    "descricao": "12 brigadeiros em caixa com laço.",
+    "preco": 75.0,
+    "imagem": "Images/Presenteaveis/Opcao_2.png",
     "opcionaisPermitidos": [
       "laco",
       "placa"
     ],
-    "ordem": 20,
-    "preco": 75,
-    "tipo": "kit"
+    "ativo": true,
+    "disponivel": true,
+    "ordem": 20
   }
 ]

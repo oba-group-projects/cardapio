@@ -1,18 +1,18 @@
 [
   {
-    "ativo": true,
-    "disponivel": true,
     "id": "laco",
     "nome": "Laço Decorativo",
-    "ordem": 10,
-    "preco": 4.5
-  },
-  {
+    "preco": 4.5,
     "ativo": true,
     "disponivel": true,
+    "ordem": 10
+  },
+  {
     "id": "placa",
     "nome": "Placa Personalizada",
-    "ordem": 20,
-    "preco": 3.5
+    "preco": 3.5,
+    "ativo": true,
+    "disponivel": true,
+    "ordem": 20
   }
 ]

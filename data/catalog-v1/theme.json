@@ -1,120 +1,105 @@
 {
+  "schemaVersion": 5,
+  "updatedAt": "2026-09-17",
+  "variante": "classica",
   "paginas": {
     "boas_vindas": {
-      "botaoCTA": "",
+      "logo": "Images/Logo_Oba/logo-vertical.png",
+      "tamanhoLogo": "medio",
+      "titulo": "Bem-vindo",
+      "subtitulo": "Prepare-se para descobrir o verdadeiro sabor artesanal em cada detalhe.",
+      "botaoCTA": "Descobrir Nossa História",
       "corFundo": "",
       "corTitulo": "",
+      "tamTitulo": "",
+      "pesoTitulo": "",
+      "tamSubtitulo": "",
+      "pesoSubtitulo": "",
+      "tamCTA": "",
+      "pesoCTA": "",
       "exibirCTA": true,
-      "exibirSubtitulo": true,
-      "logo": "",
-      "subtitulo": "",
-      "tamanhoLogo": "medio",
-      "titulo": "Seja Bem-Vinda!"
-    },
-    "eventos_modal": {
-      "titulo": ""
-    },
-    "menu_principal": {
-      "botoes": [
-        {
-          "acao": "caixas",
-          "destaque": true,
-          "icone": "fa-solid fa-box-open",
-          "id": "btn-0",
-          "label": "Caixas de Doces",
-          "sublabel": "Montagem",
-          "url": "",
-          "visivel": true
-        },
-        {
-          "acao": "presenteaveis",
-          "destaque": false,
-          "icone": "fa-solid fa-gift",
-          "id": "btn-1",
-          "label": "Presenteáveis / Especiais",
-          "sublabel": "Kits & Presentes",
-          "url": "",
-          "visivel": true
-        },
-        {
-          "acao": "personalizados",
-          "destaque": false,
-          "icone": "fa-solid fa-wand-magic-sparkles",
-          "id": "btn-2",
-          "label": "Doces Personalizados",
-          "sublabel": "Exclusivo",
-          "url": "",
-          "visivel": true
-        },
-        {
-          "acao": "eventos",
-          "destaque": false,
-          "icone": "fa-solid fa-champagne-glasses",
-          "id": "btn-3",
-          "label": "Grandes Eventos",
-          "sublabel": "Proposta",
-          "url": "",
-          "visivel": true
-        }
-      ],
-      "corFundo": "",
-      "corSubtitulo": "",
-      "logo": "",
-      "subtitulo": "",
-      "tamanhoLogo": "medio"
+      "exibirSubtitulo": true
     },
     "nossa_essencia": {
-      "citacao": "",
+      "logo": "Images/Logo_Oba/logo-circular.png",
+      "tamanhoLogo": "medio",
+      "titulo": "Nossa Essência",
+      "texto": "Na OBA Doceria, cada brigadeiro é uma obra de arte. Criamos receitas exclusivas com rigor técnico e os melhores insumos, resultando em doces menos açucarados e intensamente cremosos.",
+      "citacao": "Feito à mão, com amor e precisão.",
       "corFundo": "",
       "corTitulo": "",
+      "corTexto": "",
+      "tamTitulo": "",
+      "pesoTitulo": "",
+      "tamTexto": "",
+      "pesoTexto": "",
+      "tamCitacao": "",
+      "pesoCitacao": "",
       "exibirCitacao": true,
-      "exibirSeparador": true,
-      "logo": "",
-      "tamanhoLogo": "medio",
-      "texto": "Na Oba Doceria, cada brigadeiro é uma obra de arte. Criamos receitas exclusivas com rigor técnico e os melhores insumos, resultando em doces menos açucarados e intensamente cremosos.",
-      "titulo": ""
+      "exibirSeparador": true
     },
-    "personalizados_modal": {
-      "info_items": [],
-      "info_titulo": "",
-      "pacotes": [
-        {
-          "preco": "196,00",
-          "quantidade": 20
-        },
-        {
-          "preco": "280,00",
-          "quantidade": 35
-        },
-        {
-          "preco": "375,00",
-          "quantidade": 50
-        }
-      ],
-      "pacotes_titulo": "",
-      "titulo": ""
+    "menu_principal": {
+      "logo": "Images/Logo_Oba/logo-horizontal.png",
+      "tamanhoLogo": "medio",
+      "subtitulo": "Escolha sua Experiência",
+      "corFundo": "",
+      "corSubtitulo": "",
+      "tamSubtitulo": "",
+      "pesoSubtitulo": "",
+      "tamLabel": "",
+      "pesoLabel": "",
+      "tamSublabel": "",
+      "pesoSublabel": "",
+      "botoes": [
+        { "id": "caixas",         "label": "Caixas de Doces",           "sublabel": "Montagem",         "icone": "fa-solid fa-box-open",            "acao": "caixas",         "destaque": true,  "visivel": true },
+        { "id": "presenteaveis",  "label": "Presenteáveis / Especiais", "sublabel": "Kits & Presentes", "icone": "fa-solid fa-gift",                "acao": "presenteaveis",  "destaque": false, "visivel": true },
+        { "id": "personalizados", "label": "Doces Personalizados",      "sublabel": "Exclusivo",        "icone": "fa-solid fa-wand-magic-sparkles", "acao": "personalizados", "destaque": false, "visivel": true },
+        { "id": "eventos",        "label": "Grandes Eventos",           "sublabel": "Proposta",         "icone": "fa-solid fa-champagne-glasses",   "acao": "eventos",        "destaque": false, "visivel": true }
+      ]
     },
     "vitrine_presentes": {
-      "subtitulo": "",
-      "titulo": ""
+      "titulo": "Vitrine de Presentes",
+      "subtitulo": "Nossas opções exclusivas já vêm montadas com carinho."
+    },
+    "personalizados_modal": {
+      "titulo": "Doces Personalizados",
+      "info_titulo": "Informações",
+      "info_items": ["Modelagem artesanal.", "Mínimo: 20 unidades."],
+      "pacotes_titulo": "Pacotes Especiais",
+      "pacotes": [
+        { "quantidade": 20, "preco": "196,00" },
+        { "quantidade": 35, "preco": "280,00" },
+        { "quantidade": 50, "preco": "375,00" }
+      ]
+    },
+    "eventos_modal": {
+      "titulo": "Orçamentos de Eventos",
+      "label_nome": "Seu Nome Completo",
+      "label_tipo": "Tipo (Casamento, Formatura...)",
+      "label_data": "Data",
+      "label_convidados": "Nº Convidados",
+      "label_botao": "Solicitar Proposta"
     }
   },
   "paginas_customizadas": [],
-  "schemaVersion": 2,
   "tema": {
-    "arredondamento": "20",
-    "corBorda": "#e8d5b5",
-    "corFundo": "#faf5f0",
-    "corFundoCard": "#fff8f0",
-    "corPrimaria": "#8b4513",
-    "corTexto": "#3b2a1e",
-    "espacamento": "normal",
-    "fonte": "Poppins",
-    "pesoCorpo": "600",
-    "pesoTitulo": "200",
-    "tamanhoCorpo": "13",
-    "tamanhoTitulo": "26"
-  },
-  "updatedAt": "2026-09-17",
-  "variante": "classica"
+    "corPrimaria":       "#8B4513",
+    "corFundo":          "#FAF5F0",
+    "corBorda":          "#E8D5B5",
+    "corTexto":          "#3B2A1E",
+    "corFundoCard":      "#FFF8F0",
+    "fonte":             "Poppins",
+    "tamanhoTitulo":     "24",
+    "tamanhoCorpo":      "13",
+    "pesoTitulo":        "300",
+    "pesoCorpo":         "400",
+    "tamanhoSubtitulo":  "11",
+    "pesoSubtitulo":     "600",
+    "tamanhoModal":      "18",
+    "pesoModal":         "800",
+    "tamanhoPreco":      "14",
+    "pesoPreco":         "700",
+    "arredondamento":    "20",
+    "espacamento":       "normal"
+  }
 }
