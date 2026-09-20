@@ -37,9 +37,9 @@
     "tags": []
   },
   {
-    "ativo": false,
+    "ativo": true,
     "categoriaId": "tradicionais-1",
-    "disponivel": false,
+    "disponivel": true,
     "id": "coco-queimado",
     "imagem": "Images/Sabores_Doces/Coco Queimado.jpeg",
     "nome": "Coco Queimado",
@@ -49,9 +49,9 @@
     "tags": []
   },
   {
-    "ativo": false,
+    "ativo": true,
     "categoriaId": "tradicionais-1",
-    "disponivel": false,
+    "disponivel": true,
     "id": "dois-amores",
     "imagem": "Images/Sabores_Doces/Dois Amores.jpeg",
     "nome": "Dois Amores",
@@ -61,9 +61,9 @@
     "tags": []
   },
   {
-    "ativo": false,
+    "ativo": true,
     "categoriaId": "tradicionais-1",
-    "disponivel": false,
+    "disponivel": true,
     "id": "leite-ninho",
     "imagem": "Images/Sabores_Doces/Leite Ninho.jpeg",
     "nome": "Leite Ninho",
