@@ -13,9 +13,9 @@
     "tags": []
   },
   {
-    "ativo": true,
+    "ativo": false,
     "categoriaId": "tradicionais-1",
-    "disponivel": true,
+    "disponivel": false,
     "id": "casadinho",
     "imagem": "Images/Sabores_Doces/Casadinho.jpeg",
     "nome": "Casadinho",
@@ -25,9 +25,9 @@
     "tags": []
   },
   {
-    "ativo": true,
+    "ativo": false,
     "categoriaId": "tradicionais-1",
-    "disponivel": true,
+    "disponivel": false,
     "id": "coco",
     "imagem": "Images/Sabores_Doces/Coco.jpeg",
     "nome": "Coco",
