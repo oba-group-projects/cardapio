@@ -1765,7 +1765,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
   }
 </style>
 </head>
-<body class="antialiased selection:bg-[#8B4513] selection:text-white pb-24">
+<body class="antialiased selection:bg-[#8B4513] selection:text-white">
 
 <!-- BOTÒO WPP FLUTUANTE � visível a partir da Página 2 -->
 <a id="btn-wpp-flutuante" href="https://wa.me/5555999117626" data-oba-whatsapp-link target="_blank"
@@ -1780,7 +1780,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
 </div>
 
 <!-- ================================================================
-  MODAL 1: CONFIGURA�!ÒO DE TAMANHO (Caixas normais + Degustação)
+  MODAL 1: CONFIGURAÇÃO DE TAMANHO (Caixas normais + Degustação)
   z-[120]
 ================================================================ -->
 <div id="modal-tamanho-caixa" class="fixed inset-0 bg-black/80 hidden z-[120] flex items-center justify-center p-4" onclick="fecharModalTamanhoCaixa()">
@@ -2060,7 +2060,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
   </div>
 </div>
 <!-- ================================================================
-  MODAL 2: CONFIGURA�!ÒO DE KIT (Presenteáveis � opcionais + ações)
+  MODAL 2: CONFIGURAÇÃO DE KIT (Presenteáveis � opcionais + ações)
   z-[120]
 ================================================================ -->
 <div id="modal-config-kit" class="fixed inset-0 bg-black/80 hidden z-[120] flex items-center justify-center p-4" onclick="fecharModalConfigKit()">
@@ -2250,9 +2250,9 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
 <!-- ================================================================
   PÁGINAS 1, 2, 3 + FLUXO PRINCIPAL
 ================================================================ -->
-<div id="app-container" class="w-full max-w-6xl mx-auto overflow-hidden relative min-h-screen">
+<div id="app-container" class="w-full max-w-6xl mx-auto relative min-h-screen overflow-x-hidden">
 
-  <section id="pag-1" class="min-h-screen flex flex-col items-center justify-center px-6 py-10 fade-page max-w-md mx-auto">
+  <section id="pag-1" class="h-screen flex flex-col items-center justify-center px-6 py-8 fade-page max-w-md mx-auto overflow-y-auto">
     <img id="oba-pag1-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-vertical.png" class="w-44 sm:w-52 h-auto object-contain mb-10 drop-shadow-sm" alt="Logo">
     <div class="text-center space-y-5 w-full max-w-xs">
       <h1 id="oba-pag1-titulo" class="text-2xl font-light tracking-[0.2em] text-[#8B4513] uppercase">Bem-vindo</h1>
@@ -2263,7 +2263,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
     </div>
   </section>
 
-  <section id="pag-2" class="min-h-screen hidden flex-col items-center justify-center px-5 py-8 fade-page max-w-md mx-auto">
+  <section id="pag-2" class="h-screen hidden flex-col items-center justify-center px-5 py-8 fade-page max-w-md mx-auto overflow-y-auto">
     <div class="w-full glass-card p-8 rounded-[2.5rem] text-center space-y-6 shadow-sm">
       <img id="oba-pag2-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-circular.png" class="w-28 h-28 object-contain mx-auto mb-2 drop-shadow-sm" alt="Logo">
       <h2 id="oba-pag2-titulo" class="text-sm sm:text-base font-semibold tracking-[0.15em] text-[#8B4513] uppercase">Nossa Essência</h2>
@@ -2279,7 +2279,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
     </div>
   </section>
 
-  <section id="pag-3" class="min-h-screen hidden flex-col items-center justify-center px-6 py-10 pb-28 fade-page max-w-md mx-auto">
+  <section id="pag-3" class="h-screen hidden flex-col items-center justify-center px-6 py-8 fade-page max-w-md mx-auto overflow-y-auto">
     <header class="text-center mb-10 w-full">
       <img id="oba-pag3-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png" class="w-36 h-auto mx-auto mb-6 object-contain" alt="Logo">
       <h2 id="oba-pag3-subtitulo" class="text-[11px] text-[#8B4513]/60 font-semibold uppercase tracking-[0.2em]">Escolha sua Experiência</h2>
@@ -2303,14 +2303,14 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
         <i class="fa-solid fa-champagne-glasses text-xl opacity-20"></i>
       </button>
     </div>
-    <button onclick="navegarPara(2)" class="mt-10 py-3 px-6 text-[10px] font-bold text-[#8B4513]/50 uppercase tracking-widest border border-transparent hover:border-[#8B4513]/20 rounded-full transition-all">� � Voltar</button>
+    <button onclick="navegarPara(2)" class="mt-6 mb-6 py-3 px-6 text-[10px] font-bold text-[#8B4513]/50 uppercase tracking-widest border border-transparent hover:border-[#8B4513]/20 rounded-full transition-all">← Voltar</button>
   </section>
 
   <!-- FLUXO PRINCIPAL -->
   <section id="fluxo-principal" class="min-h-screen hidden flex-col px-4 py-8 fade-page max-w-5xl mx-auto">
     <header class="text-center mb-8">
       <img id="oba-fluxo-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png" class="w-32 mx-auto mb-4" alt="Logo">
-      <button onclick="retornarParaMenuSeletor()" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest border border-gray-200 px-4 py-1.5 rounded-full">� � Voltar às Opções</button>
+      <button onclick="retornarParaMenuSeletor()" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest border border-gray-200 px-4 py-1.5 rounded-full">← Voltar às Opções</button>
     </header>
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-10">
@@ -3454,8 +3454,8 @@ async function hidratarCatalogoDoModeloMestre() {
 
     const totalSabores = novoCatalogo.reduce((n, g) => n + g.itens.length, 0);
 
-    if (novoCatalogo.length !== 6 || totalSabores !== 55) {
-      throw new Error('Catalogo mestre incompleto; fallback preservado.');
+    if (novoCatalogo.length === 0 || totalSabores === 0) {
+      throw new Error('Catalogo mestre vazio; fallback preservado.');
     }
 
     catalogo.splice(0, catalogo.length, ...novoCatalogo);
@@ -5192,7 +5192,7 @@ function confirmarTamanhoCaixa() {
 function fecharModalTamanhoCaixa() { document.getElementById('modal-tamanho-caixa').classList.add('hidden'); }
 
 // ================================================================
-// MODAL 2 � CONFIGURA�!ÒO DE KIT
+// MODAL 2 � CONFIGURAÇÃO DE KIT
 // ================================================================
 function abrirModalConfigKit(idKit) {
   const kit = kitsPresenteaveis.find(k => k.id === idKit);
