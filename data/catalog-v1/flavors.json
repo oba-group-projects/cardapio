@@ -1,9 +1,9 @@
 [
   {
-    "ativo": false,
+    "ativo": true,
     "categoriaId": "tradicionais-1",
     "descricao": "Brigadeiro artesanal com sabor suave de cappuccino, cremoso e equilibrado.",
-    "disponivel": false,
+    "disponivel": true,
     "id": "cappuccino",
     "imagem": "Images/Sabores_Doces/Cappuccino.jpeg",
     "nome": "Cappuccino",
@@ -13,9 +13,9 @@
     "tags": []
   },
   {
-    "ativo": false,
+    "ativo": true,
     "categoriaId": "tradicionais-1",
-    "disponivel": false,
+    "disponivel": true,
     "id": "casadinho",
     "imagem": "Images/Sabores_Doces/Casadinho.jpeg",
     "nome": "Casadinho",
@@ -25,9 +25,9 @@
     "tags": []
   },
   {
-    "ativo": false,
+    "ativo": true,
     "categoriaId": "tradicionais-1",
-    "disponivel": false,
+    "disponivel": true,
     "id": "coco",
     "imagem": "Images/Sabores_Doces/Coco.jpeg",
     "nome": "Coco",
@@ -37,9 +37,9 @@
     "tags": []
   },
   {
-    "ativo": true,
+    "ativo": false,
     "categoriaId": "tradicionais-1",
-    "disponivel": true,
+    "disponivel": false,
     "id": "coco-queimado",
     "imagem": "Images/Sabores_Doces/Coco Queimado.jpeg",
     "nome": "Coco Queimado",
@@ -49,9 +49,9 @@
     "tags": []
   },
   {
-    "ativo": true,
+    "ativo": false,
     "categoriaId": "tradicionais-1",
-    "disponivel": true,
+    "disponivel": false,
     "id": "dois-amores",
     "imagem": "Images/Sabores_Doces/Dois Amores.jpeg",
     "nome": "Dois Amores",
@@ -61,9 +61,9 @@
     "tags": []
   },
   {
-    "ativo": true,
+    "ativo": false,
     "categoriaId": "tradicionais-1",
-    "disponivel": true,
+    "disponivel": false,
     "id": "leite-ninho",
     "imagem": "Images/Sabores_Doces/Leite Ninho.jpeg",
     "nome": "Leite Ninho",
