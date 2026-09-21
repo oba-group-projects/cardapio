@@ -2322,6 +2322,14 @@ export default {
 
       // Carrega os dados do slot PUBLISHED
       const catalog = await obaCatalogSnapshot({ url: request.url }, env);
+
+      // Ajusta o basePath para apontar para o GitHub raw (imagens públicas)
+      // sem isso, imagens relativas como "Images/..." ficam quebradas
+      if (catalog && catalog.loja && catalog.loja.assets) {
+        catalog.loja.assets.basePath  = "https://raw.githubusercontent.com/oba-group-projects/cardapio/main/";
+        catalog.loja.assets.imageRoot = "Images/";
+      }
+
       const catalogJson = catalog ? JSON.stringify(catalog) : "null";
 
       const source = await asset.text();
