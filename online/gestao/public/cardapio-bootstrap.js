@@ -8,7 +8,9 @@
     .then(async function(r) {
       const j = await r.json();
       if (!r.ok || !j) throw new Error('Dados do cardápio indisponíveis');
-      return j;
+      // /api/catalog retorna { ok: true, data: { sabores, categorias, ... } }
+      // ou diretamente { sabores, categorias, ... } dependendo da versão
+      return j.data || j;
     });
 
   const map = {
