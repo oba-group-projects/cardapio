@@ -2301,14 +2301,10 @@ export default {
     /* ----------------------------------------------------------------
      * ROTA PÚBLICA: GET /cardapio
      * Serve o cardápio interativo diretamente do Worker.
-     * Lê o HTML dos Static Assets e injeta os dados do slot PUBLISHED
-     * do D1 via preview-bootstrap — mesmo mecanismo do /__preview,
-     * mas usando PUBLISHED (não PREVIEW) e sem exigir autenticação.
+     * Os dados do slot PUBLISHED são injetados inline no HTML —
+     * sem script externo, sem problema de cache.
      * ---------------------------------------------------------------- */
     if (url.pathname === "/cardapio" && request.method === "GET") {
-      // Carrega o slot PUBLISHED para confirmar que existe conteúdo
-      const published = await obaLoadCatalogSlot(env, "PUBLISHED");
-
       // Busca o HTML do cardápio dos Static Assets
       const assetUrl = new URL(request.url);
       assetUrl.pathname = "/ui-desenvolvimento/index.html";
@@ -2324,13 +2320,43 @@ export default {
         });
       }
 
+      // Carrega os dados do slot PUBLISHED
+      const catalog = await obaCatalogSnapshot({ url: request.url }, env);
+      const catalogJson = catalog ? JSON.stringify(catalog) : "null";
+
       const source = await asset.text();
 
-      // Injeta o bootstrap que carrega os dados do PUBLISHED no cardápio
-      const inject = "<base href='/'><script src='/cardapio-bootstrap.js'></script>";
+      // Injeta bootstrap inline — sem script externo, sem cache
+      const bootstrapInline = `<script>
+'use strict';
+(function(){
+  var CATALOG = ${catalogJson};
+  if (!CATALOG) return;
+  var nativeFetch = window.fetch.bind(window);
+  var map = {
+    'flavors.json':'sabores','categories.json':'categorias',
+    'boxes.json':'caixas','products.json':'produtos',
+    'options.json':'opcionais','combos.json':'combos',
+    'config.json':'loja','theme.json':'tema'
+  };
+  window.fetch = function(input, init) {
+    var raw = typeof input === 'string' ? input : (input && input.url ? input.url : String(input));
+    var name = raw.split('/').pop().split('?')[0];
+    var key = map[name];
+    if (key && CATALOG[key] !== undefined) {
+      return Promise.resolve(new Response(
+        JSON.stringify(CATALOG[key]),
+        {status:200,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'}}
+      ));
+    }
+    return nativeFetch(input, init);
+  };
+})();
+</script>`;
+
       const html = source.includes("<head>")
-        ? source.replace("<head>", "<head>" + inject)
-        : inject + source;
+        ? source.replace("<head>", "<head>" + bootstrapInline)
+        : bootstrapInline + source;
 
       return new Response(html, {
         status: 200,
