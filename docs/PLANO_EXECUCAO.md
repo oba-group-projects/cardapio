@@ -22,7 +22,7 @@ A decisão aprovada é unificar tudo no Worker e eliminar o GitHub Pages como ca
 ---
 
 ### Passo 1 — Unificar o cardápio no Worker
-**Status: [ ] Pendente**
+**Status: [x] Concluído — 20/09/2026**
 
 **O que é:**
 Criar uma rota pública no Worker que serve o cardápio diretamente,
@@ -211,3 +211,4 @@ para compartilhar com clientes antes do orçamento.
 | Data | Passo | Resultado |
 |---|---|---|
 | 20/09/2026 | Plano criado e aprovado | — |
+| 20/09/2026 | Passo 1 concluído | GET /cardapio no Worker funcionando. Status 200, 623KB. /api/catalog público retorna 55 sabores, 6 categorias. |
