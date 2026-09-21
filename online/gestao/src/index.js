@@ -2298,6 +2298,51 @@ export default {
       });
     }
 
+    /* ----------------------------------------------------------------
+     * ROTA PÚBLICA: GET /cardapio
+     * Serve o cardápio interativo diretamente do Worker.
+     * Lê o HTML dos Static Assets e injeta os dados do slot PUBLISHED
+     * do D1 via preview-bootstrap — mesmo mecanismo do /__preview,
+     * mas usando PUBLISHED (não PREVIEW) e sem exigir autenticação.
+     * ---------------------------------------------------------------- */
+    if (url.pathname === "/cardapio" && request.method === "GET") {
+      // Carrega o slot PUBLISHED para confirmar que existe conteúdo
+      const published = await obaLoadCatalogSlot(env, "PUBLISHED");
+
+      // Busca o HTML do cardápio dos Static Assets
+      const assetUrl = new URL(request.url);
+      assetUrl.pathname = "/ui-desenvolvimento/index.html";
+      assetUrl.search = "";
+      assetUrl.hash = "";
+      const asset = await env.ASSETS.fetch(
+        new Request(assetUrl.toString(), { method: "GET" })
+      );
+      if (!asset.ok) {
+        return new Response("Cardápio temporariamente indisponível.", {
+          status: 502,
+          headers: { "Content-Type": "text/plain; charset=utf-8" }
+        });
+      }
+
+      const source = await asset.text();
+
+      // Injeta o bootstrap que carrega os dados do PUBLISHED no cardápio
+      const inject = "<base href='/'><script src='/cardapio-bootstrap.js'></script>";
+      const html = source.includes("<head>")
+        ? source.replace("<head>", "<head>" + inject)
+        : inject + source;
+
+      return new Response(html, {
+        status: 200,
+        headers: {
+          "Content-Type": "text/html; charset=utf-8",
+          "Cache-Control": "public, max-age=60, stale-while-revalidate=300",
+          "X-Robots-Tag": "index, follow",
+          "X-Content-Type-Options": "nosniff",
+        }
+      });
+    }
+
     if (url.pathname === "/__auth/login") {
       if (request.method === "GET") {
         return response(loginPage(), 200, {
@@ -2337,6 +2382,12 @@ export default {
     // Rota pública: lista imagens do GitHub (antes de obaHandleMediaServe para não ser capturada como ID)
     if (url.pathname === "/api/media/github" && request.method === "GET") {
       return obaHandleGithubImagesApi(request, env, url);
+    }
+
+    // Rota pública: dados do catálogo publicado (usado pelo cardápio público /cardapio)
+    if (url.pathname === "/api/catalog" && request.method === "GET") {
+      const catalogResp = await obaHandleCatalogReadApi(request, env);
+      if (catalogResp) return catalogResp;
     }
 
     if (url.pathname.startsWith("/api/media/") && request.method === "GET") {
