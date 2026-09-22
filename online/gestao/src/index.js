@@ -652,11 +652,30 @@ async function obaHandleCatalogReadApi(
     aggregateNames.has(first)
   ) {
 
-    const catalog =
-      await obaCatalogSnapshot(
-        request,
-        env
-      );
+    /*
+     * Lê o slot PUBLISHED do D1.
+     * Fallback para assets estáticos se o slot estiver vazio.
+     */
+    let catalog = null;
+
+    try {
+      const published =
+        await obaLoadCatalogSlot(env, "PUBLISHED");
+      if (published && published.payload) {
+        catalog = published.payload;
+      }
+    }
+    catch {
+      /* fallback abaixo */
+    }
+
+    if (!catalog) {
+      catalog =
+        await obaCatalogSnapshot(
+          request,
+          env
+        );
+    }
 
     if (!catalog) {
       return obaApiJson(
