@@ -2300,12 +2300,11 @@ export default {
 
     /* ----------------------------------------------------------------
      * ROTA PÚBLICA: GET /cardapio
-     * Serve o cardápio interativo diretamente do Worker.
-     * Os dados do slot PUBLISHED são injetados inline no HTML —
-     * sem script externo, sem problema de cache.
+     * Serve o cardápio público usando o slot PUBLISHED do D1.
+     * Usa o mesmo mecanismo do /__preview mas com published-bootstrap.js
+     * que lê /api/catalog em vez de /api/preview.
      * ---------------------------------------------------------------- */
     if (url.pathname === "/cardapio" && request.method === "GET") {
-      // Busca o HTML do cardápio dos Static Assets
       const assetUrl = new URL(request.url);
       assetUrl.pathname = "/ui-desenvolvimento/index.html";
       assetUrl.search = "";
@@ -2320,59 +2319,20 @@ export default {
         });
       }
 
-      // Carrega os dados do slot PUBLISHED
-      const catalog = await obaCatalogSnapshot({ url: request.url }, env);
-
-      // Ajusta o basePath para apontar para o GitHub raw (imagens públicas)
-      // sem isso, imagens relativas como "Images/..." ficam quebradas
-      if (catalog && catalog.loja && catalog.loja.assets) {
-        catalog.loja.assets.basePath  = "https://raw.githubusercontent.com/oba-group-projects/cardapio/main/";
-        catalog.loja.assets.imageRoot = "Images/";
-      }
-
-      const catalogJson = catalog ? JSON.stringify(catalog) : "null";
-
       const source = await asset.text();
-
-      // Injeta bootstrap inline — sem script externo, sem cache
-      const bootstrapInline = `<script>
-'use strict';
-(function(){
-  var CATALOG = ${catalogJson};
-  if (!CATALOG) return;
-  var nativeFetch = window.fetch.bind(window);
-  var map = {
-    'flavors.json':'sabores','categories.json':'categorias',
-    'boxes.json':'caixas','products.json':'produtos',
-    'options.json':'opcionais','combos.json':'combos',
-    'config.json':'loja','theme.json':'tema'
-  };
-  window.fetch = function(input, init) {
-    var raw = typeof input === 'string' ? input : (input && input.url ? input.url : String(input));
-    var name = raw.split('/').pop().split('?')[0];
-    var key = map[name];
-    if (key && CATALOG[key] !== undefined) {
-      return Promise.resolve(new Response(
-        JSON.stringify(CATALOG[key]),
-        {status:200,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'}}
-      ));
-    }
-    return nativeFetch(input, init);
-  };
-})();
-</script>`;
-
+      // Mesmo padrão do /__preview: base href + bootstrap script
+      const inject = "<base href='/'><script src='/published-bootstrap.js'></script>";
       const html = source.includes("<head>")
-        ? source.replace("<head>", "<head>" + bootstrapInline)
-        : bootstrapInline + source;
+        ? source.replace("<head>", "<head>" + inject)
+        : inject + source;
 
       return new Response(html, {
         status: 200,
         headers: {
           "Content-Type": "text/html; charset=utf-8",
           "Cache-Control": "public, max-age=60, stale-while-revalidate=300",
-          "X-Robots-Tag": "index, follow",
           "X-Content-Type-Options": "nosniff",
+          "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com data:; img-src * data: blob:; connect-src 'self' https:; form-action 'self'"
         }
       });
     }
