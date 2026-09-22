@@ -3674,11 +3674,11 @@ async function hidratarTemaDoModeloMestre() {
       const bcAcoes = new Set(['personalizados', 'eventos']);
       const MAX_POR_PAGINA = 4;
 
-      /* �←� R10C: Botões automáticos de seções customizadas �←←←←←←←←←←←�
+      /* � R10C: Botões automáticos de seções customizadas ←←←←←←←←←
          Seções com linkMenu.ativo=true geram um botão automaticamente
          no array de botões do menu, sem que o usuário precise adicioná-lo
          manualmente na Página 3.
-      �←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←� */
+      ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←← */
       /* Seções customizadas com linkMenu.ativo geram botão no menu.
          O overflow (R10B) cuida automaticamente do limite de 4 por página. */
       const secoesComLink = Array.isArray(tema.paginas_customizadas)
@@ -3755,7 +3755,7 @@ async function hidratarTemaDoModeloMestre() {
         return btn;
       }
 
-      /* �←� R10B: OVERFLOW AUTOMÁTICO �←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←�
+      /* � R10B: OVERFLOW AUTOMÁTICO ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←
          Divide os botões em grupos de MAX_POR_PAGINA.
          Grupo 0  → #pag-3 (já existe no HTML)
          Grupo 1  → #pag-3b (criado dinamicamente)
@@ -3763,7 +3763,7 @@ async function hidratarTemaDoModeloMestre() {
          ...
          Cada página tem "Ver mais  →" se houver próxima página,
          e "← Voltar ao menu" se for overflow.
-      �←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←� */
+      ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←← */
       const botoesVisiveis = botoesComSecoesCustom.filter(b => b.visivel !== false);
       const grupos = [];
       for (let i = 0; i < botoesVisiveis.length; i += MAX_POR_PAGINA) {
@@ -3886,14 +3886,14 @@ async function hidratarTemaDoModeloMestre() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    /* �←� R10C: SEÇÕES CUSTOMIZADAS �←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←�
+    /* � R10C: SEÇÕES CUSTOMIZADAS ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←
        Renderiza páginas criadas pelo usuário na Central a partir de
        paginas_customizadas[] do theme.json.
        Templates:
          informativa      → logo, título, texto livre, botão CTA opcional
          lista_produtos   → logo, título, cards com imagem/nome/descrição/preço
          menu_botoes      → logo, título, lista de sub-botões (igual ao pag-3)
-    �←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←� */
+    ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←← */
 
     /* Remove seções customizadas antigas antes de re-renderizar */
     document.querySelectorAll('[data-oba-secao-custom]').forEach(el => el.remove());
@@ -3936,7 +3936,7 @@ async function hidratarTemaDoModeloMestre() {
       const voltarBtn = `<button onclick="obaVoltarMenuOverflow('pag-3')"
         class="mt-10 py-3 px-6 text-[10px] font-bold text-[#8B4513]/50 uppercase tracking-widest border border-transparent hover:border-[#8B4513]/20 rounded-full transition-all">← Voltar</button>`;
 
-      /* �←←� TEMPLATE: INFORMATIVA �←←� */
+      /*  TEMPLATE: INFORMATIVA  */
       if (sec.template === 'informativa') {
         const texto = cfg.texto || '';
         const citacao = cfg.citacao || '';
@@ -3963,7 +3963,7 @@ async function hidratarTemaDoModeloMestre() {
           ${ctaHtml}
           ${voltarBtn}`;
 
-      /* �←←� TEMPLATE: LISTA DE PRODUTOS �←←� */
+      /*  TEMPLATE: LISTA DE PRODUTOS  */
       } else if (sec.template === 'lista_produtos') {
         const itens = Array.isArray(cfg.itens) ? cfg.itens : [];
         const itensHtml = itens.map(item => {
@@ -3986,7 +3986,7 @@ async function hidratarTemaDoModeloMestre() {
           </div>
           ${voltarBtn}`;
 
-      /* �←←� TEMPLATE: MENU DE BOTÕES �←←� */
+      /*  TEMPLATE: MENU DE BOTÕES  */
       } else if (sec.template === 'menu_botoes') {
         const botoesCustom = Array.isArray(cfg.botoes) ? cfg.botoes : [];
         secao.innerHTML = `
@@ -5815,7 +5815,7 @@ function finalizarPedidoBlindado() {
 
   let wppTxt =
     `Olá, OBA Doceria! Seguem os dados do meu pedido:\n\n` +
-    `*C�DIGO:* ${cod}\n` +
+    `*CÓDIGO:* ${cod}\n` +
     `*CLIENTE:* ${nome}\n` +
     `*ENTREGA:* ${dataFmt} às ${hora}\n` +
     `*PAGAMENTO:* ${pag}\n\n` +
@@ -8489,7 +8489,7 @@ function mostrarNotificacao(msg) {
           <div id="r117b1-more-products-pill">
 
             <span id="r117b1-more-products-count">
-              �  MAIS PRODUTOS
+              ↑ MAIS PRODUTOS
             </span>
 
             <span id="r117b1-more-products-help">
@@ -8725,7 +8725,7 @@ function mostrarNotificacao(msg) {
     ) {
 
       contador.textContent =
-        `�  MAIS ${abaixo.length} ${
+        `↓ MAIS ${abaixo.length} ${
           pluralR117B1(
             abaixo.length,
             'PRODUTO',
@@ -9231,7 +9231,7 @@ function mostrarNotificacao(msg) {
           <span class="r117b2-main">
 
             <span class="r117b2-arrow">
-              � 
+              ↓
             </span>
 
             <span class="r117b2-label">
@@ -9275,7 +9275,7 @@ function mostrarNotificacao(msg) {
 
 
       top.textContent =
-        '�  HÁ PRODUTOS ACIMA';
+        '↑ HÁ PRODUTOS ACIMA';
 
 
       viewport.appendChild(
@@ -12677,7 +12677,7 @@ function mostrarNotificacao(msg) {
         const textoLimpo =
           texto
             .replace(
-              /^�S\s*/,
+              /^✅\s*/,
               ''
             )
             .replace(
@@ -21610,8 +21610,8 @@ input {
           <div class="r120-ux5-marco-head">
 
             <div class="r120-ux5-marco-check">
-              �S
-            </div>
+              ✅
+</div>
 
             <p class="r120-ux5-marco-kicker">
               Mínimo da caixa atingido
@@ -22501,7 +22501,7 @@ input {
 
 
       mostrarNotificacao(
-        '�S Caixa adicionada ao carrinho. Continue comprando quando quiser.'
+        '✅ Caixa adicionada ao carrinho. Continue comprando quando quiser.'
       );
 
 
@@ -31505,7 +31505,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
         tipoCheckpoint +
         (
           tipoCheckpoint !== 'NENHUM'
-            ? ' �S'
+            ? ' ✅'
             : ''
         )
       );
@@ -32722,7 +32722,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
     aviso.innerHTML =
-      '<span class="r151-seta" aria-hidden="true">� </span>' +
+      '<span class="r151-seta" aria-hidden="true">↓</span>' +
       '<span>Mais sabores abaixo</span>';
 
 
