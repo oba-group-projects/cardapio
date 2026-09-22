@@ -7,11 +7,22 @@
       "exibirCTA": true,
       "exibirSubtitulo": true,
       "logo": "",
+      "pesoCTA": "",
+      "pesoSubtitulo": "",
+      "pesoTitulo": "",
       "subtitulo": "",
+      "tamCTA": "",
+      "tamSubtitulo": "",
+      "tamTitulo": "",
       "tamanhoLogo": "medio",
-      "titulo": "Seja Bem-Vinda!"
+      "titulo": "OBA DOCERIA"
     },
     "eventos_modal": {
+      "label_botao": "",
+      "label_convidados": "",
+      "label_data": "",
+      "label_nome": "",
+      "label_tipo": "produto",
       "titulo": ""
     },
     "menu_principal": {
@@ -60,22 +71,38 @@
       "corFundo": "",
       "corSubtitulo": "",
       "logo": "",
+      "pesoLabel": "",
+      "pesoSublabel": "",
+      "pesoSubtitulo": "",
       "subtitulo": "",
+      "tamLabel": "",
+      "tamSublabel": "",
+      "tamSubtitulo": "",
       "tamanhoLogo": "medio"
     },
     "nossa_essencia": {
       "citacao": "",
       "corFundo": "",
+      "corTexto": "",
       "corTitulo": "",
       "exibirCitacao": true,
       "exibirSeparador": true,
       "logo": "",
+      "pesoCitacao": "",
+      "pesoTexto": "",
+      "pesoTitulo": "",
+      "tamCitacao": "",
+      "tamTexto": "",
+      "tamTitulo": "",
       "tamanhoLogo": "medio",
       "texto": "Na Oba Doceria, cada brigadeiro é uma obra de arte. Criamos receitas exclusivas com rigor técnico e os melhores insumos, resultando em doces menos açucarados e intensamente cremosos.",
       "titulo": ""
     },
     "personalizados_modal": {
-      "info_items": [],
+      "info_items": [
+        "Modelagem artesanal.",
+        "Mínimo: 20 unidades."
+      ],
       "info_titulo": "",
       "pacotes": [
         {
@@ -111,10 +138,16 @@
     "espacamento": "normal",
     "fonte": "Poppins",
     "pesoCorpo": "600",
+    "pesoModal": "800",
+    "pesoPreco": "700",
+    "pesoSubtitulo": "600",
     "pesoTitulo": "200",
     "tamanhoCorpo": "13",
+    "tamanhoModal": "18",
+    "tamanhoPreco": "14",
+    "tamanhoSubtitulo": "11",
     "tamanhoTitulo": "26"
   },
-  "updatedAt": "2026-09-17",
+  "updatedAt": "2026-09-22",
   "variante": "classica"
 }
