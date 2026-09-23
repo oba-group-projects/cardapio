@@ -1,10 +1,10 @@
 ﻿# CURRENT STATE
 
-Atualizado: 2026-09-15
+Atualizado: 2026-09-22
 
 ## Git
 Branch: feature/gestao-online-segura
-Commit HEAD: ae60298
+Commit HEAD: a242ed6 (fix(scroll): bloquear scroll body nas pag 1/2/3 via oba-pagina-fixa)
 Branch main: 5913078 (fix encoding JSONs + cardapio publico)
 
 ## Estado funcional
@@ -24,6 +24,7 @@ Branch main: 5913078 (fix encoding JSONs + cardapio publico)
 - 11G: Toggle status inline em todas as tabelas + galeria integrada no editor de itens
 - 11H: Workflow GitHub Actions sync-cardapio.yml — sincronização automática feature → main → Pages
 - UX: Transição páginas 1/2/3 sem translateY (fade puro 0.25s) (subtítulo pag1, texto e citação pag2)
+- fix(scroll): body.oba-pagina-fixa bloqueia overflow no body nas pág 1/2/3 (reforça #pag-1/2/3); navegarPara() faz toggle; pág 4+ libera (commit a242ed6)
 
 ## Fases concluídas (resumo)
 - 9A-9C: Infraestrutura de tema, aba Edição Visual, controles por página
