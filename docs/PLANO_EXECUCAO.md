@@ -140,19 +140,49 @@ são fixas — o usuário clica para avançar, não rola.
 
 **O que é:**
 Gerador profissional de propostas com 3 cenários, PDF e link compartilhável.
-Substitui o caderno manual.
+Substitui o caderno manual e o áudio explicativo no WhatsApp.
 
-**O que inclui:**
-- Nova aba "Propostas" na Central
-- Editor: dados do evento + 3 cenários + adicionais por proposta + descontos
-- Cálculo automático usando preços do catálogo
-- 3 cenários lado a lado (como no caderno)
-- Adicionais configuráveis por proposta (cada proposta tem os seus)
-- Desconto individual por cenário
-- Geração de PDF no browser (sem dependência externa)
-- Link público: `/proposta/:id` (cliente abre no celular)
-- Histórico no D1 com status: Rascunho / Enviada / Aceita / Recusada
-- Envio via WhatsApp com resumo formatado
+**Estrutura de uma proposta:**
+```
+Proposta
+├── Dados do evento
+│   ├── Nome do cliente
+│   ├── Data do evento
+│   ├── Número de convidados
+│   └── Tipo de evento (campo livre)
+│
+├── Resumo geral  ← substitui o áudio explicativo
+│   └── Texto livre contextualizando a proposta
+│
+├── Cenário 1 / 2 / 3  (nome padrão editável pela Oba Doceria)
+│   ├── Nome do cenário (padrão: "Cenário 1", editável)
+│   ├── Descrição curta do cenário
+│   ├── Itens do catálogo (produto + quantidade + preço unit. + subtotal)
+│   ├── Adicionais livres (descrição + valor — variam por proposta)
+│   ├── Subtotal calculado automaticamente
+│   ├── Desconto (R$ ou %, avaliado caso a caso)
+│   └── Total final
+│
+└── Rodapé
+    ├── Validade da proposta
+    └── Contato / WhatsApp
+```
+
+**Fluxo na Central:**
+1. Nova Proposta → dados do evento + resumo geral
+2. Para cada cenário: seleciona itens do catálogo, adiciona linhas livres, aplica desconto
+3. Gerar → sistema cria link público + PDF
+4. Revisar/editar antes de enviar (pode regenerar)
+5. Copiar link ou baixar PDF → WhatsApp
+
+**Link público `/proposta/:id`:**
+- Página otimizada para celular
+- 3 cenários navegáveis
+- CTA "Quero este cenário" → WhatsApp com mensagem pré-formatada
+- Sem login, sem formulário — só leitura e contato
+
+**Histórico no D1:**
+- Rascunho / Enviada / Aceita / Recusada
 
 **O que NÃO muda:**
 - Cardápio público
@@ -160,26 +190,106 @@ Substitui o caderno manual.
 
 ---
 
-### Fase 12B — Cardápio de Consulta (sem valores)
+#### Subfase 12A-1 — Infraestrutura D1 + rota Worker
 **Status: [ ] Pendente**
 
-**O que é:**
-URL do cardápio que exibe todos os sabores sem preços,
-para compartilhar com clientes antes do orçamento.
-
-**O que inclui:**
-- Parâmetro `?modo=consulta` na URL que oculta preços automaticamente
-- Botão "Copiar link de consulta" na Central
+- Tabela `proposals` no D1 (id, cliente, data_evento, convidados, tipo_evento, resumo, validade, status, criado_em)
+- Tabela `proposal_scenarios` (id, proposal_id, nome, descricao, desconto_tipo, desconto_valor, ordem)
+- Tabela `proposal_items` (id, scenario_id, tipo: catálogo|livre, ref_id, descricao, qtd, preco_unit)
+- Rotas no Worker:
+  - `POST /api/proposals` — criar/salvar rascunho
+  - `GET /api/proposals` — listar (autenticado)
+  - `GET /api/proposals/:id` — carregar proposta (autenticado)
+  - `PUT /api/proposals/:id` — atualizar
+  - `PATCH /api/proposals/:id/status` — atualizar status
+  - `GET /proposta/:id` — página pública (sem auth)
 
 ---
 
-### Fase 12C — Melhorias na Central
+#### Subfase 12A-2 — Editor na Central (aba Propostas)
 **Status: [ ] Pendente**
 
+- Nova aba "Propostas" na Central
+- Listagem com status visual (Rascunho / Enviada / Aceita / Recusada)
+- Editor completo: dados do evento, resumo geral, 3 cenários
+- Seletor de itens do catálogo com busca e quantidade editável
+- Linhas livres (adicionais): adicionar/remover, descrição + valor
+- Desconto por cenário (toggle R$ / %)
+- Cálculo automático em tempo real
+- Salvar rascunho a qualquer momento
+
+---
+
+#### Subfase 12A-3 — Página pública `/proposta/:id`
+**Status: [ ] Pendente**
+
+- Layout mobile-first, identidade visual da Oba Doceria
+- Dados do evento + resumo geral no topo
+- Cenários em abas (navegação por toque)
+- Itens com quantidade e subtotal por linha
+- Adicionais e desconto destacados
+- Total final em destaque
+- CTA "Quero este cenário" → WhatsApp com texto pré-formatado
+- Validade visível
+
+---
+
+#### Subfase 12A-4 — Geração de PDF
+**Status: [ ] Pendente**
+
+- Geração no browser (sem dependência de servidor externo, zero custo)
+- Usa a mesma estrutura visual da página pública
+- Botão "Baixar PDF" na Central, na tela de revisão
+- Revisão antes de enviar: pode editar e regenerar
+
+---
+
+#### Subfase 12A-5 — Testes e homologação
+**Status: [ ] Pendente**
+
+- Criar proposta completa com 3 cenários, adicionais e desconto
+- Verificar cálculos automáticos
+- Abrir link público no celular e confirmar layout
+- Testar CTA WhatsApp
+- Baixar PDF e conferir fidelidade visual
+- Alterar status e confirmar histórico
+
+---
+
+### Fase 12B — Categoria "Doces Finos para Eventos" no catálogo
+**Status: [ ] Pendente — após 12A homologada**
+
+**O que é:**
+Nova categoria no catálogo gerenciada pela Central, exclusiva para eventos/festas.
+Sabores desta categoria não aparecem no cardápio do dia a dia.
+
 **O que inclui:**
-- Inativos aparecem no final da lista de sabores
-- Indicador visual mais claro quando há publicação pendente
-- Duplicar proposta de orçamento como base para nova
+- Flag `exclusivo_eventos: true` por categoria no catálogo
+- Categoria gerenciada na Central como qualquer outra (adicionar/editar/inativar sabores)
+- Itens disponíveis para seleção nas propostas de orçamento (Fase 12A)
+- Não aparecem no cardápio público (`/cardapio`)
+
+---
+
+### Fase 12C — Catálogo de Festas (vitrine pública)
+**Status: [ ] Pendente — após 12B homologada**
+
+**O que é:**
+Página de vitrine pública para clientes de eventos, sem fluxo de pedido.
+URL própria, disparada para quem solicita orçamento de festa.
+
+**O que inclui:**
+- Rota `/festas` no Worker (sem autenticação)
+- Todas as categorias do catálogo + categoria de Doces Finos para Eventos
+- Sem fluxo de pedido — só visualização
+- CTA único: "Quero um orçamento" → WhatsApp
+- Identidade visual da Oba Doceria
+
+**O que NÃO inclui (decisão):**
+- Catálogo de consulta paralelo para o dia a dia — desnecessário.
+  O cardápio atual (`/cardapio`) já serve esse propósito.
+  Se o atrito do fluxo de pedido for identificado como problema real,
+  resolve-se simplificando o cardápio existente, não criando URL paralela.
 
 ---
 
@@ -215,3 +325,5 @@ para compartilhar com clientes antes do orçamento.
 | 20/09/2026 | Passo 2 concluído | 40 -> 3 U+FFFD. Scripts em .scripts/. 13/13 validações OK. Commit a8b7284. |
 | 22/09/2026 | Fix divergência preview/cardápio | /api/catalog conectado ao slot PUBLISHED do D1. Commit 09169c4. |
 | 22/09/2026 | Passo 3 concluído | #pag-1/2/3 fixas em 100dvh, overflow:hidden. Commit 77c05a8. Deploy 2cf0ef7f. |
+| 22/09/2026 | fix(scroll) body | body.oba-pagina-fixa reforça bloqueio no body. Commit a242ed6. Deploy pendente. |
+| 22/09/2026 | Planejamento 12A-12C | Estrutura de propostas definida. 12A dividida em 5 subfases. 12B/12C planejadas. PLANO_EXECUCAO.md atualizado. |
