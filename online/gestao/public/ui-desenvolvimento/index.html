@@ -4177,8 +4177,9 @@ function navegarPara(num) {
   if (wpp) wpp.style.display = num >= 3 ? 'flex' : 'none';
   // Fluxo (pag 4+) usa smooth; páginas fixas (1-3) usa instant para não criar sensação de scroll
   window.scrollTo({ top:0, behavior: num >= 4 ? 'smooth' : 'instant' });
-  // Pag 1/2/3 bloqueiam scroll do body; fluxo libera
+  // Pag 1/2/3 bloqueiam scroll do body; fluxo libera (entFluxoCaixas recoloca oba-passo1-ativa se necessário)
   document.body.classList.toggle('oba-pagina-fixa', num < 4);
+  if (num >= 4) document.body.classList.remove('oba-passo1-ativa');
 }
 
 function entFluxoCaixas() {
