@@ -25,6 +25,11 @@
     body.oba-pagina-fixa{overflow:hidden;height:100dvh}
     /* Passo 1 do fluxo (escolha de tamanho) — fixa o body enquanto só as opções de caixa estão visíveis */
     body.oba-passo1-ativa{overflow:hidden;height:100dvh}
+    /* Detalhe de kit — compacta header e padding do fluxo para caber numa tela */
+    body.oba-kit-detalhe-ativa #fluxo-principal{padding-top:0;padding-bottom:0}
+    body.oba-kit-detalhe-ativa #fluxo-principal>header{margin-bottom:0;padding-top:8px;padding-bottom:4px}
+    body.oba-kit-detalhe-ativa #fluxo-principal>header img{width:64px;margin-bottom:4px}
+    body.oba-kit-detalhe-ativa #fluxo-principal>header button{display:none}
   </style>
   <!-- ================================================================
        R9A - VARIÁVEIS DE TEMA VISUAL (preenchidas por hidratarTemaDoModeloMestre)
@@ -5327,12 +5332,11 @@ function abrirModalConfigKit(idKit) {
   document.getElementById('skd-desc').innerText   = kit.desc || '';
   document.getElementById('skd-preco').innerText  = formatarMoeda(kit.precoFixo);
   atualizarOpcionaisDoModal();
-  // Exibir secao de detalhe, ocultar lista e header do fluxo
+  // Exibir secao de detalhe, ocultar lista
   document.getElementById('secao-kits')?.classList.add('hidden');
   document.getElementById('secao-kit-detalhe')?.classList.remove('hidden');
-  // Oculta header do fluxo-principal para ganhar espaço
-  const hdr = document.querySelector('#fluxo-principal > header');
-  if (hdr) hdr.classList.add('hidden');
+  // Compacta header e padding do fluxo para caber numa tela (mantém header visível)
+  document.body.classList.add('oba-kit-detalhe-ativa');
   // Detalhe do kit não precisa de scroll — mantém body fixo
   document.body.classList.remove('oba-passo1-ativa');
 }
@@ -5350,9 +5354,8 @@ function voltarDoKitDetalhe() {
   placaSelecionada = false;
   document.getElementById('secao-kit-detalhe')?.classList.add('hidden');
   document.getElementById('secao-kits')?.classList.remove('hidden');
-  // Restaura header do fluxo-principal
-  const hdr = document.querySelector('#fluxo-principal > header');
-  if (hdr) hdr.classList.remove('hidden');
+  // Restaura header e padding do fluxo-principal
+  document.body.classList.remove('oba-kit-detalhe-ativa');
   // Volta para lista compacta — rebloqueia scroll
   document.body.classList.add('oba-passo1-ativa');
 }
@@ -5402,9 +5405,8 @@ function adicionarKitAoCarrinho(acao) {
   caixaAtiva = null; lacoSelecionado = false; placaSelecionada = false;
   document.getElementById('secao-kit-detalhe')?.classList.add('hidden');
   document.getElementById('secao-kits')?.classList.remove('hidden');
-  // Restaura header do fluxo-principal
-  const hdr = document.querySelector('#fluxo-principal > header');
-  if (hdr) hdr.classList.remove('hidden');
+  // Restaura header e padding do fluxo-principal
+  document.body.classList.remove('oba-kit-detalhe-ativa');
   document.body.classList.add('oba-passo1-ativa');
   if (acao === 'continuar') mostrarNotificacao(`${nomeItem} adicionado!`);
   else if (acao === 'carrinho') abrirModalCarrinho();
