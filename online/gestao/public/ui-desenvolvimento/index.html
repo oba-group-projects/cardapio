@@ -5327,9 +5327,12 @@ function abrirModalConfigKit(idKit) {
   document.getElementById('skd-desc').innerText   = kit.desc || '';
   document.getElementById('skd-preco').innerText  = formatarMoeda(kit.precoFixo);
   atualizarOpcionaisDoModal();
-  // Exibir secao de detalhe, ocultar lista
+  // Exibir secao de detalhe, ocultar lista e header do fluxo
   document.getElementById('secao-kits')?.classList.add('hidden');
   document.getElementById('secao-kit-detalhe')?.classList.remove('hidden');
+  // Oculta header do fluxo-principal para ganhar espaço
+  const hdr = document.querySelector('#fluxo-principal > header');
+  if (hdr) hdr.classList.add('hidden');
   // Detalhe do kit não precisa de scroll — mantém body fixo
   document.body.classList.remove('oba-passo1-ativa');
 }
@@ -5347,6 +5350,9 @@ function voltarDoKitDetalhe() {
   placaSelecionada = false;
   document.getElementById('secao-kit-detalhe')?.classList.add('hidden');
   document.getElementById('secao-kits')?.classList.remove('hidden');
+  // Restaura header do fluxo-principal
+  const hdr = document.querySelector('#fluxo-principal > header');
+  if (hdr) hdr.classList.remove('hidden');
   // Volta para lista compacta — rebloqueia scroll
   document.body.classList.add('oba-passo1-ativa');
 }
@@ -5396,6 +5402,9 @@ function adicionarKitAoCarrinho(acao) {
   caixaAtiva = null; lacoSelecionado = false; placaSelecionada = false;
   document.getElementById('secao-kit-detalhe')?.classList.add('hidden');
   document.getElementById('secao-kits')?.classList.remove('hidden');
+  // Restaura header do fluxo-principal
+  const hdr = document.querySelector('#fluxo-principal > header');
+  if (hdr) hdr.classList.remove('hidden');
   document.body.classList.add('oba-passo1-ativa');
   if (acao === 'continuar') mostrarNotificacao(`${nomeItem} adicionado!`);
   else if (acao === 'carrinho') abrirModalCarrinho();
