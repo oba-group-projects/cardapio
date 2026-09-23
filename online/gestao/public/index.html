@@ -3161,13 +3161,23 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         <input id="${cid}-desc" value="${desc}" placeholder="Ex: Opção mais econômica com os sabores mais pedidos">
       </div>
 
+      <!-- DOCES POR CONVIDADO -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:10px;background:#fff;border:1px solid #e8d5b5;border-radius:10px;flex-wrap:wrap">
+        <label style="font-size:11px;font-weight:600;white-space:nowrap">Doces/convidado:</label>
+        <input type="number" min="1" step="1" id="${cid}-docespor" value="${dados?.docespor||5}" style="width:60px;font-size:13px;font-weight:700;text-align:center" oninput="recalcularCenario('${cid}')">
+        <span style="font-size:11px;color:#888">×</span>
+        <span id="${cid}-convidados-label" style="font-size:12px;color:#888">— convidados</span>
+        <span style="font-size:11px;color:#888">=</span>
+        <span id="${cid}-total-doces" style="font-size:14px;font-weight:700;color:var(--brand)">— doces</span>
+        <span id="${cid}-contador-global" style="margin-left:auto;font-size:12px;font-weight:700;padding:2px 10px;border-radius:20px;background:#eee;color:#555;white-space:nowrap">—</span>
+      </div>
+
       <!-- BLOCOS DE CATEGORIA -->
       <div id="${cid}-categorias" style="margin-bottom:10px"></div>
 
-      <!-- BOTÕES PARA ADICIONAR BLOCO -->
-      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-        <button class="secondary" style="font-size:11px;flex:1" onclick="obaProposalAdicionarCategoria('${cid}')">+ Categoria do catálogo</button>
-        <button class="secondary" style="font-size:11px;flex:1" onclick="obaProposalAdicionarItemLivre('${cid}')">+ Item livre (frete, etc)</button>
+      <!-- BOTÃO ITEM LIVRE -->
+      <div style="margin-bottom:14px">
+        <button class="secondary" style="font-size:11px;width:100%" onclick="obaProposalAdicionarItemLivre('${cid}')">+ Item livre (frete, montagem, etc)</button>
       </div>
 
       <!-- TOTAIS DO CENÁRIO -->
@@ -3189,14 +3199,20 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     `;
     document.getElementById('proposals-cenarios').appendChild(div);
 
-    // Restaurar blocos salvos
-    if (dados?.items) {
-      // Agrupar itens salvos por categoria
+    // Atualizar label de convidados a partir do campo do evento
+    const convidados = Number(document.getElementById('prop-convidados')?.value || 0);
+    const labelConv = document.getElementById(cid + '-convidados-label');
+    if (labelConv) labelConv.textContent = (convidados || '—') + ' convidados';
+
+    const cat = getCatalogo();
+    const categorias = cat.categories.filter(c => c.ativo !== false);
+
+    if (dados?.items && dados.items.length > 0) {
+      // Restaurar a partir de proposta salva — agrupar por categoria
       const porCategoria = {};
       const livres = [];
       dados.items.forEach(it => {
         if (it.tipo === 'catalogo' && it.ref_id) {
-          // ref_id formato: "catId:saborId"
           const [catId, saborId] = (it.ref_id||'').split(':');
           if (!porCategoria[catId]) porCategoria[catId] = {catId, total: 0, sabores: {}};
           porCategoria[catId].sabores[saborId] = it.qtd;
@@ -3205,57 +3221,60 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
           livres.push(it);
         }
       });
-      Object.values(porCategoria).forEach(c => obaProposalAdicionarCategoria(cid, c.catId, c.total, c.sabores));
+      // Abrir todas as categorias ativas; preencher quantidades das que têm dados
+      categorias.forEach(c => {
+        const saved = porCategoria[String(c.id)];
+        obaProposalAdicionarCategoria(cid, String(c.id), saved?.total || 0, saved?.sabores || {});
+      });
       livres.forEach(it => obaProposalAdicionarItemLivre(cid, it));
+    } else {
+      // Novo cenário — abrir todas as categorias ativas com total zerado
+      categorias.forEach(c => obaProposalAdicionarCategoria(cid, String(c.id), 0, {}));
     }
+
     recalcularCenario(cid);
   }
   window.obaProposalAdicionarCenario = adicionarCenario;
 
   // ---------- BLOCO DE CATEGORIA ----------
-  window.obaProposalAdicionarCategoria = function(cid, catIdPresel, totalPresel, saboresPresel) {
+  window.obaProposalAdicionarCategoria = function(cid, catId, totalPresel, saboresPresel) {
     const cat = getCatalogo();
-    const categorias = cat.categories.filter(c => c.ativo !== false);
-    if (!categorias.length) { alert('Nenhuma categoria ativa no catálogo.'); return; }
+    const catObj = cat.categories.find(c => String(c.id) === String(catId));
+    if (!catId || !catObj) return;
 
-    const blockId = cid + '-cat-' + Date.now();
+    const blockId = cid + '-cat-' + catId;
+    // Não duplicar
+    if (document.getElementById(blockId)) return;
+
     const block = document.createElement('div');
     block.id = blockId;
     block.style.cssText = 'border:1px solid #e8d5b5;border-radius:12px;padding:12px;margin-bottom:10px;background:#fff';
+    block.dataset.catId = catId;
 
-    // Selector de categoria
-    const catOpts = categorias.map(c => `<option value="${c.id}" ${String(c.id)===String(catIdPresel)?'selected':''}>${c.nome}</option>`).join('');
     block.innerHTML = `
       <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
-        <select id="${blockId}-cat" style="font-size:12px;flex:1" onchange="obaProposalRenderSabores('${blockId}','${cid}')">
-          <option value="">— Selecione a categoria —</option>
-          ${catOpts}
-        </select>
+        <strong style="font-size:12px;color:var(--brand);flex:1">${catObj.nome}</strong>
         <div style="display:flex;align-items:center;gap:6px">
-          <label style="font-size:11px;white-space:nowrap">Total:</label>
-          <input type="number" min="1" id="${blockId}-total" value="${totalPresel||''}" placeholder="qtd total" style="width:70px;font-size:12px" oninput="obaProposalAtualizarContador('${blockId}','${cid}')">
+          <label style="font-size:11px;white-space:nowrap">Total nesta categoria:</label>
+          <input type="number" min="0" step="1" id="${blockId}-total" value="${totalPresel||0}"
+            style="width:70px;font-size:13px;font-weight:700;text-align:center"
+            oninput="obaProposalAtualizarContador('${blockId}','${cid}')">
           <span style="font-size:11px;white-space:nowrap">un.</span>
         </div>
         <span id="${blockId}-contador" style="font-size:12px;font-weight:700;padding:2px 10px;border-radius:20px;background:#eee;color:#555;white-space:nowrap">—</span>
-        <button class="secondary" style="padding:3px 8px;font-size:11px;color:#dc2626" onclick="document.getElementById('${blockId}').remove();recalcularCenario('${cid}')">✕</button>
       </div>
-      <div id="${blockId}-sabores" style="margin-top:6px"></div>
+      <div id="${blockId}-sabores" style="margin-top:4px"></div>
     `;
     document.getElementById(cid + '-categorias').appendChild(block);
-
-    // Se tem categoria pré-selecionada, renderizar sabores já
-    if (catIdPresel) {
-      obaProposalRenderSabores(blockId, cid, saboresPresel);
-    }
+    obaProposalRenderSabores(blockId, cid, saboresPresel);
   };
 
   window.obaProposalRenderSabores = function(blockId, cid, qtdsPresel) {
-    const catSelect = document.getElementById(blockId + '-cat');
-    const catId = catSelect?.value;
+    const block = document.getElementById(blockId);
+    const catId = block?.dataset.catId;
     const container = document.getElementById(blockId + '-sabores');
-    if (!container) return;
+    if (!container || !catId) return;
     container.innerHTML = '';
-    if (!catId) return;
 
     const cat = getCatalogo();
     const sabores = cat.flavors.filter(f => String(f.categoriaId) === String(catId) && f.ativo !== false);
@@ -3360,6 +3379,43 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     const totEl = document.getElementById(cid + '-total');
     if (subEl) subEl.textContent = fmt(subtotal);
     if (totEl) totEl.textContent = fmt(total);
+
+    // Contador global: total de doces calculado vs alocado nas categorias
+    const convidados = Number(document.getElementById('prop-convidados')?.value || 0);
+    const docesPor = Number(document.getElementById(cid + '-docespor')?.value || 0);
+    const totalDoces = convidados * docesPor;
+
+    const labelConv = document.getElementById(cid + '-convidados-label');
+    if (labelConv) labelConv.textContent = (convidados || '—') + ' convidados';
+    const totalDocesEl = document.getElementById(cid + '-total-doces');
+    if (totalDocesEl) totalDocesEl.textContent = totalDoces > 0 ? totalDoces + ' doces' : '—';
+
+    // Contar total alocado nas categorias
+    let totalAlocado = 0;
+    document.querySelectorAll('#' + cid + '-categorias > div[data-cat-id]').forEach(block => {
+      block.querySelectorAll('input[data-sabor-id]').forEach(inp => {
+        totalAlocado += Number(inp.value || 0);
+      });
+    });
+
+    const contGlobal = document.getElementById(cid + '-contador-global');
+    if (contGlobal && totalDoces > 0) {
+      const diff = totalDoces - totalAlocado;
+      if (diff > 0) {
+        contGlobal.textContent = diff + ' doces a distribuir';
+        contGlobal.style.background = '#fef3c7'; contGlobal.style.color = '#92400e';
+      } else if (diff === 0) {
+        contGlobal.textContent = '✓ ' + totalAlocado + ' doces alocados';
+        contGlobal.style.background = '#d1fae5'; contGlobal.style.color = '#065f46';
+      } else {
+        contGlobal.textContent = Math.abs(diff) + ' doces acima do previsto';
+        contGlobal.style.background = '#fee2e2'; contGlobal.style.color = '#dc2626';
+      }
+    } else if (contGlobal) {
+      contGlobal.textContent = totalAlocado > 0 ? totalAlocado + ' doces alocados' : '—';
+      contGlobal.style.background = '#eee'; contGlobal.style.color = '#555';
+    }
+
     recalcularGlobal();
   }
 
@@ -3381,9 +3437,9 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       const items = [];
 
       // Blocos de categoria
-      document.querySelectorAll('#' + cid + '-categorias > div[id*="-cat-"]').forEach(block => {
+      document.querySelectorAll('#' + cid + '-categorias > div[data-cat-id]').forEach(block => {
         const blockId = block.id;
-        const catId = document.getElementById(blockId + '-cat')?.value;
+        const catId = block.dataset.catId;
         if (!catId) return;
         block.querySelectorAll('input[data-sabor-id]').forEach(inp => {
           const qtd = Number(inp.value || 0);
@@ -3399,7 +3455,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       });
 
       // Itens livres
-      document.querySelectorAll('#' + cid + '-categorias > div:not([id*="-cat-"])').forEach(row => {
+      document.querySelectorAll('#' + cid + '-categorias > div:not([data-cat-id])').forEach(row => {
         const desc = row.querySelector('.prop-livre-desc')?.value.trim() || '';
         const preco = Number(row.querySelector('.prop-livre-preco')?.value || 0);
         if (!desc && !preco) return;
@@ -3412,6 +3468,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         descricao: document.getElementById(cid + '-desc')?.value || '',
         desconto_tipo: document.getElementById(cid + '-desconto-tipo')?.value || 'none',
         desconto_valor: Number(document.getElementById(cid + '-desconto-valor')?.value || 0),
+        docespor: Number(document.getElementById(cid + '-docespor')?.value || 0) || undefined,
         items,
       });
     });
