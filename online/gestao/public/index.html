@@ -59,6 +59,7 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
 <button class="tab" data-tab="config">Loja</button>
 <button class="tab" data-tab="visual">✏️ Edição Visual</button>
 <button class="tab" data-tab="midia">🖼️ Mídia</button>
+<button class="tab" data-tab="proposals">📋 Propostas</button>
 </div>
 
 <section id="panel-flavors" class="panel active"><div class="toolbar"><h2>Sabores</h2><button class="primary" data-new="flavors">+ Novo sabor</button><input id="buscaSabor" placeholder="Buscar sabor"><select id="filtroCategoria"><option value="">Todas as categorias</option></select></div><table><thead><tr><th>Nome</th><th>Categoria</th><th>Preço</th><th class="hide-mobile">Imagem</th><th>Status</th></tr></thead><tbody id="body-flavors"></tbody></table></section>
@@ -2969,6 +2970,365 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
 })();
 </script>
 <!-- FIM ABA MÍDIA -->
+
+<!-- =========================================================
+     FASE 12A — ABA PROPOSTAS DE ORÇAMENTO
+========================================================= -->
+<section id="panel-proposals" class="panel">
+  <div class="toolbar" style="margin-bottom:18px">
+    <h2 style="margin:0 auto 0 0">📋 Propostas de Orçamento</h2>
+    <button class="primary" onclick="obaProposalNova()">+ Nova Proposta</button>
+  </div>
+
+  <!-- LISTAGEM -->
+  <div id="proposals-lista">
+    <table>
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Evento</th>
+          <th>Convidados</th>
+          <th>Status</th>
+          <th>Criado em</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="proposals-tbody">
+        <tr><td colspan="6" style="text-align:center;color:#888">Carregando...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- EDITOR (oculto por padrão) -->
+  <div id="proposals-editor" style="display:none">
+
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+      <button class="secondary" onclick="obaProposalCancelar()">← Voltar à lista</button>
+      <h3 id="proposals-editor-titulo" style="margin:0;font-size:15px">Nova Proposta</h3>
+      <span id="proposals-status-badge" style="margin-left:auto;font-size:11px;padding:3px 10px;border-radius:20px;background:#eee;color:#555"></span>
+    </div>
+
+    <!-- DADOS DO EVENTO -->
+    <div class="card" style="margin-bottom:16px">
+      <h4 style="margin:0 0 12px;font-size:13px;color:var(--brand)">Dados do Evento</h4>
+      <div class="grid">
+        <div class="field"><label>Nome do cliente *</label><input id="prop-cliente" placeholder="Ex: Ana Lima"></div>
+        <div class="field"><label>Data do evento</label><input id="prop-data-evento" type="date"></div>
+        <div class="field"><label>Nº de convidados</label><input id="prop-convidados" type="number" min="1" placeholder="Ex: 100"></div>
+        <div class="field"><label>Tipo de evento</label><input id="prop-tipo-evento" placeholder="Ex: Casamento, Aniversário"></div>
+        <div class="field"><label>Validade da proposta</label><input id="prop-validade" type="date"></div>
+        <div class="field full"><label>Resumo geral <span class="hint">(substitui o áudio explicativo)</span></label><textarea id="prop-resumo" rows="3" placeholder="Ex: Olá Ana! Montei 3 opções pensando no perfil do seu evento..."></textarea></div>
+      </div>
+    </div>
+
+    <!-- CENÁRIOS -->
+    <div id="proposals-cenarios"></div>
+
+    <button class="secondary" onclick="obaProposalAdicionarCenario()" style="margin-bottom:16px;width:100%">+ Adicionar Cenário</button>
+
+    <!-- AÇÕES -->
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="primary" onclick="obaProposalSalvar('rascunho')">💾 Salvar Rascunho</button>
+      <button class="primary" style="background:#059669" onclick="obaProposalSalvar('enviada')">📤 Salvar e Marcar como Enviada</button>
+    </div>
+
+  </div>
+</section>
+
+<script>
+// ================================================================
+// FASE 12A-2 — EDITOR DE PROPOSTAS (Central)
+// ================================================================
+(function() {
+
+  let obaProposalAtiva = null; // proposta em edição (objeto completo ou null para nova)
+  let obaProposalCenariosCount = 0;
+
+  // ---------- UTILITÁRIOS ----------
+  function obaProposalFmt(valor) {
+    return 'R$ ' + Number(valor||0).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+
+  function obaProposalStatusLabel(s) {
+    const map = {rascunho:'Rascunho', enviada:'Enviada', aceita:'Aceita', recusada:'Recusada'};
+    return map[s] || s;
+  }
+
+  function obaProposalStatusColor(s) {
+    const map = {rascunho:'#888', enviada:'#2563eb', aceita:'#059669', recusada:'#dc2626'};
+    return map[s] || '#888';
+  }
+
+  // ---------- LISTAGEM ----------
+  async function obaProposalCarregarLista() {
+    const tbody = document.getElementById('proposals-tbody');
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#888">Carregando...</td></tr>';
+    try {
+      const r = await fetch('/api/proposals', {headers:{'x-csrf-token': document.cookie.match(/csrf_token=([^;]+)/)?.[1]||''}});
+      const data = await r.json();
+      if (!data.ok || !data.proposals.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#888">Nenhuma proposta ainda.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.proposals.map(p => `
+        <tr>
+          <td><strong>${p.cliente}</strong></td>
+          <td>${p.data_evento ? new Date(p.data_evento+'T12:00:00').toLocaleDateString('pt-BR') : '—'}</td>
+          <td>${p.convidados ? p.convidados + ' pessoas' : '—'}</td>
+          <td><span style="font-size:11px;padding:2px 8px;border-radius:12px;background:${obaProposalStatusColor(p.status)}22;color:${obaProposalStatusColor(p.status)};font-weight:600">${obaProposalStatusLabel(p.status)}</span></td>
+          <td>${new Date(p.criado_em).toLocaleDateString('pt-BR')}</td>
+          <td style="display:flex;gap:6px">
+            <button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaProposalEditar('${p.proposal_id}')">Editar</button>
+            <button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaProposalAlterarStatus('${p.proposal_id}','${p.status}')">Status</button>
+          </td>
+        </tr>
+      `).join('');
+    } catch(e) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#dc2626">Erro ao carregar propostas.</td></tr>';
+    }
+  }
+
+  // ---------- ABRIR / FECHAR EDITOR ----------
+  function obaProposalMostrarEditor() {
+    document.getElementById('proposals-lista').style.display = 'none';
+    document.getElementById('proposals-editor').style.display = '';
+  }
+
+  function obaProposalMostrarLista() {
+    document.getElementById('proposals-lista').style.display = '';
+    document.getElementById('proposals-editor').style.display = 'none';
+  }
+
+  window.obaProposalNova = function() {
+    obaProposalAtiva = null;
+    obaProposalCenariosCount = 0;
+    document.getElementById('proposals-editor-titulo').textContent = 'Nova Proposta';
+    document.getElementById('proposals-status-badge').textContent = 'Rascunho';
+    document.getElementById('proposals-status-badge').style.background = '#eee';
+    document.getElementById('proposals-status-badge').style.color = '#555';
+    ['prop-cliente','prop-data-evento','prop-convidados','prop-tipo-evento','prop-validade','prop-resumo']
+      .forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+    document.getElementById('proposals-cenarios').innerHTML = '';
+    obaProposalAdicionarCenario();
+    obaProposalMostrarEditor();
+  };
+
+  window.obaProposalCancelar = function() {
+    obaProposalAtiva = null;
+    obaProposalMostrarLista();
+  };
+
+  window.obaProposalEditar = async function(proposalId) {
+    try {
+      const r = await fetch('/api/proposals/' + proposalId);
+      const data = await r.json();
+      if (!data.ok) { alert('Erro ao carregar proposta.'); return; }
+      const p = data.proposal;
+      obaProposalAtiva = p;
+      document.getElementById('proposals-editor-titulo').textContent = 'Editando: ' + p.cliente;
+      const badge = document.getElementById('proposals-status-badge');
+      badge.textContent = obaProposalStatusLabel(p.status);
+      badge.style.background = obaProposalStatusColor(p.status) + '22';
+      badge.style.color = obaProposalStatusColor(p.status);
+      document.getElementById('prop-cliente').value = p.cliente || '';
+      document.getElementById('prop-data-evento').value = p.data_evento || '';
+      document.getElementById('prop-convidados').value = p.convidados || '';
+      document.getElementById('prop-tipo-evento').value = p.tipo_evento || '';
+      document.getElementById('prop-validade').value = p.validade || '';
+      document.getElementById('prop-resumo').value = p.resumo || '';
+      // Renderizar cenários
+      obaProposalCenariosCount = 0;
+      document.getElementById('proposals-cenarios').innerHTML = '';
+      (p.scenarios || []).forEach(s => obaProposalAdicionarCenario(s));
+      obaProposalMostrarEditor();
+    } catch(e) {
+      alert('Erro ao carregar proposta.');
+    }
+  };
+
+  // ---------- CENÁRIOS ----------
+  window.obaProposalAdicionarCenario = function(dados) {
+    obaProposalCenariosCount++;
+    const idx = obaProposalCenariosCount;
+    const id = 'cenario-' + idx;
+    const nome = dados?.nome || 'Cenário ' + idx;
+    const desc = dados?.descricao || '';
+    const descontoTipo = dados?.desconto_tipo || 'none';
+    const descontoValor = dados?.desconto_valor || 0;
+    const items = dados?.items || [];
+
+    const div = document.createElement('div');
+    div.id = id;
+    div.className = 'card';
+    div.style.cssText = 'margin-bottom:14px;border:1px solid #e8d5b5;border-radius:14px;padding:16px';
+    div.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <strong style="font-size:13px;color:var(--brand)">Cenário ${idx}</strong>
+        <input value="${nome}" placeholder="Nome do cenário" style="flex:1;font-weight:600;font-size:13px" id="${id}-nome">
+        <button class="secondary" style="padding:3px 8px;font-size:11px;color:#dc2626" onclick="document.getElementById('${id}').remove()">Remover</button>
+      </div>
+      <div class="field" style="margin-bottom:10px">
+        <label style="font-size:11px">Descrição do cenário</label>
+        <input id="${id}-desc" value="${desc}" placeholder="Ex: Opção mais econômica com os sabores mais vendidos">
+      </div>
+      <div id="${id}-items" style="margin-bottom:10px"></div>
+      <button class="secondary" onclick="obaProposalAdicionarItem('${id}')" style="width:100%;margin-bottom:10px;font-size:11px">+ Adicionar item</button>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <label style="font-size:11px;font-weight:600">Desconto:</label>
+        <select id="${id}-desconto-tipo" style="font-size:12px" onchange="obaProposalAtualizarTotal('${id}')">
+          <option value="none" ${descontoTipo==='none'?'selected':''}>Sem desconto</option>
+          <option value="reais" ${descontoTipo==='reais'?'selected':''}>R$ (valor fixo)</option>
+          <option value="percentual" ${descontoTipo==='percentual'?'selected':''}>% (percentual)</option>
+        </select>
+        <input type="number" min="0" step="0.01" id="${id}-desconto-valor" value="${descontoValor}" style="width:80px;font-size:12px" oninput="obaProposalAtualizarTotal('${id}')">
+        <span id="${id}-total" style="margin-left:auto;font-weight:700;font-size:14px;color:var(--brand)">R$ 0,00</span>
+      </div>
+    `;
+    document.getElementById('proposals-cenarios').appendChild(div);
+    items.forEach(it => obaProposalAdicionarItem(id, it));
+    obaProposalAtualizarTotal(id);
+  };
+
+  window.obaProposalAdicionarItem = function(cenarioId, dados) {
+    const container = document.getElementById(cenarioId + '-items');
+    const itemDiv = document.createElement('div');
+    itemDiv.style.cssText = 'display:flex;gap:6px;align-items:center;margin-bottom:6px;flex-wrap:wrap';
+    const tipo = dados?.tipo || 'livre';
+    const desc = dados?.descricao || '';
+    const qtd = dados?.qtd || 1;
+    const preco = dados?.preco_unit || 0;
+    itemDiv.innerHTML = `
+      <input placeholder="Descrição do item" value="${desc}" style="flex:2;min-width:120px;font-size:12px" class="prop-item-desc" oninput="obaProposalAtualizarTotal('${cenarioId}')">
+      <input type="number" min="1" step="1" value="${qtd}" style="width:55px;font-size:12px" class="prop-item-qtd" oninput="obaProposalAtualizarTotal('${cenarioId}')">
+      <input type="number" min="0" step="0.01" value="${preco}" placeholder="Preço/un" style="width:90px;font-size:12px" class="prop-item-preco" oninput="obaProposalAtualizarTotal('${cenarioId}')">
+      <span class="prop-item-sub" style="font-size:11px;color:#888;min-width:60px">R$ 0,00</span>
+      <button class="secondary" style="padding:2px 7px;font-size:11px;color:#dc2626" onclick="this.parentElement.remove();obaProposalAtualizarTotal('${cenarioId}')">✕</button>
+    `;
+    container.appendChild(itemDiv);
+    obaProposalAtualizarTotal(cenarioId);
+  };
+
+  window.obaProposalAtualizarTotal = function(cenarioId) {
+    const container = document.getElementById(cenarioId + '-items');
+    if (!container) return;
+    let subtotal = 0;
+    container.querySelectorAll('div').forEach(row => {
+      const qtd = Number(row.querySelector('.prop-item-qtd')?.value || 0);
+      const preco = Number(row.querySelector('.prop-item-preco')?.value || 0);
+      const sub = qtd * preco;
+      const subEl = row.querySelector('.prop-item-sub');
+      if (subEl) subEl.textContent = obaProposalFmt(sub);
+      subtotal += sub;
+    });
+    const tipo = document.getElementById(cenarioId + '-desconto-tipo')?.value || 'none';
+    const valorDesc = Number(document.getElementById(cenarioId + '-desconto-valor')?.value || 0);
+    let desconto = 0;
+    if (tipo === 'reais') desconto = valorDesc;
+    else if (tipo === 'percentual') desconto = subtotal * (valorDesc / 100);
+    const total = Math.max(0, subtotal - desconto);
+    const el = document.getElementById(cenarioId + '-total');
+    if (el) el.textContent = obaProposalFmt(total);
+  };
+
+  // ---------- SALVAR ----------
+  window.obaProposalSalvar = async function(statusFinal) {
+    const cliente = document.getElementById('prop-cliente').value.trim();
+    if (!cliente) { alert('Nome do cliente é obrigatório.'); return; }
+
+    const scenarios = [];
+    document.querySelectorAll('#proposals-cenarios > div[id^="cenario-"]').forEach(div => {
+      const cenarioId = div.id;
+      const items = [];
+      div.querySelectorAll('#' + cenarioId + '-items > div').forEach(row => {
+        const desc = row.querySelector('.prop-item-desc')?.value.trim() || '';
+        if (!desc) return;
+        items.push({
+          tipo: 'livre',
+          descricao: desc,
+          qtd: Number(row.querySelector('.prop-item-qtd')?.value || 1),
+          preco_unit: Number(row.querySelector('.prop-item-preco')?.value || 0),
+        });
+      });
+      scenarios.push({
+        scenario_id: obaProposalAtiva?.scenarios?.find((_,i) => 'cenario-'+(i+1) === cenarioId)?.scenario_id || undefined,
+        nome: document.getElementById(cenarioId + '-nome')?.value || 'Cenário',
+        descricao: document.getElementById(cenarioId + '-desc')?.value || '',
+        desconto_tipo: document.getElementById(cenarioId + '-desconto-tipo')?.value || 'none',
+        desconto_valor: Number(document.getElementById(cenarioId + '-desconto-valor')?.value || 0),
+        items,
+      });
+    });
+
+    const payload = {
+      cliente,
+      data_evento: document.getElementById('prop-data-evento').value || null,
+      convidados: Number(document.getElementById('prop-convidados').value) || null,
+      tipo_evento: document.getElementById('prop-tipo-evento').value || null,
+      resumo: document.getElementById('prop-resumo').value || null,
+      validade: document.getElementById('prop-validade').value || null,
+      status: statusFinal,
+      scenarios,
+    };
+
+    const csrf = document.cookie.match(/csrf_token=([^;]+)/)?.[1] || '';
+    try {
+      let r;
+      if (obaProposalAtiva?.proposal_id) {
+        r = await fetch('/api/proposals/' + obaProposalAtiva.proposal_id, {
+          method: 'PUT',
+          headers: {'Content-Type':'application/json','x-csrf-token':csrf},
+          body: JSON.stringify(payload),
+        });
+      } else {
+        r = await fetch('/api/proposals', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json','x-csrf-token':csrf},
+          body: JSON.stringify(payload),
+        });
+      }
+      const data = await r.json();
+      if (!data.ok) { alert('Erro ao salvar: ' + (data.error||'desconhecido')); return; }
+      obaProposalAtiva = data.proposal;
+      alert('Proposta salva!');
+      obaProposalMostrarLista();
+      obaProposalCarregarLista();
+    } catch(e) {
+      alert('Erro de conexão ao salvar proposta.');
+    }
+  };
+
+  // ---------- ALTERAR STATUS ----------
+  window.obaProposalAlterarStatus = async function(proposalId, statusAtual) {
+    const opcoes = ['rascunho','enviada','aceita','recusada'];
+    const labels = ['Rascunho','Enviada','Aceita','Recusada'];
+    const novo = prompt('Status atual: ' + obaProposalStatusLabel(statusAtual) + '\nEscolha o novo status:\n' + opcoes.map((o,i)=>`${i+1}. ${labels[i]}`).join('\n') + '\n\nDigite o número:');
+    const idx = parseInt(novo) - 1;
+    if (isNaN(idx) || idx < 0 || idx >= opcoes.length) return;
+    const csrf = document.cookie.match(/csrf_token=([^;]+)/)?.[1] || '';
+    try {
+      const r = await fetch('/api/proposals/' + proposalId + '/status', {
+        method: 'PATCH',
+        headers: {'Content-Type':'application/json','x-csrf-token':csrf},
+        body: JSON.stringify({status: opcoes[idx]}),
+      });
+      const data = await r.json();
+      if (data.ok) obaProposalCarregarLista();
+      else alert('Erro: ' + (data.error||'desconhecido'));
+    } catch(e) {
+      alert('Erro de conexão.');
+    }
+  };
+
+  // ---------- INTEGRAÇÃO COM ABA ----------
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.tab[data-tab="proposals"]').forEach(btn => {
+      btn.addEventListener('click', () => setTimeout(obaProposalCarregarLista, 50));
+    });
+  });
+
+})();
+</script>
+<!-- FIM ABA PROPOSTAS -->
 
 <!-- =========================================================
      FASE 7C.2B - UX OPERACIONAL SIMPLIFICADA
