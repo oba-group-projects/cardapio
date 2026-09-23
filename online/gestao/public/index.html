@@ -3252,18 +3252,21 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     block.dataset.catId = catId;
 
     block.innerHTML = `
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;cursor:pointer;user-select:none"
+           onclick="(function(b){const s=document.getElementById(b+'-sabores');const a=document.getElementById(b+'-arrow');if(s){const open=s.style.display!=='none';s.style.display=open?'none':'';if(a)a.textContent=open?'▶':'▼'}}('${blockId}'))">
+        <span id="${blockId}-arrow" style="font-size:11px;color:var(--brand);flex-shrink:0">▶</span>
         <strong style="font-size:12px;color:var(--brand);flex:1">${catObj.nome}</strong>
-        <div style="display:flex;align-items:center;gap:6px">
-          <label style="font-size:11px;white-space:nowrap">Total nesta categoria:</label>
+        <div style="display:flex;align-items:center;gap:6px" onclick="event.stopPropagation()">
+          <label style="font-size:11px;white-space:nowrap">Total cat.:</label>
           <input type="number" min="0" step="1" id="${blockId}-total" value="${totalPresel||0}"
-            style="width:70px;font-size:13px;font-weight:700;text-align:center"
+            style="width:65px;font-size:13px;font-weight:700;text-align:center"
             oninput="obaProposalAtualizarContador('${blockId}','${cid}')">
           <span style="font-size:11px;white-space:nowrap">un.</span>
         </div>
-        <span id="${blockId}-contador" style="font-size:12px;font-weight:700;padding:2px 10px;border-radius:20px;background:#eee;color:#555;white-space:nowrap">—</span>
+        <span id="${blockId}-contador" style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:#eee;color:#555;white-space:nowrap">—</span>
+        <span id="${blockId}-falta-total" style="font-size:11px;padding:2px 8px;border-radius:20px;background:#f0f0f0;color:#888;white-space:nowrap">—</span>
       </div>
-      <div id="${blockId}-sabores" style="margin-top:4px"></div>
+      <div id="${blockId}-sabores" style="margin-top:8px;display:none"></div>
     `;
     document.getElementById(cid + '-categorias').appendChild(block);
     obaProposalRenderSabores(blockId, cid, saboresPresel);
@@ -3317,6 +3320,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       if (subEl) subEl.textContent = qtd > 0 ? fmt(sub) : '—';
     });
 
+    // Contador por categoria (restando dentro da categoria)
     const restando = total - alocado;
     if (total === 0) {
       contador.textContent = '—';
@@ -3331,6 +3335,33 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       contador.textContent = Math.abs(restando) + ' a mais';
       contador.style.background = '#fee2e2'; contador.style.color = '#dc2626';
     }
+
+    // Badge "Faltam X do total" — total previsto menos soma dos totais de todas as categorias
+    const convidados = Number(document.getElementById('prop-convidados')?.value || 0);
+    const docesPor = Number(document.getElementById(cid + '-docespor')?.value || 0);
+    const totalPrevisto = convidados * docesPor;
+    const faltaEl = document.getElementById(blockId + '-falta-total');
+    if (faltaEl && totalPrevisto > 0) {
+      let somaCategs = 0;
+      document.querySelectorAll('#' + cid + '-categorias > div[data-cat-id]').forEach(b => {
+        somaCategs += Number(document.getElementById(b.id + '-total')?.value || 0);
+      });
+      const faltam = totalPrevisto - somaCategs;
+      if (faltam > 0) {
+        faltaEl.textContent = 'Faltam ' + faltam + ' p/ total';
+        faltaEl.style.background = '#fef9ec'; faltaEl.style.color = '#92400e';
+      } else if (faltam === 0) {
+        faltaEl.textContent = '✓ Total fechado';
+        faltaEl.style.background = '#ecfdf5'; faltaEl.style.color = '#065f46';
+      } else {
+        faltaEl.textContent = Math.abs(faltam) + ' acima do total';
+        faltaEl.style.background = '#fef2f2'; faltaEl.style.color = '#dc2626';
+      }
+    } else if (faltaEl) {
+      faltaEl.textContent = '—';
+      faltaEl.style.background = '#f0f0f0'; faltaEl.style.color = '#888';
+    }
+
     recalcularCenario(cid);
   };
 
