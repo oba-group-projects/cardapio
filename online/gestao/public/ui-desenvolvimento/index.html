@@ -25,11 +25,6 @@
     body.oba-pagina-fixa{overflow:hidden;height:100dvh}
     /* Passo 1 do fluxo (escolha de tamanho) — fixa o body enquanto só as opções de caixa estão visíveis */
     body.oba-passo1-ativa{overflow:hidden;height:100dvh}
-    /* Detalhe de kit — compacta header e padding do fluxo para caber numa tela */
-    body.oba-kit-detalhe-ativa #fluxo-principal{padding-top:0;padding-bottom:0}
-    body.oba-kit-detalhe-ativa #fluxo-principal>header{margin-bottom:0;padding-top:8px;padding-bottom:4px}
-    body.oba-kit-detalhe-ativa #fluxo-principal>header img{width:64px;margin-bottom:4px}
-    body.oba-kit-detalhe-ativa #fluxo-principal>header button{display:none}
   </style>
   <!-- ================================================================
        R9A - VARIÁVEIS DE TEMA VISUAL (preenchidas por hidratarTemaDoModeloMestre)
@@ -162,6 +157,18 @@
       height: 100dvh !important;
       max-height: 100dvh !important;
       overflow: hidden !important;
+    }
+
+    /* Kit detalhe — mesmo padrão da Degustação */
+    body.oba-kit-detalhe-ativa {
+      overflow: hidden !important;
+    }
+
+    body.oba-kit-detalhe-ativa #secao-kit-detalhe {
+      height: 100dvh !important;
+      max-height: 100dvh !important;
+      overflow: hidden !important;
+      padding-bottom: 0 !important;
     }
 
     #r117-deg-escolha {
