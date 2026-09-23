@@ -3258,7 +3258,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     if (!catId) return;
 
     const cat = getCatalogo();
-    const sabores = cat.flavors.filter(f => String(f.categoria) === String(catId) && f.ativo !== false);
+    const sabores = cat.flavors.filter(f => String(f.categoriaId) === String(catId) && f.ativo !== false);
     if (!sabores.length) {
       container.innerHTML = '<p style="font-size:11px;color:#888;margin:4px 0">Nenhum sabor ativo nesta categoria.</p>';
       return;
