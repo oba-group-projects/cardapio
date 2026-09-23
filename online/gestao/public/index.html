@@ -3014,7 +3014,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       <div class="grid">
         <div class="field"><label>Nome do cliente *</label><input id="prop-cliente" placeholder="Ex: Ana Lima"></div>
         <div class="field"><label>Data do evento</label><input id="prop-data-evento" type="date"></div>
-        <div class="field"><label>Nº de convidados</label><input id="prop-convidados" type="number" min="1" placeholder="Ex: 100"></div>
+        <div class="field"><label>Nº de convidados</label><input id="prop-convidados" type="number" min="1" placeholder="Ex: 100" oninput="document.querySelectorAll('#proposals-cenarios>[id^=cenario-]').forEach(d=>recalcularCenario(d.id))"></div>
         <div class="field"><label>Tipo de evento</label><input id="prop-tipo-evento" placeholder="Ex: Casamento, Aniversário"></div>
         <div class="field"><label>Validade da proposta</label><input id="prop-validade" type="date"></div>
         <div class="field full"><label>Resumo geral <span class="hint">(substitui o áudio explicativo)</span></label><textarea id="prop-resumo" rows="3" placeholder="Ex: Olá Ana! Montei 3 opções pensando no perfil do seu evento..."></textarea></div>
