@@ -159,44 +159,13 @@
       overflow: hidden !important;
     }
 
-    /* Kit detalhe — estrutura idêntica à Degustação */
-    body.oba-kit-detalhe-ativa {
-      overflow: hidden !important;
-    }
-
-    body.oba-kit-detalhe-ativa #secao-kit-detalhe {
-      height: 100dvh !important;
-      max-height: 100dvh !important;
-      overflow: hidden !important;
-      padding-bottom: 0 !important;
-    }
-
-    body.oba-kit-detalhe-ativa #fluxo-principal > header {
-      display: none !important;
-    }
-
-    body.oba-kit-detalhe-ativa #skd-escolha {
-      height: 100dvh !important;
-      max-height: 100dvh !important;
-      overflow: hidden !important;
-    }
-
-    #skd-escolha {
-      display: flex;
-      flex-direction: column;
-    }
-
-    #skd-main {
-      min-height: 0;
-      flex: 1 1 auto;
-      display: flex;
-      flex-direction: column;
-    }
-
+    /* Kit detalhe — scroll suave, imagem limitada, sem travar o body */
     #skd-preview {
-      flex: 1 1 auto;
-      min-height: 120px;
-      max-height: 28dvh;
+      max-height: 35dvh;
+      overflow: hidden;
+      border-radius: 1.4rem;
+      border: 2px solid #E8D5B5;
+      background: white;
     }
 
     #skd-preview img {
@@ -2403,78 +2372,76 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
         <!-- ==========================================================
              ETAPA PRÓPRIA: DETALHE DE KIT (Presenteáveis)
              ========================================================== -->
-        <div id="secao-kit-detalhe" class="hidden w-full bg-[#FFF9F3]">
+        <div id="secao-kit-detalhe" class="hidden w-full">
+          <div class="w-full max-w-[430px] mx-auto px-3 py-3 space-y-3">
 
-          <section id="skd-escolha" class="w-full bg-[#FFF9F3]">
-            <div id="skd-main" class="w-full max-w-[430px] mx-auto px-3 py-3">
-
-              <!-- TOPO -->
-              <div class="flex items-center justify-between gap-3 mb-2">
-                <button type="button" onclick="voltarDoKitDetalhe()"
-                        class="h-10 px-3 bg-white border border-[#E8D5B5] rounded-xl text-[8px] font-black uppercase tracking-widest text-gray-400">
-                  ← Voltar
-                </button>
-                <div class="text-center min-w-0">
-                  <p class="text-[8px] uppercase tracking-widest font-black text-gray-400">Vitrine de Presentes</p>
-                  <h2 id="skd-titulo" class="text-[#8B4513] font-black text-sm leading-tight">Nome do Kit</h2>
-                </div>
-                <div class="w-16"></div>
+            <!-- TOPO -->
+            <div class="flex items-center justify-between gap-3">
+              <button type="button" onclick="voltarDoKitDetalhe()"
+                      class="h-10 px-3 bg-white border border-[#E8D5B5] rounded-xl text-[8px] font-black uppercase tracking-widest text-gray-400">
+                ← Voltar
+              </button>
+              <div class="text-center min-w-0">
+                <p class="text-[8px] uppercase tracking-widest font-black text-gray-400">Vitrine de Presentes</p>
+                <h2 id="skd-titulo" class="text-[#8B4513] font-black text-sm leading-tight">Nome do Kit</h2>
               </div>
-
-              <!-- IMAGEM -->
-              <div id="skd-preview" class="relative overflow-hidden rounded-[1.4rem] border-2 border-[#E8D5B5] bg-white shadow-sm">
-                <img id="skd-img" src="" alt="" class="cursor-zoom-in">
-              </div>
-
-              <!-- DESCRIÇÃO + PREÇO -->
-              <div class="bg-white rounded-[1.4rem] border border-[#E8D5B5] px-4 py-3 mt-3 text-center">
-                <p id="skd-desc" class="text-[11px] text-gray-500 leading-tight mb-2"></p>
-                <p id="skd-preco" class="text-xl font-black text-[#8B4513] oba-preco">R$ 0,00</p>
-              </div>
-
-              <!-- OPCIONAIS -->
-              <div id="skd-opcionais" class="bg-white rounded-[1.4rem] border border-[#E8D5B5] px-4 py-3 mt-3 space-y-2">
-                <p class="text-[11px] text-amber-800 font-bold">Deseja adicionar detalhes para presente?</p>
-                <div id="opt-laco-card" onclick="toggleOpcional('laco')" class="border border-orange-100 p-3 rounded-2xl flex items-center justify-between cursor-pointer select-none hover:border-orange-300 transition-all active:scale-[0.98]">
-                  <div class="flex items-center gap-3">
-                    <div id="chk-laco" class="w-5 h-5 rounded border-2 border-[#8B4513] flex items-center justify-center text-white text-xs bg-white"><i class="fa-solid fa-check opacity-0 transition-opacity"></i></div>
-                    <h4 id="opt-laco-titulo" class="text-[11px] font-bold text-[#8B4513] uppercase">Laço Decorativo</h4>
-                  </div>
-                  <span id="opt-laco-preco" class="text-[11px] font-black text-[#8B4513]">+ R$ 4,50</span>
-                </div>
-                <div id="opt-placa-card" onclick="toggleOpcional('placa')" class="border border-orange-100 p-3 rounded-2xl flex items-center justify-between cursor-pointer select-none hover:border-orange-300 transition-all active:scale-[0.98]">
-                  <div class="flex items-center gap-3">
-                    <div id="chk-placa" class="w-5 h-5 rounded border-2 border-[#8B4513] flex items-center justify-center text-white text-xs bg-white"><i class="fa-solid fa-check opacity-0 transition-opacity"></i></div>
-                    <h4 id="opt-placa-titulo" class="text-[11px] font-bold text-[#8B4513] uppercase">Placa Personalizada</h4>
-                  </div>
-                  <span id="opt-placa-preco" class="text-[11px] font-black text-[#8B4513]">+ R$ 3,50</span>
-                </div>
-              </div>
-
-              <!-- AÇÕES -->
-              <div class="flex flex-col gap-2 mt-3">
-                <button type="button" onclick="adicionarKitAoCarrinho('continuar')"
-                        class="w-full py-3.5 rounded-xl bg-green-600 text-white text-[9px] font-black uppercase tracking-widest shadow-md">
-                  <i class="fa-solid fa-box-archive mr-1"></i> Salvar e continuar comprando
-                </button>
-                <button type="button" onclick="adicionarKitAoCarrinho('carrinho')"
-                        class="w-full py-3.5 rounded-xl bg-white border-2 border-[#8B4513] text-[#8B4513] text-[9px] font-black uppercase tracking-widest">
-                  <i class="fa-solid fa-basket-shopping mr-1"></i> Ver meu carrinho
-                </button>
-                <button type="button" onclick="adicionarKitAoCarrinho('finalizar')"
-                        class="w-full py-3.5 rounded-xl bg-[#8B4513] text-white text-[9px] font-black uppercase tracking-widest shadow-md">
-                  Finalizar Pedido <i class="fa-brands fa-whatsapp ml-1"></i>
-                </button>
-                <button type="button" onclick="voltarDoKitDetalhe()"
-                        class="text-[9px] text-gray-400 uppercase tracking-widest font-black text-center mt-1">
-                  ← Voltar e alterar
-                </button>
-              </div>
-
+              <div class="w-16"></div>
             </div>
-          </section>
 
+            <!-- IMAGEM -->
+            <div id="skd-preview">
+              <img id="skd-img" src="" alt="">
+            </div>
+
+            <!-- DESCRIÇÃO + PREÇO -->
+            <div class="bg-white rounded-[1.4rem] border border-[#E8D5B5] px-4 py-3 text-center">
+              <p id="skd-desc" class="text-[11px] text-gray-500 leading-tight mb-2"></p>
+              <p id="skd-preco" class="text-xl font-black text-[#8B4513] oba-preco">R$ 0,00</p>
+            </div>
+
+            <!-- OPCIONAIS -->
+            <div id="skd-opcionais" class="bg-white rounded-[1.4rem] border border-[#E8D5B5] px-4 py-3 space-y-2">
+              <p class="text-[11px] text-amber-800 font-bold">Deseja adicionar detalhes para presente?</p>
+              <div id="opt-laco-card" onclick="toggleOpcional('laco')" class="border border-orange-100 p-3 rounded-2xl flex items-center justify-between cursor-pointer select-none hover:border-orange-300 transition-all active:scale-[0.98]">
+                <div class="flex items-center gap-3">
+                  <div id="chk-laco" class="w-5 h-5 rounded border-2 border-[#8B4513] flex items-center justify-center text-white text-xs bg-white"><i class="fa-solid fa-check opacity-0 transition-opacity"></i></div>
+                  <h4 id="opt-laco-titulo" class="text-[11px] font-bold text-[#8B4513] uppercase">Laço Decorativo</h4>
+                </div>
+                <span id="opt-laco-preco" class="text-[11px] font-black text-[#8B4513]">+ R$ 4,50</span>
+              </div>
+              <div id="opt-placa-card" onclick="toggleOpcional('placa')" class="border border-orange-100 p-3 rounded-2xl flex items-center justify-between cursor-pointer select-none hover:border-orange-300 transition-all active:scale-[0.98]">
+                <div class="flex items-center gap-3">
+                  <div id="chk-placa" class="w-5 h-5 rounded border-2 border-[#8B4513] flex items-center justify-center text-white text-xs bg-white"><i class="fa-solid fa-check opacity-0 transition-opacity"></i></div>
+                  <h4 id="opt-placa-titulo" class="text-[11px] font-bold text-[#8B4513] uppercase">Placa Personalizada</h4>
+                </div>
+                <span id="opt-placa-preco" class="text-[11px] font-black text-[#8B4513]">+ R$ 3,50</span>
+              </div>
+            </div>
+
+            <!-- AÇÕES -->
+            <div class="flex flex-col gap-2">
+              <button type="button" onclick="adicionarKitAoCarrinho('continuar')"
+                      class="w-full py-3.5 rounded-xl bg-green-600 text-white text-[9px] font-black uppercase tracking-widest shadow-md">
+                <i class="fa-solid fa-box-archive mr-1"></i> Salvar e continuar comprando
+              </button>
+              <button type="button" onclick="adicionarKitAoCarrinho('carrinho')"
+                      class="w-full py-3.5 rounded-xl bg-white border-2 border-[#8B4513] text-[#8B4513] text-[9px] font-black uppercase tracking-widest">
+                <i class="fa-solid fa-basket-shopping mr-1"></i> Ver meu carrinho
+              </button>
+              <button type="button" onclick="adicionarKitAoCarrinho('finalizar')"
+                      class="w-full py-3.5 rounded-xl bg-[#8B4513] text-white text-[9px] font-black uppercase tracking-widest shadow-md">
+                Finalizar Pedido <i class="fa-brands fa-whatsapp ml-1"></i>
+              </button>
+              <button type="button" onclick="voltarDoKitDetalhe()"
+                      class="text-[9px] text-gray-400 uppercase tracking-widest font-black text-center mt-1">
+                ← Voltar e alterar
+              </button>
+            </div>
+
+          </div>
         </div>
+
+          </div>
         </div>
 
         <!-- ==========================================================
@@ -5381,7 +5348,6 @@ function abrirModalConfigKit(idKit) {
   // Exibir secao de detalhe, ocultar lista — ativa modo 100dvh igual Degustacao
   document.getElementById('secao-kits')?.classList.add('hidden');
   document.getElementById('secao-kit-detalhe')?.classList.remove('hidden');
-  document.body.classList.add('oba-kit-detalhe-ativa');
   document.body.classList.remove('oba-passo1-ativa');
 }
 
@@ -5398,7 +5364,6 @@ function voltarDoKitDetalhe() {
   placaSelecionada = false;
   document.getElementById('secao-kit-detalhe')?.classList.add('hidden');
   document.getElementById('secao-kits')?.classList.remove('hidden');
-  document.body.classList.remove('oba-kit-detalhe-ativa');
   document.body.classList.add('oba-passo1-ativa');
 }
 
@@ -5447,7 +5412,6 @@ function adicionarKitAoCarrinho(acao) {
   caixaAtiva = null; lacoSelecionado = false; placaSelecionada = false;
   document.getElementById('secao-kit-detalhe')?.classList.add('hidden');
   document.getElementById('secao-kits')?.classList.remove('hidden');
-  document.body.classList.remove('oba-kit-detalhe-ativa');
   document.body.classList.add('oba-passo1-ativa');
   if (acao === 'continuar') mostrarNotificacao(`${nomeItem} adicionado!`);
   else if (acao === 'carrinho') abrirModalCarrinho();
