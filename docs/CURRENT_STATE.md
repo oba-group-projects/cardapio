@@ -4,7 +4,7 @@ Atualizado: 2026-09-22
 
 ## Git
 Branch: feature/gestao-online-segura
-Commit HEAD: a242ed6 (fix(scroll): bloquear scroll body nas pag 1/2/3 via oba-pagina-fixa)
+Commit HEAD: 1c86173 (fix(ux): secao-kit-detalhe scroll suave + imagem 35dvh)
 Branch main: 5913078 (fix encoding JSONs + cardapio publico)
 
 ## Estado funcional
@@ -18,51 +18,30 @@ Branch main: 5913078 (fix encoding JSONs + cardapio publico)
 - 9D: Sync automático GitHub Pages
 - 10A: Menu dinâmico (botões configuráveis, 7 ações, preview ao vivo, preços Personalizados editáveis)
 - 10B: Overflow automático de botões (máx 4/tela → páginas 3B, 3C...) + polish
-- 11D: Seletores de tamanho nomeados (pg1/pg2/pg3) + botão Galeria nos campos de logo
-- 11E: Galeria unificada GitHub+D1 com abas + tipografia completa por elemento
-- 11F: Aba Mídia na Central (upload drag&drop, listagem, exclusão, copiar URL)
-- 11G: Toggle status inline em todas as tabelas + galeria integrada no editor de itens
-- 11H: Workflow GitHub Actions sync-cardapio.yml — sincronização automática feature → main → Pages
-- UX: Transição páginas 1/2/3 sem translateY (fade puro 0.25s) (subtítulo pag1, texto e citação pag2)
-- fix(scroll): body.oba-pagina-fixa bloqueia overflow no body nas pág 1/2/3 (reforça #pag-1/2/3); navegarPara() faz toggle; pág 4+ libera (commit a242ed6)
-
-## Fases concluídas (resumo)
-- 9A-9C: Infraestrutura de tema, aba Edição Visual, controles por página
-- 9D: Sync automático GitHub Pages
-- 10A: Menu dinâmico (botões configuráveis, 7 ações, preview ao vivo, preços Personalizados editáveis)
-- 10B: Overflow automático de botões (máx 4/tela → páginas 3B, 3C...) + polish
 - 11D-11H: Galeria unificada, tipografia completa, aba Mídia, toggle status, sync Actions
 - UX: Transição páginas 1/2/3 sem translateY (fade puro 0.25s)
-- Fix-Enc: Corrigido double-encoded UTF-8 no cardápio (Nossa Essência, Feito à mão, etc.)
-- Fix-Sync: obaGitHubSyncPublished sincroniza JSONs para feature E main simultaneamente
-- Fix-Chars: Botões fechar/voltar corrigidos (&#x2715;, VOLTAR ÀS OPÇÕES)
+- Fix-Enc: Corrigido double-encoded UTF-8 no cardápio
+- Fix-Chars: Botões fechar/voltar corrigidos
 - Fix-Preco: oba-preco adicionado ao preço/un dos cards de sabores
+- fix(scroll): body.oba-pagina-fixa bloqueia overflow no body nas pág 1/2/3
+- fix(scroll): body.oba-passo1-ativa bloqueia scroll na tela de tamanho de caixa
+- UX-Presenteaveis: vitrine compacta (lista de botões), retorno correto da Degustação
+- UX-Presenteaveis: tela de detalhe de kit (scroll suave, imagem 35dvh, 3 botões de ação)
+- UX-Degustacao: movida para Presenteáveis/Especiais; retorno correto por fluxoAtivo
 
-## Estado do sync GitHub Pages
-- data/catalog-v1/*.json: sincronizados para main a cada publicação via Worker
-- ui-desenvolvimento/index.html: sincronizado para main via auto-sync do Worker
-- PROBLEMA PENDENTE: putFileToBranch("main") no Worker falha silenciosamente
-  quando há commit recente no main (SHA desatualizado). Precisar verificar logs
-  do Worker após próxima publicação para confirmar se está funcionando.
-- WORKAROUND ATIVO: commit manual no main com os JSONs corretos (5913078)
-
-## Estado do cardápio público
-- Encoding: UTF-8 correto (fix aplicado)
-- Preços ocultos: toggle cfgExibirPrecos funciona (exibirPrecos=false no config.json do main)
-- PROBLEMA: preços dos cards de sabores (R$ X,XX / un) precisam de publicação
-  nova para ocultar — elemento agora tem classe oba-preco (commit ae60298)
-- Página 3 (Menu): array dinâmico de botões, overflow automático com paginação
-- Vitrine Presenteáveis: sem scroll — investigar overflow da seção
+## Cardápio público — estado atual (validado em celular)
+- Páginas 1/2/3: não rolam (body.oba-pagina-fixa + #pag-1/2/3 overflow:hidden)
+- Passo 1 tamanho de caixa: não rola (body.oba-passo1-ativa)
+- Presenteáveis: lista compacta (Tábua, Caixa Clássica, Caixa Degustação)
+- Tela de detalhe dos kits: logo + cabeçalho + imagem 35dvh + scroll suave para opcionais/botões
+- Caixa Degustação: acessível via Presenteáveis, retorno correto após "Salvar e Continuar"
+- Fluxo de compras (pág 4+): scroll livre, sem regressão
 
 ## Próxima feature
-PRIORIDADE URGENTE: Verificar scroll da vitrine de Presenteáveis (sem scroll, itens cortados).
-Confirmar que publicação nova propaga Cappuccino inativo e preços ocultos para o cardápio público.
-
-Candidatos para próximas features:
-- Fase 10C: Preview ao vivo com iframe de celular dentro da Central
-- Fix definitivo do sync main via Worker (investigar falha silenciosa do putFileToBranch)
+Fase 12A-1 — Infraestrutura D1 + rotas Worker para módulo de propostas de orçamento.
 
 ## Links
 - Central: https://oba-cardapio-gestao.obadoceria.workers.dev/
+- Cardápio Worker: https://oba-cardapio-gestao.obadoceria.workers.dev/cardapio
 - GitHub: https://github.com/oba-group-projects/cardapio
-- Cardápio: https://oba-group-projects.github.io/cardapio/
+- Cardápio Pages (backup): https://oba-group-projects.github.io/cardapio/
