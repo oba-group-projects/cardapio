@@ -98,7 +98,7 @@ para ter um produto profissional.
 ---
 
 ### Passo 3 — Corrigir scroll nas páginas 1, 2 e 3
-**Status: [ ] Pendente**
+**Status: [x] Concluído — 22/09/2026**
 
 **O que é:**
 As páginas de boas-vindas, nossa essência e menu principal permitem
@@ -213,3 +213,5 @@ para compartilhar com clientes antes do orçamento.
 | 20/09/2026 | Plano criado e aprovado | — |
 | 20/09/2026 | Passo 1 concluído | GET /cardapio no Worker funcionando. Status 200, 623KB. /api/catalog público retorna 55 sabores, 6 categorias. |
 | 20/09/2026 | Passo 2 concluído | 40 -> 3 U+FFFD. Scripts em .scripts/. 13/13 validações OK. Commit a8b7284. |
+| 22/09/2026 | Fix divergência preview/cardápio | /api/catalog conectado ao slot PUBLISHED do D1. Commit 09169c4. |
+| 22/09/2026 | Passo 3 concluído | #pag-1/2/3 fixas em 100dvh, overflow:hidden. Commit 77c05a8. Deploy 2cf0ef7f. |
