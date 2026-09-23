@@ -2325,9 +2325,9 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
         <div id="secao-kits" class="hidden space-y-6">
           <div class="bg-white p-6 md:p-8 rounded-[2rem] border border-[#E8D5B5] shadow-sm">
             <h3 id="oba-vitrine-titulo" class="step-title mb-2"><i class="fa-solid fa-gift text-[#8B4513]"></i> Vitrine de Presentes</h3>
-            <p id="oba-vitrine-subtitulo" class="text-xs text-gray-500">Nossas opções exclusivas já vêm montadas com carinho.</p>
+            <p id="oba-vitrine-subtitulo" class="text-xs text-gray-500">Escolha sua opção para ver detalhes.</p>
+            <div class="grid grid-cols-1 gap-3 mt-6" id="opcoes-presentes"></div>
           </div>
-          <div id="kits-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full"></div>
         </div>
 
         <!-- PASSO 1: TAMANHO -->
@@ -4241,6 +4241,9 @@ function entFluxoPresenteaveis() {
     .getElementById('secao-kits')
     ?.classList.remove('hidden');
 
+  // Lista de opções não precisa de scroll — fixa o body
+  document.body.classList.add('oba-passo1-ativa');
+
   renderizarKits();
   atualizarInterface();
 }
@@ -4248,6 +4251,7 @@ function entFluxoPresenteaveis() {
 // Degustação acessível a partir dos Presenteáveis/Especiais
 async function entFluxoDegustacao() {
   entFluxoPresenteaveis();   // garante fluxoAtivo='presenteaveis' e navega para pág 4
+  document.body.classList.remove('oba-passo1-ativa'); // Degustação tem controle próprio de scroll
   await abrirPaginaDegustacao(); // oculta secao-kits e abre secao-degustacao
 }
 
@@ -5029,13 +5033,20 @@ function salvarDegustacaoEContinuarR117() {
     );
 
 
-  document
-    .getElementById(
-      'secao-passo1'
-    )
-    ?.classList.remove(
-      'hidden'
-    );
+  // Retorno correto depende de onde a Degustação foi chamada
+  if (fluxoAtivo === 'presenteaveis') {
+    document
+      .getElementById('secao-kits')
+      ?.classList.remove('hidden');
+  } else {
+    document
+      .getElementById(
+        'secao-passo1'
+      )
+      ?.classList.remove(
+        'hidden'
+      );
+  }
 
 
   mostrarNotificacao(
@@ -5097,11 +5108,21 @@ function voltarDaDegustacao() {
     )
     ?.classList.add('hidden');
 
-  document
-    .getElementById(
-      'secao-passo1'
-    )
-    ?.classList.remove('hidden');
+  // Retorno correto depende de onde a Degustação foi chamada
+  if (fluxoAtivo === 'presenteaveis') {
+    document
+      .getElementById('secao-kits')
+      ?.classList.remove('hidden');
+    // Volta para lista compacta — rebloqueia scroll
+    document.body.classList.add('oba-passo1-ativa');
+  } else {
+    document
+      .getElementById(
+        'secao-passo1'
+      )
+      ?.classList.remove('hidden');
+    document.body.classList.add('oba-passo1-ativa');
+  }
 
 
   const wppFlutuante =
@@ -6740,23 +6761,20 @@ function lembreteCaixa() { mostrarNotificacao('Selecione primeiro o tamanho da s
 // KITS PRESENTEÁVEIS
 // ================================================================
 function renderizarKits() {
-  const grid = document.getElementById('kits-grid'); if (!grid) return;
+  const grid = document.getElementById('opcoes-presentes'); if (!grid) return;
   grid.innerHTML = '';
+  // Botões compactos para cada kit — ao clicar abre modal existente
   kitsPresenteaveis.forEach(kit => {
-    grid.innerHTML += `<div class="bg-white rounded-[1.5rem] shadow-sm border border-[#E8D5B5] flex flex-col overflow-hidden hover:border-[#8B4513] transition-all">
-      <div class="w-full h-56 sm:h-64 bg-gray-50 border-b border-[#E8D5B5] overflow-hidden"><img src="${kit.img}" class="h-full w-full object-cover" onerror="this.src='https://placehold.co/400x400?text=Oba'" alt="${kit.nome}"></div>
-      <div class="p-5 flex flex-col justify-between flex-1">
-        <div><h3 class="font-black text-sm mb-1 text-[#3B2A1E]">${kit.nome}</h3><p class="text-[10px] text-gray-500 leading-tight mb-3 line-clamp-2">${kit.desc}</p><p class="text-sm text-[#8B4513] font-black mb-4 oba-preco">${formatarMoeda(kit.precoFixo)}</p></div>
-        <button onclick="abrirModalConfigKit('${kit.id}')" class="w-full py-3 bg-[#8B4513] text-white rounded-xl text-[11px] font-bold uppercase tracking-wider shadow-sm active:scale-95">Configurar Presente</button>
-      </div></div>`;
+    grid.innerHTML += `<button onclick="abrirModalConfigKit('${kit.id}')" class="p-4 bg-white border border-[#E8D5B5] rounded-[1.5rem] text-left shadow-sm transition-all hover:border-[#8B4513] w-full">
+      <h3 class="font-black text-xs text-[#8B4513]">${kit.nome}</h3>
+      <p class="text-[10px] text-gray-400 mt-1">${kit.desc || ''}</p>
+    </button>`;
   });
-  // Card especial da Caixa Degustação — fluxo próprio, não usa abrirModalConfigKit
-  grid.innerHTML += `<div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-[1.5rem] shadow-sm border border-orange-200 flex flex-col overflow-hidden hover:border-[#8B4513] transition-all">
-    <div class="w-full h-56 sm:h-64 bg-amber-50 border-b border-orange-100 overflow-hidden"><img src="https://raw.githubusercontent.com/oba-group-projects/cardapio/main/Images/Caixa_Degustacao/Degustacao_12_Sabores.jpeg" class="h-full w-full object-cover" onerror="this.src='https://placehold.co/400x400?text=Degusta%C3%A7%C3%A3o'" alt="Caixa Degustação"></div>
-    <div class="p-5 flex flex-col justify-between flex-1">
-      <div><h3 class="font-black text-sm mb-1 text-orange-800">Caixa Degustação</h3><p class="text-[10px] text-gray-500 leading-tight mb-3">Escolha entre 12 ou 25 sabores — uma experiência completa.</p></div>
-      <button onclick="entFluxoDegustacao()" class="w-full py-3 bg-[#8B4513] text-white rounded-xl text-[11px] font-bold uppercase tracking-wider shadow-sm active:scale-95">Montar Degustação</button>
-    </div></div>`;
+  // Botão compacto da Degustação — fluxo próprio
+  grid.innerHTML += `<button onclick="entFluxoDegustacao()" class="p-4 bg-gradient-to-br from-amber-50 to-orange-50 border border-orange-200 rounded-[1.5rem] text-left shadow-sm transition-all hover:border-[#8B4513] w-full">
+    <h3 class="font-black text-xs text-orange-800">Caixa Degustação</h3>
+    <p class="text-[10px] text-orange-500 font-bold mt-1">Escolha entre 12 ou 25 sabores</p>
+  </button>`;
   obaAplicarVisibilidadePrecos();
 }
 
