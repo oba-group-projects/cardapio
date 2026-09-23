@@ -30,7 +30,7 @@
   "status": "proposto-nao-integrado",
   "store": {
     "currency": "BRL",
-    "exibirPrecos": false,
+    "exibirPrecos": true,
     "locale": "pt-BR",
     "name": "Oba Doceria",
     "whatsapp": "5555999117626"
