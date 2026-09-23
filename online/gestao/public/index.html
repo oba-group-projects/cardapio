@@ -3356,12 +3356,33 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     const container = document.getElementById(cid + '-categorias');
     if (!container) return;
 
-    // Sabores do catálogo
-    container.querySelectorAll('input[data-sabor-id]').forEach(inp => {
-      subtotal += Number(inp.value||0) * Number(inp.dataset.preco||0);
+    // Por categoria: subtotal financeiro + total de doces alocados nos sabores
+    let totalDocesAlocadosNasCategorias = 0; // soma dos "total nesta categoria"
+    document.querySelectorAll('#' + cid + '-categorias > div[data-cat-id]').forEach(block => {
+      const blockId = block.id;
+      const totalCat = Number(document.getElementById(blockId + '-total')?.value || 0);
+      totalDocesAlocadosNasCategorias += totalCat;
+
+      // subtotal financeiro da categoria (sabores com quantidade > 0)
+      let subtotalCat = 0;
+      block.querySelectorAll('input[data-sabor-id]').forEach(inp => {
+        subtotalCat += Number(inp.value||0) * Number(inp.dataset.preco||0);
+      });
+      subtotal += subtotalCat;
+
+      // Exibir subtotal financeiro da categoria
+      let subCatEl = document.getElementById(blockId + '-subtotal-cat');
+      if (!subCatEl) {
+        subCatEl = document.createElement('div');
+        subCatEl.id = blockId + '-subtotal-cat';
+        subCatEl.style.cssText = 'font-size:11px;color:var(--brand);text-align:right;margin-top:4px;font-weight:600';
+        block.appendChild(subCatEl);
+      }
+      subCatEl.textContent = subtotalCat > 0 ? fmt(subtotalCat) + ' nesta categoria' : '';
     });
+
     // Itens livres
-    container.querySelectorAll('.prop-livre-preco').forEach((inp, i) => {
+    container.querySelectorAll('.prop-livre-preco').forEach(inp => {
       const v = Number(inp.value || 0);
       const subEl = inp.parentElement?.querySelector('.prop-livre-sub');
       if (subEl) subEl.textContent = v > 0 ? fmt(v) : '—';
@@ -3380,43 +3401,38 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     if (subEl) subEl.textContent = fmt(subtotal);
     if (totEl) totEl.textContent = fmt(total);
 
-    // Contador global: total de doces calculado vs alocado nas categorias
+    // Contador global: total previsto vs soma dos totais das categorias
     const convidados = Number(document.getElementById('prop-convidados')?.value || 0);
     const docesPor = Number(document.getElementById(cid + '-docespor')?.value || 0);
-    const totalDoces = convidados * docesPor;
+    const totalDocesPrevistos = convidados * docesPor;
 
     const labelConv = document.getElementById(cid + '-convidados-label');
     if (labelConv) labelConv.textContent = (convidados || '—') + ' convidados';
     const totalDocesEl = document.getElementById(cid + '-total-doces');
-    if (totalDocesEl) totalDocesEl.textContent = totalDoces > 0 ? totalDoces + ' doces' : '—';
-
-    // Contar total alocado nas categorias
-    let totalAlocado = 0;
-    document.querySelectorAll('#' + cid + '-categorias > div[data-cat-id]').forEach(block => {
-      block.querySelectorAll('input[data-sabor-id]').forEach(inp => {
-        totalAlocado += Number(inp.value || 0);
-      });
-    });
+    if (totalDocesEl) totalDocesEl.textContent = totalDocesPrevistos > 0 ? totalDocesPrevistos + ' doces' : '—';
 
     const contGlobal = document.getElementById(cid + '-contador-global');
-    if (contGlobal && totalDoces > 0) {
-      const diff = totalDoces - totalAlocado;
-      if (diff > 0) {
-        contGlobal.textContent = diff + ' doces a distribuir';
-        contGlobal.style.background = '#fef3c7'; contGlobal.style.color = '#92400e';
-      } else if (diff === 0) {
-        contGlobal.textContent = '✓ ' + totalAlocado + ' doces alocados';
-        contGlobal.style.background = '#d1fae5'; contGlobal.style.color = '#065f46';
+    if (contGlobal) {
+      if (totalDocesPrevistos > 0) {
+        const faltam = totalDocesPrevistos - totalDocesAlocadosNasCategorias;
+        if (faltam > 0) {
+          contGlobal.textContent = 'Faltam ' + faltam + ' doces nas categorias';
+          contGlobal.style.background = '#fef3c7'; contGlobal.style.color = '#92400e';
+        } else if (faltam === 0) {
+          contGlobal.textContent = '✓ ' + totalDocesAlocadosNasCategorias + ' doces distribuídos';
+          contGlobal.style.background = '#d1fae5'; contGlobal.style.color = '#065f46';
+        } else {
+          contGlobal.textContent = Math.abs(faltam) + ' doces acima do previsto';
+          contGlobal.style.background = '#fee2e2'; contGlobal.style.color = '#dc2626';
+        }
       } else {
-        contGlobal.textContent = Math.abs(diff) + ' doces acima do previsto';
-        contGlobal.style.background = '#fee2e2'; contGlobal.style.color = '#dc2626';
+        contGlobal.textContent = totalDocesAlocadosNasCategorias > 0 ? totalDocesAlocadosNasCategorias + ' doces nas categorias' : '—';
+        contGlobal.style.background = '#eee'; contGlobal.style.color = '#555';
       }
-    } else if (contGlobal) {
-      contGlobal.textContent = totalAlocado > 0 ? totalAlocado + ' doces alocados' : '—';
-      contGlobal.style.background = '#eee'; contGlobal.style.color = '#555';
     }
 
     recalcularGlobal();
+  }
   }
 
   function recalcularGlobal() {
@@ -3430,6 +3446,28 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
   window.obaProposalSalvar = async function(statusFinal) {
     const cliente = document.getElementById('prop-cliente').value.trim();
     if (!cliente) { alert('Nome do cliente é obrigatório.'); return; }
+
+    // Aviso se algum cenário tem total de doces que não fecha
+    const convidados = Number(document.getElementById('prop-convidados')?.value || 0);
+    const avisos = [];
+    document.querySelectorAll('#proposals-cenarios > div[id^="cenario-"]').forEach((div, idx) => {
+      const cid = div.id;
+      const docesPor = Number(document.getElementById(cid + '-docespor')?.value || 0);
+      const totalPrevisto = convidados * docesPor;
+      if (totalPrevisto <= 0) return;
+      let totalCategorias = 0;
+      div.querySelectorAll('div[data-cat-id]').forEach(block => {
+        totalCategorias += Number(document.getElementById(block.id + '-total')?.value || 0);
+      });
+      const diff = totalPrevisto - totalCategorias;
+      const nomeCenario = document.getElementById(cid + '-nome')?.value || ('Cenário ' + (idx+1));
+      if (diff > 0) avisos.push(`${nomeCenario}: faltam ${diff} doces nas categorias (previsto ${totalPrevisto}, distribuído ${totalCategorias})`);
+      else if (diff < 0) avisos.push(`${nomeCenario}: ${Math.abs(diff)} doces acima do previsto (previsto ${totalPrevisto}, distribuído ${totalCategorias})`);
+    });
+    if (avisos.length > 0) {
+      const continuar = confirm('⚠️ Atenção — total de doces não fecha:\n\n' + avisos.join('\n') + '\n\nDeseja salvar mesmo assim?');
+      if (!continuar) return;
+    }
 
     const scenarios = [];
     document.querySelectorAll('#proposals-cenarios > div[id^="cenario-"]').forEach((div, idx) => {
