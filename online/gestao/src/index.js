@@ -2305,6 +2305,196 @@ async function obaPrivatePreviewPage(request, env) {
 
 /* OBA_PREVIEW_API_END */
 
+// ============================================================
+// FASE 12A — PROPOSTAS DE ORCAMENTO
+// ============================================================
+
+function obaProposalId() {
+  return "prop_" + crypto.randomUUID().replace(/-/g, "").slice(0, 12);
+}
+function obaScenarioId() {
+  return "scen_" + crypto.randomUUID().replace(/-/g, "").slice(0, 12);
+}
+function obaItemId() {
+  return "item_" + crypto.randomUUID().replace(/-/g, "").slice(0, 12);
+}
+
+async function obaUpsertProposal(env, proposalId, data, now) {
+  const {
+    cliente = "",
+    data_evento = null,
+    convidados = null,
+    tipo_evento = null,
+    resumo = null,
+    validade = null,
+    status = "rascunho",
+  } = data;
+
+  await env.DB.prepare(`
+    INSERT INTO proposals (proposal_id, cliente, data_evento, convidados, tipo_evento, resumo, validade, status, criado_em, atualizado_em)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(proposal_id) DO UPDATE SET
+      cliente=excluded.cliente, data_evento=excluded.data_evento,
+      convidados=excluded.convidados, tipo_evento=excluded.tipo_evento,
+      resumo=excluded.resumo, validade=excluded.validade,
+      status=excluded.status, atualizado_em=excluded.atualizado_em
+  `).bind(
+    proposalId, cliente, data_evento, convidados, tipo_evento, resumo, validade, status, now, now
+  ).run();
+}
+
+async function obaUpsertScenarios(env, proposalId, scenarios) {
+  // Apaga cenários existentes e recria — abordagem simples e segura
+  await env.DB.prepare("DELETE FROM proposal_items WHERE scenario_id IN (SELECT scenario_id FROM proposal_scenarios WHERE proposal_id = ?)").bind(proposalId).run();
+  await env.DB.prepare("DELETE FROM proposal_scenarios WHERE proposal_id = ?").bind(proposalId).run();
+
+  for (let i = 0; i < scenarios.length; i++) {
+    const s = scenarios[i];
+    const scenarioId = s.scenario_id || obaScenarioId();
+    await env.DB.prepare(`
+      INSERT INTO proposal_scenarios (scenario_id, proposal_id, nome, descricao, desconto_tipo, desconto_valor, ordem)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      scenarioId, proposalId,
+      s.nome || `Cenário ${i + 1}`,
+      s.descricao || null,
+      s.desconto_tipo || "none",
+      Number(s.desconto_valor) || 0,
+      i + 1
+    ).run();
+
+    const items = Array.isArray(s.items) ? s.items : [];
+    for (let j = 0; j < items.length; j++) {
+      const it = items[j];
+      await env.DB.prepare(`
+        INSERT INTO proposal_items (item_id, scenario_id, tipo, ref_id, descricao, qtd, preco_unit, ordem)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        obaItemId(), scenarioId,
+        it.tipo || "livre",
+        it.ref_id || null,
+        it.descricao || "",
+        Number(it.qtd) || 1,
+        Number(it.preco_unit) || 0,
+        j + 1
+      ).run();
+    }
+  }
+}
+
+async function obaLoadProposal(env, proposalId) {
+  const proposal = await env.DB.prepare("SELECT * FROM proposals WHERE proposal_id = ?").bind(proposalId).first();
+  if (!proposal) return null;
+
+  const scenarios = await env.DB.prepare(
+    "SELECT * FROM proposal_scenarios WHERE proposal_id = ? ORDER BY ordem"
+  ).bind(proposalId).all();
+
+  const result = { ...proposal, scenarios: [] };
+  for (const s of scenarios.results) {
+    const items = await env.DB.prepare(
+      "SELECT * FROM proposal_items WHERE scenario_id = ? ORDER BY ordem"
+    ).bind(s.scenario_id).all();
+    result.scenarios.push({ ...s, items: items.results });
+  }
+  return result;
+}
+
+async function obaHandleProposalsApi(request, env, url) {
+  if (!url.pathname.startsWith("/api/proposals")) return null;
+
+  const now = new Date().toISOString();
+
+  // GET /api/proposals — listar todas
+  if (url.pathname === "/api/proposals" && request.method === "GET") {
+    const rows = await env.DB.prepare(
+      "SELECT proposal_id, cliente, data_evento, convidados, tipo_evento, status, criado_em, atualizado_em FROM proposals ORDER BY criado_em DESC"
+    ).all();
+    return json({ ok: true, proposals: rows.results });
+  }
+
+  // POST /api/proposals — criar nova proposta
+  if (url.pathname === "/api/proposals" && request.method === "POST") {
+    let body;
+    try { body = await request.json(); } catch { return json({ ok: false, error: "json_invalido" }, 400); }
+
+    const proposalId = obaProposalId();
+    await obaUpsertProposal(env, proposalId, body, now);
+    if (Array.isArray(body.scenarios) && body.scenarios.length > 0) {
+      await obaUpsertScenarios(env, proposalId, body.scenarios);
+    }
+    const saved = await obaLoadProposal(env, proposalId);
+    return json({ ok: true, proposal: saved }, 201);
+  }
+
+  // GET /api/proposals/:id — carregar proposta completa
+  const matchGet = url.pathname.match(/^\/api\/proposals\/([^/]+)$/);
+  if (matchGet && request.method === "GET") {
+    const proposal = await obaLoadProposal(env, matchGet[1]);
+    if (!proposal) return json({ ok: false, error: "nao_encontrada" }, 404);
+    return json({ ok: true, proposal });
+  }
+
+  // PUT /api/proposals/:id — atualizar proposta + cenários
+  const matchPut = url.pathname.match(/^\/api\/proposals\/([^/]+)$/);
+  if (matchPut && request.method === "PUT") {
+    let body;
+    try { body = await request.json(); } catch { return json({ ok: false, error: "json_invalido" }, 400); }
+
+    const existing = await env.DB.prepare("SELECT proposal_id FROM proposals WHERE proposal_id = ?").bind(matchPut[1]).first();
+    if (!existing) return json({ ok: false, error: "nao_encontrada" }, 404);
+
+    await obaUpsertProposal(env, matchPut[1], body, now);
+    if (Array.isArray(body.scenarios)) {
+      await obaUpsertScenarios(env, matchPut[1], body.scenarios);
+    }
+    const saved = await obaLoadProposal(env, matchPut[1]);
+    return json({ ok: true, proposal: saved });
+  }
+
+  // PATCH /api/proposals/:id/status — atualizar só o status
+  const matchStatus = url.pathname.match(/^\/api\/proposals\/([^/]+)\/status$/);
+  if (matchStatus && request.method === "PATCH") {
+    let body;
+    try { body = await request.json(); } catch { return json({ ok: false, error: "json_invalido" }, 400); }
+
+    const allowed = ["rascunho", "enviada", "aceita", "recusada"];
+    if (!allowed.includes(body.status)) {
+      return json({ ok: false, error: "status_invalido" }, 400);
+    }
+    const result = await env.DB.prepare(
+      "UPDATE proposals SET status = ?, atualizado_em = ? WHERE proposal_id = ?"
+    ).bind(body.status, now, matchStatus[1]).run();
+
+    if (result.meta.changes === 0) return json({ ok: false, error: "nao_encontrada" }, 404);
+    return json({ ok: true, proposal_id: matchStatus[1], status: body.status });
+  }
+
+  return null;
+}
+
+// ============================================================
+// ROTA PUBLICA: GET /proposta/:id
+// Retorna JSON com a proposta completa (sem autenticacao)
+// O HTML da pagina publica sera servido pela Fase 12A-3
+// ============================================================
+async function obaHandlePropostaPublica(request, env, url) {
+  const match = url.pathname.match(/^\/proposta\/([^/]+)$/);
+  if (!match) return null;
+  if (request.method !== "GET") return null;
+
+  const proposal = await obaLoadProposal(env, match[1]);
+  if (!proposal) {
+    return new Response(
+      "<!doctype html><html lang='pt-BR'><meta charset='utf-8'><title>Proposta não encontrada</title><body><h1>Proposta não encontrada.</h1><p>O link pode ter expirado ou estar incorreto.</p></body></html>",
+      { status: 404, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } }
+    );
+  }
+
+  // Por enquanto retorna JSON — a página HTML pública será construída na Fase 12A-3
+  return json({ ok: true, proposal });
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -2354,6 +2544,12 @@ export default {
           "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com data:; img-src * data: blob:; connect-src 'self' https:; form-action 'self'"
         }
       });
+    }
+
+    // Rota pública: página de proposta compartilhável
+    if (url.pathname.startsWith("/proposta/")) {
+      const propostaResp = await obaHandlePropostaPublica(request, env, url);
+      if (propostaResp) return propostaResp;
     }
 
     if (url.pathname === "/__auth/login") {
@@ -2503,6 +2699,12 @@ const obaDraftResponse =
     if (url.pathname.startsWith("/api/media") || url.pathname === "/api/upload-image") {
       const obaMediaResponse = await obaHandleMediaApi(request, env, url);
       if (obaMediaResponse) return obaMediaResponse;
+    }
+
+    // Fase 12A — Propostas de orçamento
+    if (url.pathname.startsWith("/api/proposals")) {
+      const obaProposalsResponse = await obaHandleProposalsApi(request, env, url);
+      if (obaProposalsResponse) return obaProposalsResponse;
     }
 
 return json(
