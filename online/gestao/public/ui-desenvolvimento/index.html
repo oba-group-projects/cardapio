@@ -23,6 +23,8 @@
     /* Passo 3 — páginas de navegação fixas (sem scroll) */
     #pag-1,#pag-2,#pag-3{height:100dvh;min-height:unset;overflow:hidden;box-sizing:border-box}
     body.oba-pagina-fixa{overflow:hidden;height:100dvh}
+    /* Passo 1 do fluxo (escolha de tamanho) — fixa o body enquanto só as opções de caixa estão visíveis */
+    body.oba-passo1-ativa{overflow:hidden;height:100dvh}
   </style>
   <!-- ================================================================
        R9A - VARIÁVEIS DE TEMA VISUAL (preenchidas por hidratarTemaDoModeloMestre)
@@ -2339,7 +2341,6 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
             <button onclick="abrirModalTamanhoCaixa('35')" class="p-4 bg-white border border-[#E8D5B5] rounded-[1.5rem] text-left shadow-sm transition-all hover:border-[#8B4513] h-full"><h3 class="font-black text-xs text-[#8B4513]">Caixa de 35 Doces</h3><p class="text-[10px] text-gray-400 mt-1">até 7 sabores</p></button>
             <button onclick="abrirModalTamanhoCaixa('50')" class="p-4 bg-white border border-[#E8D5B5] rounded-[1.5rem] text-left shadow-sm transition-all hover:border-[#8B4513] h-full"><h3 class="font-black text-xs text-[#8B4513]">Caixa de 50 Doces</h3><p class="text-[10px] text-gray-400 mt-1">até 10 sabores</p></button>
             <button onclick="abrirModalTamanhoCaixa('100')" class="p-4 bg-white border border-[#E8D5B5] rounded-[1.5rem] text-left shadow-sm transition-all hover:border-[#8B4513] h-full"><h3 class="font-black text-xs text-[#8B4513]">Caixa de 100 Doces</h3><p class="text-[10px] text-gray-400 mt-1">até 14 sabores</p></button>
-            <button onclick="abrirPaginaDegustacao()" class="p-4 bg-gradient-to-br from-amber-50 to-orange-50 border border-orange-200 rounded-[1.5rem] text-left shadow-sm transition-all hover:border-[#8B4513] hover:shadow-md h-full"><h3 class="font-black text-xs text-orange-800">Caixa Degustação</h3><p class="text-[10px] text-orange-500 font-bold mt-1">Escolha entre 12 ou 25 sabores</p></button>
           </div>
           <div id="resumo-caixa-selecionada" class="hidden p-4 bg-[#FAF5F0] rounded-[1.5rem] border border-orange-100 text-center font-bold text-[#8B4513] text-xs mt-4"></div>
         </div>
@@ -4197,6 +4198,9 @@ function entFluxoCaixas() {
     .getElementById('secao-passo1')
     ?.classList.remove('hidden');
 
+  // Passo 1 (só escolha de tamanho) não precisa de scroll — bloqueia body
+  document.body.classList.add('oba-passo1-ativa');
+
   if (caixaAtiva && !caixaAtiva.precoFixo) {
 
     document
@@ -4238,6 +4242,12 @@ function entFluxoPresenteaveis() {
 
   renderizarKits();
   atualizarInterface();
+}
+
+// Degustação acessível a partir dos Presenteáveis/Especiais
+async function entFluxoDegustacao() {
+  entFluxoPresenteaveis();   // garante fluxoAtivo='presenteaveis' e navega para pág 4
+  await abrirPaginaDegustacao(); // oculta secao-kits e abre secao-degustacao
 }
 
 async function retornarParaMenuSeletor() {
@@ -5192,6 +5202,8 @@ function confirmarTamanhoCaixa() {
     `${caixaAtiva.titulo} · até ${caixaAtiva.maxSabores} sabores (${caixaAtiva.totalDoces} unidades)`;
   document.getElementById('resumo-caixa-selecionada').classList.remove('hidden');
   document.getElementById('btn-alterar-caixa').classList.remove('hidden');
+  // Tamanho confirmado — passo 2 precisa de scroll, libera body
+  document.body.classList.remove('oba-passo1-ativa');
   document.getElementById('secao-passo2').classList.remove('hidden');
   renderizarDoces(); atualizarInterface();
 }
@@ -6716,6 +6728,8 @@ function resetarSelecaoCaixa() {
   const rs = document.getElementById('resumo-caixa-selecionada'); if (rs) { rs.classList.add('hidden'); rs.innerText = ''; }
   const ba = document.getElementById('btn-alterar-caixa'); if (ba) ba.classList.add('hidden');
   const p2 = document.getElementById('secao-passo2'); if (p2) p2.classList.add('hidden');
+  // Voltou ao passo 1 — bloqueia scroll novamente
+  document.body.classList.add('oba-passo1-ativa');
   atualizarInterface();
 }
 
@@ -6735,6 +6749,13 @@ function renderizarKits() {
         <button onclick="abrirModalConfigKit('${kit.id}')" class="w-full py-3 bg-[#8B4513] text-white rounded-xl text-[11px] font-bold uppercase tracking-wider shadow-sm active:scale-95">Configurar Presente</button>
       </div></div>`;
   });
+  // Card especial da Caixa Degustação — fluxo próprio, não usa abrirModalConfigKit
+  grid.innerHTML += `<div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-[1.5rem] shadow-sm border border-orange-200 flex flex-col overflow-hidden hover:border-[#8B4513] transition-all">
+    <div class="w-full h-56 sm:h-64 bg-amber-50 border-b border-orange-100 overflow-hidden"><img src="https://raw.githubusercontent.com/oba-group-projects/cardapio/main/Images/Caixa_Degustacao/Degustacao_12_Sabores.jpeg" class="h-full w-full object-cover" onerror="this.src='https://placehold.co/400x400?text=Degusta%C3%A7%C3%A3o'" alt="Caixa Degustação"></div>
+    <div class="p-5 flex flex-col justify-between flex-1">
+      <div><h3 class="font-black text-sm mb-1 text-orange-800">Caixa Degustação</h3><p class="text-[10px] text-gray-500 leading-tight mb-3">Escolha entre 12 ou 25 sabores — uma experiência completa.</p></div>
+      <button onclick="entFluxoDegustacao()" class="w-full py-3 bg-[#8B4513] text-white rounded-xl text-[11px] font-bold uppercase tracking-wider shadow-sm active:scale-95">Montar Degustação</button>
+    </div></div>`;
   obaAplicarVisibilidadePrecos();
 }
 
