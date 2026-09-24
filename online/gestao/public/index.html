@@ -3234,7 +3234,65 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
 
     recalcularCenario(cid);
   }
-  window.obaProposalAdicionarCenario = adicionarCenario;
+  window.obaProposalAdicionarCenario = function(dados) {
+    // Se chamado pelo botão (sem dados) e já existe ao menos um cenário, oferecer cópia
+    if (!dados) {
+      const cenarios = document.querySelectorAll('#proposals-cenarios > div[id^="cenario-"]');
+      if (cenarios.length > 0) {
+        const ultimo = cenarios[cenarios.length - 1];
+        const ultimoNome = document.getElementById(ultimo.id + '-nome')?.value || ('Cenário ' + cenarios.length);
+        const copiar = confirm(`Copiar as quantidades do "${ultimoNome}" como ponto de partida?\n\nClique OK para copiar, Cancelar para começar do zero.`);
+        if (copiar) {
+          // Extrair dados do último cenário
+          const dadosCopia = { nome: 'Cenário ' + (cenarios.length + 1), descricao: '', desconto_tipo: 'none', desconto_valor: 0, docespor: Number(document.getElementById(ultimo.id + '-docespor')?.value || 5), items: [] };
+          // Copiar totais das categorias
+          ultimo.querySelectorAll('div[data-cat-id]').forEach(block => {
+            const catId = block.dataset.catId;
+            const totalCat = Number(document.getElementById(block.id + '-total')?.value || 0);
+            if (totalCat > 0) {
+              block.querySelectorAll('input[data-sabor-id]').forEach(inp => {
+                const qtd = Number(inp.value || 0);
+                // Incluir todos os sabores que foram preenchidos
+                if (qtd > 0) {
+                  dadosCopia.items.push({ tipo: 'catalogo', ref_id: catId + ':' + inp.dataset.saborId, descricao: '', qtd, preco_unit: Number(inp.dataset.preco || 0) });
+                }
+              });
+              // Se nenhum sabor preenchido, só copiar o total da categoria via item placeholder
+              const temSabores = Array.from(block.querySelectorAll('input[data-sabor-id]')).some(i => Number(i.value) > 0);
+              if (!temSabores && totalCat > 0) {
+                // Guardar o total para restaurar no bloco
+                dadosCopia.items.push({ tipo: 'catalogo', ref_id: catId + ':__total__', descricao: '__total__', qtd: totalCat, preco_unit: 0 });
+              }
+            }
+          });
+          // Copiar itens livres
+          ultimo.querySelectorAll('.prop-livre-desc').forEach((inp, i) => {
+            const desc = inp.value.trim();
+            const preco = Number(inp.parentElement?.querySelector('.prop-livre-preco')?.value || 0);
+            if (desc || preco) dadosCopia.items.push({ tipo: 'livre', descricao: desc, qtd: 1, preco_unit: preco });
+          });
+          adicionarCenario(dadosCopia);
+          // Após criar, restaurar totais de categoria (os que não tinham sabores)
+          const novoCenarios = document.querySelectorAll('#proposals-cenarios > div[id^="cenario-"]');
+          const novoCid = novoCenarios[novoCenarios.length - 1]?.id;
+          if (novoCid) {
+            ultimo.querySelectorAll('div[data-cat-id]').forEach(block => {
+              const catId = block.dataset.catId;
+              const totalCat = Number(document.getElementById(block.id + '-total')?.value || 0);
+              const novoBlock = document.getElementById(novoCid + '-cat-' + catId);
+              if (novoBlock && totalCat > 0) {
+                const novoTotal = document.getElementById(novoCid + '-cat-' + catId + '-total');
+                if (novoTotal) { novoTotal.value = totalCat; obaProposalAtualizarContador(novoCid + '-cat-' + catId, novoCid); }
+              }
+            });
+            recalcularCenario(novoCid);
+          }
+          return;
+        }
+      }
+    }
+    adicionarCenario(dados);
+  };
 
   // ---------- BLOCO DE CATEGORIA ----------
   window.obaProposalAdicionarCategoria = function(cid, catId, totalPresel, saboresPresel) {
