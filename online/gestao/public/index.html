@@ -3688,10 +3688,9 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
   function obaProposalMsgTemplate(nome, tipo) {
     const n = nome || '[Nome]';
     const t = tipo || 'evento especial';
-    // Apenas emojis BMP seguros para WhatsApp (sem surrogates)
-    const estrela = '\u2728';  // ✨
-    const coracao = '\u2764';  // ❤
-    return 'Ol\u00e1, ' + n + '! ' + estrela + '\n\nQue alegria poder fazer parte do seu ' + t + '!\n\nPreparei com carinho 3 op\u00e7\u00f5es de or\u00e7amento pensando especialmente no seu dia. Cada cen\u00e1rio tem uma proposta diferente para voc\u00ea escolher o que faz mais sentido. ' + coracao + '\n\n' + estrela + ' [link]\n\nQualquer d\u00favida ou ajuste, \u00e9 s\u00f3 me chamar.\nEstou aqui para tornar esse dia ainda mais especial!\n\nCom carinho,\nOba Doceria ' + estrela;
+    // Texto que vai para o campo editavel da Central (nao para URL)
+    // Emojis aparecem normalmente no campo de texto — so a URL precisa ser limpa
+    return 'Ola, ' + n + '!\n\nQue alegria poder fazer parte do seu ' + t + '!\n\nPreparei com carinho 3 opcoes de orcamento pensando especialmente no seu dia. Cada cenario tem uma proposta diferente para voce escolher o que faz mais sentido.\n\n[link]\n\nQualquer duvida ou ajuste, e so me chamar. Estou aqui para tornar esse dia ainda mais especial!\n\nCom carinho,\nOba Doceria';
   }
 
   function obaProposalMsgWhatsApp(proposal) {

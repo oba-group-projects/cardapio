@@ -2501,8 +2501,8 @@ async function obaHandlePropostaPublica(request, env, url) {
     if (pub && pub.payload) {
       catalogCategories = pub.payload.categorias || pub.payload.categories || [];
       catalogFlavors   = pub.payload.sabores || pub.payload.flavors || [];
-      const loja = pub.payload.loja || pub.payload.config?.store || {};
-      obaWhatsapp = loja.whatsapp || "";
+      const loja = pub.payload.loja || {};
+      obaWhatsapp = loja.whatsapp || loja.store?.whatsapp || "";
     }
   } catch(e) {}
 
@@ -2584,8 +2584,8 @@ async function obaHandlePropostaPublica(request, env, url) {
     const livreLinhas=livres.map(it=>`<tr><td class="td-nome">${it.descricao}</td><td class="td-qtd"></td><td class="td-val">${fmtMoeda(it.preco_unit)}</td></tr>`).join("");
     const descLinha=desc>0?`<tr class="tr-desc"><td colspan="2">Desconto</td><td>&minus;\u00a0${fmtMoeda(desc)}</td></tr>`:"";
 
-    // CTA para WhatsApp da OBA DOCERIA
-    const ctaMsg=encodeURIComponent("Ola! Gostei do cenario "+((si+1))+" da proposta e gostaria de conversar. Pode me ajudar?");
+    // CTA para WhatsApp da OBA DOCERIA — mensagem ASCII pura (sem emojis na URL)
+    const ctaMsg=encodeURIComponent("Ola! Vi a proposta e gostei do cenario "+(si+1)+". Podemos conversar sobre os detalhes?");
     const ctaHref=obaWpp?"https://wa.me/55"+obaWpp+"?text="+ctaMsg:"";
 
     return `
