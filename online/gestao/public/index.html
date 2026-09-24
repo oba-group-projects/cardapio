@@ -3048,7 +3048,10 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
   function fmt(v) { return 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
   function statusLabel(s) { return {rascunho:'Rascunho',enviada:'Enviada',aceita:'Aceita',recusada:'Recusada'}[s]||s; }
   function statusColor(s) { return {rascunho:'#888',enviada:'#2563eb',aceita:'#059669',recusada:'#dc2626'}[s]||'#888'; }
-  function csrf() { return document.cookie.match(/csrf_token=([^;]+)/)?.[1]||''; }
+  function csrf() {
+    const token = String(document.cookie||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('__Host-oba_csrf='));
+    return token ? decodeURIComponent(token.slice('__Host-oba_csrf='.length)) : '';
+  }
 
   // Acessa o catálogo global já carregado pela Central
   function getCatalogo() { return typeof catalogo !== 'undefined' ? catalogo : {flavors:[], categories:[]}; }
@@ -3607,7 +3610,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       const r = await fetch(
         obaProposalAtiva?.proposal_id ? '/api/proposals/' + obaProposalAtiva.proposal_id : '/api/proposals',
         { method: obaProposalAtiva?.proposal_id ? 'PUT' : 'POST',
-          headers: {'Content-Type':'application/json','x-csrf-token':csrf()},
+          headers: {'Content-Type':'application/json','X-CSRF-Token':csrf()},
           body: JSON.stringify(payload) }
       );
       const data = await r.json();
@@ -3631,7 +3634,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     try {
       const r = await fetch('/api/proposals/' + proposalId + '/status', {
         method: 'PATCH',
-        headers: {'Content-Type':'application/json','x-csrf-token':csrf()},
+        headers: {'Content-Type':'application/json','X-CSRF-Token':csrf()},
         body: JSON.stringify({status: opcoes[idx]}),
       });
       const data = await r.json();
