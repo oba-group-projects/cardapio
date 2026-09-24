@@ -2511,8 +2511,22 @@ async function obaHandlePropostaPublica(request, env, url) {
   // Mapa saborId → preco
   const saborPrecoMap = {};
   catalogFlavors.forEach(f => { saborPrecoMap[String(f.id)] = Number(f.preco||0); });
-  const fmtMoeda = (v) => "R$ " + Number(v||0).toLocaleString("pt-BR", {minimumFractionDigits:2, maximumFractionDigits:2});
-  const fmtData = (d) => d ? new Date(d + "T12:00:00").toLocaleDateString("pt-BR", {day:"2-digit",month:"long",year:"numeric"}) : null;
+
+  // Formatação sem toLocaleString (não disponível no Workers runtime)
+  const fmtMoeda = (v) => {
+    const n = Number(v||0).toFixed(2);
+    const [int, dec] = n.split(".");
+    const intFmt = int.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    return "R$ " + intFmt + "," + dec;
+  };
+  const MESES = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+  const fmtData = (d) => {
+    if (!d) return null;
+    try {
+      const [y,m,day] = d.split("-");
+      return `${parseInt(day)} de ${MESES[parseInt(m)-1]} de ${y}`;
+    } catch { return d; }
+  };
 
   // Calcular total de cada cenário
   const cenariosHtml = (proposal.scenarios || []).map((s, si) => {
