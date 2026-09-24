@@ -2637,6 +2637,8 @@ async function obaHandlePropostaPublica(request, env, url) {
       </div>
     </div>`;
   }).join("");
+
+  const html = `<!doctype html>
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
