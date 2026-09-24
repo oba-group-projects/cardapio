@@ -3019,6 +3019,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         <div class="field"><label>Tipo de evento</label><input id="prop-tipo-evento" placeholder="Ex: Casamento, Aniversário"></div>
         <div class="field"><label>Validade da proposta</label><input id="prop-validade" type="date"></div>
         <div class="field full"><label>Resumo geral <span class="hint">(substitui o áudio explicativo)</span></label><textarea id="prop-resumo" rows="3" placeholder="Ex: Olá Ana! Montei 3 opções pensando no perfil do seu evento..."></textarea></div>
+        <div class="field full"><label>Mensagem WhatsApp <span class="hint">(editável — use [Nome], [tipo], [link])</span></label><textarea id="prop-msg-wpp" rows="8" placeholder="Será preenchida automaticamente ao salvar..."></textarea></div>
       </div>
     </div>
 
@@ -3110,10 +3111,13 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     document.getElementById('proposals-editor-titulo').textContent = 'Nova Proposta';
     const badge = document.getElementById('proposals-status-badge');
     badge.textContent = 'Rascunho'; badge.style.background = '#eee'; badge.style.color = '#555';
-    ['prop-cliente','prop-whatsapp','prop-data-evento','prop-convidados','prop-tipo-evento','prop-validade','prop-resumo']
+    ['prop-cliente','prop-whatsapp','prop-data-evento','prop-convidados','prop-tipo-evento','prop-validade','prop-resumo','prop-msg-wpp']
       .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
     document.getElementById('proposals-cenarios').innerHTML = '';
     adicionarCenario();
+    // Preencher template padrão da mensagem WhatsApp
+    const msgEl = document.getElementById('prop-msg-wpp');
+    if (msgEl) msgEl.value = obaProposalMsgTemplate('', '');
     mostrarEditor();
   };
 
@@ -3137,6 +3141,9 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       document.getElementById('prop-cliente').value = p.cliente || '';
       document.getElementById('prop-whatsapp').value = p.whatsapp || '';
       document.getElementById('prop-data-evento').value = p.data_evento || '';
+      // Preencher mensagem WhatsApp salva ou gerar template
+      const msgEl = document.getElementById('prop-msg-wpp');
+      if (msgEl) msgEl.value = p.msg_wpp || obaProposalMsgTemplate(p.cliente, p.tipo_evento);
       document.getElementById('prop-convidados').value = p.convidados || '';
       document.getElementById('prop-tipo-evento').value = p.tipo_evento || '';
       document.getElementById('prop-validade').value = p.validade || '';
@@ -3678,15 +3685,20 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     return window.location.origin + '/proposta/' + proposalId;
   }
 
+  function obaProposalMsgTemplate(nome, tipo) {
+    const n = nome || '[Nome]';
+    const t = tipo || 'evento especial';
+    return `Olá, ${n}! 🌸\n\nQue felicidade poder fazer parte do seu ${t}! 💕\n\nPreparei com muito carinho 3 opções de orçamento pensando especialmente no seu dia. Cada cenário tem uma proposta diferente para você escolher o que faz mais sentido. 🍫✨\n\n👉 [link]\n\nQualquer dúvida ou ajuste, é só falar.\nEstou aqui para tornar esse dia ainda mais especial! 😊\n\nCom carinho,\nOba Doceria 🤍`;
+  }
+
   function obaProposalMsgWhatsApp(proposal) {
-    const nome = proposal?.cliente || 'cliente';
-    const tipo = proposal?.tipo_evento ? ' para o seu ' + proposal.tipo_evento : '';
-    const data = proposal?.data_evento ? ' em ' + new Date(proposal.data_evento+'T12:00:00').toLocaleDateString('pt-BR') : '';
-    const n = (proposal?.scenarios || []).length;
     const url = obaProposalUrlById(proposal.proposal_id);
-    return encodeURIComponent(
-      `Olá ${nome}! 🍫\n\nSegue sua proposta de orçamento da Oba Doceria${tipo}${data}:\n\n🔗 ${url}\n\nNela você encontra ${n} cenário${n>1?'s':''} personalizado${n>1?'s':''} para o seu evento.\nQualquer dúvida estou à disposição! 😊\n\n— Oba Doceria`
-    );
+    // Usar mensagem editável ou gerar template
+    const msgEl = document.getElementById('prop-msg-wpp');
+    let msg = (msgEl?.value || '').trim() || obaProposalMsgTemplate(proposal.cliente, proposal.tipo_evento);
+    // Substituir [link] pela URL real
+    msg = msg.replace(/\[link\]/gi, url);
+    return encodeURIComponent(msg);
   }
 
   window.obaProposalCopiarLink = function() {

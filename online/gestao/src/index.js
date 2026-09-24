@@ -2516,6 +2516,8 @@ async function obaHandlePropostaPublica(request, env, url) {
 
   // Calcular total de cada cenário
   const cenariosHtml = (proposal.scenarios || []).map((s, si) => {
+    const pal = paletas[si] || paletas[paletas.length-1];
+
     // Agrupar itens por categoria vs livre
     const porCategoria = {};
     const livres = [];
@@ -2531,18 +2533,13 @@ async function obaHandlePropostaPublica(request, env, url) {
     });
 
     let subtotal = 0;
-    // Para itens __total__: usar precoReferencia da categoria; para sabores: usar preco_unit ou saborPrecoMap
     (s.items || []).forEach(it => {
       if (it.tipo === "catalogo" && it.ref_id) {
         const [catId, saborId] = (it.ref_id||"").split(":");
         if (saborId === "__total__") {
-          // Estimativa: total × precoReferencia da categoria
-          const ref = catPrecoMap[catId] || 0;
-          subtotal += Number(it.qtd||0) * ref;
+          subtotal += Number(it.qtd||0) * (catPrecoMap[catId] || 0);
         } else {
-          // Sabor individual: usar preco_unit salvo ou fallback do catálogo
-          const preco = Number(it.preco_unit||0) || (saborPrecoMap[saborId]||0);
-          subtotal += Number(it.qtd||0) * preco;
+          subtotal += Number(it.qtd||0) * (Number(it.preco_unit||0) || (saborPrecoMap[saborId]||0));
         }
       } else {
         subtotal += Number(it.qtd||0) * Number(it.preco_unit||0);
@@ -2556,62 +2553,76 @@ async function obaHandlePropostaPublica(request, env, url) {
     // Itens de categoria
     const catHtml = Object.values(porCategoria).map(cat => {
       if (cat.items && cat.items.length > 0) {
-        const rows = cat.items.map(it =>
-          `<tr><td style="padding:5px 0;border-bottom:1px solid #f5ede0;font-size:13px">${it.descricao}</td><td style="text-align:center;padding:5px 8px;border-bottom:1px solid #f5ede0;font-size:13px;white-space:nowrap">${it.qtd} un</td><td style="text-align:right;padding:5px 0;border-bottom:1px solid #f5ede0;font-size:13px;color:#8B4513;white-space:nowrap">${fmtMoeda(Number(it.qtd)*Number(it.preco_unit))}</td></tr>`
-        ).join("");
-        return `<tr><td colspan="3" style="padding:10px 0 4px;font-size:11px;font-weight:700;color:#8B4513;text-transform:uppercase;letter-spacing:.5px">${cat.catId.replace(/-/g," ")}</td></tr>${rows}`;
+        const rows = cat.items.map(it => {
+          const preco = Number(it.preco_unit||0) || (saborPrecoMap[(it.ref_id||"").split(":")[1]]||0);
+          return `<tr><td class="it-nome">${it.descricao}</td><td class="it-qtd">${it.qtd} un</td><td class="it-val" style="color:${pal.badge}">${fmtMoeda(Number(it.qtd)*preco)}</td></tr>`;
+        }).join("");
+        return `<tr class="cat-header"><td colspan="3" style="color:${pal.badge}">${cat.catId.replace(/-/g," ").replace(/\b\w/g,c=>c.toUpperCase())}</td></tr>${rows}`;
       } else if (cat.total) {
         const precoRef = catPrecoMap[cat.catId] || 0;
         const valorEstimado = cat.total * precoRef;
-        const valorStr = precoRef > 0 ? ` · ${fmtMoeda(valorEstimado)}` : "";
-        return `<tr><td style="padding:8px 0;border-bottom:1px solid #f5ede0;font-size:13px;color:#555">${cat.catId.replace(/-/g," ").replace(/\b\w/g,c=>c.toUpperCase())}</td><td style="text-align:center;padding:8px 8px;border-bottom:1px solid #f5ede0;font-size:13px;white-space:nowrap">${cat.total} doces</td><td style="text-align:right;padding:8px 0;border-bottom:1px solid #f5ede0;font-size:13px;color:#8B4513;white-space:nowrap">${precoRef > 0 ? fmtMoeda(valorEstimado) : "—"}</td></tr>`;
+        return `<tr><td class="it-nome">${cat.catId.replace(/-/g," ").replace(/\b\w/g,c=>c.toUpperCase())}</td><td class="it-qtd">${cat.total} doces</td><td class="it-val" style="color:${pal.badge}">${precoRef>0?fmtMoeda(valorEstimado):"—"}</td></tr>`;
       }
       return "";
     }).join("");
 
     const livresHtml = livres.map(it =>
-      `<tr><td style="padding:5px 0;border-bottom:1px solid #f5ede0;font-size:13px">${it.descricao}</td><td style="text-align:center;padding:5px 8px;border-bottom:1px solid #f5ede0;font-size:13px"></td><td style="text-align:right;padding:5px 0;border-bottom:1px solid #f5ede0;font-size:13px;color:#8B4513">${fmtMoeda(it.preco_unit)}</td></tr>`
+      `<tr><td class="it-nome">${it.descricao}</td><td class="it-qtd"></td><td class="it-val" style="color:${pal.badge}">${fmtMoeda(it.preco_unit)}</td></tr>`
     ).join("");
 
     const descontoHtml = desconto > 0
-      ? `<tr><td colspan="2" style="padding:4px 0;font-size:12px;color:#059669">Desconto</td><td style="text-align:right;font-size:12px;color:#059669;padding:4px 0">− ${fmtMoeda(desconto)}</td></tr>` : "";
+      ? `<tr class="totais"><td colspan="2" style="color:#059669;font-size:12px">Desconto aplicado</td><td style="text-align:right;color:#059669;font-size:12px">− ${fmtMoeda(desconto)}</td></tr>` : "";
 
-    const wpp = (proposal.whatsapp||"").replace(/\D/g,"");
-    const msg = encodeURIComponent(`Olá ${proposal.cliente}! Tenho interesse no ${s.nome} da proposta da Oba Doceria. 😊`);
-    const wppUrl = wpp ? `https://wa.me/55${wpp}?text=${msg}` : null;
-
-    const ctaBtn = wppUrl
-      ? `<a href="${wppUrl}" target="_blank" style="display:block;width:100%;box-sizing:border-box;background:#25d366;color:#fff;text-align:center;padding:14px;border-radius:14px;font-weight:800;font-size:13px;text-decoration:none;letter-spacing:.5px;margin-top:16px">📱 Quero este cenário — falar no WhatsApp</a>`
+    const wppNum = (proposal.whatsapp||"").replace(/\D/g,"");
+    const msg = encodeURIComponent(`Olá! Tenho interesse no ${s.nome||"cenário "+(si+1)} da proposta da Oba Doceria. 😊`);
+    const ctaBtn = wppNum
+      ? `<a href="https://wa.me/55${wppNum}?text=${msg}" target="_blank" class="cta-btn" style="background:${pal.btnBg};color:${pal.btnTxt}">📱 Quero este cenário · falar no WhatsApp</a>`
       : "";
 
     return `
-    <div style="background:#fff;border-radius:20px;border:2px solid ${si===0?"#8B4513":"#E8D5B5"};padding:20px;margin-bottom:20px;page-break-inside:avoid">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
-        <div>
-          <p style="margin:0;font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1px;font-weight:700">Cenário ${si+1}</p>
-          <h3 style="margin:0;font-size:18px;color:#3B2A1E;font-weight:900">${s.nome}</h3>
-          ${s.descricao ? `<p style="margin:4px 0 0;font-size:12px;color:#666;font-style:italic">${s.descricao}</p>` : ""}
+    <div id="cenario-${si+1}" class="cenario-wrap" style="scroll-margin-top:12px">
+      <div class="cenario-card" style="background:${pal.bg};border-color:${pal.border}">
+        <div class="cenario-header">
+          <div>
+            <span class="cenario-badge" style="background:${pal.badge}">Cenário ${si+1}</span>
+            <h3 class="cenario-nome">${s.nome||"Cenário "+(si+1)}</h3>
+            ${s.descricao ? `<p class="cenario-desc">${s.descricao}</p>` : ""}
+          </div>
+          <div class="cenario-total-wrap">
+            ${s.doces_por_convidado ? `<p class="cenario-docespor">${s.doces_por_convidado} doces/convidado</p>` : ""}
+            <p class="cenario-total" style="color:${pal.badge}">${fmtMoeda(total)}</p>
+          </div>
         </div>
-        <div style="text-align:right">
-          <p style="margin:0;font-size:11px;color:#888">${s.doces_por_convidado||"?"} doces/convidado</p>
-          <p style="margin:0;font-size:22px;font-weight:900;color:#8B4513">${fmtMoeda(total)}</p>
+        <div class="cenario-body">
+          <table class="itens">
+            <tbody>
+              ${catHtml}
+              ${livresHtml}
+              ${descontoHtml}
+              <tr class="total-final" style="border-color:${pal.border}">
+                <td colspan="2" style="color:#3B2A1E">Total</td>
+                <td style="text-align:right;color:${pal.badge}">${fmtMoeda(total)}</td>
+              </tr>
+            </tbody>
+          </table>
+          ${ctaBtn}
         </div>
       </div>
-      <table style="width:100%;border-collapse:collapse">
-        <tbody>
-          ${catHtml}
-          ${livresHtml}
-          ${descontoHtml}
-          <tr><td colspan="2" style="padding:8px 0 0;font-size:13px;font-weight:700;border-top:2px solid #E8D5B5">Total</td><td style="text-align:right;padding:8px 0 0;font-size:16px;font-weight:900;color:#8B4513;border-top:2px solid #E8D5B5">${fmtMoeda(total)}</td></tr>
-        </tbody>
-      </table>
-      ${ctaBtn}
     </div>`;
   }).join("");
 
   const dataEvento = fmtData(proposal.data_evento);
   const validade = fmtData(proposal.validade);
   const wpp = (proposal.whatsapp||"").replace(/\D/g,"");
+  const propUrl = `https://oba-cardapio-gestao.obadoceria.workers.dev/proposta/${proposal.proposal_id}`;
+
+  // Paletas por cenário: âmbar / rosé / lavanda / fallback neutro
+  const paletas = [
+    { bg:"#FFF8EC", border:"#F5C842", badge:"#E8A800", btnBg:"#E8A800", btnTxt:"#fff" },
+    { bg:"#FFF0F3", border:"#F4A0B0", badge:"#D4607A", btnBg:"#D4607A", btnTxt:"#fff" },
+    { bg:"#F5F0FF", border:"#C4A8E8", badge:"#8B5CF6", btnBg:"#8B5CF6", btnTxt:"#fff" },
+    { bg:"#F0FAF0", border:"#86C98A", badge:"#2D7D32", btnBg:"#2D7D32", btnTxt:"#fff" },
+  ];
 
   const html = `<!doctype html>
 <html lang="pt-BR">
@@ -2619,58 +2630,100 @@ async function obaHandlePropostaPublica(request, env, url) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
-  <title>Proposta — ${proposal.cliente} | Oba Doceria</title>
+  <title>Proposta para ${proposal.cliente} · Oba Doceria</title>
   <style>
     *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-    body{margin:0;background:#FFF9F3;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#3B2A1E;padding:0}
-    .page{max-width:600px;margin:0 auto;padding:24px 16px 48px}
+    body{margin:0;background:#F9F3EE;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3B2A1E}
+    .page{max-width:640px;margin:0 auto;padding:0 0 56px}
+    .hero{background:linear-gradient(160deg,#FFF9F3 0%,#FFF0E0 100%);padding:36px 24px 28px;text-align:center;border-bottom:1px solid #EDD9C0}
+    .hero img{height:44px;object-fit:contain;margin-bottom:14px;opacity:.92}
+    .hero-title{margin:0 0 4px;font-size:22px;font-weight:900;color:#3B2A1E;letter-spacing:-.3px}
+    .hero-sub{margin:0;font-size:13px;color:#8B6A50;font-weight:500}
+    .hero-sub strong{color:#5D3A1A}
+    .info-card{margin:20px 16px 0;background:#fff;border-radius:16px;border:1px solid #EDD9C0;padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+    .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 8px}
+    .info-item p{margin:0}
+    .info-label{font-size:9px;color:#aaa;text-transform:uppercase;font-weight:700;letter-spacing:.8px}
+    .info-value{font-size:13px;font-weight:700;color:#3B2A1E;margin-top:2px!important}
+    .resumo{margin:16px 16px 0;background:#FFF3E0;border-left:3px solid #8B4513;border-radius:0 12px 12px 0;padding:14px 16px}
+    .resumo p{margin:0;font-size:13px;line-height:1.65;color:#5D3A1A;font-style:italic}
+    .nav-anchors{display:flex;gap:8px;margin:20px 16px 0;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+    .nav-anchors::-webkit-scrollbar{display:none}
+    .nav-anchor{flex-shrink:0;padding:7px 14px;border-radius:20px;border:1.5px solid #EDD9C0;background:#fff;font-size:12px;font-weight:700;color:#8B4513;cursor:pointer;text-decoration:none;white-space:nowrap;transition:all .2s}
+    .nav-anchor:hover{border-color:#8B4513;background:#FFF9F3}
+    .cenario-wrap{margin:18px 16px 0}
+    .cenario-card{border-radius:20px;border:2px solid;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+    .cenario-header{padding:18px 20px 14px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+    .cenario-badge{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;padding:3px 8px;border-radius:20px;color:#fff;display:inline-block;margin-bottom:6px}
+    .cenario-nome{margin:0;font-size:20px;font-weight:900;color:#3B2A1E;line-height:1.2}
+    .cenario-desc{margin:4px 0 0;font-size:12px;color:#777;font-style:italic;line-height:1.4}
+    .cenario-total-wrap{text-align:right;flex-shrink:0}
+    .cenario-docespor{font-size:10px;color:#aaa;white-space:nowrap}
+    .cenario-total{font-size:24px;font-weight:900;color:#3B2A1E;line-height:1;margin-top:2px}
+    .cenario-body{padding:0 20px 18px}
+    table.itens{width:100%;border-collapse:collapse}
+    table.itens td{padding:7px 0;border-bottom:1px solid rgba(0,0,0,.06);font-size:13px}
+    table.itens td.it-nome{color:#3B2A1E}
+    table.itens td.it-qtd{text-align:center;color:#888;font-size:12px;padding:7px 10px;white-space:nowrap}
+    table.itens td.it-val{text-align:right;font-weight:600;white-space:nowrap}
+    table.itens tr.cat-header td{padding:12px 0 4px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#8B4513;border-bottom:none}
+    table.itens tr.totais td{border-bottom:none;padding:6px 0;font-size:13px}
+    table.itens tr.total-final td{border-top:2px solid;padding:10px 0 0;font-size:16px;font-weight:900}
+    .cta-btn{display:block;margin:16px 0 0;padding:14px;border-radius:14px;text-align:center;font-weight:800;font-size:13px;text-decoration:none;letter-spacing:.3px;transition:opacity .2s}
+    .cta-btn:hover{opacity:.88}
+    .footer{text-align:center;padding:24px 16px 0;margin-top:8px}
+    .footer p{margin:0 0 6px;font-size:12px;color:#aaa}
+    .footer a{color:#8B4513;font-weight:600}
+    .btn-pdf{margin-top:16px;background:#3B2A1E;color:#fff;border:none;border-radius:12px;padding:12px 28px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.3px}
     @media print{
-      body{background:#fff;padding:0}
-      .page{padding:16px;max-width:100%}
+      body{background:#fff}
       .no-print{display:none!important}
-      a[href]{text-decoration:none;color:inherit}
-      .cta-wpp{display:none!important}
+      .nav-anchors{display:none!important}
+      .cenario-wrap{margin:12px 0 0}
+      .cta-btn{display:none!important}
+      .btn-pdf{display:none!important}
+      .page{padding:0}
     }
   </style>
 </head>
 <body>
 <div class="page">
 
-  <!-- CABEÇALHO -->
-  <div style="text-align:center;padding:24px 0 20px;border-bottom:2px solid #E8D5B5;margin-bottom:20px">
+  <!-- HERO -->
+  <div class="hero">
     <img src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png"
-         alt="Oba Doceria" style="height:56px;object-fit:contain;margin-bottom:12px" onerror="this.style.display='none'">
-    <h1 style="margin:0 0 4px;font-size:20px;font-weight:900;color:#3B2A1E">Proposta de Orçamento</h1>
-    <p style="margin:0;font-size:13px;color:#666">Exclusiva para <strong>${proposal.cliente}</strong></p>
+         alt="Oba Doceria" onerror="this.style.display='none'">
+    <h1 class="hero-title">Proposta de Orçamento</h1>
+    <p class="hero-sub">Preparada com carinho para <strong>${proposal.cliente}</strong></p>
   </div>
 
-  <!-- DADOS DO EVENTO -->
-  <div style="background:#fff;border-radius:16px;border:1px solid #E8D5B5;padding:16px;margin-bottom:20px">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;row-gap:8px">
-      ${proposal.tipo_evento ? `<div><p style="margin:0;font-size:10px;color:#888;text-transform:uppercase;font-weight:700">Evento</p><p style="margin:2px 0 0;font-size:13px;font-weight:600">${proposal.tipo_evento}</p></div>` : ""}
-      ${dataEvento ? `<div><p style="margin:0;font-size:10px;color:#888;text-transform:uppercase;font-weight:700">Data</p><p style="margin:2px 0 0;font-size:13px;font-weight:600">${dataEvento}</p></div>` : ""}
-      ${proposal.convidados ? `<div><p style="margin:0;font-size:10px;color:#888;text-transform:uppercase;font-weight:700">Convidados</p><p style="margin:2px 0 0;font-size:13px;font-weight:600">${proposal.convidados} pessoas</p></div>` : ""}
-      ${(proposal.scenarios||[]).length ? `<div><p style="margin:0;font-size:10px;color:#888;text-transform:uppercase;font-weight:700">Cenários</p><p style="margin:2px 0 0;font-size:13px;font-weight:600">${proposal.scenarios.length} opções</p></div>` : ""}
+  <!-- INFO DO EVENTO -->
+  <div class="info-card">
+    <div class="info-grid">
+      ${proposal.tipo_evento ? `<div class="info-item"><p class="info-label">Evento</p><p class="info-value">${proposal.tipo_evento}</p></div>` : ""}
+      ${dataEvento ? `<div class="info-item"><p class="info-label">Data</p><p class="info-value">${dataEvento}</p></div>` : ""}
+      ${proposal.convidados ? `<div class="info-item"><p class="info-label">Convidados</p><p class="info-value">${proposal.convidados} pessoas</p></div>` : ""}
+      ${(proposal.scenarios||[]).length ? `<div class="info-item"><p class="info-label">Opções</p><p class="info-value">${proposal.scenarios.length} cenários</p></div>` : ""}
     </div>
   </div>
 
-  <!-- RESUMO GERAL -->
-  ${proposal.resumo ? `<div style="background:#FFF3E0;border-left:4px solid #8B4513;border-radius:0 12px 12px 0;padding:14px 16px;margin-bottom:20px"><p style="margin:0;font-size:13px;line-height:1.6;color:#5D3A1A;font-style:italic">"${proposal.resumo}"</p></div>` : ""}
+  <!-- RESUMO -->
+  ${proposal.resumo ? `<div class="resumo"><p>"${proposal.resumo}"</p></div>` : ""}
+
+  <!-- ÍNDICE DE ÂNCORAS -->
+  <nav class="nav-anchors no-print">
+    ${(proposal.scenarios||[]).map((s,i) => `<a class="nav-anchor" href="#cenario-${i+1}" style="border-color:${(paletas[i]||paletas[0]).border};color:${(paletas[i]||paletas[0]).badge}">${s.nome||"Cenário "+(i+1)}</a>`).join("")}
+  </nav>
 
   <!-- CENÁRIOS -->
   ${cenariosHtml}
 
   <!-- RODAPÉ -->
-  <div style="border-top:1px solid #E8D5B5;padding-top:16px;margin-top:8px;text-align:center">
-    ${validade ? `<p style="margin:0 0 8px;font-size:12px;color:#888">⏳ Proposta válida até <strong>${validade}</strong></p>` : ""}
-    ${wpp ? `<p style="margin:0 0 4px;font-size:12px;color:#888">Dúvidas? <a href="https://wa.me/55${wpp}" style="color:#8B4513;font-weight:700">fale pelo WhatsApp</a></p>` : ""}
-    <p style="margin:8px 0 0;font-size:11px;color:#bbb">Oba Doceria • Um jeito doce de expressar felicidade</p>
-
-    <!-- Botão imprimir / PDF -->
-    <button class="no-print" onclick="window.print()"
-      style="margin-top:16px;background:#8B4513;color:#fff;border:none;border-radius:12px;padding:12px 28px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.5px">
-      📄 Salvar como PDF
-    </button>
+  <div class="footer no-print">
+    ${validade ? `<p>⏳ Válida até <strong style="color:#3B2A1E">${validade}</strong></p>` : ""}
+    ${wpp ? `<p>Dúvidas? <a href="https://wa.me/55${wpp}">fale pelo WhatsApp</a></p>` : ""}
+    <p style="font-size:11px;margin-top:12px">Oba Doceria · Um jeito doce de expressar felicidade 🤍</p>
+    <button class="btn-pdf no-print" onclick="window.print()">📄 Salvar como PDF</button>
   </div>
 
 </div>
