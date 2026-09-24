@@ -2489,21 +2489,20 @@ async function obaHandlePropostaPublica(request, env, url) {
   const proposal = await obaLoadProposal(env, match[1]);
   if (!proposal) {
     return new Response(
-      `<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Proposta nao encontrada - Oba Doceria</title><style>body{font-family:sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#FFF9F3;color:#3B2A1E;text-align:center;padding:24px}.box{max-width:340px}.logo{font-size:28px;font-weight:900;color:#8B4513;margin-bottom:8px}p{color:#888;font-size:14px}</style><body><div class="box"><div class="logo">Oba Doceria</div><h2 style="margin:0 0 8px">Proposta nao encontrada</h2><p>O link pode ter expirado ou estar incorreto.</p></div></body></html>`,
+      `<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Proposta nao encontrada - Oba Doceria</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Georgia,serif;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#FAF7F4;color:#3B2A1E;text-align:center;padding:32px}.box{max-width:360px}.logo{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#C8922A;margin-bottom:24px}h2{font-size:22px;font-weight:400;margin-bottom:12px}p{color:#999;font-size:13px;line-height:1.6}</style><body><div class="box"><div class="logo">Oba Doceria</div><h2>Proposta nao encontrada</h2><p>O link pode ter expirado ou estar incorreto.<br>Entre em contato com a Oba Doceria.</p></div></body></html>`,
       { status: 404, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } }
     );
   }
 
-  // Carregar catalogo PUBLISHED para precos
-  let catalogCategories = [];
-  let catalogFlavors = [];
-  let obaWhatsapp = "";
+  // Catalogo PUBLISHED para precos e numero da Oba
+  let catalogCategories = [], catalogFlavors = [], obaWhatsapp = "";
   try {
-    const published = await obaLoadCatalogSlot(env, "PUBLISHED");
-    if (published && published.payload) {
-      catalogCategories = published.payload.categorias || published.payload.categories || [];
-      catalogFlavors = published.payload.sabores || published.payload.flavors || [];
-      obaWhatsapp = (published.payload.loja || published.payload.config?.store || {}).whatsapp || "";
+    const pub = await obaLoadCatalogSlot(env, "PUBLISHED");
+    if (pub && pub.payload) {
+      catalogCategories = pub.payload.categorias || pub.payload.categories || [];
+      catalogFlavors   = pub.payload.sabores || pub.payload.flavors || [];
+      const loja = pub.payload.loja || pub.payload.config?.store || {};
+      obaWhatsapp = loja.whatsapp || "";
     }
   } catch(e) {}
 
@@ -2513,191 +2512,191 @@ async function obaHandlePropostaPublica(request, env, url) {
   catalogFlavors.forEach(f => { saborPrecoMap[String(f.id)] = Number(f.preco||0); });
 
   const fmtMoeda = (v) => {
-    const n = Number(v||0).toFixed(2);
-    const [int, dec] = n.split(".");
-    return "R$\u00a0" + int.replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "," + dec;
+    const n = Number(v||0).toFixed(2), [int,dec] = n.split(".");
+    return "R$\u00a0" + int.replace(/\B(?=(\d{3})+(?!\d))/g,".") + "," + dec;
   };
-  const MESES = ["janeiro","fevereiro","mar\u00e7o","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+  const MESES = ["janeiro","fevereiro","mar\u00e7o","abril","maio","junho",
+                 "julho","agosto","setembro","outubro","novembro","dezembro"];
   const fmtData = (d) => {
     if (!d) return null;
-    try { const [y,m,day] = d.split("-"); return parseInt(day) + " de " + MESES[parseInt(m)-1] + " de " + y; }
-    catch { return d; }
+    try { const [y,m,dy]=d.split("-"); return parseInt(dy)+" de "+MESES[parseInt(m)-1]+" de "+y; }
+    catch{return d;}
   };
 
-  const dataEvento = fmtData(proposal.data_evento);
-  const validade = fmtData(proposal.validade);
-  const obaWpp = obaWhatsapp.replace(/\D/g,"");
+  // Rotulos fixos por posicao — elegantes e adequados ao contexto
+  const ROTULOS = ["Econ\u00f4mico","Equilibrado","Generoso"];
 
-  const paletas = [
-    { bg:"#FFFBF0", border:"#F0C040", badge:"#B8860B", btn:"#D4A017", txt:"#3B2A1E" },
-    { bg:"#FFF5F7", border:"#E8A0B0", badge:"#C0526A", btn:"#C0526A", txt:"#fff"    },
-    { bg:"#F8F4FF", border:"#B8A0E0", badge:"#7C4DCC", btn:"#7C4DCC", txt:"#fff"    },
-    { bg:"#F0FBF4", border:"#80C890", badge:"#2E7D32", btn:"#2E7D32", txt:"#fff"    },
+  // Paletas: acento de cor apenas (linha topo + total + rotulo) — fundo sempre branco/creme
+  const PALETAS = [
+    { acento:"#C8922A", fundo:"#FFFDF8", linhaTopo:"#C8922A" },  // ouro quente
+    { acento:"#A0536A", fundo:"#FFF8FA", linhaTopo:"#A0536A" },  // rose
+    { acento:"#6B5BA0", fundo:"#F9F7FF", linhaTopo:"#6B5BA0" },  // lilas
+    { acento:"#3A7D5A", fundo:"#F6FBF8", linhaTopo:"#3A7D5A" },  // verde
   ];
 
-  const cenariosHtml = (proposal.scenarios || []).map((s, si) => {
-    const pal = paletas[si] || paletas[paletas.length-1];
+  const dataEvento = fmtData(proposal.data_evento);
+  const validade   = fmtData(proposal.validade);
+  const obaWpp     = obaWhatsapp.replace(/\D/g,"");
 
-    const porCategoria = {};
-    const livres = [];
-    (s.items || []).forEach(it => {
-      if (it.tipo === "catalogo" && it.ref_id) {
-        const [catId, saborId] = (it.ref_id||"").split(":");
-        if (!porCategoria[catId]) porCategoria[catId] = { catId, items:[] };
-        if (saborId !== "__total__") porCategoria[catId].items.push(it);
-        else porCategoria[catId].total = it.qtd;
-      } else { livres.push(it); }
-    });
+  const cenariosHtml = (proposal.scenarios||[]).map((s,si) => {
+    const pal    = PALETAS[si] || PALETAS[PALETAS.length-1];
+    const rotulo = ROTULOS[si] || "";
 
-    let subtotal = 0;
+    // Agrupar itens
+    const porCat = {}, livres = [];
     (s.items||[]).forEach(it => {
       if (it.tipo==="catalogo" && it.ref_id) {
-        const [catId,saborId] = (it.ref_id||"").split(":");
-        subtotal += Number(it.qtd||0) * (saborId==="__total__" ? (catPrecoMap[catId]||0) : (Number(it.preco_unit||0)||(saborPrecoMap[saborId]||0)));
-      } else { subtotal += Number(it.qtd||0)*Number(it.preco_unit||0); }
+        const [cid,sid]=(it.ref_id||"").split(":");
+        if (!porCat[cid]) porCat[cid]={cid,items:[]};
+        if (sid!=="__total__") porCat[cid].items.push(it);
+        else porCat[cid].total=it.qtd;
+      } else livres.push(it);
     });
-    let desconto = 0;
-    if (s.desconto_tipo==="reais") desconto = Number(s.desconto_valor||0);
-    else if (s.desconto_tipo==="percentual") desconto = subtotal*(Number(s.desconto_valor||0)/100);
-    const total = Math.max(0, subtotal-desconto);
 
-    const catRows = Object.values(porCategoria).map(cat => {
-      const nome = cat.catId.split("-").map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(" ");
-      if (cat.items && cat.items.length>0) {
-        const rows = cat.items.map(it => {
-          const p = Number(it.preco_unit||0)||(saborPrecoMap[(it.ref_id||"").split(":")[1]]||0);
-          return `<tr><td class="r-nome">${it.descricao}</td><td class="r-qtd">${it.qtd} un</td><td class="r-val">${fmtMoeda(it.qtd*p)}</td></tr>`;
+    // Calcular subtotal
+    let sub=0;
+    (s.items||[]).forEach(it=>{
+      if(it.tipo==="catalogo"&&it.ref_id){
+        const [cid,sid]=(it.ref_id||"").split(":");
+        sub+=Number(it.qtd||0)*(sid==="__total__"?(catPrecoMap[cid]||0):(Number(it.preco_unit||0)||(saborPrecoMap[sid]||0)));
+      } else sub+=Number(it.qtd||0)*Number(it.preco_unit||0);
+    });
+    let desc=0;
+    if(s.desconto_tipo==="reais") desc=Number(s.desconto_valor||0);
+    else if(s.desconto_tipo==="percentual") desc=sub*(Number(s.desconto_valor||0)/100);
+    const total=Math.max(0,sub-desc);
+
+    // Linhas de categoria
+    const catLinhas=Object.values(porCat).map(cat=>{
+      const nome=cat.cid.split("-").map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(" ");
+      if(cat.items&&cat.items.length>0){
+        return cat.items.map(it=>{
+          const p=Number(it.preco_unit||0)||(saborPrecoMap[(it.ref_id||"").split(":")[1]]||0);
+          return `<tr><td class="td-nome">${it.descricao}</td><td class="td-qtd">${it.qtd} un</td><td class="td-val">${fmtMoeda(it.qtd*p)}</td></tr>`;
         }).join("");
-        return `<tr class="r-cat"><td colspan="3">${nome}</td></tr>${rows}`;
-      } else if (cat.total) {
-        const ref = catPrecoMap[cat.catId]||0;
-        return `<tr><td class="r-nome">${nome}</td><td class="r-qtd">${cat.total} doces</td><td class="r-val">${ref>0?fmtMoeda(cat.total*ref):"&mdash;"}</td></tr>`;
+      } else if(cat.total){
+        const ref=catPrecoMap[cat.cid]||0;
+        return `<tr><td class="td-nome">${nome}</td><td class="td-qtd">${cat.total} doces</td><td class="td-val">${ref>0?fmtMoeda(cat.total*ref):"&mdash;"}</td></tr>`;
       }
       return "";
     }).join("");
 
-    const livreRows = livres.map(it =>
-      `<tr><td class="r-nome">${it.descricao}</td><td class="r-qtd"></td><td class="r-val">${fmtMoeda(it.preco_unit)}</td></tr>`
-    ).join("");
+    const livreLinhas=livres.map(it=>`<tr><td class="td-nome">${it.descricao}</td><td class="td-qtd"></td><td class="td-val">${fmtMoeda(it.preco_unit)}</td></tr>`).join("");
+    const descLinha=desc>0?`<tr class="tr-desc"><td colspan="2">Desconto</td><td>&minus;\u00a0${fmtMoeda(desc)}</td></tr>`:"";
 
-    const descRow = desconto>0
-      ? `<tr class="r-desc"><td colspan="2">Desconto</td><td>&minus; ${fmtMoeda(desconto)}</td></tr>` : "";
+    // CTA para WhatsApp da OBA DOCERIA
+    const ctaMsg=encodeURIComponent("Ola! Gostei do cenario "+((si+1))+" da proposta e gostaria de conversar. Pode me ajudar?");
+    const ctaHref=obaWpp?"https://wa.me/55"+obaWpp+"?text="+ctaMsg:"";
 
-    // CTA vai para WhatsApp da OBA DOCERIA (nao da cliente)
-    const ctaMsg = encodeURIComponent("Ola! Gostei do " + (s.nome||("Cenario "+(si+1))) + " da proposta. Podemos conversar?");
-    const ctaUrl = obaWpp ? "https://wa.me/55"+obaWpp+"?text="+ctaMsg : null;
-    const ctaBtn = ctaUrl
-      ? `<a href="${ctaUrl}" target="_blank" class="cta-btn" style="background:${pal.btn};color:${pal.txt}">Quero este cen&aacute;rio &mdash; falar com a Oba Doceria</a>`
-      : "";
-
-    return `<section id="c${si+1}" class="c-wrap">
-  <div class="c-card" style="background:${pal.bg};border-color:${pal.border}">
-    <div class="c-head" style="border-bottom-color:${pal.border}">
-      <div class="c-meta">
-        <span class="c-badge" style="background:${pal.badge}">Cen&aacute;rio ${si+1}</span>
+    return `
+<section id="c${si+1}" class="cenario">
+  <div class="c-card" style="background:${pal.fundo};border-top:4px solid ${pal.linhaTopo}">
+    <div class="c-topo">
+      <div class="c-esq">
+        <span class="c-num">Cen&aacute;rio ${si+1}${rotulo?" &middot; "+rotulo:""}</span>
         <h2 class="c-nome">${s.nome||("Cen\u00e1rio "+(si+1))}</h2>
-        ${s.descricao ? `<p class="c-desc">${s.descricao}</p>` : ""}
+        ${s.descricao?`<p class="c-desc">${s.descricao}</p>`:""}
       </div>
-      <div class="c-price-block">
-        ${s.doces_por_convidado ? `<span class="c-dpc">${s.doces_por_convidado} doces/pessoa</span>` : ""}
-        <span class="c-total" style="color:${pal.badge}">${fmtMoeda(total)}</span>
+      <div class="c-dir">
+        ${s.doces_por_convidado?`<span class="c-dpc">${s.doces_por_convidado} doces/pessoa</span>`:""}
+        <span class="c-total" style="color:${pal.acento}">${fmtMoeda(total)}</span>
       </div>
     </div>
-    <div class="c-body">
-      <table class="rt"><tbody>${catRows}${livreRows}${descRow}
-        <tr class="r-final" style="border-color:${pal.border}">
-          <td colspan="2" style="font-family:'Playfair Display',serif">Total</td>
-          <td style="color:${pal.badge}">${fmtMoeda(total)}</td>
-        </tr>
+    <div class="c-corpo">
+      <table class="tab"><tbody>
+        ${catLinhas}${livreLinhas}${descLinha}
+        <tr class="tr-total"><td colspan="2">Total</td><td style="color:${pal.acento}">${fmtMoeda(total)}</td></tr>
       </tbody></table>
-      ${ctaBtn}
+      ${ctaHref?`<a href="${ctaHref}" target="_blank" class="cta" style="background:${pal.acento}">Quero este cen&aacute;rio &#10084;</a>`:""}
     </div>
   </div>
 </section>`;
   }).join("\n");
 
-  const anchors = (proposal.scenarios||[]).map((s,i) => {
-    const pal = paletas[i]||paletas[paletas.length-1];
-    return `<a class="anc" href="#c${i+1}" style="border-color:${pal.border};color:${pal.badge}">${s.nome||"Cen\u00e1rio "+(i+1)}</a>`;
+  const anchors=(proposal.scenarios||[]).map((s,i)=>{
+    const pal=PALETAS[i]||PALETAS[PALETAS.length-1];
+    return `<a class="anc" href="#c${i+1}" style="color:${pal.acento};border-color:${pal.acento}">${s.nome||"Cen\u00e1rio "+(i+1)}</a>`;
   }).join("");
 
-  const html = `<!doctype html>
+  const html=`<!doctype html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>Proposta para ${proposal.cliente} &middot; Oba Doceria</title>
+<title>${proposal.cliente} &middot; Proposta Oba Doceria</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;margin:0;padding:0}
-body{background:#F7F2EC;font-family:'Inter',sans-serif;color:#3B2A1E;min-height:100vh}
-.page{max-width:640px;margin:0 auto;padding:0 0 60px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{background:#FAF7F4;font-family:'Inter',sans-serif;color:#3B2A1E;min-height:100vh}
+.page{max-width:660px;margin:0 auto;padding:0 0 72px}
 
 /* HERO */
-.hero{background:linear-gradient(150deg,#FFF9F3 0%,#FFEEDD 100%);padding:40px 24px 32px;text-align:center;border-bottom:1px solid #EDD9C0}
-.hero-logo{height:48px;object-fit:contain;margin-bottom:16px;opacity:.9}
-.hero h1{font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:#3B2A1E;letter-spacing:-.5px;margin-bottom:4px}
-.hero-sub{font-size:14px;color:#8B6A50;font-weight:500}
-.hero-sub strong{color:#5D3A1A;font-weight:700}
+.hero{background:linear-gradient(175deg,#FFFDF8 0%,#FFF3E4 100%);padding:52px 32px 40px;text-align:center;border-bottom:1px solid #EDD9C0}
+.hero-logo{height:52px;object-fit:contain;margin-bottom:20px;opacity:.88}
+.hero-ornamento{font-size:18px;color:#C8922A;letter-spacing:8px;margin-bottom:16px}
+.hero h1{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:300;color:#3B2A1E;letter-spacing:.5px;margin-bottom:6px;line-height:1.2}
+.hero-sub{font-family:'Cormorant Garamond',serif;font-size:16px;color:#8B6A50;font-style:italic}
+.hero-sub strong{color:#5D3A1A;font-style:normal;font-weight:600}
 
-/* INFO CARD */
-.info{margin:20px 16px 0;background:#fff;border-radius:18px;border:1px solid #EDD9C0;padding:18px 20px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
-.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.info-label{font-size:9px;color:#bbb;text-transform:uppercase;font-weight:700;letter-spacing:1px}
-.info-value{font-size:14px;font-weight:700;color:#3B2A1E;margin-top:3px;font-family:'Playfair Display',serif}
+/* INFO */
+.info{margin:24px 20px 0;background:#fff;border-radius:16px;border:1px solid #EDD9C0;padding:20px 24px}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.info-label{font-size:9px;color:#bbb;text-transform:uppercase;letter-spacing:1.5px;font-weight:600;margin-bottom:4px}
+.info-value{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:#3B2A1E}
 
 /* RESUMO */
-.resumo{margin:16px 16px 0;background:#FFFBF5;border-left:4px solid #C8922A;border-radius:0 14px 14px 0;padding:16px 18px}
-.resumo p{font-size:13px;line-height:1.7;color:#5D3A1A;font-style:italic}
+.resumo{margin:16px 20px 0;padding:18px 20px;border-left:2px solid #C8922A;background:#FFFDF8}
+.resumo p{font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;color:#5D3A1A;line-height:1.7}
 
 /* ANCHORS */
-.anchors{display:flex;gap:8px;margin:20px 16px 0;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.anchors{display:flex;gap:10px;margin:24px 20px 0;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
 .anchors::-webkit-scrollbar{display:none}
-.anc{flex-shrink:0;padding:8px 16px;border-radius:24px;border:2px solid;background:#fff;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;white-space:nowrap;transition:opacity .15s}
-.anc:hover{opacity:.75}
+.anc{flex-shrink:0;padding:6px 18px;border-radius:24px;border:1px solid;background:transparent;font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:600;text-decoration:none;white-space:nowrap;transition:opacity .15s}
+.anc:hover{opacity:.65}
 
-/* CENARIOS */
-.c-wrap{margin:18px 16px 0;scroll-margin-top:12px}
-.c-card{border-radius:22px;border:2px solid;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.07)}
-.c-head{padding:22px 22px 18px;border-bottom:1px solid;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-.c-meta{flex:1;min-width:0}
-.c-badge{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;padding:4px 10px;border-radius:24px;color:#fff;display:inline-block;margin-bottom:8px}
-.c-nome{font-family:'Playfair Display',serif;font-size:24px;font-weight:900;color:#3B2A1E;line-height:1.15;margin-bottom:6px}
-.c-desc{font-size:12px;color:#888;font-style:italic;line-height:1.5}
-.c-price-block{text-align:right;flex-shrink:0}
-.c-dpc{display:block;font-size:10px;color:#aaa;margin-bottom:4px}
-.c-total{display:block;font-family:'Playfair Display',serif;font-size:28px;font-weight:900;line-height:1}
-.c-body{padding:18px 22px 22px}
+/* CENARIO */
+.cenario{margin:20px 20px 0}
+.c-card{border-radius:18px;border:1px solid #EDD9C0;overflow:hidden;background:#fff;box-shadow:0 2px 12px rgba(60,35,20,.06)}
+.c-topo{padding:24px 28px 20px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.c-esq{flex:1;min-width:0}
+.c-num{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#bbb;font-weight:600;display:block;margin-bottom:6px}
+.c-nome{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:#3B2A1E;line-height:1.2;margin-bottom:6px}
+.c-desc{font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;color:#aaa;line-height:1.5}
+.c-dir{text-align:right;flex-shrink:0}
+.c-dpc{display:block;font-size:10px;color:#ccc;letter-spacing:.5px;margin-bottom:6px}
+.c-total{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;line-height:1;display:block}
+.c-corpo{padding:0 28px 24px;border-top:1px solid #F0EAE0}
 
 /* TABELA */
-.rt{width:100%;border-collapse:collapse}
-.rt td{padding:9px 0;border-bottom:1px solid rgba(0,0,0,.07);font-size:13px;vertical-align:middle}
-.r-nome{color:#3B2A1E;font-weight:500}
-.r-qtd{text-align:center;color:#999;font-size:12px;padding:9px 10px;white-space:nowrap}
-.r-val{text-align:right;font-weight:600;white-space:nowrap}
-.r-cat td{padding:14px 0 4px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;border-bottom:none;color:#888}
-.r-desc td{font-size:12px;color:#059669;border-bottom:none;padding:6px 0}
-.r-desc td:last-child{text-align:right}
-.r-final td{border-top:2px solid;border-bottom:none;padding:14px 0 0;font-size:17px;font-weight:700}
-.r-final td:last-child{text-align:right;font-size:20px;font-weight:900}
+.tab{width:100%;border-collapse:collapse;margin-top:4px}
+.tab td{padding:10px 0;border-bottom:1px solid #F5EFE8;font-size:13px;vertical-align:middle}
+.td-nome{color:#3B2A1E;font-weight:500;padding-right:8px}
+.td-qtd{text-align:center;color:#ccc;font-size:12px;padding:10px 12px;white-space:nowrap}
+.td-val{text-align:right;font-weight:600;white-space:nowrap;color:#5D3A1A}
+.tr-desc td{border-bottom:none;padding:8px 0;font-size:12px;color:#059669}
+.tr-desc td:last-child{text-align:right}
+.tr-total td{border:none;padding:16px 0 0;font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600}
+.tr-total td:last-child{text-align:right;font-size:24px}
 
 /* CTA */
-.cta-btn{display:block;margin:18px 0 0;padding:16px;border-radius:16px;text-align:center;font-weight:700;font-size:13px;text-decoration:none;letter-spacing:.3px}
+.cta{display:block;margin:20px 0 0;padding:16px;border-radius:14px;text-align:center;color:#fff;font-weight:600;font-size:14px;text-decoration:none;letter-spacing:.2px;transition:opacity .2s}
+.cta:hover{opacity:.85}
 
 /* FOOTER */
-.footer{text-align:center;padding:28px 16px 0;margin-top:8px}
-.footer p{font-size:12px;color:#bbb;margin-bottom:6px}
-.footer a{color:#8B4513;font-weight:600;text-decoration:none}
-.btn-pdf{margin-top:18px;background:#3B2A1E;color:#fff;border:none;border-radius:14px;padding:13px 32px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:.3px}
+.footer{margin:32px 20px 0;text-align:center;padding-top:24px;border-top:1px solid #EDD9C0}
+.footer p{font-size:12px;color:#ccc;margin-bottom:6px;line-height:1.6}
+.footer a{color:#8B4513;font-weight:500;text-decoration:none}
+.footer-brand{font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;color:#bbb;margin-top:8px}
+.btn-pdf{margin-top:20px;background:#3B2A1E;color:#fff;border:none;border-radius:12px;padding:13px 32px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;letter-spacing:.3px}
 
 @media print{
   body{background:#fff}
-  .anchors,.btn-pdf,.cta-btn{display:none!important}
+  .anchors,.btn-pdf,.cta{display:none!important}
   .page{padding:0}
-  .c-wrap{margin:12px 0 0}
-  .info,.resumo,.c-card{box-shadow:none}
+  .cenario{margin:12px 0 0}
+  .c-card{box-shadow:none;border-color:#ddd}
 }
 </style>
 </head>
@@ -2706,29 +2705,30 @@ body{background:#F7F2EC;font-family:'Inter',sans-serif;color:#3B2A1E;min-height:
 
 <div class="hero">
   <img class="hero-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png" alt="Oba Doceria" onerror="this.style.display='none'">
+  <div class="hero-ornamento">&middot; &middot; &middot;</div>
   <h1>Proposta de Or&ccedil;amento</h1>
   <p class="hero-sub">Preparada com carinho para <strong>${proposal.cliente}</strong></p>
 </div>
 
 <div class="info">
   <div class="info-grid">
-    ${proposal.tipo_evento ? `<div><p class="info-label">Evento</p><p class="info-value">${proposal.tipo_evento}</p></div>` : ""}
-    ${dataEvento ? `<div><p class="info-label">Data</p><p class="info-value">${dataEvento}</p></div>` : ""}
-    ${proposal.convidados ? `<div><p class="info-label">Convidados</p><p class="info-value">${proposal.convidados} pessoas</p></div>` : ""}
-    ${(proposal.scenarios||[]).length ? `<div><p class="info-label">Op&ccedil;&otilde;es</p><p class="info-value">${proposal.scenarios.length} cen&aacute;rios</p></div>` : ""}
+    ${proposal.tipo_evento?`<div><p class="info-label">Evento</p><p class="info-value">${proposal.tipo_evento}</p></div>`:""}
+    ${dataEvento?`<div><p class="info-label">Data</p><p class="info-value">${dataEvento}</p></div>`:""}
+    ${proposal.convidados?`<div><p class="info-label">Convidados</p><p class="info-value">${proposal.convidados} pessoas</p></div>`:""}
+    ${(proposal.scenarios||[]).length?`<div><p class="info-label">Cen&aacute;rios</p><p class="info-value">${proposal.scenarios.length} op&ccedil;&otilde;es</p></div>`:""}
   </div>
 </div>
 
-${proposal.resumo ? `<div class="resumo"><p>&ldquo;${proposal.resumo}&rdquo;</p></div>` : ""}
+${proposal.resumo?`<div class="resumo"><p>&ldquo;${proposal.resumo}&rdquo;</p></div>`:""}
 
 <nav class="anchors">${anchors}</nav>
 
 ${cenariosHtml}
 
 <div class="footer">
-  ${validade ? `<p>Proposta v&aacute;lida at&eacute; <strong style="color:#3B2A1E">${validade}</strong></p>` : ""}
-  ${obaWpp ? `<p>D&uacute;vidas? <a href="https://wa.me/55${obaWpp}">fale pelo WhatsApp</a></p>` : ""}
-  <p>Oba Doceria &middot; Um jeito doce de expressar felicidade</p>
+  ${validade?`<p>Proposta v&aacute;lida at&eacute; <strong style="color:#5D3A1A">${validade}</strong></p>`:""}
+  ${obaWpp?`<p>D&uacute;vidas? <a href="https://wa.me/55${obaWpp}">fale pelo WhatsApp</a></p>`:""}
+  <p class="footer-brand">Oba Doceria &middot; Um jeito doce de expressar felicidade</p>
   <button class="btn-pdf" onclick="window.print()">Salvar como PDF</button>
 </div>
 
@@ -2737,12 +2737,8 @@ ${cenariosHtml}
 </html>`;
 
   return new Response(html, {
-    status: 200,
-    headers: {
-      "Content-Type": "text/html; charset=utf-8",
-      "Cache-Control": "no-store",
-      "X-Robots-Tag": "noindex, nofollow"
-    }
+    status:200,
+    headers:{"Content-Type":"text/html; charset=utf-8","Cache-Control":"no-store","X-Robots-Tag":"noindex, nofollow"}
   });
 }
 export default {
