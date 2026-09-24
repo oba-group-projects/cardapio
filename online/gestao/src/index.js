@@ -1,4 +1,4 @@
-const encoder = new TextEncoder();
+﻿const encoder = new TextEncoder();
 
 const COOKIE_NAME = "__Host-oba_admin";
 const CSRF_COOKIE = "__Host-oba_csrf";
@@ -2528,6 +2528,19 @@ async function obaHandlePropostaPublica(request, env, url) {
     } catch { return d; }
   };
 
+  const dataEvento = fmtData(proposal.data_evento);
+  const validade = fmtData(proposal.validade);
+  const wpp = (proposal.whatsapp||"").replace(/\D/g,"");
+  const propUrl = `https://oba-cardapio-gestao.obadoceria.workers.dev/proposta/${proposal.proposal_id}`;
+
+  // Paletas por cenário: âmbar / rosé / lavanda / fallback neutro
+  const paletas = [
+    { bg:"#FFF8EC", border:"#F5C842", badge:"#E8A800", btnBg:"#E8A800", btnTxt:"#fff" },
+    { bg:"#FFF0F3", border:"#F4A0B0", badge:"#D4607A", btnBg:"#D4607A", btnTxt:"#fff" },
+    { bg:"#F5F0FF", border:"#C4A8E8", badge:"#8B5CF6", btnBg:"#8B5CF6", btnTxt:"#fff" },
+    { bg:"#F0FAF0", border:"#86C98A", badge:"#2D7D32", btnBg:"#2D7D32", btnTxt:"#fff" },
+  ];
+
   // Calcular total de cada cenário
   const cenariosHtml = (proposal.scenarios || []).map((s, si) => {
     const pal = paletas[si] || paletas[paletas.length-1];
@@ -2588,9 +2601,9 @@ async function obaHandlePropostaPublica(request, env, url) {
       ? `<tr class="totais"><td colspan="2" style="color:#059669;font-size:12px">Desconto aplicado</td><td style="text-align:right;color:#059669;font-size:12px">− ${fmtMoeda(desconto)}</td></tr>` : "";
 
     const wppNum = (proposal.whatsapp||"").replace(/\D/g,"");
-    const msg = encodeURIComponent(`Olá! Tenho interesse no ${s.nome||"cenário "+(si+1)} da proposta da Oba Doceria. 😊`);
+    const msg = encodeURIComponent(`Olá! Tenho interesse no ${s.nome||"cenário "+(si+1)} da proposta da Oba Doceria. \uD83D\uDE0A`);
     const ctaBtn = wppNum
-      ? `<a href="https://wa.me/55${wppNum}?text=${msg}" target="_blank" class="cta-btn" style="background:${pal.btnBg};color:${pal.btnTxt}">📱 Quero este cenário · falar no WhatsApp</a>`
+      ? `<a href="https://wa.me/55${wppNum}?text=${msg}" target="_blank" class="cta-btn" style="background:${pal.btnBg};color:${pal.btnTxt}">\uD83D\uDCF1 Quero este cenário · falar no WhatsApp</a>`
       : "";
 
     return `
@@ -2624,21 +2637,6 @@ async function obaHandlePropostaPublica(request, env, url) {
       </div>
     </div>`;
   }).join("");
-
-  const dataEvento = fmtData(proposal.data_evento);
-  const validade = fmtData(proposal.validade);
-  const wpp = (proposal.whatsapp||"").replace(/\D/g,"");
-  const propUrl = `https://oba-cardapio-gestao.obadoceria.workers.dev/proposta/${proposal.proposal_id}`;
-
-  // Paletas por cenário: âmbar / rosé / lavanda / fallback neutro
-  const paletas = [
-    { bg:"#FFF8EC", border:"#F5C842", badge:"#E8A800", btnBg:"#E8A800", btnTxt:"#fff" },
-    { bg:"#FFF0F3", border:"#F4A0B0", badge:"#D4607A", btnBg:"#D4607A", btnTxt:"#fff" },
-    { bg:"#F5F0FF", border:"#C4A8E8", badge:"#8B5CF6", btnBg:"#8B5CF6", btnTxt:"#fff" },
-    { bg:"#F0FAF0", border:"#86C98A", badge:"#2D7D32", btnBg:"#2D7D32", btnTxt:"#fff" },
-  ];
-
-  const html = `<!doctype html>
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
@@ -2734,10 +2732,10 @@ async function obaHandlePropostaPublica(request, env, url) {
 
   <!-- RODAPÉ -->
   <div class="footer no-print">
-    ${validade ? `<p>⏳ Válida até <strong style="color:#3B2A1E">${validade}</strong></p>` : ""}
+    ${validade ? `<p>\u23F3 Válida até <strong style="color:#3B2A1E">${validade}</strong></p>` : ""}
     ${wpp ? `<p>Dúvidas? <a href="https://wa.me/55${wpp}">fale pelo WhatsApp</a></p>` : ""}
-    <p style="font-size:11px;margin-top:12px">Oba Doceria · Um jeito doce de expressar felicidade 🤍</p>
-    <button class="btn-pdf no-print" onclick="window.print()">📄 Salvar como PDF</button>
+    <p style="font-size:11px;margin-top:12px">Oba Doceria · Um jeito doce de expressar felicidade \uD83E\uDD0D</p>
+    <button class="btn-pdf no-print" onclick="window.print()">\uD83D\uDCC4 Salvar como PDF</button>
   </div>
 
 </div>
