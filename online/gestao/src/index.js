@@ -2601,9 +2601,9 @@ async function obaHandlePropostaPublica(request, env, url) {
       ? `<tr class="totais"><td colspan="2" style="color:#059669;font-size:12px">Desconto aplicado</td><td style="text-align:right;color:#059669;font-size:12px">− ${fmtMoeda(desconto)}</td></tr>` : "";
 
     const wppNum = (proposal.whatsapp||"").replace(/\D/g,"");
-    const msg = encodeURIComponent(`Olá! Tenho interesse no ${s.nome||"cenário "+(si+1)} da proposta da Oba Doceria. \uD83D\uDE0A`);
+    const msg = encodeURIComponent(`Olá! Tenho interesse no ${s.nome||"cenário "+(si+1)} da proposta da Oba Doceria.`);
     const ctaBtn = wppNum
-      ? `<a href="https://wa.me/55${wppNum}?text=${msg}" target="_blank" class="cta-btn" style="background:${pal.btnBg};color:${pal.btnTxt}">\uD83D\uDCF1 Quero este cenário · falar no WhatsApp</a>`
+      ? `<a href="https://wa.me/55${wppNum}?text=${msg}" target="_blank" class="cta-btn" style="background:${pal.btnBg};color:${pal.btnTxt}">Quero este cenário · falar no WhatsApp</a>`
       : "";
 
     return `
@@ -2732,10 +2732,10 @@ async function obaHandlePropostaPublica(request, env, url) {
 
   <!-- RODAPÉ -->
   <div class="footer no-print">
-    ${validade ? `<p>\u23F3 Válida até <strong style="color:#3B2A1E">${validade}</strong></p>` : ""}
+    ${validade ? `<p>Válida até <strong style="color:#3B2A1E">${validade}</strong></p>` : ""}
     ${wpp ? `<p>Dúvidas? <a href="https://wa.me/55${wpp}">fale pelo WhatsApp</a></p>` : ""}
-    <p style="font-size:11px;margin-top:12px">Oba Doceria · Um jeito doce de expressar felicidade \uD83E\uDD0D</p>
-    <button class="btn-pdf no-print" onclick="window.print()">\uD83D\uDCC4 Salvar como PDF</button>
+    <p style="font-size:11px;margin-top:12px">Oba Doceria · Um jeito doce de expressar felicidade </p>
+    <button class="btn-pdf no-print" onclick="window.print()">Salvar como PDF</button>
   </div>
 
 </div>
