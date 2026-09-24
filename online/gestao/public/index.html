@@ -3027,9 +3027,13 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     <button class="secondary" onclick="obaProposalAdicionarCenario()" style="margin-bottom:16px;width:100%">+ Adicionar Cenário</button>
 
     <!-- AÇÕES -->
-    <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <button class="primary" onclick="obaProposalSalvar('rascunho')">💾 Salvar Rascunho</button>
-      <button class="primary" style="background:#059669" onclick="obaProposalSalvar('enviada')">📤 Salvar e Marcar como Enviada</button>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <button class="primary" onclick="obaProposalSalvar('rascunho')" style="background:#6b7280">💾 Salvar</button>
+      <button class="primary" style="background:#059669" onclick="obaProposalSalvar('enviada')">📤 Enviar Proposta</button>
+      <span id="proposals-link-actions" style="display:none;margin-left:auto;display:flex;gap:8px">
+        <button class="secondary" onclick="obaProposalCopiarLink()" style="font-size:12px">🔗 Copiar Link</button>
+        <button class="secondary" onclick="obaProposalAbrirPDF()" style="font-size:12px">📄 Ver / PDF</button>
+      </span>
     </div>
 
   </div>
@@ -3075,7 +3079,9 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
           <td><span style="font-size:11px;padding:2px 8px;border-radius:12px;background:${statusColor(p.status)}22;color:${statusColor(p.status)};font-weight:600">${statusLabel(p.status)}</span></td>
           <td>${new Date(p.criado_em).toLocaleDateString('pt-BR')}</td>
           <td style="display:flex;gap:6px;flex-wrap:wrap">
-            <button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaProposalEditar('${p.proposal_id}')">Editar</button>
+            <button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaProposalEditar('${p.proposal_id}')">✏️ Editar</button>
+            <button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaProposalCopiarLinkById('${p.proposal_id}')">🔗 Link</button>
+            <button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaProposalAbrirPDFById('${p.proposal_id}')">📄 PDF</button>
             <button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaProposalAlterarStatus('${p.proposal_id}','${p.status}')">Status</button>
           </td>
         </tr>
@@ -3218,8 +3224,13 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         if (it.tipo === 'catalogo' && it.ref_id) {
           const [catId, saborId] = (it.ref_id||'').split(':');
           if (!porCategoria[catId]) porCategoria[catId] = {catId, total: 0, sabores: {}};
-          porCategoria[catId].sabores[saborId] = it.qtd;
-          porCategoria[catId].total += it.qtd;
+          if (saborId === '__total__') {
+            // Item de total sem sabores definidos
+            porCategoria[catId].total = it.qtd;
+          } else {
+            porCategoria[catId].sabores[saborId] = it.qtd;
+            porCategoria[catId].total += it.qtd;
+          }
         } else {
           livres.push(it);
         }
@@ -3616,6 +3627,9 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       const data = await r.json();
       if (!data.ok) { alert('Erro ao salvar: ' + (data.error||'desconhecido')); return; }
       obaProposalAtiva = data.proposal;
+      // Exibir botões de link/pdf no editor
+      const linkActions = document.getElementById('proposals-link-actions');
+      if (linkActions) linkActions.style.display = 'flex';
       alert('Proposta salva!');
       mostrarLista();
       carregarLista();
@@ -3641,6 +3655,34 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       if (data.ok) carregarLista();
       else alert('Erro: ' + (data.error||'desconhecido'));
     } catch(e) { alert('Erro de conexão.'); }
+  };
+
+  // ---------- LINK E PDF ----------
+  function obaProposalUrlById(proposalId) {
+    return window.location.origin + '/proposta/' + proposalId;
+  }
+
+  window.obaProposalCopiarLink = function() {
+    if (!obaProposalAtiva?.proposal_id) return;
+    navigator.clipboard.writeText(obaProposalUrlById(obaProposalAtiva.proposal_id))
+      .then(() => alert('✓ Link copiado!\n' + obaProposalUrlById(obaProposalAtiva.proposal_id)))
+      .catch(() => prompt('Copie o link abaixo:', obaProposalUrlById(obaProposalAtiva.proposal_id)));
+  };
+
+  window.obaProposalAbrirPDF = function() {
+    if (!obaProposalAtiva?.proposal_id) return;
+    window.open(obaProposalUrlById(obaProposalAtiva.proposal_id), '_blank');
+  };
+
+  window.obaProposalCopiarLinkById = function(id) {
+    const url = obaProposalUrlById(id);
+    navigator.clipboard.writeText(url)
+      .then(() => alert('✓ Link copiado!\n' + url))
+      .catch(() => prompt('Copie o link abaixo:', url));
+  };
+
+  window.obaProposalAbrirPDFById = function(id) {
+    window.open(obaProposalUrlById(id), '_blank');
   };
 
   // ---------- INTEGRAÇÃO COM ABA ----------
