@@ -2328,18 +2328,20 @@ async function obaUpsertProposal(env, proposalId, data, now) {
     resumo = null,
     validade = null,
     status = "rascunho",
+    whatsapp = null,
   } = data;
 
   await env.DB.prepare(`
-    INSERT INTO proposals (proposal_id, cliente, data_evento, convidados, tipo_evento, resumo, validade, status, criado_em, atualizado_em)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO proposals (proposal_id, cliente, whatsapp, data_evento, convidados, tipo_evento, resumo, validade, status, criado_em, atualizado_em)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ON CONFLICT(proposal_id) DO UPDATE SET
-      cliente=excluded.cliente, data_evento=excluded.data_evento,
+      cliente=excluded.cliente, whatsapp=excluded.whatsapp,
+      data_evento=excluded.data_evento,
       convidados=excluded.convidados, tipo_evento=excluded.tipo_evento,
       resumo=excluded.resumo, validade=excluded.validade,
       status=excluded.status, atualizado_em=excluded.atualizado_em
   `).bind(
-    proposalId, cliente, data_evento, convidados, tipo_evento, resumo, validade, status, now, now
+    proposalId, cliente, whatsapp, data_evento, convidados, tipo_evento, resumo, validade, status, now, now
   ).run();
 }
 

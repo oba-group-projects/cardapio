@@ -3013,6 +3013,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       <h4 style="margin:0 0 12px;font-size:13px;color:var(--brand)">Dados do Evento</h4>
       <div class="grid">
         <div class="field"><label>Nome do cliente *</label><input id="prop-cliente" placeholder="Ex: Ana Lima"></div>
+        <div class="field"><label>WhatsApp do cliente * <span class="hint">(com DDD, ex: 11999998888)</span></label><input id="prop-whatsapp" type="tel" placeholder="11999998888" required></div>
         <div class="field"><label>Data do evento</label><input id="prop-data-evento" type="date"></div>
         <div class="field"><label>Nº de convidados</label><input id="prop-convidados" type="number" min="1" placeholder="Ex: 100" oninput="document.querySelectorAll('#proposals-cenarios>[id^=cenario-]').forEach(d=>recalcularCenario(d.id))"></div>
         <div class="field"><label>Tipo de evento</label><input id="prop-tipo-evento" placeholder="Ex: Casamento, Aniversário"></div>
@@ -3031,8 +3032,9 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       <button class="primary" onclick="obaProposalSalvar('rascunho')" style="background:#6b7280">💾 Salvar</button>
       <button class="primary" style="background:#059669" onclick="obaProposalSalvar('enviada')">📤 Enviar Proposta</button>
       <span id="proposals-link-actions" style="display:none;margin-left:auto;display:flex;gap:8px">
-        <button class="secondary" onclick="obaProposalCopiarLink()" style="font-size:12px">🔗 Copiar Link</button>
-        <button class="secondary" onclick="obaProposalAbrirPDF()" style="font-size:12px">📄 Ver / PDF</button>
+        <button class="secondary" onclick="obaProposalEnviarWhatsApp()" style="font-size:12px;background:#25d366;color:#fff;border:none">📱 WhatsApp</button>
+        <button class="secondary" onclick="obaProposalCopiarLink()" style="font-size:12px">🔗 Link</button>
+        <button class="secondary" onclick="obaProposalAbrirPDF()" style="font-size:12px">📄 PDF</button>
       </span>
     </div>
 
@@ -3080,6 +3082,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
           <td>${new Date(p.criado_em).toLocaleDateString('pt-BR')}</td>
           <td style="display:flex;gap:6px;flex-wrap:wrap">
             <button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaProposalEditar('${p.proposal_id}')">✏️ Editar</button>
+            <button class="secondary" style="padding:4px 10px;font-size:11px;background:#25d366;color:#fff;border:none" onclick="obaProposalEnviarWhatsAppById('${p.proposal_id}')">📱 WhatsApp</button>
             <button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaProposalCopiarLinkById('${p.proposal_id}')">🔗 Link</button>
             <button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaProposalAbrirPDFById('${p.proposal_id}')">📄 PDF</button>
             <button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaProposalAlterarStatus('${p.proposal_id}','${p.status}')">Status</button>
@@ -3107,7 +3110,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     document.getElementById('proposals-editor-titulo').textContent = 'Nova Proposta';
     const badge = document.getElementById('proposals-status-badge');
     badge.textContent = 'Rascunho'; badge.style.background = '#eee'; badge.style.color = '#555';
-    ['prop-cliente','prop-data-evento','prop-convidados','prop-tipo-evento','prop-validade','prop-resumo']
+    ['prop-cliente','prop-whatsapp','prop-data-evento','prop-convidados','prop-tipo-evento','prop-validade','prop-resumo']
       .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
     document.getElementById('proposals-cenarios').innerHTML = '';
     adicionarCenario();
@@ -3132,6 +3135,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       badge.style.background = statusColor(p.status) + '22';
       badge.style.color = statusColor(p.status);
       document.getElementById('prop-cliente').value = p.cliente || '';
+      document.getElementById('prop-whatsapp').value = p.whatsapp || '';
       document.getElementById('prop-data-evento').value = p.data_evento || '';
       document.getElementById('prop-convidados').value = p.convidados || '';
       document.getElementById('prop-tipo-evento').value = p.tipo_evento || '';
@@ -3541,6 +3545,8 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
   window.obaProposalSalvar = async function(statusFinal) {
     const cliente = document.getElementById('prop-cliente').value.trim();
     if (!cliente) { alert('Nome do cliente é obrigatório.'); return; }
+    const whatsapp = document.getElementById('prop-whatsapp').value.trim().replace(/\D/g,'');
+    if (!whatsapp) { alert('WhatsApp do cliente é obrigatório.'); return; }
 
     // Aviso se algum cenário tem total de doces que não fecha
     const convidados = Number(document.getElementById('prop-convidados')?.value || 0);
@@ -3608,6 +3614,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
 
     const payload = {
       cliente,
+      whatsapp: whatsapp || null,
       data_evento: document.getElementById('prop-data-evento').value || null,
       convidados: Number(document.getElementById('prop-convidados').value) || null,
       tipo_evento: document.getElementById('prop-tipo-evento').value || null,
@@ -3657,16 +3664,29 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     } catch(e) { alert('Erro de conexão.'); }
   };
 
-  // ---------- LINK E PDF ----------
+  // ---------- LINK, PDF E WHATSAPP ----------
   function obaProposalUrlById(proposalId) {
     return window.location.origin + '/proposta/' + proposalId;
   }
 
+  function obaProposalMsgWhatsApp(proposal) {
+    const nome = proposal?.cliente || 'cliente';
+    const tipo = proposal?.tipo_evento ? ' para o seu ' + proposal.tipo_evento : '';
+    const data = proposal?.data_evento ? ' em ' + new Date(proposal.data_evento+'T12:00:00').toLocaleDateString('pt-BR') : '';
+    const n = (proposal?.scenarios || []).length;
+    const url = obaProposalUrlById(proposal.proposal_id);
+    return encodeURIComponent(
+      `Olá ${nome}! 🍫\n\nSegue sua proposta de orçamento da Oba Doceria${tipo}${data}:\n\n🔗 ${url}\n\nNela você encontra ${n} cenário${n>1?'s':''} personalizado${n>1?'s':''} para o seu evento.\nQualquer dúvida estou à disposição! 😊\n\n— Oba Doceria`
+    );
+  }
+
   window.obaProposalCopiarLink = function() {
     if (!obaProposalAtiva?.proposal_id) return;
-    navigator.clipboard.writeText(obaProposalUrlById(obaProposalAtiva.proposal_id))
-      .then(() => alert('✓ Link copiado!\n' + obaProposalUrlById(obaProposalAtiva.proposal_id)))
-      .catch(() => prompt('Copie o link abaixo:', obaProposalUrlById(obaProposalAtiva.proposal_id)));
+    const url = obaProposalUrlById(obaProposalAtiva.proposal_id);
+    navigator.clipboard.writeText(url)
+      .then(() => {})
+      .catch(() => {});
+    window.open(url, '_blank');
   };
 
   window.obaProposalAbrirPDF = function() {
@@ -3674,15 +3694,33 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     window.open(obaProposalUrlById(obaProposalAtiva.proposal_id), '_blank');
   };
 
+  window.obaProposalEnviarWhatsApp = function() {
+    if (!obaProposalAtiva?.proposal_id) return;
+    const wpp = obaProposalAtiva.whatsapp || document.getElementById('prop-whatsapp')?.value?.replace(/\D/g,'') || '';
+    if (!wpp) { alert('Preencha o WhatsApp do cliente antes de enviar.'); return; }
+    const msg = obaProposalMsgWhatsApp(obaProposalAtiva);
+    window.open('https://wa.me/55' + wpp + '?text=' + msg, '_blank');
+  };
+
   window.obaProposalCopiarLinkById = function(id) {
     const url = obaProposalUrlById(id);
-    navigator.clipboard.writeText(url)
-      .then(() => alert('✓ Link copiado!\n' + url))
-      .catch(() => prompt('Copie o link abaixo:', url));
+    navigator.clipboard.writeText(url).catch(()=>{});
+    window.open(url, '_blank');
   };
 
   window.obaProposalAbrirPDFById = function(id) {
     window.open(obaProposalUrlById(id), '_blank');
+  };
+
+  window.obaProposalEnviarWhatsAppById = async function(id) {
+    try {
+      const r = await fetch('/api/proposals/' + id);
+      const data = await r.json();
+      if (!data.ok) { alert('Erro ao carregar proposta.'); return; }
+      const wpp = (data.proposal.whatsapp || '').replace(/\D/g,'');
+      if (!wpp) { alert('Proposta sem WhatsApp cadastrado. Edite a proposta e preencha o número.'); return; }
+      window.open('https://wa.me/55' + wpp + '?text=' + obaProposalMsgWhatsApp(data.proposal), '_blank');
+    } catch(e) { alert('Erro de conexão.'); }
   };
 
   // ---------- INTEGRAÇÃO COM ABA ----------
