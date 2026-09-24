@@ -2494,7 +2494,23 @@ async function obaHandlePropostaPublica(request, env, url) {
     );
   }
 
-  // Funções auxiliares de formatação
+  // Carregar catálogo PUBLISHED para obter precoReferencia das categorias e preços dos sabores
+  let catalogCategories = [];
+  let catalogFlavors = [];
+  try {
+    const published = await obaLoadCatalogSlot(env, "PUBLISHED");
+    if (published && published.payload) {
+      catalogCategories = published.payload.categorias || published.payload.categories || [];
+      catalogFlavors = published.payload.sabores || published.payload.flavors || [];
+    }
+  } catch(e) { /* seguro — fallback para preços zerados */ }
+
+  // Mapa catId → precoReferencia
+  const catPrecoMap = {};
+  catalogCategories.forEach(c => { catPrecoMap[String(c.id)] = Number(c.precoReferencia||0); });
+  // Mapa saborId → preco
+  const saborPrecoMap = {};
+  catalogFlavors.forEach(f => { saborPrecoMap[String(f.id)] = Number(f.preco||0); });
   const fmtMoeda = (v) => "R$ " + Number(v||0).toLocaleString("pt-BR", {minimumFractionDigits:2, maximumFractionDigits:2});
   const fmtData = (d) => d ? new Date(d + "T12:00:00").toLocaleDateString("pt-BR", {day:"2-digit",month:"long",year:"numeric"}) : null;
 
@@ -2515,7 +2531,23 @@ async function obaHandlePropostaPublica(request, env, url) {
     });
 
     let subtotal = 0;
-    (s.items || []).forEach(it => { subtotal += Number(it.qtd||0) * Number(it.preco_unit||0); });
+    // Para itens __total__: usar precoReferencia da categoria; para sabores: usar preco_unit ou saborPrecoMap
+    (s.items || []).forEach(it => {
+      if (it.tipo === "catalogo" && it.ref_id) {
+        const [catId, saborId] = (it.ref_id||"").split(":");
+        if (saborId === "__total__") {
+          // Estimativa: total × precoReferencia da categoria
+          const ref = catPrecoMap[catId] || 0;
+          subtotal += Number(it.qtd||0) * ref;
+        } else {
+          // Sabor individual: usar preco_unit salvo ou fallback do catálogo
+          const preco = Number(it.preco_unit||0) || (saborPrecoMap[saborId]||0);
+          subtotal += Number(it.qtd||0) * preco;
+        }
+      } else {
+        subtotal += Number(it.qtd||0) * Number(it.preco_unit||0);
+      }
+    });
     let desconto = 0;
     if (s.desconto_tipo === "reais") desconto = Number(s.desconto_valor||0);
     else if (s.desconto_tipo === "percentual") desconto = subtotal * (Number(s.desconto_valor||0)/100);
@@ -2529,7 +2561,10 @@ async function obaHandlePropostaPublica(request, env, url) {
         ).join("");
         return `<tr><td colspan="3" style="padding:10px 0 4px;font-size:11px;font-weight:700;color:#8B4513;text-transform:uppercase;letter-spacing:.5px">${cat.catId.replace(/-/g," ")}</td></tr>${rows}`;
       } else if (cat.total) {
-        return `<tr><td colspan="3" style="padding:8px 0;border-bottom:1px solid #f5ede0"><span style="font-size:13px;color:#555">${cat.catId.replace(/-/g," ").replace(/\b\w/g,c=>c.toUpperCase())}</span> <span style="font-size:12px;color:#8B4513;font-weight:600">${cat.total} doces</span></td></tr>`;
+        const precoRef = catPrecoMap[cat.catId] || 0;
+        const valorEstimado = cat.total * precoRef;
+        const valorStr = precoRef > 0 ? ` · ${fmtMoeda(valorEstimado)}` : "";
+        return `<tr><td style="padding:8px 0;border-bottom:1px solid #f5ede0;font-size:13px;color:#555">${cat.catId.replace(/-/g," ").replace(/\b\w/g,c=>c.toUpperCase())}</td><td style="text-align:center;padding:8px 8px;border-bottom:1px solid #f5ede0;font-size:13px;white-space:nowrap">${cat.total} doces</td><td style="text-align:right;padding:8px 0;border-bottom:1px solid #f5ede0;font-size:13px;color:#8B4513;white-space:nowrap">${precoRef > 0 ? fmtMoeda(valorEstimado) : "—"}</td></tr>`;
       }
       return "";
     }).join("");
