@@ -2354,12 +2354,13 @@ async function obaUpsertScenarios(env, proposalId, scenarios) {
     const s = scenarios[i];
     const scenarioId = s.scenario_id || obaScenarioId();
     await env.DB.prepare(`
-      INSERT INTO proposal_scenarios (scenario_id, proposal_id, nome, descricao, desconto_tipo, desconto_valor, doces_por_convidado, ordem)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO proposal_scenarios (scenario_id, proposal_id, nome, descricao, texto_publico, desconto_tipo, desconto_valor, doces_por_convidado, ordem)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       scenarioId, proposalId,
       s.nome || `Cenário ${i + 1}`,
       s.descricao || null,
+      s.texto_publico || null,
       s.desconto_tipo || "none",
       Number(s.desconto_valor) || 0,
       s.docespor != null ? Number(s.docespor) : null,
@@ -2585,9 +2586,9 @@ async function obaHandlePropostaPublica(request, env, url) {
     const livreLinhas=livres.map(it=>`<tr><td class="td-n">${it.descricao}</td><td class="td-q"></td><td class="td-v">${R(it.preco_unit)}</td></tr>`).join("");
     const descLinha=desc>0?`<tr class="tr-d"><td colspan="2">Desconto</td><td>&minus;&nbsp;${R(desc)}</td></tr>`:"";
 
-    // Introducao: usa descricao do cenario se preenchida, senao usa a automatica
-    const descricaoExibir = (s.descricao||"").trim();
-    const introTexto = descricaoExibir || meta.intro;
+    // Introducao: texto_publico (campo dedicado) tem prioridade
+    // Se vazio, usa o texto automatico do rotulo — nunca usa descricao (campo interno)
+    const introTexto = (s.texto_publico||"").trim() || meta.intro;
 
     // CTA
     const ctaMsg=encodeURIComponent("Ola! Vi a proposta e gostei do cenario "+(si+1)+" ("+meta.rotulo+"). Podemos conversar sobre os detalhes?");

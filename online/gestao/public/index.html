@@ -3177,8 +3177,12 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         <button class="secondary" style="padding:3px 8px;font-size:11px;color:#dc2626;white-space:nowrap" onclick="document.getElementById('${cid}').remove();recalcularGlobal()">Remover</button>
       </div>
       <div class="field" style="margin-bottom:12px">
-        <label style="font-size:11px">Descrição do cenário</label>
-        <input id="${cid}-desc" value="${desc}" placeholder="Ex: Opção mais econômica com os sabores mais pedidos">
+        <label style="font-size:11px">Descrição interna <span class="hint">(uso próprio, não aparece na proposta)</span></label>
+        <input id="${cid}-desc" value="${desc}" placeholder="Ex: Notas internas sobre este cenário">
+      </div>
+      <div class="field" style="margin-bottom:12px">
+        <label style="font-size:11px">Introdução para o cliente <span class="hint">(aparece na proposta — deixe vazio para texto automático)</span></label>
+        <input id="${cid}-textopub" value="${dados?.texto_publico||''}" placeholder="Ex: A opção que equilibra qualidade e custo para o seu dia especial...">
       </div>
 
       <!-- DOCES POR CONVIDADO -->
@@ -3269,7 +3273,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         const copiar = confirm(`Copiar as quantidades do "${ultimoNome}" como ponto de partida?\n\nClique OK para copiar, Cancelar para começar do zero.`);
         if (copiar) {
           // Extrair dados do último cenário
-          const dadosCopia = { nome: 'Cenário ' + (cenarios.length + 1), descricao: '', desconto_tipo: 'none', desconto_valor: 0, docespor: Number(document.getElementById(ultimo.id + '-docespor')?.value || 5), items: [] };
+          const dadosCopia = { nome: 'Cenário ' + (cenarios.length + 1), descricao: '', texto_publico: '', desconto_tipo: 'none', desconto_valor: 0, docespor: Number(document.getElementById(ultimo.id + '-docespor')?.value || 5), items: [] };
           // Copiar totais das categorias
           ultimo.querySelectorAll('div[data-cat-id]').forEach(block => {
             const catId = block.dataset.catId;
@@ -3621,6 +3625,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         scenario_id: obaProposalAtiva?.scenarios?.[idx]?.scenario_id || undefined,
         nome: document.getElementById(cid + '-nome')?.value || ('Cenário ' + (idx+1)),
         descricao: document.getElementById(cid + '-desc')?.value || '',
+        texto_publico: document.getElementById(cid + '-textopub')?.value || '',
         desconto_tipo: document.getElementById(cid + '-desconto-tipo')?.value || 'none',
         desconto_valor: Number(document.getElementById(cid + '-desconto-valor')?.value || 0),
         docespor: Number(document.getElementById(cid + '-docespor')?.value || 0) || undefined,
