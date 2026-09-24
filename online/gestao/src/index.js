@@ -2489,13 +2489,167 @@ async function obaHandlePropostaPublica(request, env, url) {
   const proposal = await obaLoadProposal(env, match[1]);
   if (!proposal) {
     return new Response(
-      "<!doctype html><html lang='pt-BR'><meta charset='utf-8'><title>Proposta não encontrada</title><body><h1>Proposta não encontrada.</h1><p>O link pode ter expirado ou estar incorreto.</p></body></html>",
+      `<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Proposta não encontrada — Oba Doceria</title><style>body{font-family:sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#FFF9F3;color:#3B2A1E;text-align:center;padding:24px}.box{max-width:340px}.logo{font-size:28px;font-weight:900;color:#8B4513;margin-bottom:8px}p{color:#888;font-size:14px}</style><body><div class="box"><div class="logo">Oba Doceria</div><h2 style="margin:0 0 8px">Proposta não encontrada</h2><p>O link pode ter expirado ou estar incorreto. Entre em contato com a Oba Doceria para obter um novo link.</p></div></body></html>`,
       { status: 404, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } }
     );
   }
 
-  // Por enquanto retorna JSON — a página HTML pública será construída na Fase 12A-3
-  return json({ ok: true, proposal });
+  // Funções auxiliares de formatação
+  const fmtMoeda = (v) => "R$ " + Number(v||0).toLocaleString("pt-BR", {minimumFractionDigits:2, maximumFractionDigits:2});
+  const fmtData = (d) => d ? new Date(d + "T12:00:00").toLocaleDateString("pt-BR", {day:"2-digit",month:"long",year:"numeric"}) : null;
+
+  // Calcular total de cada cenário
+  const cenariosHtml = (proposal.scenarios || []).map((s, si) => {
+    // Agrupar itens por categoria vs livre
+    const porCategoria = {};
+    const livres = [];
+    (s.items || []).forEach(it => {
+      if (it.tipo === "catalogo" && it.ref_id) {
+        const [catId, saborId] = (it.ref_id || "").split(":");
+        if (!porCategoria[catId]) porCategoria[catId] = { catId, items: [] };
+        if (saborId !== "__total__") porCategoria[catId].items.push(it);
+        else porCategoria[catId].total = it.qtd;
+      } else {
+        livres.push(it);
+      }
+    });
+
+    let subtotal = 0;
+    (s.items || []).forEach(it => { subtotal += Number(it.qtd||0) * Number(it.preco_unit||0); });
+    let desconto = 0;
+    if (s.desconto_tipo === "reais") desconto = Number(s.desconto_valor||0);
+    else if (s.desconto_tipo === "percentual") desconto = subtotal * (Number(s.desconto_valor||0)/100);
+    const total = Math.max(0, subtotal - desconto);
+
+    // Itens de categoria
+    const catHtml = Object.values(porCategoria).map(cat => {
+      if (cat.items && cat.items.length > 0) {
+        const rows = cat.items.map(it =>
+          `<tr><td style="padding:5px 0;border-bottom:1px solid #f5ede0;font-size:13px">${it.descricao}</td><td style="text-align:center;padding:5px 8px;border-bottom:1px solid #f5ede0;font-size:13px;white-space:nowrap">${it.qtd} un</td><td style="text-align:right;padding:5px 0;border-bottom:1px solid #f5ede0;font-size:13px;color:#8B4513;white-space:nowrap">${fmtMoeda(Number(it.qtd)*Number(it.preco_unit))}</td></tr>`
+        ).join("");
+        return `<tr><td colspan="3" style="padding:10px 0 4px;font-size:11px;font-weight:700;color:#8B4513;text-transform:uppercase;letter-spacing:.5px">${cat.catId.replace(/-/g," ")}</td></tr>${rows}`;
+      } else if (cat.total) {
+        return `<tr><td colspan="3" style="padding:8px 0;border-bottom:1px solid #f5ede0"><span style="font-size:13px;color:#555">${cat.catId.replace(/-/g," ").replace(/\b\w/g,c=>c.toUpperCase())}</span> <span style="font-size:12px;color:#8B4513;font-weight:600">${cat.total} doces</span></td></tr>`;
+      }
+      return "";
+    }).join("");
+
+    const livresHtml = livres.map(it =>
+      `<tr><td style="padding:5px 0;border-bottom:1px solid #f5ede0;font-size:13px">${it.descricao}</td><td style="text-align:center;padding:5px 8px;border-bottom:1px solid #f5ede0;font-size:13px"></td><td style="text-align:right;padding:5px 0;border-bottom:1px solid #f5ede0;font-size:13px;color:#8B4513">${fmtMoeda(it.preco_unit)}</td></tr>`
+    ).join("");
+
+    const descontoHtml = desconto > 0
+      ? `<tr><td colspan="2" style="padding:4px 0;font-size:12px;color:#059669">Desconto</td><td style="text-align:right;font-size:12px;color:#059669;padding:4px 0">− ${fmtMoeda(desconto)}</td></tr>` : "";
+
+    const wpp = (proposal.whatsapp||"").replace(/\D/g,"");
+    const msg = encodeURIComponent(`Olá ${proposal.cliente}! Tenho interesse no ${s.nome} da proposta da Oba Doceria. 😊`);
+    const wppUrl = wpp ? `https://wa.me/55${wpp}?text=${msg}` : null;
+
+    const ctaBtn = wppUrl
+      ? `<a href="${wppUrl}" target="_blank" style="display:block;width:100%;box-sizing:border-box;background:#25d366;color:#fff;text-align:center;padding:14px;border-radius:14px;font-weight:800;font-size:13px;text-decoration:none;letter-spacing:.5px;margin-top:16px">📱 Quero este cenário — falar no WhatsApp</a>`
+      : "";
+
+    return `
+    <div style="background:#fff;border-radius:20px;border:2px solid ${si===0?"#8B4513":"#E8D5B5"};padding:20px;margin-bottom:20px;page-break-inside:avoid">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+        <div>
+          <p style="margin:0;font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1px;font-weight:700">Cenário ${si+1}</p>
+          <h3 style="margin:0;font-size:18px;color:#3B2A1E;font-weight:900">${s.nome}</h3>
+          ${s.descricao ? `<p style="margin:4px 0 0;font-size:12px;color:#666;font-style:italic">${s.descricao}</p>` : ""}
+        </div>
+        <div style="text-align:right">
+          <p style="margin:0;font-size:11px;color:#888">${s.doces_por_convidado||"?"} doces/convidado</p>
+          <p style="margin:0;font-size:22px;font-weight:900;color:#8B4513">${fmtMoeda(total)}</p>
+        </div>
+      </div>
+      <table style="width:100%;border-collapse:collapse">
+        <tbody>
+          ${catHtml}
+          ${livresHtml}
+          ${descontoHtml}
+          <tr><td colspan="2" style="padding:8px 0 0;font-size:13px;font-weight:700;border-top:2px solid #E8D5B5">Total</td><td style="text-align:right;padding:8px 0 0;font-size:16px;font-weight:900;color:#8B4513;border-top:2px solid #E8D5B5">${fmtMoeda(total)}</td></tr>
+        </tbody>
+      </table>
+      ${ctaBtn}
+    </div>`;
+  }).join("");
+
+  const dataEvento = fmtData(proposal.data_evento);
+  const validade = fmtData(proposal.validade);
+  const wpp = (proposal.whatsapp||"").replace(/\D/g,"");
+
+  const html = `<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Proposta — ${proposal.cliente} | Oba Doceria</title>
+  <style>
+    *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    body{margin:0;background:#FFF9F3;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#3B2A1E;padding:0}
+    .page{max-width:600px;margin:0 auto;padding:24px 16px 48px}
+    @media print{
+      body{background:#fff;padding:0}
+      .page{padding:16px;max-width:100%}
+      .no-print{display:none!important}
+      a[href]{text-decoration:none;color:inherit}
+      .cta-wpp{display:none!important}
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- CABEÇALHO -->
+  <div style="text-align:center;padding:24px 0 20px;border-bottom:2px solid #E8D5B5;margin-bottom:20px">
+    <img src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png"
+         alt="Oba Doceria" style="height:56px;object-fit:contain;margin-bottom:12px" onerror="this.style.display='none'">
+    <h1 style="margin:0 0 4px;font-size:20px;font-weight:900;color:#3B2A1E">Proposta de Orçamento</h1>
+    <p style="margin:0;font-size:13px;color:#666">Exclusiva para <strong>${proposal.cliente}</strong></p>
+  </div>
+
+  <!-- DADOS DO EVENTO -->
+  <div style="background:#fff;border-radius:16px;border:1px solid #E8D5B5;padding:16px;margin-bottom:20px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;row-gap:8px">
+      ${proposal.tipo_evento ? `<div><p style="margin:0;font-size:10px;color:#888;text-transform:uppercase;font-weight:700">Evento</p><p style="margin:2px 0 0;font-size:13px;font-weight:600">${proposal.tipo_evento}</p></div>` : ""}
+      ${dataEvento ? `<div><p style="margin:0;font-size:10px;color:#888;text-transform:uppercase;font-weight:700">Data</p><p style="margin:2px 0 0;font-size:13px;font-weight:600">${dataEvento}</p></div>` : ""}
+      ${proposal.convidados ? `<div><p style="margin:0;font-size:10px;color:#888;text-transform:uppercase;font-weight:700">Convidados</p><p style="margin:2px 0 0;font-size:13px;font-weight:600">${proposal.convidados} pessoas</p></div>` : ""}
+      ${(proposal.scenarios||[]).length ? `<div><p style="margin:0;font-size:10px;color:#888;text-transform:uppercase;font-weight:700">Cenários</p><p style="margin:2px 0 0;font-size:13px;font-weight:600">${proposal.scenarios.length} opções</p></div>` : ""}
+    </div>
+  </div>
+
+  <!-- RESUMO GERAL -->
+  ${proposal.resumo ? `<div style="background:#FFF3E0;border-left:4px solid #8B4513;border-radius:0 12px 12px 0;padding:14px 16px;margin-bottom:20px"><p style="margin:0;font-size:13px;line-height:1.6;color:#5D3A1A;font-style:italic">"${proposal.resumo}"</p></div>` : ""}
+
+  <!-- CENÁRIOS -->
+  ${cenariosHtml}
+
+  <!-- RODAPÉ -->
+  <div style="border-top:1px solid #E8D5B5;padding-top:16px;margin-top:8px;text-align:center">
+    ${validade ? `<p style="margin:0 0 8px;font-size:12px;color:#888">⏳ Proposta válida até <strong>${validade}</strong></p>` : ""}
+    ${wpp ? `<p style="margin:0 0 4px;font-size:12px;color:#888">Dúvidas? <a href="https://wa.me/55${wpp}" style="color:#8B4513;font-weight:700">fale pelo WhatsApp</a></p>` : ""}
+    <p style="margin:8px 0 0;font-size:11px;color:#bbb">Oba Doceria • Um jeito doce de expressar felicidade</p>
+
+    <!-- Botão imprimir / PDF -->
+    <button class="no-print" onclick="window.print()"
+      style="margin-top:16px;background:#8B4513;color:#fff;border:none;border-radius:12px;padding:12px 28px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.5px">
+      📄 Salvar como PDF
+    </button>
+  </div>
+
+</div>
+</body>
+</html>`;
+
+  return new Response(html, {
+    status: 200,
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+      "Cache-Control": "no-store",
+      "X-Robots-Tag": "noindex, nofollow"
+    }
+  });
 }
 
 export default {
