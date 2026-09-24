@@ -3688,7 +3688,15 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
   function obaProposalMsgTemplate(nome, tipo) {
     const n = nome || '[Nome]';
     const t = tipo || 'evento especial';
-    return `Ol\u00e1, ${n}! \ud83c\udf38\n\nQue felicidade poder fazer parte do seu ${t}! \ud83d\udc95\n\nPreparei com muito carinho 3 op\u00e7\u00f5es de or\u00e7amento pensando especialmente no seu dia. Cada cen\u00e1rio tem uma proposta diferente para voc\u00ea escolher o que faz mais sentido. \ud83c\udf6b\u2728\n\n\ud83d\udc49 [link]\n\nQualquer d\u00favida ou ajuste, \u00e9 s\u00f3 falar.\nEstou aqui para tornar esse dia ainda mais especial! \ud83d\ude0a\n\nCom carinho,\nOba Doceria \ud83e\udd0d`;
+    // Emojis via String.fromCodePoint para garantir encoding correto
+    const flor = String.fromCodePoint(0x1F338);       // 🌸
+    const coracao = String.fromCodePoint(0x1F495);    // 💕
+    const doceria = String.fromCodePoint(0x1F36B);    // 🍫
+    const brilho = String.fromCodePoint(0x2728);      // ✨
+    const seta = String.fromCodePoint(0x1F449);       // 👉
+    const sorriso = String.fromCodePoint(0x1F60A);    // 😊
+    const branco = String.fromCodePoint(0x1F90D);     // 🤍
+    return `Ol\u00e1, ${n}! ${flor}\n\nQue felicidade poder fazer parte do seu ${t}! ${coracao}\n\nPreparei com muito carinho 3 op\u00e7\u00f5es de or\u00e7amento pensando especialmente no seu dia. Cada cen\u00e1rio tem uma proposta diferente para voc\u00ea escolher o que faz mais sentido. ${doceria}${brilho}\n\n${seta} [link]\n\nQualquer d\u00favida ou ajuste, \u00e9 s\u00f3 falar.\nEstou aqui para tornar esse dia ainda mais especial! ${sorriso}\n\nCom carinho,\nOba Doceria ${branco}`;
   }
 
   function obaProposalMsgWhatsApp(proposal) {

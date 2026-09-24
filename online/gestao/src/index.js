@@ -2489,256 +2489,248 @@ async function obaHandlePropostaPublica(request, env, url) {
   const proposal = await obaLoadProposal(env, match[1]);
   if (!proposal) {
     return new Response(
-      `<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Proposta não encontrada — Oba Doceria</title><style>body{font-family:sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#FFF9F3;color:#3B2A1E;text-align:center;padding:24px}.box{max-width:340px}.logo{font-size:28px;font-weight:900;color:#8B4513;margin-bottom:8px}p{color:#888;font-size:14px}</style><body><div class="box"><div class="logo">Oba Doceria</div><h2 style="margin:0 0 8px">Proposta não encontrada</h2><p>O link pode ter expirado ou estar incorreto. Entre em contato com a Oba Doceria para obter um novo link.</p></div></body></html>`,
+      `<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Proposta nao encontrada - Oba Doceria</title><style>body{font-family:sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#FFF9F3;color:#3B2A1E;text-align:center;padding:24px}.box{max-width:340px}.logo{font-size:28px;font-weight:900;color:#8B4513;margin-bottom:8px}p{color:#888;font-size:14px}</style><body><div class="box"><div class="logo">Oba Doceria</div><h2 style="margin:0 0 8px">Proposta nao encontrada</h2><p>O link pode ter expirado ou estar incorreto.</p></div></body></html>`,
       { status: 404, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } }
     );
   }
 
-  // Carregar catálogo PUBLISHED para obter precoReferencia das categorias e preços dos sabores
+  // Carregar catalogo PUBLISHED para precos
   let catalogCategories = [];
   let catalogFlavors = [];
+  let obaWhatsapp = "";
   try {
     const published = await obaLoadCatalogSlot(env, "PUBLISHED");
     if (published && published.payload) {
       catalogCategories = published.payload.categorias || published.payload.categories || [];
       catalogFlavors = published.payload.sabores || published.payload.flavors || [];
+      obaWhatsapp = (published.payload.loja || published.payload.config?.store || {}).whatsapp || "";
     }
-  } catch(e) { /* seguro — fallback para preços zerados */ }
+  } catch(e) {}
 
-  // Mapa catId → precoReferencia
   const catPrecoMap = {};
   catalogCategories.forEach(c => { catPrecoMap[String(c.id)] = Number(c.precoReferencia||0); });
-  // Mapa saborId → preco
   const saborPrecoMap = {};
   catalogFlavors.forEach(f => { saborPrecoMap[String(f.id)] = Number(f.preco||0); });
 
-  // Formatação sem toLocaleString (não disponível no Workers runtime)
   const fmtMoeda = (v) => {
     const n = Number(v||0).toFixed(2);
     const [int, dec] = n.split(".");
-    const intFmt = int.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    return "R$ " + intFmt + "," + dec;
+    return "R$\u00a0" + int.replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "," + dec;
   };
-  const MESES = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+  const MESES = ["janeiro","fevereiro","mar\u00e7o","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
   const fmtData = (d) => {
     if (!d) return null;
-    try {
-      const [y,m,day] = d.split("-");
-      return `${parseInt(day)} de ${MESES[parseInt(m)-1]} de ${y}`;
-    } catch { return d; }
+    try { const [y,m,day] = d.split("-"); return parseInt(day) + " de " + MESES[parseInt(m)-1] + " de " + y; }
+    catch { return d; }
   };
 
   const dataEvento = fmtData(proposal.data_evento);
   const validade = fmtData(proposal.validade);
-  const wpp = (proposal.whatsapp||"").replace(/\D/g,"");
-  const propUrl = `https://oba-cardapio-gestao.obadoceria.workers.dev/proposta/${proposal.proposal_id}`;
+  const obaWpp = obaWhatsapp.replace(/\D/g,"");
 
-  // Paletas por cenário: âmbar / rosé / lavanda / fallback neutro
   const paletas = [
-    { bg:"#FFF8EC", border:"#F5C842", badge:"#E8A800", btnBg:"#E8A800", btnTxt:"#fff" },
-    { bg:"#FFF0F3", border:"#F4A0B0", badge:"#D4607A", btnBg:"#D4607A", btnTxt:"#fff" },
-    { bg:"#F5F0FF", border:"#C4A8E8", badge:"#8B5CF6", btnBg:"#8B5CF6", btnTxt:"#fff" },
-    { bg:"#F0FAF0", border:"#86C98A", badge:"#2D7D32", btnBg:"#2D7D32", btnTxt:"#fff" },
+    { bg:"#FFFBF0", border:"#F0C040", badge:"#B8860B", btn:"#D4A017", txt:"#3B2A1E" },
+    { bg:"#FFF5F7", border:"#E8A0B0", badge:"#C0526A", btn:"#C0526A", txt:"#fff"    },
+    { bg:"#F8F4FF", border:"#B8A0E0", badge:"#7C4DCC", btn:"#7C4DCC", txt:"#fff"    },
+    { bg:"#F0FBF4", border:"#80C890", badge:"#2E7D32", btn:"#2E7D32", txt:"#fff"    },
   ];
 
-  // Calcular total de cada cenário
   const cenariosHtml = (proposal.scenarios || []).map((s, si) => {
     const pal = paletas[si] || paletas[paletas.length-1];
 
-    // Agrupar itens por categoria vs livre
     const porCategoria = {};
     const livres = [];
     (s.items || []).forEach(it => {
       if (it.tipo === "catalogo" && it.ref_id) {
-        const [catId, saborId] = (it.ref_id || "").split(":");
-        if (!porCategoria[catId]) porCategoria[catId] = { catId, items: [] };
+        const [catId, saborId] = (it.ref_id||"").split(":");
+        if (!porCategoria[catId]) porCategoria[catId] = { catId, items:[] };
         if (saborId !== "__total__") porCategoria[catId].items.push(it);
         else porCategoria[catId].total = it.qtd;
-      } else {
-        livres.push(it);
-      }
+      } else { livres.push(it); }
     });
 
     let subtotal = 0;
-    (s.items || []).forEach(it => {
-      if (it.tipo === "catalogo" && it.ref_id) {
-        const [catId, saborId] = (it.ref_id||"").split(":");
-        if (saborId === "__total__") {
-          subtotal += Number(it.qtd||0) * (catPrecoMap[catId] || 0);
-        } else {
-          subtotal += Number(it.qtd||0) * (Number(it.preco_unit||0) || (saborPrecoMap[saborId]||0));
-        }
-      } else {
-        subtotal += Number(it.qtd||0) * Number(it.preco_unit||0);
-      }
+    (s.items||[]).forEach(it => {
+      if (it.tipo==="catalogo" && it.ref_id) {
+        const [catId,saborId] = (it.ref_id||"").split(":");
+        subtotal += Number(it.qtd||0) * (saborId==="__total__" ? (catPrecoMap[catId]||0) : (Number(it.preco_unit||0)||(saborPrecoMap[saborId]||0)));
+      } else { subtotal += Number(it.qtd||0)*Number(it.preco_unit||0); }
     });
     let desconto = 0;
-    if (s.desconto_tipo === "reais") desconto = Number(s.desconto_valor||0);
-    else if (s.desconto_tipo === "percentual") desconto = subtotal * (Number(s.desconto_valor||0)/100);
-    const total = Math.max(0, subtotal - desconto);
+    if (s.desconto_tipo==="reais") desconto = Number(s.desconto_valor||0);
+    else if (s.desconto_tipo==="percentual") desconto = subtotal*(Number(s.desconto_valor||0)/100);
+    const total = Math.max(0, subtotal-desconto);
 
-    // Itens de categoria
-    const catHtml = Object.values(porCategoria).map(cat => {
-      if (cat.items && cat.items.length > 0) {
+    const catRows = Object.values(porCategoria).map(cat => {
+      const nome = cat.catId.split("-").map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(" ");
+      if (cat.items && cat.items.length>0) {
         const rows = cat.items.map(it => {
-          const preco = Number(it.preco_unit||0) || (saborPrecoMap[(it.ref_id||"").split(":")[1]]||0);
-          return `<tr><td class="it-nome">${it.descricao}</td><td class="it-qtd">${it.qtd} un</td><td class="it-val" style="color:${pal.badge}">${fmtMoeda(Number(it.qtd)*preco)}</td></tr>`;
+          const p = Number(it.preco_unit||0)||(saborPrecoMap[(it.ref_id||"").split(":")[1]]||0);
+          return `<tr><td class="r-nome">${it.descricao}</td><td class="r-qtd">${it.qtd} un</td><td class="r-val">${fmtMoeda(it.qtd*p)}</td></tr>`;
         }).join("");
-        return `<tr class="cat-header"><td colspan="3" style="color:${pal.badge}">${cat.catId.replace(/-/g," ").replace(/\b\w/g,c=>c.toUpperCase())}</td></tr>${rows}`;
+        return `<tr class="r-cat"><td colspan="3">${nome}</td></tr>${rows}`;
       } else if (cat.total) {
-        const precoRef = catPrecoMap[cat.catId] || 0;
-        const valorEstimado = cat.total * precoRef;
-        return `<tr><td class="it-nome">${cat.catId.replace(/-/g," ").replace(/\b\w/g,c=>c.toUpperCase())}</td><td class="it-qtd">${cat.total} doces</td><td class="it-val" style="color:${pal.badge}">${precoRef>0?fmtMoeda(valorEstimado):"—"}</td></tr>`;
+        const ref = catPrecoMap[cat.catId]||0;
+        return `<tr><td class="r-nome">${nome}</td><td class="r-qtd">${cat.total} doces</td><td class="r-val">${ref>0?fmtMoeda(cat.total*ref):"&mdash;"}</td></tr>`;
       }
       return "";
     }).join("");
 
-    const livresHtml = livres.map(it =>
-      `<tr><td class="it-nome">${it.descricao}</td><td class="it-qtd"></td><td class="it-val" style="color:${pal.badge}">${fmtMoeda(it.preco_unit)}</td></tr>`
+    const livreRows = livres.map(it =>
+      `<tr><td class="r-nome">${it.descricao}</td><td class="r-qtd"></td><td class="r-val">${fmtMoeda(it.preco_unit)}</td></tr>`
     ).join("");
 
-    const descontoHtml = desconto > 0
-      ? `<tr class="totais"><td colspan="2" style="color:#059669;font-size:12px">Desconto aplicado</td><td style="text-align:right;color:#059669;font-size:12px">− ${fmtMoeda(desconto)}</td></tr>` : "";
+    const descRow = desconto>0
+      ? `<tr class="r-desc"><td colspan="2">Desconto</td><td>&minus; ${fmtMoeda(desconto)}</td></tr>` : "";
 
-    const wppNum = (proposal.whatsapp||"").replace(/\D/g,"");
-    const msg = encodeURIComponent(`Olá! Tenho interesse no ${s.nome||"cenário "+(si+1)} da proposta da Oba Doceria.`);
-    const ctaBtn = wppNum
-      ? `<a href="https://wa.me/55${wppNum}?text=${msg}" target="_blank" class="cta-btn" style="background:${pal.btnBg};color:${pal.btnTxt}">Quero este cenário · falar no WhatsApp</a>`
+    // CTA vai para WhatsApp da OBA DOCERIA (nao da cliente)
+    const ctaMsg = encodeURIComponent("Ola! Gostei do " + (s.nome||("Cenario "+(si+1))) + " da proposta. Podemos conversar?");
+    const ctaUrl = obaWpp ? "https://wa.me/55"+obaWpp+"?text="+ctaMsg : null;
+    const ctaBtn = ctaUrl
+      ? `<a href="${ctaUrl}" target="_blank" class="cta-btn" style="background:${pal.btn};color:${pal.txt}">Quero este cen&aacute;rio &mdash; falar com a Oba Doceria</a>`
       : "";
 
-    return `
-    <div id="cenario-${si+1}" class="cenario-wrap" style="scroll-margin-top:12px">
-      <div class="cenario-card" style="background:${pal.bg};border-color:${pal.border}">
-        <div class="cenario-header">
-          <div>
-            <span class="cenario-badge" style="background:${pal.badge}">Cenário ${si+1}</span>
-            <h3 class="cenario-nome">${s.nome||"Cenário "+(si+1)}</h3>
-            ${s.descricao ? `<p class="cenario-desc">${s.descricao}</p>` : ""}
-          </div>
-          <div class="cenario-total-wrap">
-            ${s.doces_por_convidado ? `<p class="cenario-docespor">${s.doces_por_convidado} doces/convidado</p>` : ""}
-            <p class="cenario-total" style="color:${pal.badge}">${fmtMoeda(total)}</p>
-          </div>
-        </div>
-        <div class="cenario-body">
-          <table class="itens">
-            <tbody>
-              ${catHtml}
-              ${livresHtml}
-              ${descontoHtml}
-              <tr class="total-final" style="border-color:${pal.border}">
-                <td colspan="2" style="color:#3B2A1E">Total</td>
-                <td style="text-align:right;color:${pal.badge}">${fmtMoeda(total)}</td>
-              </tr>
-            </tbody>
-          </table>
-          ${ctaBtn}
-        </div>
+    return `<section id="c${si+1}" class="c-wrap">
+  <div class="c-card" style="background:${pal.bg};border-color:${pal.border}">
+    <div class="c-head" style="border-bottom-color:${pal.border}">
+      <div class="c-meta">
+        <span class="c-badge" style="background:${pal.badge}">Cen&aacute;rio ${si+1}</span>
+        <h2 class="c-nome">${s.nome||("Cen\u00e1rio "+(si+1))}</h2>
+        ${s.descricao ? `<p class="c-desc">${s.descricao}</p>` : ""}
       </div>
-    </div>`;
+      <div class="c-price-block">
+        ${s.doces_por_convidado ? `<span class="c-dpc">${s.doces_por_convidado} doces/pessoa</span>` : ""}
+        <span class="c-total" style="color:${pal.badge}">${fmtMoeda(total)}</span>
+      </div>
+    </div>
+    <div class="c-body">
+      <table class="rt"><tbody>${catRows}${livreRows}${descRow}
+        <tr class="r-final" style="border-color:${pal.border}">
+          <td colspan="2" style="font-family:'Playfair Display',serif">Total</td>
+          <td style="color:${pal.badge}">${fmtMoeda(total)}</td>
+        </tr>
+      </tbody></table>
+      ${ctaBtn}
+    </div>
+  </div>
+</section>`;
+  }).join("\n");
+
+  const anchors = (proposal.scenarios||[]).map((s,i) => {
+    const pal = paletas[i]||paletas[paletas.length-1];
+    return `<a class="anc" href="#c${i+1}" style="border-color:${pal.border};color:${pal.badge}">${s.nome||"Cen\u00e1rio "+(i+1)}</a>`;
   }).join("");
 
   const html = `<!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="robots" content="noindex,nofollow">
-  <title>Proposta para ${proposal.cliente} · Oba Doceria</title>
-  <style>
-    *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-    body{margin:0;background:#F9F3EE;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3B2A1E}
-    .page{max-width:640px;margin:0 auto;padding:0 0 56px}
-    .hero{background:linear-gradient(160deg,#FFF9F3 0%,#FFF0E0 100%);padding:36px 24px 28px;text-align:center;border-bottom:1px solid #EDD9C0}
-    .hero img{height:44px;object-fit:contain;margin-bottom:14px;opacity:.92}
-    .hero-title{margin:0 0 4px;font-size:22px;font-weight:900;color:#3B2A1E;letter-spacing:-.3px}
-    .hero-sub{margin:0;font-size:13px;color:#8B6A50;font-weight:500}
-    .hero-sub strong{color:#5D3A1A}
-    .info-card{margin:20px 16px 0;background:#fff;border-radius:16px;border:1px solid #EDD9C0;padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
-    .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 8px}
-    .info-item p{margin:0}
-    .info-label{font-size:9px;color:#aaa;text-transform:uppercase;font-weight:700;letter-spacing:.8px}
-    .info-value{font-size:13px;font-weight:700;color:#3B2A1E;margin-top:2px!important}
-    .resumo{margin:16px 16px 0;background:#FFF3E0;border-left:3px solid #8B4513;border-radius:0 12px 12px 0;padding:14px 16px}
-    .resumo p{margin:0;font-size:13px;line-height:1.65;color:#5D3A1A;font-style:italic}
-    .nav-anchors{display:flex;gap:8px;margin:20px 16px 0;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch}
-    .nav-anchors::-webkit-scrollbar{display:none}
-    .nav-anchor{flex-shrink:0;padding:7px 14px;border-radius:20px;border:1.5px solid #EDD9C0;background:#fff;font-size:12px;font-weight:700;color:#8B4513;cursor:pointer;text-decoration:none;white-space:nowrap;transition:all .2s}
-    .nav-anchor:hover{border-color:#8B4513;background:#FFF9F3}
-    .cenario-wrap{margin:18px 16px 0}
-    .cenario-card{border-radius:20px;border:2px solid;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-    .cenario-header{padding:18px 20px 14px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
-    .cenario-badge{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;padding:3px 8px;border-radius:20px;color:#fff;display:inline-block;margin-bottom:6px}
-    .cenario-nome{margin:0;font-size:20px;font-weight:900;color:#3B2A1E;line-height:1.2}
-    .cenario-desc{margin:4px 0 0;font-size:12px;color:#777;font-style:italic;line-height:1.4}
-    .cenario-total-wrap{text-align:right;flex-shrink:0}
-    .cenario-docespor{font-size:10px;color:#aaa;white-space:nowrap}
-    .cenario-total{font-size:24px;font-weight:900;color:#3B2A1E;line-height:1;margin-top:2px}
-    .cenario-body{padding:0 20px 18px}
-    table.itens{width:100%;border-collapse:collapse}
-    table.itens td{padding:7px 0;border-bottom:1px solid rgba(0,0,0,.06);font-size:13px}
-    table.itens td.it-nome{color:#3B2A1E}
-    table.itens td.it-qtd{text-align:center;color:#888;font-size:12px;padding:7px 10px;white-space:nowrap}
-    table.itens td.it-val{text-align:right;font-weight:600;white-space:nowrap}
-    table.itens tr.cat-header td{padding:12px 0 4px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#8B4513;border-bottom:none}
-    table.itens tr.totais td{border-bottom:none;padding:6px 0;font-size:13px}
-    table.itens tr.total-final td{border-top:2px solid;padding:10px 0 0;font-size:16px;font-weight:900}
-    .cta-btn{display:block;margin:16px 0 0;padding:14px;border-radius:14px;text-align:center;font-weight:800;font-size:13px;text-decoration:none;letter-spacing:.3px;transition:opacity .2s}
-    .cta-btn:hover{opacity:.88}
-    .footer{text-align:center;padding:24px 16px 0;margin-top:8px}
-    .footer p{margin:0 0 6px;font-size:12px;color:#aaa}
-    .footer a{color:#8B4513;font-weight:600}
-    .btn-pdf{margin-top:16px;background:#3B2A1E;color:#fff;border:none;border-radius:12px;padding:12px 28px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.3px}
-    @media print{
-      body{background:#fff}
-      .no-print{display:none!important}
-      .nav-anchors{display:none!important}
-      .cenario-wrap{margin:12px 0 0}
-      .cta-btn{display:none!important}
-      .btn-pdf{display:none!important}
-      .page{padding:0}
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Proposta para ${proposal.cliente} &middot; Oba Doceria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;margin:0;padding:0}
+body{background:#F7F2EC;font-family:'Inter',sans-serif;color:#3B2A1E;min-height:100vh}
+.page{max-width:640px;margin:0 auto;padding:0 0 60px}
+
+/* HERO */
+.hero{background:linear-gradient(150deg,#FFF9F3 0%,#FFEEDD 100%);padding:40px 24px 32px;text-align:center;border-bottom:1px solid #EDD9C0}
+.hero-logo{height:48px;object-fit:contain;margin-bottom:16px;opacity:.9}
+.hero h1{font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:#3B2A1E;letter-spacing:-.5px;margin-bottom:4px}
+.hero-sub{font-size:14px;color:#8B6A50;font-weight:500}
+.hero-sub strong{color:#5D3A1A;font-weight:700}
+
+/* INFO CARD */
+.info{margin:20px 16px 0;background:#fff;border-radius:18px;border:1px solid #EDD9C0;padding:18px 20px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.info-label{font-size:9px;color:#bbb;text-transform:uppercase;font-weight:700;letter-spacing:1px}
+.info-value{font-size:14px;font-weight:700;color:#3B2A1E;margin-top:3px;font-family:'Playfair Display',serif}
+
+/* RESUMO */
+.resumo{margin:16px 16px 0;background:#FFFBF5;border-left:4px solid #C8922A;border-radius:0 14px 14px 0;padding:16px 18px}
+.resumo p{font-size:13px;line-height:1.7;color:#5D3A1A;font-style:italic}
+
+/* ANCHORS */
+.anchors{display:flex;gap:8px;margin:20px 16px 0;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.anchors::-webkit-scrollbar{display:none}
+.anc{flex-shrink:0;padding:8px 16px;border-radius:24px;border:2px solid;background:#fff;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;white-space:nowrap;transition:opacity .15s}
+.anc:hover{opacity:.75}
+
+/* CENARIOS */
+.c-wrap{margin:18px 16px 0;scroll-margin-top:12px}
+.c-card{border-radius:22px;border:2px solid;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.07)}
+.c-head{padding:22px 22px 18px;border-bottom:1px solid;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.c-meta{flex:1;min-width:0}
+.c-badge{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;padding:4px 10px;border-radius:24px;color:#fff;display:inline-block;margin-bottom:8px}
+.c-nome{font-family:'Playfair Display',serif;font-size:24px;font-weight:900;color:#3B2A1E;line-height:1.15;margin-bottom:6px}
+.c-desc{font-size:12px;color:#888;font-style:italic;line-height:1.5}
+.c-price-block{text-align:right;flex-shrink:0}
+.c-dpc{display:block;font-size:10px;color:#aaa;margin-bottom:4px}
+.c-total{display:block;font-family:'Playfair Display',serif;font-size:28px;font-weight:900;line-height:1}
+.c-body{padding:18px 22px 22px}
+
+/* TABELA */
+.rt{width:100%;border-collapse:collapse}
+.rt td{padding:9px 0;border-bottom:1px solid rgba(0,0,0,.07);font-size:13px;vertical-align:middle}
+.r-nome{color:#3B2A1E;font-weight:500}
+.r-qtd{text-align:center;color:#999;font-size:12px;padding:9px 10px;white-space:nowrap}
+.r-val{text-align:right;font-weight:600;white-space:nowrap}
+.r-cat td{padding:14px 0 4px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;border-bottom:none;color:#888}
+.r-desc td{font-size:12px;color:#059669;border-bottom:none;padding:6px 0}
+.r-desc td:last-child{text-align:right}
+.r-final td{border-top:2px solid;border-bottom:none;padding:14px 0 0;font-size:17px;font-weight:700}
+.r-final td:last-child{text-align:right;font-size:20px;font-weight:900}
+
+/* CTA */
+.cta-btn{display:block;margin:18px 0 0;padding:16px;border-radius:16px;text-align:center;font-weight:700;font-size:13px;text-decoration:none;letter-spacing:.3px}
+
+/* FOOTER */
+.footer{text-align:center;padding:28px 16px 0;margin-top:8px}
+.footer p{font-size:12px;color:#bbb;margin-bottom:6px}
+.footer a{color:#8B4513;font-weight:600;text-decoration:none}
+.btn-pdf{margin-top:18px;background:#3B2A1E;color:#fff;border:none;border-radius:14px;padding:13px 32px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:.3px}
+
+@media print{
+  body{background:#fff}
+  .anchors,.btn-pdf,.cta-btn{display:none!important}
+  .page{padding:0}
+  .c-wrap{margin:12px 0 0}
+  .info,.resumo,.c-card{box-shadow:none}
+}
+</style>
 </head>
 <body>
 <div class="page">
 
-  <!-- HERO -->
-  <div class="hero">
-    <img src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png"
-         alt="Oba Doceria" onerror="this.style.display='none'">
-    <h1 class="hero-title">Proposta de Orçamento</h1>
-    <p class="hero-sub">Preparada com carinho para <strong>${proposal.cliente}</strong></p>
+<div class="hero">
+  <img class="hero-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png" alt="Oba Doceria" onerror="this.style.display='none'">
+  <h1>Proposta de Or&ccedil;amento</h1>
+  <p class="hero-sub">Preparada com carinho para <strong>${proposal.cliente}</strong></p>
+</div>
+
+<div class="info">
+  <div class="info-grid">
+    ${proposal.tipo_evento ? `<div><p class="info-label">Evento</p><p class="info-value">${proposal.tipo_evento}</p></div>` : ""}
+    ${dataEvento ? `<div><p class="info-label">Data</p><p class="info-value">${dataEvento}</p></div>` : ""}
+    ${proposal.convidados ? `<div><p class="info-label">Convidados</p><p class="info-value">${proposal.convidados} pessoas</p></div>` : ""}
+    ${(proposal.scenarios||[]).length ? `<div><p class="info-label">Op&ccedil;&otilde;es</p><p class="info-value">${proposal.scenarios.length} cen&aacute;rios</p></div>` : ""}
   </div>
+</div>
 
-  <!-- INFO DO EVENTO -->
-  <div class="info-card">
-    <div class="info-grid">
-      ${proposal.tipo_evento ? `<div class="info-item"><p class="info-label">Evento</p><p class="info-value">${proposal.tipo_evento}</p></div>` : ""}
-      ${dataEvento ? `<div class="info-item"><p class="info-label">Data</p><p class="info-value">${dataEvento}</p></div>` : ""}
-      ${proposal.convidados ? `<div class="info-item"><p class="info-label">Convidados</p><p class="info-value">${proposal.convidados} pessoas</p></div>` : ""}
-      ${(proposal.scenarios||[]).length ? `<div class="info-item"><p class="info-label">Opções</p><p class="info-value">${proposal.scenarios.length} cenários</p></div>` : ""}
-    </div>
-  </div>
+${proposal.resumo ? `<div class="resumo"><p>&ldquo;${proposal.resumo}&rdquo;</p></div>` : ""}
 
-  <!-- RESUMO -->
-  ${proposal.resumo ? `<div class="resumo"><p>"${proposal.resumo}"</p></div>` : ""}
+<nav class="anchors">${anchors}</nav>
 
-  <!-- ÍNDICE DE ÂNCORAS -->
-  <nav class="nav-anchors no-print">
-    ${(proposal.scenarios||[]).map((s,i) => `<a class="nav-anchor" href="#cenario-${i+1}" style="border-color:${(paletas[i]||paletas[0]).border};color:${(paletas[i]||paletas[0]).badge}">${s.nome||"Cenário "+(i+1)}</a>`).join("")}
-  </nav>
+${cenariosHtml}
 
-  <!-- CENÁRIOS -->
-  ${cenariosHtml}
-
-  <!-- RODAPÉ -->
-  <div class="footer no-print">
-    ${validade ? `<p>Válida até <strong style="color:#3B2A1E">${validade}</strong></p>` : ""}
-    ${wpp ? `<p>Dúvidas? <a href="https://wa.me/55${wpp}">fale pelo WhatsApp</a></p>` : ""}
-    <p style="font-size:11px;margin-top:12px">Oba Doceria · Um jeito doce de expressar felicidade </p>
-    <button class="btn-pdf no-print" onclick="window.print()">Salvar como PDF</button>
-  </div>
+<div class="footer">
+  ${validade ? `<p>Proposta v&aacute;lida at&eacute; <strong style="color:#3B2A1E">${validade}</strong></p>` : ""}
+  ${obaWpp ? `<p>D&uacute;vidas? <a href="https://wa.me/55${obaWpp}">fale pelo WhatsApp</a></p>` : ""}
+  <p>Oba Doceria &middot; Um jeito doce de expressar felicidade</p>
+  <button class="btn-pdf" onclick="window.print()">Salvar como PDF</button>
+</div>
 
 </div>
 </body>
@@ -2753,7 +2745,6 @@ async function obaHandlePropostaPublica(request, env, url) {
     }
   });
 }
-
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
