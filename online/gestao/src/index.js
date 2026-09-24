@@ -2354,14 +2354,15 @@ async function obaUpsertScenarios(env, proposalId, scenarios) {
     const s = scenarios[i];
     const scenarioId = s.scenario_id || obaScenarioId();
     await env.DB.prepare(`
-      INSERT INTO proposal_scenarios (scenario_id, proposal_id, nome, descricao, desconto_tipo, desconto_valor, ordem)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO proposal_scenarios (scenario_id, proposal_id, nome, descricao, desconto_tipo, desconto_valor, doces_por_convidado, ordem)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       scenarioId, proposalId,
       s.nome || `Cenário ${i + 1}`,
       s.descricao || null,
       s.desconto_tipo || "none",
       Number(s.desconto_valor) || 0,
+      s.docespor != null ? Number(s.docespor) : null,
       i + 1
     ).run();
 
