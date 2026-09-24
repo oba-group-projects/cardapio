@@ -3580,9 +3580,11 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         const blockId = block.id;
         const catId = block.dataset.catId;
         if (!catId) return;
+        let algumSaborPreenchido = false;
         block.querySelectorAll('input[data-sabor-id]').forEach(inp => {
           const qtd = Number(inp.value || 0);
           if (qtd <= 0) return;
+          algumSaborPreenchido = true;
           items.push({
             tipo: 'catalogo',
             ref_id: catId + ':' + inp.dataset.saborId,
@@ -3591,6 +3593,13 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
             preco_unit: Number(inp.dataset.preco || 0),
           });
         });
+        // Se nenhum sabor foi distribuído mas há total definido, salvar o total
+        if (!algumSaborPreenchido) {
+          const totalCat = Number(document.getElementById(blockId + '-total')?.value || 0);
+          if (totalCat > 0) {
+            items.push({ tipo: 'catalogo', ref_id: catId + ':__total__', descricao: '__total__', qtd: totalCat, preco_unit: 0 });
+          }
+        }
       });
 
       // Itens livres
