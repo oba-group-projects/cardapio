@@ -1,40 +1,43 @@
 # HANDOFF
 
-Atualizado: 2026-09-22
+Atualizado: 2026-09-23
 
 Branch: feature/gestao-online-segura
-HEAD: 1c86173
+HEAD: ca003b1
 
 ## Ultima fase entregue
-UX — Módulo Presenteáveis completo + scroll corrigido em pág 1/2/3 e passo 1
+12A-2 — Editor de Propostas na Central (completo)
 
 ## Commits desta sessão (mais recente primeiro)
 | Commit   | O que fez |
 |----------|-----------|
-| 1c86173  | Tela de detalhe kit: scroll suave, imagem 35dvh, sem oba-kit-detalhe-ativa |
-| e85cb4f  | secao-kit-detalhe estrutura idêntica r117-deg-escolha |
-| 9b0ffd6  | Revert ao estado 8bb8261 (antes das tentativas de layout) |
-| 8bb8261  | Tela de detalhe de kit no padrão da Degustação (versão inicial) |
-| c8356bb  | Vitrine compacta + retorno correto da Degustação |
-| adfb8b6  | Limpar oba-passo1-ativa em navegarPara() ao entrar no fluxo |
-| b38d6ac  | Bloquear scroll passo1 + mover Degustação para Presenteáveis |
-| a242ed6  | body.oba-pagina-fixa bloqueia scroll nas pág 1/2/3 |
+| ca003b1  | fix restauração de quantidades + botões profissionais (Link/PDF) |
+| c5c08fa  | fix CSRF cookie e header |
+| 278818c  | feat copiar cenário anterior |
+| 746d3dd  | feat estimativa por precoReferencia |
+| d771735  | fix valor numérico + remover badge redundante |
+| 4d2cfb0  | feat acordeão + faltam X por categoria |
+| 800d20a  | fix SyntaxError chave duplicada |
+| c2799b8  | feat contador global + subtotal por categoria + aviso ao salvar |
 
 ## O que está funcionando
-- Páginas 1/2/3 não rolam (validado em celular)
-- Passo 1 (tamanho de caixa) não rola
-- Vitrine de Presenteáveis: lista compacta com 3 opções
-- Tela de detalhe (Tábua/Caixa Clássica): logo + imagem + preço + scroll curto para opcionais/botões
-- Caixa Degustação em Presenteáveis: retorno correto por fluxoAtivo
-- Fluxo de compras sem regressão
+- Aba Propostas funcional: criar, editar, salvar, listar
+- Cenários com doces/convidado, totais por categoria, estimativa financeira
+- Botões: Salvar / Enviar Proposta / Copiar Link / Ver+PDF
+- CSRF funcionando corretamente
+- Restauração ao editar: quantidades restauram com categorias fechadas
 
 ## O que precisa de atenção
-- Deploy pendente: executar EXECUTAR-9AB-DEPLOY.cmd para levar 1c86173 ao Cloudflare
-- Próximo passo: Fase 12A-1 — tabelas D1 + rotas Worker para módulo de propostas
+- Deploy pendente: EXECUTAR-9AB-DEPLOY.cmd para levar ca003b1 ao Cloudflare
+- 12A-3 é a próxima fase: página pública /proposta/:id
+
+## Próxima fase
+12A-3 — Página pública /proposta/:id (HTML bonito, mobile-first, CSS print para PDF)
+Layout: logo + cabeçalho do evento + resumo + 3 cenários + CTA WhatsApp + validade
 
 ## Arquivos críticos alterados nesta sessão
-- online/gestao/public/ui-desenvolvimento/index.html (cardápio — UX Presenteáveis)
-- docs/PLANO_EXECUCAO.md (planejamento 12A/12B/12C atualizado)
+- online/gestao/public/index.html (Central — aba Propostas completa)
+- online/gestao/public/data/catalog-v1/ (não alterado nesta sessão)
 - docs/CURRENT_STATE.md
 - docs/HANDOFF.md
 
