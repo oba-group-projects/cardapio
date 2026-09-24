@@ -2489,76 +2489,67 @@ async function obaHandlePropostaPublica(request, env, url) {
   const proposal = await obaLoadProposal(env, match[1]);
   if (!proposal) {
     return new Response(
-      `<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Proposta nao encontrada - Oba Doceria</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Georgia,serif;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#FAF7F4;color:#3B2A1E;text-align:center;padding:32px}.box{max-width:360px}.logo{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#C8922A;margin-bottom:24px}h2{font-size:22px;font-weight:400;margin-bottom:12px}p{color:#999;font-size:13px;line-height:1.6}</style><body><div class="box"><div class="logo">Oba Doceria</div><h2>Proposta nao encontrada</h2><p>O link pode ter expirado ou estar incorreto.<br>Entre em contato com a Oba Doceria.</p></div></body></html>`,
-      { status: 404, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } }
+      `<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Proposta nao encontrada</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#FAF7F4;color:#3B2A1E;text-align:center;padding:32px}.logo{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#C8922A;margin-bottom:20px}h2{font-size:20px;font-weight:500;margin-bottom:10px}p{color:#aaa;font-size:13px;line-height:1.6}</style><body><div><div class="logo">Oba Doceria</div><h2>Proposta n&atilde;o encontrada</h2><p>O link pode ter expirado.<br>Entre em contato com a Oba Doceria.</p></div></body></html>`,
+      { status:404, headers:{"Content-Type":"text/html; charset=utf-8","Cache-Control":"no-store"} }
     );
   }
 
   // Catalogo PUBLISHED para precos e numero da Oba
-  let catalogCategories = [], catalogFlavors = [], obaWhatsapp = "";
+  let cats=[], flavors=[], obaWpp="";
   try {
     const pub = await obaLoadCatalogSlot(env, "PUBLISHED");
     if (pub && pub.payload) {
-      catalogCategories = pub.payload.categorias || pub.payload.categories || [];
-      catalogFlavors   = pub.payload.sabores || pub.payload.flavors || [];
-      const loja = pub.payload.loja || {};
-      obaWhatsapp = loja.whatsapp || loja.store?.whatsapp || "";
+      cats    = pub.payload.categorias || pub.payload.categories || [];
+      flavors = pub.payload.sabores    || pub.payload.flavors    || [];
+      const lj = pub.payload.loja || {};
+      obaWpp = (lj.whatsapp || lj.store?.whatsapp || "").replace(/\D/g,"");
     }
   } catch(e) {}
 
-  const catPrecoMap = {};
-  catalogCategories.forEach(c => { catPrecoMap[String(c.id)] = Number(c.precoReferencia||0); });
-  const saborPrecoMap = {};
-  catalogFlavors.forEach(f => { saborPrecoMap[String(f.id)] = Number(f.preco||0); });
+  const catPM={}, saborPM={};
+  cats.forEach(c    => { catPM[String(c.id)]   = Number(c.precoReferencia||0); });
+  flavors.forEach(f => { saborPM[String(f.id)] = Number(f.preco||0); });
 
-  const fmtMoeda = (v) => {
-    const n = Number(v||0).toFixed(2), [int,dec] = n.split(".");
-    return "R$\u00a0" + int.replace(/\B(?=(\d{3})+(?!\d))/g,".") + "," + dec;
+  // Formatacao (sem toLocaleString — indisponivel no Workers V8)
+  const R = (v) => {
+    const n = Number(v||0).toFixed(2), [i,d]=n.split(".");
+    return "R$\u00a0"+i.replace(/\B(?=(\d{3})+(?!\d))/g,".")+","+d;
   };
-  const MESES = ["janeiro","fevereiro","mar\u00e7o","abril","maio","junho",
-                 "julho","agosto","setembro","outubro","novembro","dezembro"];
-  const fmtData = (d) => {
-    if (!d) return null;
-    try { const [y,m,dy]=d.split("-"); return parseInt(dy)+" de "+MESES[parseInt(m)-1]+" de "+y; }
-    catch{return d;}
-  };
+  const MESES=["janeiro","fevereiro","mar\u00e7o","abril","maio","junho",
+               "julho","agosto","setembro","outubro","novembro","dezembro"];
+  const fmtD=(d)=>{ if(!d)return null; try{const[y,m,dy]=d.split("-");return parseInt(dy)+" de "+MESES[parseInt(m)-1]+" de "+y;}catch{return d;} };
 
-  // Rotulos fixos por posicao — elegantes e adequados ao contexto
-  const ROTULOS = ["Econ\u00f4mico","Equilibrado","Generoso"];
-
-  // Paletas: acento de cor apenas (linha topo + total + rotulo) — fundo sempre branco/creme
-  const PALETAS = [
-    { acento:"#C8922A", fundo:"#FFFDF8", linhaTopo:"#C8922A" },  // ouro quente
-    { acento:"#A0536A", fundo:"#FFF8FA", linhaTopo:"#A0536A" },  // rose
-    { acento:"#6B5BA0", fundo:"#F9F7FF", linhaTopo:"#6B5BA0" },  // lilas
-    { acento:"#3A7D5A", fundo:"#F6FBF8", linhaTopo:"#3A7D5A" },  // verde
+  // Rotulos e introducoes automaticas por posicao
+  const META=[
+    { rotulo:"Econ\u00f4mico",
+      intro:"A op\u00e7\u00e3o que equilibra qualidade e custo, garantindo o essencial para um evento especial e inesquec\u00edvel." },
+    { rotulo:"Equilibrado",
+      intro:"A escolha mais completa, pensada para oferecer variedade e sabor com a quantidade certa para cada convidado." },
+    { rotulo:"Generoso",
+      intro:"Para quem quer garantir que n\u00e3o vai faltar nada \u2014 uma experi\u00eancia farta, diversificada e verdadeiramente memoravel." },
   ];
 
-  const dataEvento = fmtData(proposal.data_evento);
-  const validade   = fmtData(proposal.validade);
-  const obaWpp     = obaWhatsapp.replace(/\D/g,"");
+  // Paletas: acento sutil — fundo creme, linha topo colorida
+  const PAL=[
+    {acento:"#B8860B",fundo:"#FFFDF8",topo:"#C8922A"},
+    {acento:"#9B3A5C",fundo:"#FFF8FA",topo:"#B05070"},
+    {acento:"#5B4A9A",fundo:"#F9F7FF",topo:"#6B5BAA"},
+    {acento:"#2E7A50",fundo:"#F5FBF7",topo:"#3A8A5A"},
+  ];
+
+  const dataEvento = fmtD(proposal.data_evento);
+  const validade   = fmtD(proposal.validade);
 
   const cenariosHtml = (proposal.scenarios||[]).map((s,si) => {
-    const pal    = PALETAS[si] || PALETAS[PALETAS.length-1];
-    const rotulo = ROTULOS[si] || "";
+    const pal = PAL[si]||PAL[PAL.length-1];
+    const meta = META[si]||{rotulo:"",intro:""};
 
-    // Agrupar itens
-    const porCat = {}, livres = [];
-    (s.items||[]).forEach(it => {
-      if (it.tipo==="catalogo" && it.ref_id) {
-        const [cid,sid]=(it.ref_id||"").split(":");
-        if (!porCat[cid]) porCat[cid]={cid,items:[]};
-        if (sid!=="__total__") porCat[cid].items.push(it);
-        else porCat[cid].total=it.qtd;
-      } else livres.push(it);
-    });
-
-    // Calcular subtotal
+    // Calculo do subtotal
     let sub=0;
     (s.items||[]).forEach(it=>{
       if(it.tipo==="catalogo"&&it.ref_id){
-        const [cid,sid]=(it.ref_id||"").split(":");
-        sub+=Number(it.qtd||0)*(sid==="__total__"?(catPrecoMap[cid]||0):(Number(it.preco_unit||0)||(saborPrecoMap[sid]||0)));
+        const[cid,sid]=(it.ref_id||"").split(":");
+        sub+=Number(it.qtd||0)*(sid==="__total__"?(catPM[cid]||0):(Number(it.preco_unit||0)||(saborPM[sid]||0)));
       } else sub+=Number(it.qtd||0)*Number(it.preco_unit||0);
     });
     let desc=0;
@@ -2566,55 +2557,76 @@ async function obaHandlePropostaPublica(request, env, url) {
     else if(s.desconto_tipo==="percentual") desc=sub*(Number(s.desconto_valor||0)/100);
     const total=Math.max(0,sub-desc);
 
-    // Linhas de categoria
-    const catLinhas=Object.values(porCat).map(cat=>{
-      const nome=cat.cid.split("-").map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(" ");
-      if(cat.items&&cat.items.length>0){
-        return cat.items.map(it=>{
-          const p=Number(it.preco_unit||0)||(saborPrecoMap[(it.ref_id||"").split(":")[1]]||0);
-          return `<tr><td class="td-nome">${it.descricao}</td><td class="td-qtd">${it.qtd} un</td><td class="td-val">${fmtMoeda(it.qtd*p)}</td></tr>`;
+    // Itens agrupados
+    const porCat={}, livres=[];
+    (s.items||[]).forEach(it=>{
+      if(it.tipo==="catalogo"&&it.ref_id){
+        const[cid,sid]=(it.ref_id||"").split(":");
+        if(!porCat[cid])porCat[cid]={cid,items:[]};
+        if(sid!=="__total__")porCat[cid].items.push(it);
+        else porCat[cid].total=it.qtd;
+      } else livres.push(it);
+    });
+
+    const catLinhas=Object.values(porCat).map(c=>{
+      const nm=c.cid.split("-").map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(" ");
+      if(c.items&&c.items.length){
+        return c.items.map(it=>{
+          const p=Number(it.preco_unit||0)||(saborPM[(it.ref_id||"").split(":")[1]]||0);
+          return `<tr><td class="td-n">${it.descricao}</td><td class="td-q">${it.qtd}&nbsp;un</td><td class="td-v">${R(it.qtd*p)}</td></tr>`;
         }).join("");
-      } else if(cat.total){
-        const ref=catPrecoMap[cat.cid]||0;
-        return `<tr><td class="td-nome">${nome}</td><td class="td-qtd">${cat.total} doces</td><td class="td-val">${ref>0?fmtMoeda(cat.total*ref):"&mdash;"}</td></tr>`;
+      } else if(c.total){
+        const ref=catPM[c.cid]||0;
+        return `<tr><td class="td-n">${nm}</td><td class="td-q">${c.total}&nbsp;doces</td><td class="td-v">${ref>0?R(c.total*ref):"&mdash;"}</td></tr>`;
       }
       return "";
     }).join("");
 
-    const livreLinhas=livres.map(it=>`<tr><td class="td-nome">${it.descricao}</td><td class="td-qtd"></td><td class="td-val">${fmtMoeda(it.preco_unit)}</td></tr>`).join("");
-    const descLinha=desc>0?`<tr class="tr-desc"><td colspan="2">Desconto</td><td>&minus;\u00a0${fmtMoeda(desc)}</td></tr>`:"";
+    const livreLinhas=livres.map(it=>`<tr><td class="td-n">${it.descricao}</td><td class="td-q"></td><td class="td-v">${R(it.preco_unit)}</td></tr>`).join("");
+    const descLinha=desc>0?`<tr class="tr-d"><td colspan="2">Desconto</td><td>&minus;&nbsp;${R(desc)}</td></tr>`:"";
 
-    // CTA para WhatsApp da OBA DOCERIA — mensagem ASCII pura (sem emojis na URL)
-    const ctaMsg=encodeURIComponent("Ola! Vi a proposta e gostei do cenario "+(si+1)+". Podemos conversar sobre os detalhes?");
+    // Introducao: usa descricao do cenario se preenchida, senao usa a automatica
+    const descricaoExibir = (s.descricao||"").trim();
+    const introTexto = descricaoExibir || meta.intro;
+
+    // CTA
+    const ctaMsg=encodeURIComponent("Ola! Vi a proposta e gostei do cenario "+(si+1)+" ("+meta.rotulo+"). Podemos conversar sobre os detalhes?");
     const ctaHref=obaWpp?"https://wa.me/55"+obaWpp+"?text="+ctaMsg:"";
 
     return `
-<section id="c${si+1}" class="cenario">
-  <div class="c-card" style="background:${pal.fundo};border-top:4px solid ${pal.linhaTopo}">
-    <div class="c-topo">
+<section id="c${si+1}" class="c-wrap">
+  <div class="c-card" style="border-top-color:${pal.topo};background:${pal.fundo}">
+
+    <div class="c-cabecalho">
       <div class="c-esq">
-        <span class="c-num">Cen&aacute;rio ${si+1}${rotulo?" &middot; "+rotulo:""}</span>
+        <span class="c-rotulo" style="color:${pal.acento}">Cen&aacute;rio ${si+1}&ensp;&middot;&ensp;${meta.rotulo}</span>
         <h2 class="c-nome">${s.nome||("Cen\u00e1rio "+(si+1))}</h2>
-        ${s.descricao?`<p class="c-desc">${s.descricao}</p>`:""}
       </div>
       <div class="c-dir">
         ${s.doces_por_convidado?`<span class="c-dpc">${s.doces_por_convidado} doces/pessoa</span>`:""}
-        <span class="c-total" style="color:${pal.acento}">${fmtMoeda(total)}</span>
+        <span class="c-total" style="color:${pal.acento}">${R(total)}</span>
       </div>
     </div>
+
+    <div class="c-intro">
+      <p>${introTexto}</p>
+    </div>
+
     <div class="c-corpo">
       <table class="tab"><tbody>
         ${catLinhas}${livreLinhas}${descLinha}
-        <tr class="tr-total"><td colspan="2">Total</td><td style="color:${pal.acento}">${fmtMoeda(total)}</td></tr>
+        <tr class="tr-tot"><td colspan="2">Total</td><td style="color:${pal.acento}">${R(total)}</td></tr>
       </tbody></table>
-      ${ctaHref?`<a href="${ctaHref}" target="_blank" class="cta" style="background:${pal.acento}">Quero este cen&aacute;rio &#10084;</a>`:""}
+      ${ctaHref?`<a href="${ctaHref}" target="_blank" class="cta-btn" style="background:${pal.acento}">Quero este cen&aacute;rio &mdash; falar com a Oba Doceria</a>`:""}
     </div>
+
   </div>
 </section>`;
   }).join("\n");
 
   const anchors=(proposal.scenarios||[]).map((s,i)=>{
-    const pal=PALETAS[i]||PALETAS[PALETAS.length-1];
+    const pal=PAL[i]||PAL[PAL.length-1];
+    const meta=META[i]||{rotulo:""};
     return `<a class="anc" href="#c${i+1}" style="color:${pal.acento};border-color:${pal.acento}">${s.nome||"Cen\u00e1rio "+(i+1)}</a>`;
   }).join("");
 
@@ -2626,76 +2638,72 @@ async function obaHandlePropostaPublica(request, env, url) {
 <meta name="robots" content="noindex,nofollow">
 <title>${proposal.cliente} &middot; Proposta Oba Doceria</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;1,300&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-body{background:#FAF7F4;font-family:'Inter',sans-serif;color:#3B2A1E;min-height:100vh}
-.page{max-width:660px;margin:0 auto;padding:0 0 72px}
+body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#3B2A1E;line-height:1.5}
+.page{max-width:640px;margin:0 auto;padding:0 0 72px}
 
 /* HERO */
-.hero{background:linear-gradient(175deg,#FFFDF8 0%,#FFF3E4 100%);padding:52px 32px 40px;text-align:center;border-bottom:1px solid #EDD9C0}
-.hero-logo{height:52px;object-fit:contain;margin-bottom:20px;opacity:.88}
-.hero-ornamento{font-size:18px;color:#C8922A;letter-spacing:8px;margin-bottom:16px}
-.hero h1{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:300;color:#3B2A1E;letter-spacing:.5px;margin-bottom:6px;line-height:1.2}
-.hero-sub{font-family:'Cormorant Garamond',serif;font-size:16px;color:#8B6A50;font-style:italic}
-.hero-sub strong{color:#5D3A1A;font-style:normal;font-weight:600}
+.hero{background:linear-gradient(170deg,#FFFDF8 0%,#FFF0DC 100%);padding:48px 24px 36px;text-align:center;border-bottom:1px solid #EDD9C0}
+.hero-logo{height:50px;object-fit:contain;margin-bottom:16px;opacity:.88}
+.hero h1{font-family:'Cormorant Garamond',Georgia,serif;font-size:32px;font-weight:400;color:#3B2A1E;letter-spacing:.3px;margin-bottom:6px}
+.hero-sub{font-size:14px;color:#9B7A60}
+.hero-sub strong{color:#5D3A1A;font-weight:600}
 
 /* INFO */
-.info{margin:24px 20px 0;background:#fff;border-radius:16px;border:1px solid #EDD9C0;padding:20px 24px}
-.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.info-label{font-size:9px;color:#bbb;text-transform:uppercase;letter-spacing:1.5px;font-weight:600;margin-bottom:4px}
-.info-value{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:#3B2A1E}
+.bloco{margin:20px 16px 0;background:#fff;border-radius:14px;border:1px solid #EDD9C0;padding:18px 20px}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.lbl{font-size:9px;color:#bbb;text-transform:uppercase;letter-spacing:1.5px;font-weight:600;margin-bottom:3px}
+.val{font-size:14px;font-weight:600;color:#3B2A1E}
 
 /* RESUMO */
-.resumo{margin:16px 20px 0;padding:18px 20px;border-left:2px solid #C8922A;background:#FFFDF8}
-.resumo p{font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;color:#5D3A1A;line-height:1.7}
+.resumo{margin:14px 16px 0;padding:16px 18px;border-left:3px solid #C8922A;background:#FFFCF5}
+.resumo p{font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;font-style:italic;color:#6B4A2A;line-height:1.65}
 
 /* ANCHORS */
-.anchors{display:flex;gap:10px;margin:24px 20px 0;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.anchors{display:flex;gap:8px;margin:20px 16px 0;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
 .anchors::-webkit-scrollbar{display:none}
-.anc{flex-shrink:0;padding:6px 18px;border-radius:24px;border:1px solid;background:transparent;font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:600;text-decoration:none;white-space:nowrap;transition:opacity .15s}
-.anc:hover{opacity:.65}
+.anc{flex-shrink:0;padding:7px 18px;border-radius:24px;border:1.5px solid;background:transparent;font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap}
 
 /* CENARIO */
-.cenario{margin:20px 20px 0}
-.c-card{border-radius:18px;border:1px solid #EDD9C0;overflow:hidden;background:#fff;box-shadow:0 2px 12px rgba(60,35,20,.06)}
-.c-topo{padding:24px 28px 20px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.c-wrap{margin:16px 16px 0;scroll-margin-top:8px}
+.c-card{border-radius:16px;border:1px solid #EDD9C0;border-top-width:4px;overflow:hidden;background:#fff;box-shadow:0 2px 16px rgba(60,35,20,.07)}
+.c-cabecalho{padding:22px 24px 16px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
 .c-esq{flex:1;min-width:0}
-.c-num{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#bbb;font-weight:600;display:block;margin-bottom:6px}
-.c-nome{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:#3B2A1E;line-height:1.2;margin-bottom:6px}
-.c-desc{font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;color:#aaa;line-height:1.5}
+.c-rotulo{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:6px}
+.c-nome{font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:400;color:#3B2A1E;line-height:1.2}
 .c-dir{text-align:right;flex-shrink:0}
-.c-dpc{display:block;font-size:10px;color:#ccc;letter-spacing:.5px;margin-bottom:6px}
-.c-total{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;line-height:1;display:block}
-.c-corpo{padding:0 28px 24px;border-top:1px solid #F0EAE0}
+.c-dpc{display:block;font-size:10px;color:#ccc;margin-bottom:4px}
+.c-total{font-size:28px;font-weight:700;display:block;line-height:1}
+.c-intro{padding:0 24px 16px;border-bottom:1px solid #F0E8DE}
+.c-intro p{font-size:13px;color:#7A5A40;line-height:1.65}
+.c-corpo{padding:16px 24px 20px}
 
 /* TABELA */
-.tab{width:100%;border-collapse:collapse;margin-top:4px}
-.tab td{padding:10px 0;border-bottom:1px solid #F5EFE8;font-size:13px;vertical-align:middle}
-.td-nome{color:#3B2A1E;font-weight:500;padding-right:8px}
-.td-qtd{text-align:center;color:#ccc;font-size:12px;padding:10px 12px;white-space:nowrap}
-.td-val{text-align:right;font-weight:600;white-space:nowrap;color:#5D3A1A}
-.tr-desc td{border-bottom:none;padding:8px 0;font-size:12px;color:#059669}
-.tr-desc td:last-child{text-align:right}
-.tr-total td{border:none;padding:16px 0 0;font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600}
-.tr-total td:last-child{text-align:right;font-size:24px}
-
-/* CTA */
-.cta{display:block;margin:20px 0 0;padding:16px;border-radius:14px;text-align:center;color:#fff;font-weight:600;font-size:14px;text-decoration:none;letter-spacing:.2px;transition:opacity .2s}
-.cta:hover{opacity:.85}
+.tab{width:100%;border-collapse:collapse}
+.tab td{padding:9px 0;border-bottom:1px solid #F5EDE4;font-size:13px;vertical-align:middle}
+.td-n{color:#3B2A1E;font-weight:500}
+.td-q{text-align:center;color:#ccc;font-size:12px;padding:9px 10px;white-space:nowrap}
+.td-v{text-align:right;font-weight:600;color:#5D3A1A;white-space:nowrap}
+.tr-d td{border-bottom:none;padding:8px 0 0;font-size:12px;color:#059669}
+.tr-d td:last-child{text-align:right}
+.tr-tot td{border:none;padding:14px 0 0;font-size:15px;font-weight:700;border-top:2px solid #EDD9C0}
+.tr-tot td:last-child{text-align:right;font-size:20px;font-weight:700}
+.cta-btn{display:block;margin:16px 0 0;padding:15px;border-radius:12px;text-align:center;color:#fff;font-weight:600;font-size:13px;text-decoration:none;letter-spacing:.2px}
 
 /* FOOTER */
-.footer{margin:32px 20px 0;text-align:center;padding-top:24px;border-top:1px solid #EDD9C0}
-.footer p{font-size:12px;color:#ccc;margin-bottom:6px;line-height:1.6}
+.footer{margin:28px 16px 0;text-align:center;padding-top:24px;border-top:1px solid #EDD9C0}
+.footer p{font-size:12px;color:#bbb;margin-bottom:5px}
 .footer a{color:#8B4513;font-weight:500;text-decoration:none}
-.footer-brand{font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;color:#bbb;margin-top:8px}
-.btn-pdf{margin-top:20px;background:#3B2A1E;color:#fff;border:none;border-radius:12px;padding:13px 32px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;letter-spacing:.3px}
+.footer-brand{font-family:'Cormorant Garamond',Georgia,serif;font-size:14px;font-style:italic;color:#bbb;margin-top:8px}
+.btn-pdf{margin-top:18px;background:#3B2A1E;color:#fff;border:none;border-radius:12px;padding:12px 32px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer}
 
 @media print{
   body{background:#fff}
-  .anchors,.btn-pdf,.cta{display:none!important}
+  .anchors,.btn-pdf,.cta-btn{display:none!important}
   .page{padding:0}
-  .cenario{margin:12px 0 0}
+  .c-wrap{margin:12px 0 0}
   .c-card{box-shadow:none;border-color:#ddd}
 }
 </style>
@@ -2705,17 +2713,16 @@ body{background:#FAF7F4;font-family:'Inter',sans-serif;color:#3B2A1E;min-height:
 
 <div class="hero">
   <img class="hero-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png" alt="Oba Doceria" onerror="this.style.display='none'">
-  <div class="hero-ornamento">&middot; &middot; &middot;</div>
   <h1>Proposta de Or&ccedil;amento</h1>
   <p class="hero-sub">Preparada com carinho para <strong>${proposal.cliente}</strong></p>
 </div>
 
-<div class="info">
+<div class="bloco">
   <div class="info-grid">
-    ${proposal.tipo_evento?`<div><p class="info-label">Evento</p><p class="info-value">${proposal.tipo_evento}</p></div>`:""}
-    ${dataEvento?`<div><p class="info-label">Data</p><p class="info-value">${dataEvento}</p></div>`:""}
-    ${proposal.convidados?`<div><p class="info-label">Convidados</p><p class="info-value">${proposal.convidados} pessoas</p></div>`:""}
-    ${(proposal.scenarios||[]).length?`<div><p class="info-label">Cen&aacute;rios</p><p class="info-value">${proposal.scenarios.length} op&ccedil;&otilde;es</p></div>`:""}
+    ${proposal.tipo_evento?`<div><p class="lbl">Evento</p><p class="val">${proposal.tipo_evento}</p></div>`:""}
+    ${dataEvento?`<div><p class="lbl">Data</p><p class="val">${dataEvento}</p></div>`:""}
+    ${proposal.convidados?`<div><p class="lbl">Convidados</p><p class="val">${proposal.convidados} pessoas</p></div>`:""}
+    ${(proposal.scenarios||[]).length?`<div><p class="lbl">Cen&aacute;rios</p><p class="val">${proposal.scenarios.length} op&ccedil;&otilde;es</p></div>`:""}
   </div>
 </div>
 
@@ -2736,10 +2743,7 @@ ${cenariosHtml}
 </body>
 </html>`;
 
-  return new Response(html, {
-    status:200,
-    headers:{"Content-Type":"text/html; charset=utf-8","Cache-Control":"no-store","X-Robots-Tag":"noindex, nofollow"}
-  });
+  return new Response(html,{status:200,headers:{"Content-Type":"text/html; charset=utf-8","Cache-Control":"no-store","X-Robots-Tag":"noindex, nofollow"}});
 }
 export default {
   async fetch(request, env) {
