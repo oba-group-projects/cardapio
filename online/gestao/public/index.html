@@ -3364,14 +3364,28 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     let totalDocesAlocadosNasCategorias = 0; // soma dos "total nesta categoria"
     document.querySelectorAll('#' + cid + '-categorias > div[data-cat-id]').forEach(block => {
       const blockId = block.id;
+      const catId = block.dataset.catId;
       const totalCat = Number(document.getElementById(blockId + '-total')?.value || 0);
       totalDocesAlocadosNasCategorias += totalCat;
 
-      // subtotal financeiro da categoria (sabores com quantidade > 0)
+      // subtotal financeiro da categoria
       let subtotalCat = 0;
+      let qtdSaboresPreenchidos = 0;
       block.querySelectorAll('input[data-sabor-id]').forEach(inp => {
-        subtotalCat += Number(inp.value||0) * Number(inp.dataset.preco||0);
+        const q = Number(inp.value || 0);
+        if (q > 0) qtdSaboresPreenchidos++;
+        subtotalCat += q * Number(inp.dataset.preco || 0);
       });
+
+      // Se nenhum sabor foi preenchido, usar precoReferencia da categoria × total como estimativa
+      if (qtdSaboresPreenchidos === 0 && totalCat > 0) {
+        const catObj = getCatalogo().categories.find(c => String(c.id) === String(catId));
+        const precoRef = catObj?.precoReferencia;
+        if (precoRef != null && Number(precoRef) > 0) {
+          subtotalCat = totalCat * Number(precoRef);
+        }
+      }
+
       subtotal += subtotalCat;
 
       // Exibir subtotal financeiro da categoria
@@ -3379,10 +3393,16 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       if (!subCatEl) {
         subCatEl = document.createElement('div');
         subCatEl.id = blockId + '-subtotal-cat';
-        subCatEl.style.cssText = 'font-size:11px;color:var(--brand);text-align:right;margin-top:4px;font-weight:600';
+        subCatEl.style.cssText = 'font-size:11px;text-align:right;margin-top:4px;font-weight:600';
         block.appendChild(subCatEl);
       }
-      subCatEl.textContent = subtotalCat > 0 ? fmt(subtotalCat) + ' nesta categoria' : '';
+      if (subtotalCat > 0) {
+        const isEstimativa = qtdSaboresPreenchidos === 0 && totalCat > 0;
+        subCatEl.textContent = fmt(subtotalCat) + (isEstimativa ? ' (estimativa)' : ' nesta categoria');
+        subCatEl.style.color = isEstimativa ? '#888' : 'var(--brand)';
+      } else {
+        subCatEl.textContent = '';
+      }
     });
 
     // Itens livres
