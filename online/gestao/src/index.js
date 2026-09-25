@@ -2795,7 +2795,7 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
 .res-ev-item:last-child{border-right:none}
 .res-ev-lbl{font-size:7px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#ccc;display:block}
 .res-ev-val{font-size:11px;font-weight:600;color:#3B2A1E;display:block}
-.res-secao{padding:12px 16px 4px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:#C8922A}
+.res-secao{padding:20px 16px 6px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:#C8922A}
 /* Cards de cenario — mais delicados */
 .rc{margin:0 16px 8px;border-radius:10px;border:1px solid #EDD9C0;border-left-width:2px;background:#fff;padding:10px 14px;box-shadow:none}
 .rc-linha{display:flex;align-items:center;gap:10px;justify-content:space-between}
@@ -2819,14 +2819,14 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
 .det-navbtns{display:flex;gap:5px;flex-wrap:wrap}
 .nav-outro{background:none;border:1.5px solid;border-radius:24px;padding:4px 11px;font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;cursor:pointer;white-space:nowrap}
 .nav-outro:hover{opacity:.75}
-.c-card{margin:10px 16px 0;border-radius:14px;border:1px solid #EDD9C0;border-top-width:3px;overflow:hidden;background:#fff;box-shadow:0 1px 8px rgba(60,35,20,.05)}
+.c-card{margin:10px auto 0;max-width:480px;border-radius:14px;border:1px solid #EDD9C0;border-top-width:3px;overflow:hidden;background:#fff;box-shadow:0 1px 8px rgba(60,35,20,.05)}
 .c-cabecalho{padding:18px 20px 13px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .c-esq{flex:1;min-width:0}
 .c-rotulo{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:4px}
 .c-nome{font-family:'Cormorant Garamond',Georgia,serif;font-size:21px;font-weight:400;color:#3B2A1E;line-height:1.2}
 .c-dir{text-align:right;flex-shrink:0}
 .c-dpc{display:block;font-size:10px;color:#ccc;margin-bottom:3px}
-.c-total{font-size:22px;font-weight:600;display:block;line-height:1}
+.c-total{font-size:18px;font-weight:600;display:block;line-height:1}
 .c-intro{padding:0 20px 13px;border-bottom:1px solid #F0E8DE}
 .c-intro p{font-size:12px;color:#7A5A40;line-height:1.65;font-style:italic}
 .c-corpo{padding:13px 20px 18px}
@@ -2839,8 +2839,8 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
 .tr-d td:last-child{text-align:right}
 .tr-tot td{border:none;padding:12px 0 0;font-size:13px;font-weight:600;border-top:1px solid #EDD9C0}
 .tr-tot td:last-child{text-align:right;font-size:17px;font-weight:700}
-.cta-btn{display:block;margin:14px 0 0;padding:13px;border-radius:11px;text-align:center;color:#fff;font-weight:600;font-size:12.5px;text-decoration:none;letter-spacing:.2px}
-.cta-btn:hover{opacity:.88}
+.cta-btn{display:block;margin:14px 0 0;padding:12px;border-radius:11px;text-align:center;color:#fff;font-weight:500;font-size:12px;text-decoration:none;letter-spacing:.3px;opacity:.9}
+.cta-btn:hover{opacity:1}
 .det-rodape-nav{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:10px 14px;margin-top:4px}
 .det-voltar-rodape{background:none;border:1.5px solid #EDD9C0;border-radius:24px;padding:5px 13px;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;color:#7A5A40;cursor:pointer}
 .det-voltar-rodape:hover{background:#FAF5EE}
@@ -2857,19 +2857,19 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
 @page{margin:14mm 18mm}
 @media print{
   body{background:#fff}
-  /* Capa e resumo juntos na pagina 1 */
+  /* Pagina 1: capa + resumo */
   #pg0{display:block!important;min-height:0!important;background:none!important}
   .ab-btn,.ab-ornamento,.ab-assinatura,.ab-citacao{display:none!important}
   .ab-rodape{padding:4px 0 8px}
   #pg1{display:block!important}
   #pg1::before{content:"";display:block;border-top:1px solid #EDD9C0;margin:14px 0}
   .res-voltar-ab,.res-footer-nav,.rc-cta{display:none!important}
-  /* Cada cenario em nova pagina */
-  .det-page{display:block!important;page-break-before:always}
+  /* Cenarios: nova pagina com padding-top para centralizar visualmente */
+  .det-page{display:block!important;page-break-before:always;padding-top:55mm}
   .det-topbar,.det-rodape-nav,.cta-btn,.btn-pdf{display:none!important}
-  /* Layout PDF — ocupa largura disponivel apos margens de @page */
   .page{max-width:100%;padding:0}
-  .c-card{margin:12px 0 0;box-shadow:none;border-color:#ddd;page-break-inside:avoid}
+  /* Card ocupa largura disponivel — margens do @page ja enquadram */
+  .c-card{margin:0 auto;max-width:100%;box-shadow:none;border-color:#ddd;page-break-inside:avoid}
   .rc{margin:0 0 8px;page-break-inside:avoid}
   .footer{border-top:1px solid #EDD9C0;padding:10px 0 0;margin-top:14px}
   #print-hint{display:block!important}
