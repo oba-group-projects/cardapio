@@ -1,4 +1,4 @@
-﻿const encoder = new TextEncoder();
+const encoder = new TextEncoder();
 
 const COOKIE_NAME = "__Host-oba_admin";
 const CSRF_COOKIE = "__Host-oba_csrf";
@@ -2495,7 +2495,6 @@ async function obaHandlePropostaPublica(request, env, url) {
     );
   }
 
-  // Catalogo PUBLISHED para precos e numero da Oba
   let cats=[], flavors=[], obaWpp="";
   try {
     const pub = await obaLoadCatalogSlot(env, "PUBLISHED");
@@ -2511,7 +2510,6 @@ async function obaHandlePropostaPublica(request, env, url) {
   cats.forEach(c    => { catPM[String(c.id)]   = Number(c.precoReferencia||0); });
   flavors.forEach(f => { saborPM[String(f.id)] = Number(f.preco||0); });
 
-  // Formatacao (sem toLocaleString — indisponivel no Workers V8)
   const R = (v) => {
     const n = Number(v||0).toFixed(2), [i,d]=n.split(".");
     return "R$\u00a0"+i.replace(/\B(?=(\d{3})+(?!\d))/g,".")+","+d;
@@ -2520,17 +2518,15 @@ async function obaHandlePropostaPublica(request, env, url) {
                "julho","agosto","setembro","outubro","novembro","dezembro"];
   const fmtD=(d)=>{ if(!d)return null; try{const[y,m,dy]=d.split("-");return parseInt(dy)+" de "+MESES[parseInt(m)-1]+" de "+y;}catch{return d;} };
 
-  // Rotulos e introducoes automaticas por posicao
   const META=[
     { rotulo:"Econ\u00f4mico",
       intro:"A op\u00e7\u00e3o que equilibra qualidade e custo, garantindo o essencial para um evento especial e inesquec\u00edvel." },
     { rotulo:"Equilibrado",
       intro:"A escolha mais completa, pensada para oferecer variedade e sabor com a quantidade certa para cada convidado." },
     { rotulo:"Generoso",
-      intro:"Para quem quer garantir que n\u00e3o vai faltar nada \u2014 uma experi\u00eancia farta, diversificada e verdadeiramente memoravel." },
+      intro:"Para quem quer garantir que n\u00e3o vai faltar nada \u2014 uma experi\u00eancia farta, diversificada e verdadeiramente memor\u00e1vel." },
   ];
 
-  // Paletas: acento sutil — fundo creme, linha topo colorida
   const PAL=[
     {acento:"#B8860B",fundo:"#FFFDF8",topo:"#C8922A"},
     {acento:"#9B3A5C",fundo:"#FFF8FA",topo:"#B05070"},
@@ -2540,18 +2536,32 @@ async function obaHandlePropostaPublica(request, env, url) {
 
   const dataEvento = fmtD(proposal.data_evento);
   const validade   = fmtD(proposal.validade);
+  const nomeCliente   = proposal.cliente||"";
+  const nomeEvento    = (proposal.tipo_evento||"evento").toLowerCase();
+  const numConvidados = proposal.convidados ? Number(proposal.convidados) : null;
+  const numCenarios   = (proposal.scenarios||[]).length;
 
-  // ----------------------------------------------------------------
-  // Calcula totais por cenario (necessario tanto para resumo quanto para detalhe)
-  // ----------------------------------------------------------------
-  const cenariosData = (proposal.scenarios||[]).map((s,si)=>{
+  // Texto de abertura personalizado
+  const paraA = dataEvento
+    ? "No dia <strong>"+dataEvento+"</strong>, algo muito especial acontece. Um <strong>"+nomeEvento+"</strong> que merece ser vivido com intensidade, celebrado com cuidado e lembrado com carinho por todos que estiverem presentes."
+    : "Um <strong>"+nomeEvento+"</strong> \u00e9 um momento que pede aten\u00e7\u00e3o a cada detalhe \u2014 e \u00e9 exatamente isso que a Oba Doceria prepara para voc\u00ea.";
+
+  const paraB = numConvidados
+    ? "S\u00e3o <strong>"+numConvidados+" convidados</strong> que merecem uma experi\u00eancia inesquec\u00edvel. Cada doce que chegar \u00e0 mesa ser\u00e1 feito com ingredientes selecionados, acabamento artesanal e o cuidado de quem sabe que \u00e9 nos pequenos momentos \u2014 uma bandeja bem posta, um doce que derrete na boca \u2014 que as grandes festas s\u00e3o realmente lembradas."
+    : "Cada doce que chegar \u00e0 mesa ser\u00e1 feito com ingredientes selecionados, acabamento artesanal e o cuidado de quem sabe que \u00e9 nos pequenos momentos que as grandes festas s\u00e3o realmente lembradas.";
+
+  const paraC = "Para "+(nomeCliente?"voc\u00ea, <strong>"+nomeCliente+"</strong>,":"voc\u00ea")+" preparamos <strong>"+numCenarios+" cen\u00e1rio"+(numCenarios!==1?"s":"")+"</strong> pensados com muito cuidado. Cada um respeita um perfil diferente, para que a escolha seja t\u00e3o gostosa quanto os pr\u00f3prios doces.";
+
+  // Calcula totais e monta dados de cada cenario
+  const cenariosData = (proposal.scenarios||[]).map(function(s,si){
     const pal  = PAL[si]||PAL[PAL.length-1];
     const meta = META[si]||{rotulo:"",intro:""};
 
     let sub=0;
-    (s.items||[]).forEach(it=>{
+    (s.items||[]).forEach(function(it){
       if(it.tipo==="catalogo"&&it.ref_id){
-        const[cid,sid]=(it.ref_id||"").split(":");
+        const parts=(it.ref_id||"").split(":");
+        const cid=parts[0], sid=parts[1];
         sub+=Number(it.qtd||0)*(sid==="__total__"?(catPM[cid]||0):(Number(it.preco_unit||0)||(saborPM[sid]||0)));
       } else sub+=Number(it.qtd||0)*Number(it.preco_unit||0);
     });
@@ -2560,290 +2570,338 @@ async function obaHandlePropostaPublica(request, env, url) {
     else if(s.desconto_tipo==="percentual") desc=sub*(Number(s.desconto_valor||0)/100);
     const total=Math.max(0,sub-desc);
 
-    // Total de doces: preferencia pelo campo doces_por_convidado × convidados
     const totalDoces = s.doces_por_convidado && proposal.convidados
-      ? (Number(s.doces_por_convidado)*Number(proposal.convidados))
+      ? Number(s.doces_por_convidado)*Number(proposal.convidados)
       : null;
 
-    // Itens agrupados para tabela de detalhe
     const porCat={}, livres=[];
-    (s.items||[]).forEach(it=>{
+    (s.items||[]).forEach(function(it){
       if(it.tipo==="catalogo"&&it.ref_id){
-        const[cid,sid]=(it.ref_id||"").split(":");
+        const parts=(it.ref_id||"").split(":");
+        const cid=parts[0], sid=parts[1];
         if(!porCat[cid])porCat[cid]={cid,items:[]};
         if(sid!=="__total__")porCat[cid].items.push(it);
         else porCat[cid].total=it.qtd;
       } else livres.push(it);
     });
 
-    const catLinhas=Object.values(porCat).map(c=>{
-      const nm=c.cid.split("-").map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(" ");
+    const catLinhas=Object.values(porCat).map(function(c){
+      const nm=c.cid.split("-").map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join(" ");
       if(c.items&&c.items.length){
-        return c.items.map(it=>{
-          const p=Number(it.preco_unit||0)||(saborPM[(it.ref_id||"").split(":")[1]]||0);
-          return `<tr><td class="td-n">${it.descricao}</td><td class="td-q">${it.qtd}&nbsp;doces</td><td class="td-v">${R(it.qtd*p)}</td></tr>`;
+        return c.items.map(function(it){
+          const parts2=(it.ref_id||"").split(":");
+          const p=Number(it.preco_unit||0)||(saborPM[parts2[1]]||0);
+          return "<tr><td class=\"td-n\">"+it.descricao+"</td><td class=\"td-q\">"+it.qtd+"&nbsp;doces</td><td class=\"td-v\">"+R(it.qtd*p)+"</td></tr>";
         }).join("");
       } else if(c.total){
         const ref=catPM[c.cid]||0;
-        return `<tr><td class="td-n">${nm}</td><td class="td-q">${c.total}&nbsp;doces</td><td class="td-v">${ref>0?R(c.total*ref):"&mdash;"}</td></tr>`;
+        return "<tr><td class=\"td-n\">"+nm+"</td><td class=\"td-q\">"+c.total+"&nbsp;doces</td><td class=\"td-v\">"+(ref>0?R(c.total*ref):"&mdash;")+"</td></tr>";
       }
       return "";
     }).join("");
 
-    const livreLinhas=livres.map(it=>`<tr><td class="td-n">${it.descricao}</td><td class="td-q"></td><td class="td-v">${R(it.preco_unit)}</td></tr>`).join("");
-    const descLinha=desc>0?`<tr class="tr-d"><td colspan="2">Desconto</td><td>&minus;&nbsp;${R(desc)}</td></tr>`:"";
+    const livreLinhas=livres.map(function(it){
+      return "<tr><td class=\"td-n\">"+it.descricao+"</td><td class=\"td-q\"></td><td class=\"td-v\">"+R(it.preco_unit)+"</td></tr>";
+    }).join("");
 
-    // Introducao: texto_publico tem prioridade; fallback no automatico
+    const descLinha=desc>0?"<tr class=\"tr-d\"><td colspan=\"2\">Desconto</td><td>&minus;&nbsp;"+R(desc)+"</td></tr>":"";
     const introTexto=(s.texto_publico||"").trim()||meta.intro;
 
-    // CTA — mensagem profissional com identidade da marca
     const ctaMsg=encodeURIComponent(
       "Oba! Recebi a proposta e quero seguir com o Cen\u00e1rio "+(si+1)+" \u2013 "+meta.rotulo+
       " ("+R(total)+"). Vamos fechar os detalhes?"
     );
     const ctaHref=obaWpp?"https://wa.me/55"+obaWpp+"?text="+ctaMsg:"";
 
-    return {s,si,pal,meta,total,totalDoces,desc,catLinhas,livreLinhas,descLinha,introTexto,ctaHref};
+    return {s:s,si:si,pal:pal,meta:meta,total:total,totalDoces:totalDoces,
+            desc:desc,catLinhas:catLinhas,livreLinhas:livreLinhas,
+            descLinha:descLinha,introTexto:introTexto,ctaHref:ctaHref};
   });
 
-  // ----------------------------------------------------------------
-  // PAGINA 1 — Cards de resumo dos cenarios
-  // ----------------------------------------------------------------
-  const resumoCards = cenariosData.map(({s,si,pal,meta,total,totalDoces,introTexto})=>`
-<div class="rc" style="border-top-color:${pal.topo};background:${pal.fundo}">
-  <div class="rc-topo">
-    <div class="rc-esq">
-      <span class="rc-badge" style="color:${pal.acento};border-color:${pal.acento}80">Cen&aacute;rio ${si+1}</span>
-      <h3 class="rc-nome" style="color:${pal.acento}">${meta.rotulo}</h3>
-    </div>
-    <div class="rc-dir">
-      <span class="rc-valor" style="color:${pal.acento}">${R(total)}</span>
-    </div>
-  </div>
-  <p class="rc-intro">${introTexto}</p>
-  <div class="rc-pills">
-    ${proposal.convidados?`<span class="rc-pill">${proposal.convidados} convidados</span>`:""}
-    ${s.doces_por_convidado?`<span class="rc-pill">${s.doces_por_convidado} doces/pessoa</span>`:""}
-    ${totalDoces?`<span class="rc-pill">${totalDoces} doces no total</span>`:""}
-  </div>
-  <button class="rc-cta" style="background:${pal.acento}" onclick="obaShowPage(${si+1})">
-    Ver detalhes deste cen&aacute;rio &rarr;
-  </button>
-</div>`).join("\n");
-
-  // ----------------------------------------------------------------
-  // PAGINAS 2/3/4 — Detalhe de cada cenario
-  // ----------------------------------------------------------------
-  const detalhePages = cenariosData.map(({s,si,pal,meta,total,catLinhas,livreLinhas,descLinha,introTexto,ctaHref})=>{
-    // Botoes de navegacao entre cenarios (exceto o atual)
-    const navBtns = cenariosData
-      .filter(d=>d.si!==si)
-      .map(d=>`<button class="nav-outro" style="color:${d.pal.acento};border-color:${d.pal.acento}80" onclick="obaShowPage(${d.si+1})">Cen&aacute;rio ${d.si+1} &ndash; ${d.meta.rotulo}</button>`)
-      .join("");
-
-    return `
-<div id="pg${si+1}" class="det-page" style="display:none">
-
-  <div class="det-topbar">
-    <button class="det-voltar" onclick="obaShowPage(0)">&#8592; Voltar &agrave; vis&atilde;o geral</button>
-    <div class="det-navbtns">${navBtns}</div>
-  </div>
-
-  <div class="c-card" style="border-top-color:${pal.topo};background:${pal.fundo}">
-    <div class="c-cabecalho">
-      <div class="c-esq">
-        <span class="c-rotulo" style="color:${pal.acento}">Cen&aacute;rio ${si+1}&ensp;&middot;&ensp;${meta.rotulo}</span>
-        <h2 class="c-nome">${s.nome||("Cen\u00e1rio "+(si+1))}</h2>
-      </div>
-      <div class="c-dir">
-        ${s.doces_por_convidado?`<span class="c-dpc">${s.doces_por_convidado} doces/pessoa</span>`:""}
-        <span class="c-total" style="color:${pal.acento}">${R(total)}</span>
-      </div>
-    </div>
-
-    <div class="c-intro">
-      <p>${introTexto}</p>
-    </div>
-
-    <div class="c-corpo">
-      <table class="tab"><tbody>
-        ${catLinhas}${livreLinhas}${descLinha}
-        <tr class="tr-tot"><td colspan="2">Total</td><td style="color:${pal.acento}">${R(total)}</td></tr>
-      </tbody></table>
-      ${ctaHref?`<a href="${ctaHref}" target="_blank" class="cta-btn" style="background:${pal.acento}">Escolhi este cen&aacute;rio &mdash; vamos conversar</a>`:""}
-    </div>
-  </div>
-
-  <div class="det-rodape-nav">
-    <button class="det-voltar-rodape" onclick="obaShowPage(0)">&#8592; Ver todos os cen&aacute;rios</button>
-    ${navBtns?`<div class="det-navbtns-rodape">${navBtns}</div>`:""}
-  </div>
-
-</div>`;
+  // PG1 — Cards compactos de resumo
+  const resumoCards = cenariosData.map(function(d){
+    const s=d.s,si=d.si,pal=d.pal,meta=d.meta,total=d.total,totalDoces=d.totalDoces;
+    const pills =
+      (s.doces_por_convidado?"<span class=\"rc-pill\">"+s.doces_por_convidado+" doces/pessoa</span>":"")+
+      (totalDoces?"<span class=\"rc-pill\">"+totalDoces+" doces</span>":"");
+    return (
+      "<div class=\"rc\" style=\"border-left-color:"+pal.acento+"\">"+
+        "<div class=\"rc-linha\">"+
+          "<div class=\"rc-esq\">"+
+            "<span class=\"rc-num\" style=\"color:"+pal.acento+"\">"+(si+1)+"</span>"+
+            "<div>"+
+              "<span class=\"rc-badge\">"+meta.rotulo+"</span>"+
+              "<div class=\"rc-pills\">"+pills+"</div>"+
+            "</div>"+
+          "</div>"+
+          "<div class=\"rc-dir\">"+
+            "<span class=\"rc-valor\" style=\"color:"+pal.acento+"\">"+R(total)+"</span>"+
+            "<button class=\"rc-cta\" style=\"background:"+pal.acento+"\" onclick=\"obaShowPage("+(si+2)+")\">Ver detalhes &rarr;</button>"+
+          "</div>"+
+        "</div>"+
+      "</div>"
+    );
   }).join("\n");
 
-  const html=`<!doctype html>
+  // PG2/3/4 — Detalhe por cenario
+  const detalhePages = cenariosData.map(function(d){
+    const s=d.s,si=d.si,pal=d.pal,meta=d.meta,total=d.total;
+    const catLinhas=d.catLinhas,livreLinhas=d.livreLinhas,descLinha=d.descLinha;
+    const introTexto=d.introTexto,ctaHref=d.ctaHref;
+
+    const navBtns = cenariosData
+      .filter(function(x){return x.si!==si;})
+      .map(function(x){
+        return "<button class=\"nav-outro\" style=\"color:"+x.pal.acento+";border-color:"+x.pal.acento+"60\" onclick=\"obaShowPage("+(x.si+2)+")\">Cen\u00e1rio "+(x.si+1)+" \u2013 "+x.meta.rotulo+"</button>";
+      }).join("");
+
+    const ctaBtnHtml = ctaHref
+      ? "<a href=\""+ctaHref+"\" target=\"_blank\" class=\"cta-btn\" style=\"background:"+pal.acento+"\">Escolhi este cen\u00e1rio \u2014 vamos conversar</a>"
+      : "";
+
+    return (
+      "<div id=\"pg"+(si+2)+"\" class=\"det-page\" style=\"display:none\">"+
+        "<div class=\"det-topbar\">"+
+          "<button class=\"det-voltar\" onclick=\"obaShowPage(1)\">&#8592; Todos os cen\u00e1rios</button>"+
+          "<div class=\"det-navbtns\">"+navBtns+"</div>"+
+        "</div>"+
+        "<div class=\"c-card\" style=\"border-top-color:"+pal.topo+";background:"+pal.fundo+"\">"+
+          "<div class=\"c-cabecalho\">"+
+            "<div class=\"c-esq\">"+
+              "<span class=\"c-rotulo\" style=\"color:"+pal.acento+"\">Cen\u00e1rio "+(si+1)+" &ensp;&middot;&ensp; "+meta.rotulo+"</span>"+
+              "<h2 class=\"c-nome\">"+(s.nome||("Cen\u00e1rio "+(si+1)))+"</h2>"+
+            "</div>"+
+            "<div class=\"c-dir\">"+
+              (s.doces_por_convidado?"<span class=\"c-dpc\">"+s.doces_por_convidado+" doces/pessoa</span>":"")+
+              "<span class=\"c-total\" style=\"color:"+pal.acento+"\">"+R(total)+"</span>"+
+            "</div>"+
+          "</div>"+
+          "<div class=\"c-intro\"><p>"+introTexto+"</p></div>"+
+          "<div class=\"c-corpo\">"+
+            "<table class=\"tab\"><tbody>"+
+              catLinhas+livreLinhas+descLinha+
+              "<tr class=\"tr-tot\"><td colspan=\"2\">Total</td><td style=\"color:"+pal.acento+"\">"+R(total)+"</td></tr>"+
+            "</tbody></table>"+
+            ctaBtnHtml+
+          "</div>"+
+        "</div>"+
+        "<div class=\"det-rodape-nav\">"+
+          "<button class=\"det-voltar-rodape\" onclick=\"obaShowPage(1)\">&#8592; Todos os cen\u00e1rios</button>"+
+          (navBtns?"<div class=\"det-navbtns-rodape\">"+navBtns+"</div>":"")+
+        "</div>"+
+      "</div>"
+    );
+  }).join("\n");
+
+  // Bloco de info do evento (usado em pg0 e pg1)
+  const infoEventoPg0 = (proposal.tipo_evento||dataEvento||proposal.convidados) ? (
+    "<div class=\"ab-evento\">"+
+    (proposal.tipo_evento?"<div class=\"ab-ev-item\"><span class=\"ab-ev-label\">Evento</span><span class=\"ab-ev-val\">"+proposal.tipo_evento+"</span></div>":"")+
+    (dataEvento?"<div class=\"ab-ev-item\"><span class=\"ab-ev-label\">Data</span><span class=\"ab-ev-val\">"+dataEvento+"</span></div>":"")+
+    (proposal.convidados?"<div class=\"ab-ev-item\"><span class=\"ab-ev-label\">Convidados</span><span class=\"ab-ev-val\">"+proposal.convidados+" pessoas</span></div>":"")+
+    "</div>"
+  ) : "";
+
+  const infoEventoPg1 = (proposal.tipo_evento||dataEvento||proposal.convidados) ? (
+    "<div class=\"res-ev\">"+
+    (proposal.tipo_evento?"<div class=\"res-ev-item\"><span class=\"res-ev-lbl\">Evento</span><span class=\"res-ev-val\">"+proposal.tipo_evento+"</span></div>":"")+
+    (dataEvento?"<div class=\"res-ev-item\"><span class=\"res-ev-lbl\">Data</span><span class=\"res-ev-val\">"+dataEvento+"</span></div>":"")+
+    (proposal.convidados?"<div class=\"res-ev-item\"><span class=\"res-ev-lbl\">Convidados</span><span class=\"res-ev-val\">"+proposal.convidados+" pessoas</span></div>":"")+
+    "</div>"
+  ) : "";
+
+  const citacaoHtml = proposal.resumo
+    ? "<div class=\"ab-citacao\">&ldquo;"+proposal.resumo+"&rdquo;</div>"
+    : "";
+
+  const validadeHtml = validade
+    ? "<p>Proposta v&aacute;lida at&eacute; <strong style=\"color:#5D3A1A\">"+validade+"</strong></p>"
+    : "";
+
+  const wppHtml = obaWpp
+    ? "<p>D&uacute;vidas? <a href=\"https://wa.me/55"+obaWpp+"\">fale pelo WhatsApp</a></p>"
+    : "";
+
+  const resSub = nomeCliente
+    ? "Para <strong>"+nomeCliente+"</strong>"+(dataEvento?" &middot; "+dataEvento:"")
+    : (dataEvento?dataEvento:"");
+
+  const html = `<!doctype html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>${proposal.cliente} &middot; Proposta Oba Doceria</title>
+<title>${nomeCliente} &middot; Proposta Oba Doceria</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;1,300&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,300;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#3B2A1E;line-height:1.5}
-.page{max-width:640px;margin:0 auto;padding:0 0 72px}
+.page{max-width:600px;margin:0 auto}
 
-/* HERO */
-.hero{background:linear-gradient(170deg,#FFFDF8 0%,#FFF0DC 100%);padding:48px 24px 36px;text-align:center;border-bottom:1px solid #EDD9C0}
-.hero-logo{height:50px;object-fit:contain;margin-bottom:16px;opacity:.88}
-.hero h1{font-family:'Cormorant Garamond',Georgia,serif;font-size:32px;font-weight:400;color:#3B2A1E;letter-spacing:.3px;margin-bottom:6px}
-.hero-sub{font-size:14px;color:#9B7A60}
-.hero-sub strong{color:#5D3A1A;font-weight:600}
+/* PG0 — ABERTURA */
+#pg0{min-height:100svh;display:flex;flex-direction:column;background:linear-gradient(160deg,#FFF8EE 0%,#FDF0D8 55%,#F9E4BE 100%)}
+.ab-topo{padding:32px 24px 0;text-align:center}
+.ab-logo{height:40px;object-fit:contain;opacity:.9;margin-bottom:20px}
+.ab-label{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#C8922A;margin-bottom:2px}
+.ab-cliente{font-family:'Cormorant Garamond',Georgia,serif;font-size:34px;font-weight:600;color:#3B2A1E;line-height:1.1;margin-bottom:16px}
+.ab-evento{display:flex;flex-wrap:wrap;justify-content:center;background:#fff9;backdrop-filter:blur(4px);border:1px solid #EDD9C0;border-radius:12px;overflow:hidden;margin:0 auto}
+.ab-ev-item{flex:1;min-width:0;text-align:center;padding:10px 12px;border-right:1px solid #EDD9C0}
+.ab-ev-item:last-child{border-right:none}
+.ab-ev-label{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#C8922A;display:block;margin-bottom:2px}
+.ab-ev-val{font-size:12px;font-weight:600;color:#3B2A1E;display:block}
+.ab-corpo{padding:20px 24px;flex:1}
+.ab-p{font-family:'Cormorant Garamond',Georgia,serif;font-size:16.5px;color:#5D3A1A;line-height:1.85;margin-bottom:14px}
+.ab-p:last-of-type{margin-bottom:0}
+.ab-p strong{font-weight:600;color:#3B2A1E}
+.ab-citacao{margin-top:18px;padding:14px 16px;border-left:2px solid #C8922A;background:#FFFCF4;font-family:'Cormorant Garamond',Georgia,serif;font-size:15px;font-style:italic;color:#9B6A3A;line-height:1.7}
+.ab-rodape{padding:20px 24px 32px;text-align:center}
+.ab-ornamento{font-family:'Cormorant Garamond',Georgia,serif;font-size:12px;font-style:italic;color:#C8922A;opacity:.7;margin-bottom:16px}
+.ab-btn{display:inline-block;background:#3B2A1E;color:#F9E8C8;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.8px;padding:14px 32px;border-radius:50px;border:none;cursor:pointer;text-transform:uppercase}
+.ab-btn:hover{opacity:.85}
 
-/* INFO BLOCO */
-.bloco{margin:20px 16px 0;background:#fff;border-radius:14px;border:1px solid #EDD9C0;padding:18px 20px}
-.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.lbl{font-size:9px;color:#bbb;text-transform:uppercase;letter-spacing:1.5px;font-weight:600;margin-bottom:3px}
-.val{font-size:14px;font-weight:600;color:#3B2A1E}
-
-/* RESUMO QUOTE */
-.resumo{margin:14px 16px 0;padding:16px 18px;border-left:3px solid #C8922A;background:#FFFCF5}
-.resumo p{font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;font-style:italic;color:#6B4A2A;line-height:1.65}
-
-/* TITULO SECAO */
-.sec-titulo{margin:28px 16px 0;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#C8922A}
-
-/* CARDS DE RESUMO (pagina 0) */
-.rc{margin:12px 16px 0;border-radius:16px;border:1px solid #EDD9C0;border-top-width:4px;padding:20px;background:#fff;box-shadow:0 2px 12px rgba(60,35,20,.06)}
-.rc-topo{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}
-.rc-esq{flex:1;min-width:0}
-.rc-badge{display:inline-block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;border:1px solid;border-radius:20px;padding:2px 10px;margin-bottom:6px}
-.rc-nome{font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;font-weight:400;line-height:1.2}
+/* PG1 — RESUMO */
+#pg1{display:none}
+.res-hero{padding:20px 20px 14px;text-align:center;background:#FFFDF8;border-bottom:1px solid #EDD9C0}
+.res-logo{height:28px;object-fit:contain;opacity:.82;margin-bottom:10px}
+.res-titulo{font-family:'Cormorant Garamond',Georgia,serif;font-size:19px;font-weight:400;color:#3B2A1E;margin-bottom:2px}
+.res-sub{font-size:10px;color:#9B7A60}
+.res-sub strong{color:#5D3A1A;font-weight:600}
+.res-ev{display:flex;justify-content:center;border-bottom:1px solid #EDD9C0;background:#FFFDF8}
+.res-ev-item{flex:1;text-align:center;padding:8px 10px;border-right:1px solid #EDD9C0}
+.res-ev-item:last-child{border-right:none}
+.res-ev-lbl{font-size:7px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#ccc;display:block}
+.res-ev-val{font-size:11px;font-weight:600;color:#3B2A1E;display:block}
+.res-secao{padding:12px 16px 4px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:#C8922A}
+.rc{margin:0 16px 8px;border-radius:10px;border:1px solid #EDD9C0;border-left-width:3px;background:#fff;padding:12px 14px;box-shadow:0 1px 6px rgba(60,35,20,.04)}
+.rc-linha{display:flex;align-items:center;gap:10px;justify-content:space-between}
+.rc-esq{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
+.rc-num{font-family:'Cormorant Garamond',Georgia,serif;font-size:24px;font-weight:600;line-height:1;flex-shrink:0;opacity:.6}
+.rc-badge{display:block;font-size:13px;font-weight:700;color:#3B2A1E;margin-bottom:3px}
+.rc-pills{display:flex;flex-wrap:wrap;gap:3px}
+.rc-pill{font-size:10px;font-weight:500;background:#F5EDE4;color:#9B7A60;padding:2px 7px;border-radius:20px}
 .rc-dir{text-align:right;flex-shrink:0}
-.rc-valor{font-size:24px;font-weight:700;display:block;line-height:1}
-.rc-intro{font-size:13px;color:#7A5A40;line-height:1.6;margin-bottom:12px}
-.rc-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
-.rc-pill{font-size:11px;font-weight:500;background:#F5EDE4;color:#7A5A40;padding:4px 10px;border-radius:20px}
-.rc-cta{width:100%;padding:13px;border-radius:12px;border:none;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;letter-spacing:.2px;transition:opacity .15s}
+.rc-valor{display:block;font-size:17px;font-weight:700;line-height:1;margin-bottom:7px}
+.rc-cta{display:block;padding:6px 13px;border-radius:20px;border:none;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap}
 .rc-cta:hover{opacity:.88}
+.res-footer-nav{padding:10px 16px 0;text-align:center}
+.res-voltar-ab{background:none;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;color:#bbb;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 
-/* BARRA TOPO DO DETALHE */
-.det-topbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:14px 16px;background:#fff;border-bottom:1px solid #EDD9C0;position:sticky;top:0;z-index:10}
-.det-voltar{background:none;border:1.5px solid #EDD9C0;border-radius:24px;padding:6px 14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;color:#7A5A40;cursor:pointer}
-.det-voltar:hover{background:#FAF5EE}
-.det-navbtns{display:flex;gap:6px;flex-wrap:wrap}
-.nav-outro{background:none;border:1.5px solid;border-radius:24px;padding:6px 14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;cursor:pointer}
-.nav-outro:hover{opacity:.75}
-
-/* DETALHE DO CENARIO */
+/* DETALHE */
 .det-page{padding-bottom:8px}
-.c-card{margin:0 16px;border-radius:16px;border:1px solid #EDD9C0;border-top-width:4px;overflow:hidden;background:#fff;box-shadow:0 2px 16px rgba(60,35,20,.07)}
-.c-cabecalho{padding:22px 24px 16px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.det-topbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:10px 14px;background:#fff;border-bottom:1px solid #EDD9C0;position:sticky;top:0;z-index:10}
+.det-voltar{background:none;border:1.5px solid #EDD9C0;border-radius:24px;padding:5px 13px;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;color:#7A5A40;cursor:pointer;white-space:nowrap}
+.det-voltar:hover{background:#FAF5EE}
+.det-navbtns{display:flex;gap:5px;flex-wrap:wrap}
+.nav-outro{background:none;border:1.5px solid;border-radius:24px;padding:4px 11px;font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;cursor:pointer;white-space:nowrap}
+.nav-outro:hover{opacity:.75}
+.c-card{margin:10px 16px 0;border-radius:14px;border:1px solid #EDD9C0;border-top-width:4px;overflow:hidden;background:#fff;box-shadow:0 2px 14px rgba(60,35,20,.07)}
+.c-cabecalho{padding:18px 20px 13px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .c-esq{flex:1;min-width:0}
-.c-rotulo{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:6px}
-.c-nome{font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:400;color:#3B2A1E;line-height:1.2}
+.c-rotulo{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:4px}
+.c-nome{font-family:'Cormorant Garamond',Georgia,serif;font-size:23px;font-weight:400;color:#3B2A1E;line-height:1.2}
 .c-dir{text-align:right;flex-shrink:0}
-.c-dpc{display:block;font-size:10px;color:#ccc;margin-bottom:4px}
-.c-total{font-size:28px;font-weight:700;display:block;line-height:1}
-.c-intro{padding:0 24px 16px;border-bottom:1px solid #F0E8DE}
-.c-intro p{font-size:13px;color:#7A5A40;line-height:1.65}
-.c-corpo{padding:16px 24px 20px}
-
-/* TABELA */
+.c-dpc{display:block;font-size:10px;color:#ccc;margin-bottom:3px}
+.c-total{font-size:24px;font-weight:700;display:block;line-height:1}
+.c-intro{padding:0 20px 13px;border-bottom:1px solid #F0E8DE}
+.c-intro p{font-size:12.5px;color:#7A5A40;line-height:1.65}
+.c-corpo{padding:13px 20px 18px}
 .tab{width:100%;border-collapse:collapse}
-.tab td{padding:9px 0;border-bottom:1px solid #F5EDE4;font-size:13px;vertical-align:middle}
+.tab td{padding:8px 0;border-bottom:1px solid #F5EDE4;font-size:12.5px;vertical-align:middle}
 .td-n{color:#3B2A1E;font-weight:500}
-.td-q{text-align:center;color:#ccc;font-size:12px;padding:9px 10px;white-space:nowrap}
+.td-q{text-align:center;color:#ccc;font-size:11px;padding:8px 8px;white-space:nowrap}
 .td-v{text-align:right;font-weight:600;color:#5D3A1A;white-space:nowrap}
-.tr-d td{border-bottom:none;padding:8px 0 0;font-size:12px;color:#059669}
+.tr-d td{border-bottom:none;padding:7px 0 0;font-size:11px;color:#059669}
 .tr-d td:last-child{text-align:right}
-.tr-tot td{border:none;padding:14px 0 0;font-size:15px;font-weight:700;border-top:2px solid #EDD9C0}
-.tr-tot td:last-child{text-align:right;font-size:20px;font-weight:700}
-.cta-btn{display:block;margin:18px 0 0;padding:15px;border-radius:12px;text-align:center;color:#fff;font-weight:600;font-size:13px;text-decoration:none;letter-spacing:.2px;transition:opacity .15s}
+.tr-tot td{border:none;padding:12px 0 0;font-size:13px;font-weight:700;border-top:2px solid #EDD9C0}
+.tr-tot td:last-child{text-align:right;font-size:18px;font-weight:700}
+.cta-btn{display:block;margin:14px 0 0;padding:13px;border-radius:11px;text-align:center;color:#fff;font-weight:600;font-size:12.5px;text-decoration:none;letter-spacing:.2px}
 .cta-btn:hover{opacity:.88}
-
-/* RODAPE DE NAVEGACAO DO DETALHE */
-.det-rodape-nav{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:14px 16px;margin-top:8px}
-.det-voltar-rodape{background:none;border:1.5px solid #EDD9C0;border-radius:24px;padding:6px 14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;color:#7A5A40;cursor:pointer}
+.det-rodape-nav{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:10px 14px;margin-top:4px}
+.det-voltar-rodape{background:none;border:1.5px solid #EDD9C0;border-radius:24px;padding:5px 13px;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;color:#7A5A40;cursor:pointer}
 .det-voltar-rodape:hover{background:#FAF5EE}
-.det-navbtns-rodape{display:flex;gap:6px;flex-wrap:wrap}
+.det-navbtns-rodape{display:flex;gap:5px;flex-wrap:wrap}
 
 /* FOOTER */
-.footer{margin:28px 16px 0;text-align:center;padding-top:24px;border-top:1px solid #EDD9C0}
-.footer p{font-size:12px;color:#bbb;margin-bottom:5px}
+.footer{margin:20px 16px 0;text-align:center;padding:18px 0 28px;border-top:1px solid #EDD9C0}
+.footer p{font-size:11px;color:#bbb;margin-bottom:4px}
 .footer a{color:#8B4513;font-weight:500;text-decoration:none}
-.footer-brand{font-family:'Cormorant Garamond',Georgia,serif;font-size:14px;font-style:italic;color:#bbb;margin-top:8px}
-.btn-pdf{margin-top:18px;background:#3B2A1E;color:#fff;border:none;border-radius:12px;padding:12px 32px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer}
+.footer-brand{font-family:'Cormorant Garamond',Georgia,serif;font-size:13px;font-style:italic;color:#bbb;margin-top:6px}
+.btn-pdf{margin-top:14px;background:#3B2A1E;color:#fff;border:none;border-radius:11px;padding:10px 26px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer}
 
+/* PRINT */
 @media print{
   body{background:#fff}
-  .det-topbar,.det-voltar,.det-navbtns,.det-rodape-nav,.btn-pdf,.rc-cta,.cta-btn,.sec-titulo{display:none!important}
-  #pg0{display:block!important}
-  .det-page{display:block!important}
-  .page{padding:0}
-  .c-card{margin:12px 0 0;box-shadow:none;border-color:#ddd}
+  #pg0{display:flex!important;min-height:0;page-break-after:always;background:linear-gradient(160deg,#FFF8EE,#F9E4BE)!important}
+  .ab-btn,.ab-ornamento{display:none!important}
+  .ab-rodape{padding:16px 24px 24px}
+  #pg1{display:block!important;page-break-after:always}
+  .res-voltar-ab,.res-footer-nav,.rc-cta{display:none!important}
+  .det-page{display:block!important;page-break-before:always}
+  .det-topbar,.det-rodape-nav,.cta-btn,.btn-pdf{display:none!important}
+  .page{max-width:100%}
+  .c-card{margin:8px 0 0;box-shadow:none;border-color:#ddd}
+  .rc{margin:0 0 8px}
 }
 </style>
 </head>
 <body>
 <div class="page">
 
-<!-- HERO -->
-<div class="hero">
-  <img class="hero-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png" alt="Oba Doceria" onerror="this.style.display='none'">
-  <h1>Proposta de Or&ccedil;amento</h1>
-  <p class="hero-sub">Preparada com carinho para <strong>${proposal.cliente}</strong></p>
-</div>
-
-<!-- INFORMACOES DO EVENTO -->
-<div class="bloco">
-  <div class="info-grid">
-    ${proposal.tipo_evento?`<div><p class="lbl">Evento</p><p class="val">${proposal.tipo_evento}</p></div>`:""}
-    ${dataEvento?`<div><p class="lbl">Data</p><p class="val">${dataEvento}</p></div>`:""}
-    ${proposal.convidados?`<div><p class="lbl">Convidados</p><p class="val">${proposal.convidados} pessoas</p></div>`:""}
-    ${(proposal.scenarios||[]).length?`<div><p class="lbl">Cen&aacute;rios</p><p class="val">${proposal.scenarios.length} op&ccedil;&otilde;es</p></div>`:""}
+<div id="pg0">
+  <div class="ab-topo">
+    <img class="ab-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png" alt="Oba Doceria" onerror="this.style.display='none'">
+    <p class="ab-label">Proposta de Or&ccedil;amento</p>
+    <h1 class="ab-cliente">${nomeCliente||"Proposta Especial"}</h1>
+    ${infoEventoPg0}
+  </div>
+  <div class="ab-corpo">
+    <p class="ab-p">${paraA}</p>
+    <p class="ab-p">${paraB}</p>
+    <p class="ab-p">${paraC}</p>
+    ${citacaoHtml}
+  </div>
+  <div class="ab-rodape">
+    <p class="ab-ornamento">Feito com cuidado. Servido com amor.</p>
+    <button class="ab-btn" onclick="obaShowPage(1)">Ver minha proposta &rarr;</button>
   </div>
 </div>
 
-${proposal.resumo?`<div class="resumo"><p>&ldquo;${proposal.resumo}&rdquo;</p></div>`:""}
-
-<!-- PAGINA 0: RESUMO DOS CENARIOS -->
-<div id="pg0">
-  <p class="sec-titulo">Escolha o seu cen&aacute;rio</p>
+<div id="pg1" style="display:none">
+  <div class="res-hero">
+    <img class="res-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png" alt="Oba Doceria" onerror="this.style.display='none'">
+    <p class="res-titulo">Cen&aacute;rios preparados para voc&ecirc;</p>
+    <p class="res-sub">${resSub}</p>
+  </div>
+  ${infoEventoPg1}
+  <p class="res-secao">Escolha o seu cen&aacute;rio</p>
   ${resumoCards}
+  <div class="res-footer-nav">
+    <button class="res-voltar-ab" onclick="obaShowPage(0)">&#8592; Voltar &agrave; apresenta&ccedil;&atilde;o</button>
+  </div>
+  <div class="footer">
+    ${validadeHtml}
+    ${wppHtml}
+    <p class="footer-brand">Oba Doceria &middot; Um jeito doce de expressar felicidade</p>
+    <button class="btn-pdf" onclick="window.print()">Salvar como PDF</button>
+  </div>
 </div>
 
-<!-- PAGINAS DE DETALHE (ocultas por padrao) -->
 ${detalhePages}
 
-<!-- FOOTER (sempre visivel) -->
-<div class="footer">
-  ${validade?`<p>Proposta v&aacute;lida at&eacute; <strong style="color:#5D3A1A">${validade}</strong></p>`:""}
-  ${obaWpp?`<p>D&uacute;vidas? <a href="https://wa.me/55${obaWpp}">fale pelo WhatsApp</a></p>`:""}
-  <p class="footer-brand">Oba Doceria &middot; Um jeito doce de expressar felicidade</p>
-  <button class="btn-pdf" onclick="window.print()">Salvar como PDF</button>
 </div>
-
-</div>
-
 <script>
-// Navegacao entre paginas — sem reload, sem hash, puro show/hide
-function obaShowPage(n) {
-  // Esconde pg0 e todas as paginas de detalhe
-  var pg0 = document.getElementById('pg0');
-  if (pg0) pg0.style.display = n === 0 ? '' : 'none';
-  var total = ${(proposal.scenarios||[]).length};
-  for (var i = 1; i <= total; i++) {
-    var el = document.getElementById('pg' + i);
-    if (el) el.style.display = i === n ? '' : 'none';
-  }
-  // Scroll suave para o topo da pagina
-  window.scrollTo({top: 0, behavior: 'smooth'});
+function obaShowPage(n){
+  var ids=['pg0','pg1'];
+  var total=${numCenarios};
+  for(var i=2;i<=total+1;i++)ids.push('pg'+i);
+  ids.forEach(function(id,idx){
+    var el=document.getElementById(id);
+    if(el)el.style.display=(idx===n)?'':'none';
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
 }
-// Estado inicial: pg0 visivel, detalhes ocultos (ja definido pelo display:none inline)
 </script>
 </body>
 </html>`;
