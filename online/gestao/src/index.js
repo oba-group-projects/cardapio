@@ -2541,16 +2541,16 @@ async function obaHandlePropostaPublica(request, env, url) {
   const numConvidados = proposal.convidados ? Number(proposal.convidados) : null;
   const numCenarios   = (proposal.scenarios||[]).length;
 
-  // Texto de abertura personalizado
+  // Texto de abertura personalizado — curto e impactante (cabe em ~1 tela mobile)
   const paraA = dataEvento
-    ? "No dia <strong>"+dataEvento+"</strong>, algo muito especial acontece. Um <strong>"+nomeEvento+"</strong> que merece ser vivido com intensidade, celebrado com cuidado e lembrado com carinho por todos que estiverem presentes."
-    : "Um <strong>"+nomeEvento+"</strong> \u00e9 um momento que pede aten\u00e7\u00e3o a cada detalhe \u2014 e \u00e9 exatamente isso que a Oba Doceria prepara para voc\u00ea.";
+    ? "No dia <strong>"+dataEvento+"</strong>, \u00e9 hora de celebrar. Preparamos esta proposta com cuidado especial para tornar esse <strong>"+nomeEvento+"</strong> inesquec\u00edvel."
+    : "Preparamos esta proposta com cuidado especial para tornar esse <strong>"+nomeEvento+"</strong> inesquec\u00edvel.";
 
   const paraB = numConvidados
-    ? "S\u00e3o <strong>"+numConvidados+" convidados</strong> que merecem uma experi\u00eancia inesquec\u00edvel. Cada doce que chegar \u00e0 mesa ser\u00e1 feito com ingredientes selecionados, acabamento artesanal e o cuidado de quem sabe que \u00e9 nos pequenos momentos \u2014 uma bandeja bem posta, um doce que derrete na boca \u2014 que as grandes festas s\u00e3o realmente lembradas."
-    : "Cada doce que chegar \u00e0 mesa ser\u00e1 feito com ingredientes selecionados, acabamento artesanal e o cuidado de quem sabe que \u00e9 nos pequenos momentos que as grandes festas s\u00e3o realmente lembradas.";
+    ? "S\u00e3o <strong>"+numConvidados+" convidados</strong> \u2014 e cada um deles merece um doce feito com ingredientes selecionados, acabamento artesanal e muito amor em cada detalhe."
+    : "Cada doce \u00e9 feito com ingredientes selecionados, acabamento artesanal e muito amor em cada detalhe.";
 
-  const paraC = "Para "+(nomeCliente?"voc\u00ea, <strong>"+nomeCliente+"</strong>,":"voc\u00ea")+" preparamos <strong>"+numCenarios+" cen\u00e1rio"+(numCenarios!==1?"s":"")+"</strong> pensados com muito cuidado. Cada um respeita um perfil diferente, para que a escolha seja t\u00e3o gostosa quanto os pr\u00f3prios doces.";
+  const paraC = (nomeCliente?"<strong>"+nomeCliente+"</strong>, preparamos ":"Preparamos ")+"<strong>"+numCenarios+" cen\u00e1rio"+(numCenarios!==1?"s":"")+"</strong> para voc\u00ea escolher o que mais combina com o seu momento.";
 
   // Calcula totais e monta dados de cada cenario
   const cenariosData = (proposal.scenarios||[]).map(function(s,si){
@@ -2898,7 +2898,13 @@ function obaShowPage(n){
   for(var i=2;i<=total+1;i++)ids.push('pg'+i);
   ids.forEach(function(id,idx){
     var el=document.getElementById(id);
-    if(el)el.style.display=(idx===n)?'':'none';
+    if(!el)return;
+    if(idx===n){
+      // pg0 usa flex; pg1 e detalhes usam block
+      el.style.display=(idx===0)?'flex':'block';
+    } else {
+      el.style.display='none';
+    }
   });
   window.scrollTo({top:0,behavior:'smooth'});
 }
