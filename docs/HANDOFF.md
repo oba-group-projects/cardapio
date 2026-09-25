@@ -3,37 +3,40 @@
 Atualizado: 2026-09-24
 
 Branch: feature/gestao-online-segura
-HEAD: 7f8d230
+HEAD: ac87851
 
 ## Ultima fase entregue
-12A-3 — Página pública /proposta/:id redesenhada (completo)
+12A-3 — Página pública /proposta/:id com 4 páginas de navegação (completo)
 
 ## Commits desta sessão (mais recente primeiro)
 | Commit   | O que fez |
 |----------|-----------|
+| ac87851  | feat(12A-3): pagina de abertura personalizada + 4 paginas de navegacao |
+| be5f388  | docs: handoff 12A-3 — pagina resumo + navegacao + copy profissional |
 | 7f8d230  | feat(12A-3): pagina resumo + navegacao por cenario + copy profissional |
 | db3197b  | feat: campo texto_publico por cenario (Opcao C definitiva) |
-| f043b33  | feat(12A-3): layout final elegante + introducao automatica por cenario |
-| d1f2283  | fix: whatsapp da Oba + CTA restaurado + mensagem limpa |
 
 ## O que está funcionando
-- Aba Propostas funcional: criar, editar, salvar, listar
-- Página pública /proposta/:id com novo layout:
-  - Página 0 (resumo): 3 cards com nome, descrição, pills e valor
-  - Páginas 1/2/3 (detalhe): tabela completa, barra sticky de navegação
+- Aba Propostas: criar, editar, salvar, listar
+- Página pública /proposta/:id com experiência de 4 etapas:
+  - PG0: abertura com texto dinâmico personalizado por cliente/evento
+  - PG1: resumo compacto dos 3 cenários com valor e botão "Ver detalhes"
+  - PG2/3/4: detalhe completo com tabela, topbar sticky, navegação entre cenários
   - CTA: "Escolhi este cenário — vamos conversar"
   - WhatsApp: "Oba! Recebi a proposta e quero seguir com o Cenário X – Nome (R$ X). Vamos fechar os detalhes?"
+  - PDF: capa elegante (pg0) + resumo + cenários individuais por página
 - Gates estáticos: AUTH_GATE_STATIC_OK
 
 ## O que precisa de atenção
-- Deploy pendente: executar EXECUTAR-9AB-DEPLOY.cmd para levar 7f8d230 ao Cloudflare
+- Deploy pendente: executar EXECUTAR-9AB-DEPLOY.cmd para levar ac87851 ao Cloudflare
+- Homologação ao vivo: testar fluxo Central → Enviar Proposta → Link público → CTA WhatsApp
 
-## Próxima fase sugerida
-- Deploy + homologação ao vivo da página pública de proposta
-- Testar fluxo completo: Central → Enviar Proposta → Link público → CTA WhatsApp
+## Nota técnica importante
+- A função obaHandlePropostaPublica usa strings JS concatenadas (não template literals aninhados)
+  para evitar corrupção silenciosa em edições futuras via str_replace
 
 ## Arquivos críticos alterados nesta sessão
-- online/gestao/src/index.js (função obaHandlePropostaPublica — redesign completo)
+- online/gestao/src/index.js (função obaHandlePropostaPublica — reescrita completa)
 - docs/CURRENT_STATE.md
 - docs/HANDOFF.md
 
