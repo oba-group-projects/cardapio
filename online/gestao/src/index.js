@@ -2760,22 +2760,24 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
 
 /* PG0 — ABERTURA */
 #pg0{min-height:100svh;display:flex;flex-direction:column;background:linear-gradient(160deg,#FFF8EE 0%,#FDF0D8 55%,#F9E4BE 100%)}
-.ab-topo{padding:28px 24px 0;text-align:center}
-.ab-logo{height:40px;object-fit:contain;opacity:.9;margin-bottom:16px}
-.ab-label{font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;font-weight:600;color:#3B2A1E;letter-spacing:.2px;margin-bottom:14px;display:block}
+.ab-topo{padding:36px 24px 0;text-align:center}
+.ab-logo{height:38px;object-fit:contain;opacity:.85;margin-bottom:10px}
+.ab-label{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#C8922A;margin-bottom:20px;display:block}
 .ab-evento{display:flex;flex-wrap:wrap;justify-content:center;background:#fff9;backdrop-filter:blur(4px);border:1px solid #EDD9C0;border-radius:12px;overflow:hidden;margin:0 auto}
 .ab-ev-item{flex:1;min-width:0;text-align:center;padding:10px 12px;border-right:1px solid #EDD9C0}
 .ab-ev-item:last-child{border-right:none}
 .ab-ev-label{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#C8922A;display:block;margin-bottom:2px}
 .ab-ev-val{font-size:12px;font-weight:600;color:#3B2A1E;display:block}
-.ab-corpo{padding:20px 24px;flex:1}
-.ab-p{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(13px,4vw,17px);color:#5D3A1A;line-height:1.85;margin-bottom:14px}
+.ab-sep{border:none;border-top:1px solid #EDD9C0;margin:22px auto 0;width:48px}
+.ab-corpo{padding:22px 20px 0;text-align:center;flex:1}
+.ab-p-destaque{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(20px,5.5vw,26px);font-weight:600;color:#3B2A1E;line-height:1.4;margin-bottom:18px;font-style:italic}
+.ab-p{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(13px,3.8vw,16px);color:#6B4A2A;line-height:1.8;margin-bottom:12px}
 .ab-p:last-of-type{margin-bottom:0}
 .ab-p strong{font-weight:600;color:#3B2A1E}
-.ab-citacao{margin-top:18px;padding:14px 16px;border-left:2px solid #C8922A;background:#FFFCF4;font-family:'Cormorant Garamond',Georgia,serif;font-size:15px;font-style:italic;color:#9B6A3A;line-height:1.7}
-.ab-rodape{padding:20px 24px 32px;text-align:center}
-.ab-ornamento{font-family:'Cormorant Garamond',Georgia,serif;font-size:12px;font-style:italic;color:#C8922A;opacity:.7;margin-bottom:16px}
-.ab-btn{display:inline-block;background:#3B2A1E;color:#F9E8C8;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.8px;padding:14px 32px;border-radius:50px;border:none;cursor:pointer;text-transform:uppercase}
+.ab-citacao{margin-top:18px;padding:14px 16px;border-left:2px solid #C8922A;background:#FFFCF4;font-family:'Cormorant Garamond',Georgia,serif;font-size:15px;font-style:italic;color:#9B6A3A;line-height:1.7;text-align:left}
+.ab-rodape{padding:20px 24px 36px;text-align:center}
+.ab-ornamento{font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;color:#C8922A;opacity:.5;letter-spacing:8px;margin-bottom:20px;display:block}
+.ab-btn{display:inline-block;background:#3B2A1E;color:#F9E8C8;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.8px;padding:14px 36px;border-radius:50px;border:none;cursor:pointer;text-transform:uppercase}
 .ab-btn:hover{opacity:.85}
 
 /* PG1 — RESUMO */
@@ -2876,15 +2878,17 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
     <img class="ab-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png" alt="Oba Doceria" onerror="this.style.display='none'">
     <span class="ab-label">Proposta de Or&ccedil;amento</span>
     ${infoEventoPg0}
+    <hr class="ab-sep">
   </div>
   <div class="ab-corpo">
-    <p class="ab-p">${paraA}</p>
-    <p class="ab-p">${paraB}</p>
-    <p class="ab-p">${paraC}</p>
+    ${paraA ? `<p class="ab-p-destaque">${paraA}</p>` : ""}
+    ${paraB ? `<p class="ab-p">${paraB}</p>` : ""}
+    ${paraC ? `<p class="ab-p">${paraC}</p>` : ""}
     ${citacaoHtml}
   </div>
   <div class="ab-rodape">
-    <p class="ab-ornamento">Feito com cuidado. Servido com amor.</p>
+    <span class="ab-ornamento">&middot;&ensp;&middot;&ensp;&middot;</span>
+    <p style="font-family:'Cormorant Garamond',Georgia,serif;font-size:12px;font-style:italic;color:#C8922A;opacity:.7;margin-bottom:20px">Feito com cuidado. Servido com amor.</p>
     <button class="ab-btn" onclick="obaShowPage(1)">Ver minha proposta &rarr;</button>
   </div>
 </div>
