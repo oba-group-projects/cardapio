@@ -2762,21 +2762,23 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
 #pg0{min-height:100svh;display:flex;flex-direction:column;background:linear-gradient(160deg,#FFF8EE 0%,#FDF0D8 55%,#F9E4BE 100%)}
 .ab-topo{padding:36px 24px 0;text-align:center}
 .ab-logo{height:38px;object-fit:contain;opacity:.85;margin-bottom:10px}
-.ab-label{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#C8922A;margin-bottom:20px;display:block}
-.ab-evento{display:flex;flex-wrap:wrap;justify-content:center;background:#fff9;backdrop-filter:blur(4px);border:1px solid #EDD9C0;border-radius:12px;overflow:hidden;margin:0 auto}
-.ab-ev-item{flex:1;min-width:0;text-align:center;padding:10px 12px;border-right:1px solid #EDD9C0}
-.ab-ev-item:last-child{border-right:none}
-.ab-ev-label{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#C8922A;display:block;margin-bottom:2px}
-.ab-ev-val{font-size:12px;font-weight:600;color:#3B2A1E;display:block}
-.ab-sep{border:none;border-top:1px solid #EDD9C0;margin:22px auto 0;width:48px}
-.ab-corpo{padding:22px 20px 0;text-align:center;flex:1}
-.ab-p-destaque{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(20px,5.5vw,26px);font-weight:600;color:#3B2A1E;line-height:1.4;margin-bottom:18px;font-style:italic}
-.ab-p{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(13px,3.8vw,16px);color:#6B4A2A;line-height:1.8;margin-bottom:12px}
+.ab-label{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#C8922A;margin-bottom:18px;display:block}
+/* Evento sem caixa — apenas labels + valores com separadores */
+.ab-evento{display:flex;justify-content:center;gap:0;margin:0 auto 0;max-width:340px}
+.ab-ev-item{flex:1;text-align:center;padding:0 10px;position:relative}
+.ab-ev-item+.ab-ev-item::before{content:"";position:absolute;left:0;top:20%;height:60%;width:1px;background:#EDD9C0}
+.ab-ev-label{font-size:7px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#C8922A;display:block;margin-bottom:3px}
+.ab-ev-val{font-size:11px;font-weight:500;color:#5D3A1A;display:block}
+.ab-sep{border:none;border-top:1px solid #EDD9C0;margin:20px auto 0;width:40px}
+.ab-corpo{padding:24px 20px 0;text-align:center;flex:1}
+.ab-p-destaque{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(20px,5.5vw,26px);font-weight:600;color:#3B2A1E;line-height:1.45;margin-bottom:20px;font-style:italic}
+.ab-p{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(15px,4vw,17px);color:#6B4A2A;line-height:2;margin-bottom:14px}
 .ab-p:last-of-type{margin-bottom:0}
 .ab-p strong{font-weight:600;color:#3B2A1E}
 .ab-citacao{margin-top:18px;padding:14px 16px;border-left:2px solid #C8922A;background:#FFFCF4;font-family:'Cormorant Garamond',Georgia,serif;font-size:15px;font-style:italic;color:#9B6A3A;line-height:1.7;text-align:left}
-.ab-rodape{padding:20px 24px 36px;text-align:center}
-.ab-ornamento{font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;color:#C8922A;opacity:.5;letter-spacing:8px;margin-bottom:20px;display:block}
+.ab-rodape{padding:24px 24px 40px;text-align:center}
+.ab-ornamento{font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;color:#C8922A;opacity:.4;letter-spacing:10px;margin-bottom:14px;display:block}
+.ab-assinatura{font-family:'Cormorant Garamond',Georgia,serif;font-size:15px;font-style:italic;color:#C8922A;margin-bottom:24px;display:block}
 .ab-btn{display:inline-block;background:#3B2A1E;color:#F9E8C8;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.8px;padding:14px 36px;border-radius:50px;border:none;cursor:pointer;text-transform:uppercase}
 .ab-btn:hover{opacity:.85}
 
@@ -2793,16 +2795,17 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
 .res-ev-lbl{font-size:7px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#ccc;display:block}
 .res-ev-val{font-size:11px;font-weight:600;color:#3B2A1E;display:block}
 .res-secao{padding:12px 16px 4px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:#C8922A}
-.rc{margin:0 16px 8px;border-radius:10px;border:1px solid #EDD9C0;border-left-width:3px;background:#fff;padding:12px 14px;box-shadow:0 1px 6px rgba(60,35,20,.04)}
+/* Cards de cenario — mais delicados */
+.rc{margin:0 16px 8px;border-radius:10px;border:1px solid #EDD9C0;border-left-width:2px;background:#fff;padding:10px 14px;box-shadow:none}
 .rc-linha{display:flex;align-items:center;gap:10px;justify-content:space-between}
 .rc-esq{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
-.rc-num{font-family:'Cormorant Garamond',Georgia,serif;font-size:24px;font-weight:600;line-height:1;flex-shrink:0;opacity:.6}
-.rc-badge{display:block;font-size:13px;font-weight:700;color:#3B2A1E;margin-bottom:3px}
+.rc-num{font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;font-weight:400;line-height:1;flex-shrink:0;opacity:.4;font-style:italic}
+.rc-badge{display:block;font-size:13px;font-weight:600;color:#3B2A1E;margin-bottom:2px}
 .rc-pills{display:flex;flex-wrap:wrap;gap:3px}
-.rc-pill{font-size:10px;font-weight:500;background:#F5EDE4;color:#9B7A60;padding:2px 7px;border-radius:20px}
+.rc-pill{font-size:9px;font-weight:500;background:#FAF5EE;color:#9B7A60;padding:2px 6px;border-radius:20px}
 .rc-dir{text-align:right;flex-shrink:0}
-.rc-valor{display:block;font-size:17px;font-weight:700;line-height:1;margin-bottom:7px}
-.rc-cta{display:block;padding:6px 13px;border-radius:20px;border:none;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap}
+.rc-valor{display:block;font-size:15px;font-weight:600;line-height:1;margin-bottom:6px}
+.rc-cta{display:block;padding:5px 12px;border-radius:20px;border:none;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;cursor:pointer;white-space:nowrap}
 .rc-cta:hover{opacity:.88}
 .res-footer-nav{padding:10px 16px 0;text-align:center}
 .res-voltar-ab{background:none;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;color:#bbb;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
@@ -2815,26 +2818,26 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
 .det-navbtns{display:flex;gap:5px;flex-wrap:wrap}
 .nav-outro{background:none;border:1.5px solid;border-radius:24px;padding:4px 11px;font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;cursor:pointer;white-space:nowrap}
 .nav-outro:hover{opacity:.75}
-.c-card{margin:10px 16px 0;border-radius:14px;border:1px solid #EDD9C0;border-top-width:4px;overflow:hidden;background:#fff;box-shadow:0 2px 14px rgba(60,35,20,.07)}
+.c-card{margin:10px 16px 0;border-radius:14px;border:1px solid #EDD9C0;border-top-width:3px;overflow:hidden;background:#fff;box-shadow:0 1px 8px rgba(60,35,20,.05)}
 .c-cabecalho{padding:18px 20px 13px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .c-esq{flex:1;min-width:0}
 .c-rotulo{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:4px}
-.c-nome{font-family:'Cormorant Garamond',Georgia,serif;font-size:23px;font-weight:400;color:#3B2A1E;line-height:1.2}
+.c-nome{font-family:'Cormorant Garamond',Georgia,serif;font-size:21px;font-weight:400;color:#3B2A1E;line-height:1.2}
 .c-dir{text-align:right;flex-shrink:0}
 .c-dpc{display:block;font-size:10px;color:#ccc;margin-bottom:3px}
-.c-total{font-size:24px;font-weight:700;display:block;line-height:1}
+.c-total{font-size:22px;font-weight:600;display:block;line-height:1}
 .c-intro{padding:0 20px 13px;border-bottom:1px solid #F0E8DE}
-.c-intro p{font-size:12.5px;color:#7A5A40;line-height:1.65}
+.c-intro p{font-size:12px;color:#7A5A40;line-height:1.65;font-style:italic}
 .c-corpo{padding:13px 20px 18px}
 .tab{width:100%;border-collapse:collapse}
-.tab td{padding:8px 0;border-bottom:1px solid #F5EDE4;font-size:12.5px;vertical-align:middle}
-.td-n{color:#3B2A1E;font-weight:500}
-.td-q{text-align:center;color:#ccc;font-size:11px;padding:8px 8px;white-space:nowrap}
-.td-v{text-align:right;font-weight:600;color:#5D3A1A;white-space:nowrap}
+.tab td{padding:7px 0;border-bottom:1px solid #F5EDE4;font-size:12px;vertical-align:middle}
+.td-n{color:#3B2A1E;font-weight:400}
+.td-q{text-align:center;color:#ccc;font-size:11px;padding:7px 8px;white-space:nowrap}
+.td-v{text-align:right;font-weight:500;color:#5D3A1A;white-space:nowrap}
 .tr-d td{border-bottom:none;padding:7px 0 0;font-size:11px;color:#059669}
 .tr-d td:last-child{text-align:right}
-.tr-tot td{border:none;padding:12px 0 0;font-size:13px;font-weight:700;border-top:2px solid #EDD9C0}
-.tr-tot td:last-child{text-align:right;font-size:18px;font-weight:700}
+.tr-tot td{border:none;padding:12px 0 0;font-size:13px;font-weight:600;border-top:1px solid #EDD9C0}
+.tr-tot td:last-child{text-align:right;font-size:17px;font-weight:700}
 .cta-btn{display:block;margin:14px 0 0;padding:13px;border-radius:11px;text-align:center;color:#fff;font-weight:600;font-size:12.5px;text-decoration:none;letter-spacing:.2px}
 .cta-btn:hover{opacity:.88}
 .det-rodape-nav{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:10px 14px;margin-top:4px}
@@ -2850,24 +2853,29 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
 .btn-pdf{margin-top:14px;background:#3B2A1E;color:#fff;border:none;border-radius:11px;padding:10px 26px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer}
 
 /* PRINT */
-@page{margin:12mm 14mm}
+@page{margin:0}
 @media print{
   body{background:#fff}
-  /* Capa e resumo juntos na pagina 1 do PDF */
-  #pg0{display:block!important;min-height:0!important;background:none!important;padding:0}
-  .ab-btn,.ab-ornamento,.ab-citacao{display:none!important}
-  .ab-rodape{padding:8px 0 12px}
+  /* Capa e resumo juntos na pagina 1 */
+  #pg0{display:block!important;min-height:0!important;background:none!important;padding:24px 40px 20px}
+  .ab-btn,.ab-ornamento,.ab-assinatura,.ab-citacao{display:none!important}
+  .ab-rodape{padding:0}
   #pg1{display:block!important}
-  #pg1::before{content:"";display:block;border-top:1px solid #EDD9C0;margin:12px 0}
+  #pg1::before{content:"";display:block;border-top:1px solid #EDD9C0;margin:16px 0}
   .res-voltar-ab,.res-footer-nav,.rc-cta{display:none!important}
   /* Cada cenario em nova pagina */
-  .det-page{display:block!important;page-break-before:always;page-break-inside:avoid}
+  .det-page{display:block!important;page-break-before:always;padding:32px 40px 32px}
   .det-topbar,.det-rodape-nav,.cta-btn,.btn-pdf{display:none!important}
+  /* Container centralizado no PDF */
   .page{max-width:100%;padding:0}
-  .c-card{margin:8px 0 0;box-shadow:none;border-color:#ddd;page-break-inside:avoid}
-  .rc{margin:0 0 6px;page-break-inside:avoid}
-  .footer{border-top:1px solid #EDD9C0;padding:10px 0 0;margin-top:12px}
+  .c-card{margin:16px auto 0;max-width:520px;box-shadow:none;border-color:#ddd;page-break-inside:avoid}
+  .rc{margin:0 auto 8px;max-width:520px;page-break-inside:avoid}
+  .res-hero,.res-ev,.res-secao{padding-left:40px;padding-right:40px}
+  .footer{border-top:1px solid #EDD9C0;padding:10px 40px 0;margin-top:12px}
+  /* Instrucao discreta para o usuario */
+  #print-hint{display:block!important}
 }
+#print-hint{display:none;font-size:9px;color:#bbb;text-align:center;padding:4px 0 0;font-family:'Plus Jakarta Sans',sans-serif}
 </style>
 </head>
 <body>
@@ -2888,7 +2896,7 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
   </div>
   <div class="ab-rodape">
     <span class="ab-ornamento">&middot;&ensp;&middot;&ensp;&middot;</span>
-    <p style="font-family:'Cormorant Garamond',Georgia,serif;font-size:12px;font-style:italic;color:#C8922A;opacity:.7;margin-bottom:20px">Feito com cuidado. Servido com amor.</p>
+    <span class="ab-assinatura">Feito com cuidado. Servido com amor.</span>
     <button class="ab-btn" onclick="obaShowPage(1)">Ver minha proposta &rarr;</button>
   </div>
 </div>
@@ -2910,6 +2918,7 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
     ${wppHtml}
     <p class="footer-brand">Oba Doceria &middot; Um jeito doce de expressar felicidade</p>
     <button class="btn-pdf" onclick="window.print()">Salvar como PDF</button>
+    <p id="print-hint">Dica: no di&aacute;logo de impress&atilde;o, desmarque &ldquo;Cabe&ccedil;alhos e rodap&eacute;s&rdquo; para o PDF mais limpo.</p>
   </div>
 </div>
 
