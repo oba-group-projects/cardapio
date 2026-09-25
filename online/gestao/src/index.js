@@ -2541,11 +2541,13 @@ async function obaHandlePropostaPublica(request, env, url) {
   const dataEvento = fmtD(proposal.data_evento);
   const validade   = fmtD(proposal.validade);
 
-  const cenariosHtml = (proposal.scenarios||[]).map((s,si) => {
-    const pal = PAL[si]||PAL[PAL.length-1];
+  // ----------------------------------------------------------------
+  // Calcula totais por cenario (necessario tanto para resumo quanto para detalhe)
+  // ----------------------------------------------------------------
+  const cenariosData = (proposal.scenarios||[]).map((s,si)=>{
+    const pal  = PAL[si]||PAL[PAL.length-1];
     const meta = META[si]||{rotulo:"",intro:""};
 
-    // Calculo do subtotal
     let sub=0;
     (s.items||[]).forEach(it=>{
       if(it.tipo==="catalogo"&&it.ref_id){
@@ -2558,7 +2560,12 @@ async function obaHandlePropostaPublica(request, env, url) {
     else if(s.desconto_tipo==="percentual") desc=sub*(Number(s.desconto_valor||0)/100);
     const total=Math.max(0,sub-desc);
 
-    // Itens agrupados
+    // Total de doces: preferencia pelo campo doces_por_convidado × convidados
+    const totalDoces = s.doces_por_convidado && proposal.convidados
+      ? (Number(s.doces_por_convidado)*Number(proposal.convidados))
+      : null;
+
+    // Itens agrupados para tabela de detalhe
     const porCat={}, livres=[];
     (s.items||[]).forEach(it=>{
       if(it.tipo==="catalogo"&&it.ref_id){
@@ -2574,7 +2581,7 @@ async function obaHandlePropostaPublica(request, env, url) {
       if(c.items&&c.items.length){
         return c.items.map(it=>{
           const p=Number(it.preco_unit||0)||(saborPM[(it.ref_id||"").split(":")[1]]||0);
-          return `<tr><td class="td-n">${it.descricao}</td><td class="td-q">${it.qtd}&nbsp;un</td><td class="td-v">${R(it.qtd*p)}</td></tr>`;
+          return `<tr><td class="td-n">${it.descricao}</td><td class="td-q">${it.qtd}&nbsp;doces</td><td class="td-v">${R(it.qtd*p)}</td></tr>`;
         }).join("");
       } else if(c.total){
         const ref=catPM[c.cid]||0;
@@ -2586,18 +2593,63 @@ async function obaHandlePropostaPublica(request, env, url) {
     const livreLinhas=livres.map(it=>`<tr><td class="td-n">${it.descricao}</td><td class="td-q"></td><td class="td-v">${R(it.preco_unit)}</td></tr>`).join("");
     const descLinha=desc>0?`<tr class="tr-d"><td colspan="2">Desconto</td><td>&minus;&nbsp;${R(desc)}</td></tr>`:"";
 
-    // Introducao: texto_publico (campo dedicado) tem prioridade
-    // Se vazio, usa o texto automatico do rotulo — nunca usa descricao (campo interno)
-    const introTexto = (s.texto_publico||"").trim() || meta.intro;
+    // Introducao: texto_publico tem prioridade; fallback no automatico
+    const introTexto=(s.texto_publico||"").trim()||meta.intro;
 
-    // CTA
-    const ctaMsg=encodeURIComponent("Ola! Vi a proposta e gostei do cenario "+(si+1)+" ("+meta.rotulo+"). Podemos conversar sobre os detalhes?");
+    // CTA — mensagem profissional com identidade da marca
+    const ctaMsg=encodeURIComponent(
+      "Oba! Recebi a proposta e quero seguir com o Cen\u00e1rio "+(si+1)+" \u2013 "+meta.rotulo+
+      " ("+R(total)+"). Vamos fechar os detalhes?"
+    );
     const ctaHref=obaWpp?"https://wa.me/55"+obaWpp+"?text="+ctaMsg:"";
 
-    return `
-<section id="c${si+1}" class="c-wrap">
-  <div class="c-card" style="border-top-color:${pal.topo};background:${pal.fundo}">
+    return {s,si,pal,meta,total,totalDoces,desc,catLinhas,livreLinhas,descLinha,introTexto,ctaHref};
+  });
 
+  // ----------------------------------------------------------------
+  // PAGINA 1 — Cards de resumo dos cenarios
+  // ----------------------------------------------------------------
+  const resumoCards = cenariosData.map(({s,si,pal,meta,total,totalDoces,introTexto})=>`
+<div class="rc" style="border-top-color:${pal.topo};background:${pal.fundo}">
+  <div class="rc-topo">
+    <div class="rc-esq">
+      <span class="rc-badge" style="color:${pal.acento};border-color:${pal.acento}80">Cen&aacute;rio ${si+1}</span>
+      <h3 class="rc-nome" style="color:${pal.acento}">${meta.rotulo}</h3>
+    </div>
+    <div class="rc-dir">
+      <span class="rc-valor" style="color:${pal.acento}">${R(total)}</span>
+    </div>
+  </div>
+  <p class="rc-intro">${introTexto}</p>
+  <div class="rc-pills">
+    ${proposal.convidados?`<span class="rc-pill">${proposal.convidados} convidados</span>`:""}
+    ${s.doces_por_convidado?`<span class="rc-pill">${s.doces_por_convidado} doces/pessoa</span>`:""}
+    ${totalDoces?`<span class="rc-pill">${totalDoces} doces no total</span>`:""}
+  </div>
+  <button class="rc-cta" style="background:${pal.acento}" onclick="obaShowPage(${si+1})">
+    Ver detalhes deste cen&aacute;rio &rarr;
+  </button>
+</div>`).join("\n");
+
+  // ----------------------------------------------------------------
+  // PAGINAS 2/3/4 — Detalhe de cada cenario
+  // ----------------------------------------------------------------
+  const detalhePages = cenariosData.map(({s,si,pal,meta,total,catLinhas,livreLinhas,descLinha,introTexto,ctaHref})=>{
+    // Botoes de navegacao entre cenarios (exceto o atual)
+    const navBtns = cenariosData
+      .filter(d=>d.si!==si)
+      .map(d=>`<button class="nav-outro" style="color:${d.pal.acento};border-color:${d.pal.acento}80" onclick="obaShowPage(${d.si+1})">Cen&aacute;rio ${d.si+1} &ndash; ${d.meta.rotulo}</button>`)
+      .join("");
+
+    return `
+<div id="pg${si+1}" class="det-page" style="display:none">
+
+  <div class="det-topbar">
+    <button class="det-voltar" onclick="obaShowPage(0)">&#8592; Voltar &agrave; vis&atilde;o geral</button>
+    <div class="det-navbtns">${navBtns}</div>
+  </div>
+
+  <div class="c-card" style="border-top-color:${pal.topo};background:${pal.fundo}">
     <div class="c-cabecalho">
       <div class="c-esq">
         <span class="c-rotulo" style="color:${pal.acento}">Cen&aacute;rio ${si+1}&ensp;&middot;&ensp;${meta.rotulo}</span>
@@ -2618,18 +2670,17 @@ async function obaHandlePropostaPublica(request, env, url) {
         ${catLinhas}${livreLinhas}${descLinha}
         <tr class="tr-tot"><td colspan="2">Total</td><td style="color:${pal.acento}">${R(total)}</td></tr>
       </tbody></table>
-      ${ctaHref?`<a href="${ctaHref}" target="_blank" class="cta-btn" style="background:${pal.acento}">Quero este cen&aacute;rio &mdash; falar com a Oba Doceria</a>`:""}
+      ${ctaHref?`<a href="${ctaHref}" target="_blank" class="cta-btn" style="background:${pal.acento}">Escolhi este cen&aacute;rio &mdash; vamos conversar</a>`:""}
     </div>
-
   </div>
-</section>`;
-  }).join("\n");
 
-  const anchors=(proposal.scenarios||[]).map((s,i)=>{
-    const pal=PAL[i]||PAL[PAL.length-1];
-    const meta=META[i]||{rotulo:""};
-    return `<a class="anc" href="#c${i+1}" style="color:${pal.acento};border-color:${pal.acento}">${s.nome||"Cen\u00e1rio "+(i+1)}</a>`;
-  }).join("");
+  <div class="det-rodape-nav">
+    <button class="det-voltar-rodape" onclick="obaShowPage(0)">&#8592; Ver todos os cen&aacute;rios</button>
+    ${navBtns?`<div class="det-navbtns-rodape">${navBtns}</div>`:""}
+  </div>
+
+</div>`;
+  }).join("\n");
 
   const html=`<!doctype html>
 <html lang="pt-BR">
@@ -2652,24 +2703,44 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
 .hero-sub{font-size:14px;color:#9B7A60}
 .hero-sub strong{color:#5D3A1A;font-weight:600}
 
-/* INFO */
+/* INFO BLOCO */
 .bloco{margin:20px 16px 0;background:#fff;border-radius:14px;border:1px solid #EDD9C0;padding:18px 20px}
 .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .lbl{font-size:9px;color:#bbb;text-transform:uppercase;letter-spacing:1.5px;font-weight:600;margin-bottom:3px}
 .val{font-size:14px;font-weight:600;color:#3B2A1E}
 
-/* RESUMO */
+/* RESUMO QUOTE */
 .resumo{margin:14px 16px 0;padding:16px 18px;border-left:3px solid #C8922A;background:#FFFCF5}
 .resumo p{font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;font-style:italic;color:#6B4A2A;line-height:1.65}
 
-/* ANCHORS */
-.anchors{display:flex;gap:8px;margin:20px 16px 0;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
-.anchors::-webkit-scrollbar{display:none}
-.anc{flex-shrink:0;padding:7px 18px;border-radius:24px;border:1.5px solid;background:transparent;font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap}
+/* TITULO SECAO */
+.sec-titulo{margin:28px 16px 0;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#C8922A}
 
-/* CENARIO */
-.c-wrap{margin:16px 16px 0;scroll-margin-top:8px}
-.c-card{border-radius:16px;border:1px solid #EDD9C0;border-top-width:4px;overflow:hidden;background:#fff;box-shadow:0 2px 16px rgba(60,35,20,.07)}
+/* CARDS DE RESUMO (pagina 0) */
+.rc{margin:12px 16px 0;border-radius:16px;border:1px solid #EDD9C0;border-top-width:4px;padding:20px;background:#fff;box-shadow:0 2px 12px rgba(60,35,20,.06)}
+.rc-topo{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}
+.rc-esq{flex:1;min-width:0}
+.rc-badge{display:inline-block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;border:1px solid;border-radius:20px;padding:2px 10px;margin-bottom:6px}
+.rc-nome{font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;font-weight:400;line-height:1.2}
+.rc-dir{text-align:right;flex-shrink:0}
+.rc-valor{font-size:24px;font-weight:700;display:block;line-height:1}
+.rc-intro{font-size:13px;color:#7A5A40;line-height:1.6;margin-bottom:12px}
+.rc-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.rc-pill{font-size:11px;font-weight:500;background:#F5EDE4;color:#7A5A40;padding:4px 10px;border-radius:20px}
+.rc-cta{width:100%;padding:13px;border-radius:12px;border:none;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;letter-spacing:.2px;transition:opacity .15s}
+.rc-cta:hover{opacity:.88}
+
+/* BARRA TOPO DO DETALHE */
+.det-topbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:14px 16px;background:#fff;border-bottom:1px solid #EDD9C0;position:sticky;top:0;z-index:10}
+.det-voltar{background:none;border:1.5px solid #EDD9C0;border-radius:24px;padding:6px 14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;color:#7A5A40;cursor:pointer}
+.det-voltar:hover{background:#FAF5EE}
+.det-navbtns{display:flex;gap:6px;flex-wrap:wrap}
+.nav-outro{background:none;border:1.5px solid;border-radius:24px;padding:6px 14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;cursor:pointer}
+.nav-outro:hover{opacity:.75}
+
+/* DETALHE DO CENARIO */
+.det-page{padding-bottom:8px}
+.c-card{margin:0 16px;border-radius:16px;border:1px solid #EDD9C0;border-top-width:4px;overflow:hidden;background:#fff;box-shadow:0 2px 16px rgba(60,35,20,.07)}
 .c-cabecalho{padding:22px 24px 16px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
 .c-esq{flex:1;min-width:0}
 .c-rotulo{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:6px}
@@ -2691,7 +2762,14 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
 .tr-d td:last-child{text-align:right}
 .tr-tot td{border:none;padding:14px 0 0;font-size:15px;font-weight:700;border-top:2px solid #EDD9C0}
 .tr-tot td:last-child{text-align:right;font-size:20px;font-weight:700}
-.cta-btn{display:block;margin:16px 0 0;padding:15px;border-radius:12px;text-align:center;color:#fff;font-weight:600;font-size:13px;text-decoration:none;letter-spacing:.2px}
+.cta-btn{display:block;margin:18px 0 0;padding:15px;border-radius:12px;text-align:center;color:#fff;font-weight:600;font-size:13px;text-decoration:none;letter-spacing:.2px;transition:opacity .15s}
+.cta-btn:hover{opacity:.88}
+
+/* RODAPE DE NAVEGACAO DO DETALHE */
+.det-rodape-nav{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:14px 16px;margin-top:8px}
+.det-voltar-rodape{background:none;border:1.5px solid #EDD9C0;border-radius:24px;padding:6px 14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;color:#7A5A40;cursor:pointer}
+.det-voltar-rodape:hover{background:#FAF5EE}
+.det-navbtns-rodape{display:flex;gap:6px;flex-wrap:wrap}
 
 /* FOOTER */
 .footer{margin:28px 16px 0;text-align:center;padding-top:24px;border-top:1px solid #EDD9C0}
@@ -2702,22 +2780,25 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
 
 @media print{
   body{background:#fff}
-  .anchors,.btn-pdf,.cta-btn{display:none!important}
+  .det-topbar,.det-voltar,.det-navbtns,.det-rodape-nav,.btn-pdf,.rc-cta,.cta-btn,.sec-titulo{display:none!important}
+  #pg0{display:block!important}
+  .det-page{display:block!important}
   .page{padding:0}
-  .c-wrap{margin:12px 0 0}
-  .c-card{box-shadow:none;border-color:#ddd}
+  .c-card{margin:12px 0 0;box-shadow:none;border-color:#ddd}
 }
 </style>
 </head>
 <body>
 <div class="page">
 
+<!-- HERO -->
 <div class="hero">
   <img class="hero-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png" alt="Oba Doceria" onerror="this.style.display='none'">
   <h1>Proposta de Or&ccedil;amento</h1>
   <p class="hero-sub">Preparada com carinho para <strong>${proposal.cliente}</strong></p>
 </div>
 
+<!-- INFORMACOES DO EVENTO -->
 <div class="bloco">
   <div class="info-grid">
     ${proposal.tipo_evento?`<div><p class="lbl">Evento</p><p class="val">${proposal.tipo_evento}</p></div>`:""}
@@ -2729,10 +2810,16 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
 
 ${proposal.resumo?`<div class="resumo"><p>&ldquo;${proposal.resumo}&rdquo;</p></div>`:""}
 
-<nav class="anchors">${anchors}</nav>
+<!-- PAGINA 0: RESUMO DOS CENARIOS -->
+<div id="pg0">
+  <p class="sec-titulo">Escolha o seu cen&aacute;rio</p>
+  ${resumoCards}
+</div>
 
-${cenariosHtml}
+<!-- PAGINAS DE DETALHE (ocultas por padrao) -->
+${detalhePages}
 
+<!-- FOOTER (sempre visivel) -->
 <div class="footer">
   ${validade?`<p>Proposta v&aacute;lida at&eacute; <strong style="color:#5D3A1A">${validade}</strong></p>`:""}
   ${obaWpp?`<p>D&uacute;vidas? <a href="https://wa.me/55${obaWpp}">fale pelo WhatsApp</a></p>`:""}
@@ -2741,6 +2828,23 @@ ${cenariosHtml}
 </div>
 
 </div>
+
+<script>
+// Navegacao entre paginas — sem reload, sem hash, puro show/hide
+function obaShowPage(n) {
+  // Esconde pg0 e todas as paginas de detalhe
+  var pg0 = document.getElementById('pg0');
+  if (pg0) pg0.style.display = n === 0 ? '' : 'none';
+  var total = ${(proposal.scenarios||[]).length};
+  for (var i = 1; i <= total; i++) {
+    var el = document.getElementById('pg' + i);
+    if (el) el.style.display = i === n ? '' : 'none';
+  }
+  // Scroll suave para o topo da pagina
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+// Estado inicial: pg0 visivel, detalhes ocultos (ja definido pelo display:none inline)
+</script>
 </body>
 </html>`;
 
