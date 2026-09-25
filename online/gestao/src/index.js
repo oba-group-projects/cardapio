@@ -2541,16 +2541,27 @@ async function obaHandlePropostaPublica(request, env, url) {
   const numConvidados = proposal.convidados ? Number(proposal.convidados) : null;
   const numCenarios   = (proposal.scenarios||[]).length;
 
-  // Texto de abertura personalizado — curto e impactante (cabe em ~1 tela mobile)
-  const paraA = dataEvento
-    ? "No dia <strong>"+dataEvento+"</strong>, \u00e9 hora de celebrar. Preparamos esta proposta com cuidado especial para tornar esse <strong>"+nomeEvento+"</strong> inesquec\u00edvel."
-    : "Preparamos esta proposta com cuidado especial para tornar esse <strong>"+nomeEvento+"</strong> inesquec\u00edvel.";
+  // Texto de abertura: campo resumo tem prioridade (editavel pela Central)
+  // Se vazio, gera automaticamente com os dados do evento
+  const textoAberturaPersonalizado = (proposal.resumo||"").trim();
 
-  const paraB = numConvidados
-    ? "S\u00e3o <strong>"+numConvidados+" convidados</strong> \u2014 e cada um deles merece um doce feito com ingredientes selecionados, acabamento artesanal e muito amor em cada detalhe."
-    : "Cada doce \u00e9 feito com ingredientes selecionados, acabamento artesanal e muito amor em cada detalhe.";
+  const paraA = textoAberturaPersonalizado
+    ? textoAberturaPersonalizado   // texto livre editado pela Oba na Central
+    : ( dataEvento
+        ? "No dia <strong>"+dataEvento+"</strong>, \u00e9 hora de celebrar. Preparamos esta proposta com cuidado especial para tornar esse <strong>"+nomeEvento+"</strong> inesquec\u00edvel."
+        : "Preparamos esta proposta com cuidado especial para tornar esse <strong>"+nomeEvento+"</strong> inesquec\u00edvel." );
 
-  const paraC = (nomeCliente?"<strong>"+nomeCliente+"</strong>, preparamos ":"Preparamos ")+"<strong>"+numCenarios+" cen\u00e1rio"+(numCenarios!==1?"s":"")+"</strong> para voc\u00ea escolher o que mais combina com o seu momento.";
+  // paraB e paraC so aparecem quando o texto e automatico
+  const paraB = textoAberturaPersonalizado ? "" : (
+    numConvidados
+      ? "S\u00e3o <strong>"+numConvidados+" convidados</strong> \u2014 e cada um deles merece um doce feito com ingredientes selecionados, acabamento artesanal e muito amor em cada detalhe."
+      : "Cada doce \u00e9 feito com ingredientes selecionados, acabamento artesanal e muito amor em cada detalhe."
+  );
+
+  const paraC = textoAberturaPersonalizado ? "" : (
+    (nomeCliente?"<strong>"+nomeCliente+"</strong>, preparamos ":"Preparamos ")+
+    "<strong>"+numCenarios+" cen\u00e1rio"+(numCenarios!==1?"s":"")+"</strong> para voc\u00ea escolher o que mais combina com o seu momento."
+  );
 
   // Calcula totais e monta dados de cada cenario
   const cenariosData = (proposal.scenarios||[]).map(function(s,si){
@@ -2710,9 +2721,8 @@ async function obaHandlePropostaPublica(request, env, url) {
     "</div>"
   ) : "";
 
-  const citacaoHtml = proposal.resumo
-    ? "<div class=\"ab-citacao\">&ldquo;"+proposal.resumo+"&rdquo;</div>"
-    : "";
+  // Citacao so aparece quando o texto e automatico (resumo ja foi usado como texto principal)
+  const citacaoHtml = "";
 
   const validadeHtml = validade
     ? "<p>Proposta v&aacute;lida at&eacute; <strong style=\"color:#5D3A1A\">"+validade+"</strong></p>"
@@ -2738,7 +2748,7 @@ async function obaHandlePropostaPublica(request, env, url) {
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#3B2A1E;line-height:1.5}
-.page{max-width:600px;margin:0 auto}
+.page{max-width:600px;margin:0 auto;padding:0 16px}
 
 /* PG0 — ABERTURA */
 #pg0{min-height:100svh;display:flex;flex-direction:column;background:linear-gradient(160deg,#FFF8EE 0%,#FDF0D8 55%,#F9E4BE 100%)}
@@ -2831,18 +2841,23 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
 .btn-pdf{margin-top:14px;background:#3B2A1E;color:#fff;border:none;border-radius:11px;padding:10px 26px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer}
 
 /* PRINT */
+@page{margin:12mm 14mm}
 @media print{
   body{background:#fff}
-  #pg0{display:flex!important;min-height:0;page-break-after:always;background:linear-gradient(160deg,#FFF8EE,#F9E4BE)!important}
-  .ab-btn,.ab-ornamento{display:none!important}
-  .ab-rodape{padding:16px 24px 24px}
-  #pg1{display:block!important;page-break-after:always}
+  /* Capa e resumo juntos na pagina 1 do PDF */
+  #pg0{display:block!important;min-height:0!important;background:none!important;padding:0}
+  .ab-btn,.ab-ornamento,.ab-citacao{display:none!important}
+  .ab-rodape{padding:8px 0 12px}
+  #pg1{display:block!important}
+  #pg1::before{content:"";display:block;border-top:1px solid #EDD9C0;margin:12px 0}
   .res-voltar-ab,.res-footer-nav,.rc-cta{display:none!important}
-  .det-page{display:block!important;page-break-before:always}
+  /* Cada cenario em nova pagina */
+  .det-page{display:block!important;page-break-before:always;page-break-inside:avoid}
   .det-topbar,.det-rodape-nav,.cta-btn,.btn-pdf{display:none!important}
-  .page{max-width:100%}
-  .c-card{margin:8px 0 0;box-shadow:none;border-color:#ddd}
-  .rc{margin:0 0 8px}
+  .page{max-width:100%;padding:0}
+  .c-card{margin:8px 0 0;box-shadow:none;border-color:#ddd;page-break-inside:avoid}
+  .rc{margin:0 0 6px;page-break-inside:avoid}
+  .footer{border-top:1px solid #EDD9C0;padding:10px 0 0;margin-top:12px}
 }
 </style>
 </head>
