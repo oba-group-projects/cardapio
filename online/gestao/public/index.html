@@ -3019,6 +3019,18 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         <div class="field"><label>Tipo de evento</label><input id="prop-tipo-evento" placeholder="Ex: Casamento, Aniversário"></div>
         <div class="field"><label>Validade da proposta</label><input id="prop-validade" type="date"></div>
         <div class="field full"><label>Resumo geral <span class="hint">(substitui o áudio explicativo)</span></label><textarea id="prop-resumo" rows="3" placeholder="Ex: Olá Ana! Montei 3 opções pensando no perfil do seu evento..."></textarea></div>
+        <div class="field full" style="margin-top:-4px">
+          <label style="display:flex;justify-content:space-between;align-items:center">
+            Texto da abertura
+            <span id="prop-abertura-count" style="font-size:10px;color:#bbb;font-weight:400">0 caracteres</span>
+          </label>
+          <textarea id="prop-abertura" rows="5"
+            placeholder="Texto que abre a proposta para o cliente. Se vazio, um texto automático será gerado com os dados do evento.&#10;&#10;Ex: Fofa, que data linda essa que se aproxima. Um casamento é uma das poucas ocasiões na vida em que cada detalhe importa de verdade..."
+            style="resize:vertical;font-size:13px;line-height:1.6"
+            oninput="document.getElementById('prop-abertura-count').textContent=this.value.length+' caracteres';document.getElementById('prop-abertura-count').style.color=this.value.length>600?'#e53e3e':this.value.length>400?'#C8922A':'#bbb'"
+          ></textarea>
+          <p style="font-size:11px;color:#9B7A60;margin-top:4px">💡 Recomendado: até 400 caracteres (3 parágrafos curtos). Suporta HTML básico: &lt;strong&gt;, &lt;em&gt;.</p>
+        </div>
         <div class="field full"><label>Mensagem WhatsApp <span class="hint">(editável — use [Nome], [tipo], [link])</span></label><textarea id="prop-msg-wpp" rows="8" placeholder="Será preenchida automaticamente ao salvar..."></textarea></div>
       </div>
     </div>
@@ -3148,6 +3160,12 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       document.getElementById('prop-tipo-evento').value = p.tipo_evento || '';
       document.getElementById('prop-validade').value = p.validade || '';
       document.getElementById('prop-resumo').value = p.resumo || '';
+      const aberturaEl = document.getElementById('prop-abertura');
+      if (aberturaEl) {
+        aberturaEl.value = p.abertura || '';
+        const cnt = document.getElementById('prop-abertura-count');
+        if (cnt) cnt.textContent = aberturaEl.value.length + ' caracteres';
+      }
       obaProposalCenariosCount = 0;
       document.getElementById('proposals-cenarios').innerHTML = '';
       (p.scenarios || []).forEach(s => adicionarCenario(s));
@@ -3640,6 +3658,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       convidados: Number(document.getElementById('prop-convidados').value) || null,
       tipo_evento: document.getElementById('prop-tipo-evento').value || null,
       resumo: document.getElementById('prop-resumo').value || null,
+      abertura: (document.getElementById('prop-abertura')?.value || '').trim() || null,
       validade: document.getElementById('prop-validade').value || null,
       status: statusFinal,
       scenarios,

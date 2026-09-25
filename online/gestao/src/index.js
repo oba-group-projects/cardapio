@@ -2541,26 +2541,34 @@ async function obaHandlePropostaPublica(request, env, url) {
   const numConvidados = proposal.convidados ? Number(proposal.convidados) : null;
   const numCenarios   = (proposal.scenarios||[]).length;
 
-  // Texto de abertura: campo resumo tem prioridade (editavel pela Central)
-  // Se vazio, gera automaticamente com os dados do evento
-  const textoAberturaPersonalizado = (proposal.resumo||"").trim();
+  // Data curta para o bloco de info (dd/mm/aaaa)
+  const fmtDCurta=(d)=>{ if(!d)return null; try{const[y,m,dy]=d.split("-");return dy+"/"+m+"/"+y;}catch{return d;} };
+  const dataEventoCurta = fmtDCurta(proposal.data_evento);
+
+  // Evento com nome: "Casamento de Fofa"
+  const eventoComNome = proposal.tipo_evento
+    ? (proposal.tipo_evento + (nomeCliente ? " de "+nomeCliente : ""))
+    : "";
+
+  // Texto de abertura: campo abertura tem prioridade maxima (editavel na Central)
+  // Fallback: campo resumo; Fallback final: texto automatico
+  const textoAberturaPersonalizado = (proposal.abertura||proposal.resumo||"").trim();
 
   const paraA = textoAberturaPersonalizado
-    ? textoAberturaPersonalizado   // texto livre editado pela Oba na Central
-    : ( dataEvento
-        ? "No dia <strong>"+dataEvento+"</strong>, \u00e9 hora de celebrar. Preparamos esta proposta com cuidado especial para tornar esse <strong>"+nomeEvento+"</strong> inesquec\u00edvel."
-        : "Preparamos esta proposta com cuidado especial para tornar esse <strong>"+nomeEvento+"</strong> inesquec\u00edvel." );
+    ? textoAberturaPersonalizado
+    : ( nomeCliente
+        ? nomeCliente+", que data linda essa que se aproxima."
+        : "Que data linda essa que se aproxima." );
 
-  // paraB e paraC so aparecem quando o texto e automatico
   const paraB = textoAberturaPersonalizado ? "" : (
-    numConvidados
-      ? "S\u00e3o <strong>"+numConvidados+" convidados</strong> \u2014 e cada um deles merece um doce feito com ingredientes selecionados, acabamento artesanal e muito amor em cada detalhe."
-      : "Cada doce \u00e9 feito com ingredientes selecionados, acabamento artesanal e muito amor em cada detalhe."
+    "Um <strong>"+nomeEvento+"</strong> \u00e9 uma das poucas ocasi\u00f5es na vida em que cada detalhe importa de verdade \u2014 e os doces que chegam \u00e0 mesa fazem parte dessa mem\u00f3ria."
   );
 
   const paraC = textoAberturaPersonalizado ? "" : (
-    (nomeCliente?"<strong>"+nomeCliente+"</strong>, preparamos ":"Preparamos ")+
-    "<strong>"+numCenarios+" cen\u00e1rio"+(numCenarios!==1?"s":"")+"</strong> para voc\u00ea escolher o que mais combina com o seu momento."
+    "Preparamos "+
+    "<strong>"+numCenarios+" cen\u00e1rio"+(numCenarios!==1?"s":"")+"</strong>"+
+    (numConvidados?" pensados para voc\u00ea e seus <strong>"+numConvidados+" convidados</strong>.":" pensados especialmente para voc\u00ea.")+
+    " Escolha o que mais combina com o que voc\u00ea imaginou para esse dia."
   );
 
   // Calcula totais e monta dados de cada cenario
@@ -2705,19 +2713,19 @@ async function obaHandlePropostaPublica(request, env, url) {
   }).join("\n");
 
   // Bloco de info do evento (usado em pg0 e pg1)
-  const infoEventoPg0 = (proposal.tipo_evento||dataEvento||proposal.convidados) ? (
+  const infoEventoPg0 = (eventoComNome||dataEventoCurta||proposal.convidados) ? (
     "<div class=\"ab-evento\">"+
-    (proposal.tipo_evento?"<div class=\"ab-ev-item\"><span class=\"ab-ev-label\">Evento</span><span class=\"ab-ev-val\">"+proposal.tipo_evento+"</span></div>":"")+
-    (dataEvento?"<div class=\"ab-ev-item\"><span class=\"ab-ev-label\">Data</span><span class=\"ab-ev-val\">"+dataEvento+"</span></div>":"")+
-    (proposal.convidados?"<div class=\"ab-ev-item\"><span class=\"ab-ev-label\">Convidados</span><span class=\"ab-ev-val\">"+proposal.convidados+" pessoas</span></div>":"")+
+    (eventoComNome?"<div class=\"ab-ev-item\"><span class=\"ab-ev-label\">Evento</span><span class=\"ab-ev-val\">"+eventoComNome+"</span></div>":"")+
+    (dataEventoCurta?"<div class=\"ab-ev-item\"><span class=\"ab-ev-label\">Data</span><span class=\"ab-ev-val\">"+dataEventoCurta+"</span></div>":"")+
+    (proposal.convidados?"<div class=\"ab-ev-item\"><span class=\"ab-ev-label\">Convidados</span><span class=\"ab-ev-val\">"+proposal.convidados+"</span></div>":"")+
     "</div>"
   ) : "";
 
   const infoEventoPg1 = (proposal.tipo_evento||dataEvento||proposal.convidados) ? (
     "<div class=\"res-ev\">"+
     (proposal.tipo_evento?"<div class=\"res-ev-item\"><span class=\"res-ev-lbl\">Evento</span><span class=\"res-ev-val\">"+proposal.tipo_evento+"</span></div>":"")+
-    (dataEvento?"<div class=\"res-ev-item\"><span class=\"res-ev-lbl\">Data</span><span class=\"res-ev-val\">"+dataEvento+"</span></div>":"")+
-    (proposal.convidados?"<div class=\"res-ev-item\"><span class=\"res-ev-lbl\">Convidados</span><span class=\"res-ev-val\">"+proposal.convidados+" pessoas</span></div>":"")+
+    (dataEvento?"<div class=\"res-ev-item\"><span class=\"res-ev-lbl\">Data</span><span class=\"res-ev-val\">"+dataEventoCurta+"</span></div>":"")+
+    (proposal.convidados?"<div class=\"res-ev-item\"><span class=\"res-ev-lbl\">Convidados</span><span class=\"res-ev-val\">"+proposal.convidados+"</span></div>":"")+
     "</div>"
   ) : "";
 
@@ -2742,7 +2750,7 @@ async function obaHandlePropostaPublica(request, env, url) {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>${nomeCliente} &middot; Proposta Oba Doceria</title>
+<title>Proposta ${nomeCliente ? "para "+nomeCliente : ""} &middot; Oba Doceria</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,300;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -2752,17 +2760,16 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
 
 /* PG0 — ABERTURA */
 #pg0{min-height:100svh;display:flex;flex-direction:column;background:linear-gradient(160deg,#FFF8EE 0%,#FDF0D8 55%,#F9E4BE 100%)}
-.ab-topo{padding:32px 24px 0;text-align:center}
-.ab-logo{height:40px;object-fit:contain;opacity:.9;margin-bottom:20px}
-.ab-label{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#C8922A;margin-bottom:2px}
-.ab-cliente{font-family:'Cormorant Garamond',Georgia,serif;font-size:34px;font-weight:600;color:#3B2A1E;line-height:1.1;margin-bottom:16px}
+.ab-topo{padding:28px 24px 0;text-align:center}
+.ab-logo{height:40px;object-fit:contain;opacity:.9;margin-bottom:16px}
+.ab-label{font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;font-weight:600;color:#3B2A1E;letter-spacing:.2px;margin-bottom:14px;display:block}
 .ab-evento{display:flex;flex-wrap:wrap;justify-content:center;background:#fff9;backdrop-filter:blur(4px);border:1px solid #EDD9C0;border-radius:12px;overflow:hidden;margin:0 auto}
 .ab-ev-item{flex:1;min-width:0;text-align:center;padding:10px 12px;border-right:1px solid #EDD9C0}
 .ab-ev-item:last-child{border-right:none}
 .ab-ev-label{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#C8922A;display:block;margin-bottom:2px}
 .ab-ev-val{font-size:12px;font-weight:600;color:#3B2A1E;display:block}
 .ab-corpo{padding:20px 24px;flex:1}
-.ab-p{font-family:'Cormorant Garamond',Georgia,serif;font-size:16.5px;color:#5D3A1A;line-height:1.85;margin-bottom:14px}
+.ab-p{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(13px,4vw,17px);color:#5D3A1A;line-height:1.85;margin-bottom:14px}
 .ab-p:last-of-type{margin-bottom:0}
 .ab-p strong{font-weight:600;color:#3B2A1E}
 .ab-citacao{margin-top:18px;padding:14px 16px;border-left:2px solid #C8922A;background:#FFFCF4;font-family:'Cormorant Garamond',Georgia,serif;font-size:15px;font-style:italic;color:#9B6A3A;line-height:1.7}
@@ -2867,8 +2874,7 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
 <div id="pg0">
   <div class="ab-topo">
     <img class="ab-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png" alt="Oba Doceria" onerror="this.style.display='none'">
-    <p class="ab-label">Proposta de Or&ccedil;amento</p>
-    <h1 class="ab-cliente">${nomeCliente||"Proposta Especial"}</h1>
+    <span class="ab-label">Proposta de Or&ccedil;amento</span>
     ${infoEventoPg0}
   </div>
   <div class="ab-corpo">
