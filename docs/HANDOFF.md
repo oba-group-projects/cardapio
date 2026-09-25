@@ -1,43 +1,39 @@
 # HANDOFF
 
-Atualizado: 2026-09-23
+Atualizado: 2026-09-24
 
 Branch: feature/gestao-online-segura
-HEAD: ca003b1
+HEAD: 7f8d230
 
 ## Ultima fase entregue
-12A-2 — Editor de Propostas na Central (completo)
+12A-3 — Página pública /proposta/:id redesenhada (completo)
 
 ## Commits desta sessão (mais recente primeiro)
 | Commit   | O que fez |
 |----------|-----------|
-| ca003b1  | fix restauração de quantidades + botões profissionais (Link/PDF) |
-| c5c08fa  | fix CSRF cookie e header |
-| 278818c  | feat copiar cenário anterior |
-| 746d3dd  | feat estimativa por precoReferencia |
-| d771735  | fix valor numérico + remover badge redundante |
-| 4d2cfb0  | feat acordeão + faltam X por categoria |
-| 800d20a  | fix SyntaxError chave duplicada |
-| c2799b8  | feat contador global + subtotal por categoria + aviso ao salvar |
+| 7f8d230  | feat(12A-3): pagina resumo + navegacao por cenario + copy profissional |
+| db3197b  | feat: campo texto_publico por cenario (Opcao C definitiva) |
+| f043b33  | feat(12A-3): layout final elegante + introducao automatica por cenario |
+| d1f2283  | fix: whatsapp da Oba + CTA restaurado + mensagem limpa |
 
 ## O que está funcionando
 - Aba Propostas funcional: criar, editar, salvar, listar
-- Cenários com doces/convidado, totais por categoria, estimativa financeira
-- Botões: Salvar / Enviar Proposta / Copiar Link / Ver+PDF
-- CSRF funcionando corretamente
-- Restauração ao editar: quantidades restauram com categorias fechadas
+- Página pública /proposta/:id com novo layout:
+  - Página 0 (resumo): 3 cards com nome, descrição, pills e valor
+  - Páginas 1/2/3 (detalhe): tabela completa, barra sticky de navegação
+  - CTA: "Escolhi este cenário — vamos conversar"
+  - WhatsApp: "Oba! Recebi a proposta e quero seguir com o Cenário X – Nome (R$ X). Vamos fechar os detalhes?"
+- Gates estáticos: AUTH_GATE_STATIC_OK
 
 ## O que precisa de atenção
-- Deploy pendente: EXECUTAR-9AB-DEPLOY.cmd para levar ca003b1 ao Cloudflare
-- 12A-3 é a próxima fase: página pública /proposta/:id
+- Deploy pendente: executar EXECUTAR-9AB-DEPLOY.cmd para levar 7f8d230 ao Cloudflare
 
-## Próxima fase
-12A-3 — Página pública /proposta/:id (HTML bonito, mobile-first, CSS print para PDF)
-Layout: logo + cabeçalho do evento + resumo + 3 cenários + CTA WhatsApp + validade
+## Próxima fase sugerida
+- Deploy + homologação ao vivo da página pública de proposta
+- Testar fluxo completo: Central → Enviar Proposta → Link público → CTA WhatsApp
 
 ## Arquivos críticos alterados nesta sessão
-- online/gestao/public/index.html (Central — aba Propostas completa)
-- online/gestao/public/data/catalog-v1/ (não alterado nesta sessão)
+- online/gestao/src/index.js (função obaHandlePropostaPublica — redesign completo)
 - docs/CURRENT_STATE.md
 - docs/HANDOFF.md
 

@@ -1,10 +1,10 @@
 ﻿# CURRENT STATE
 
-Atualizado: 2026-09-23
+Atualizado: 2026-09-24
 
 ## Git
 Branch: feature/gestao-online-segura
-Commit HEAD: ca003b1
+Commit HEAD: 7f8d230
 Branch main: 5913078
 
 ## Estado funcional
@@ -12,7 +12,7 @@ Branch main: 5913078
 - Fluxo DRAFT → PREVIEW → PUBLISHED com rollback e histórico
 - Cardápio público: páginas 1/2/3 fixas, passo 1 sem scroll
 - Vitrine Presenteáveis: lista compacta, tela de detalhe por kit, Degustação integrada
-- Módulo de Propostas de Orçamento (12A-1 e 12A-2 concluídas)
+- Módulo de Propostas de Orçamento (12A-1, 12A-2 e 12A-3 concluídas)
 
 ## Fases concluídas (12A)
 - 12A-1: D1 migrations (proposals, proposal_scenarios, proposal_items) + rotas Worker
@@ -33,14 +33,17 @@ Branch main: 5913078
   - Listagem: ✏️ Editar · 🔗 Link · 📄 PDF · Status
   - CSRF corrigido (__Host-oba_csrf + X-CSRF-Token)
   - Restauração ao editar corrigida (__total__ tratado separadamente)
+- 12A-3: Página pública /proposta/:id — redesign completo
+  - Página 0: 3 cards de resumo (badge, nome, descrição, pills convidados/doces, valor, botão "Ver detalhes")
+  - Páginas 1/2/3: detalhe individual por cenário (show/hide JS, sem reload)
+  - Barra sticky no topo de cada detalhe: "Voltar" + navegação entre cenários
+  - Rodapé de navegação espelhado em cada detalhe
+  - CTA: "Escolhi este cenário — vamos conversar"
+  - Mensagem WhatsApp: "Oba! Recebi a proposta e quero seguir com o Cenário X – Nome (R$ X). Vamos fechar os detalhes?"
+  - campo texto_publico por cenário preservado (prioridade sobre intro automática)
 
 ## Próxima fase
-12A-3 — Página pública /proposta/:id
-- HTML bonito, mobile-first, identidade visual Oba Doceria
-- 3 cenários navegáveis (abas ou accordion)
-- CTA "Quero este cenário" → WhatsApp pré-formatado
-- Validade visível
-- CSS @media print para geração de PDF via window.print()
+Deploy: executar EXECUTAR-9AB-DEPLOY.cmd para levar 7f8d230 ao Cloudflare
 
 ## Links
 - Central: https://oba-cardapio-gestao.obadoceria.workers.dev/
