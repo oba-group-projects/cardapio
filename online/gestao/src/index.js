@@ -2762,17 +2762,18 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
 #pg0{min-height:100svh;display:flex;flex-direction:column;background:linear-gradient(160deg,#FFF8EE 0%,#FDF0D8 55%,#F9E4BE 100%)}
 .ab-topo{padding:36px 24px 0;text-align:center}
 .ab-logo{height:38px;object-fit:contain;opacity:.85;margin-bottom:10px}
-.ab-label{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#C8922A;margin-bottom:18px;display:block}
-/* Evento sem caixa — apenas labels + valores com separadores */
-.ab-evento{display:flex;justify-content:center;gap:0;margin:0 auto 0;max-width:340px}
-.ab-ev-item{flex:1;text-align:center;padding:0 10px;position:relative}
-.ab-ev-item+.ab-ev-item::before{content:"";position:absolute;left:0;top:20%;height:60%;width:1px;background:#EDD9C0}
-.ab-ev-label{font-size:7px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#C8922A;display:block;margin-bottom:3px}
+.ab-label{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#C8922A;margin-bottom:16px;display:block}
+/* Bloco evento: caixinha discreta sem backdrop */
+.ab-evento{display:flex;justify-content:center;background:#FFFCF5;border:1px solid #EDD9C0;border-radius:10px;overflow:hidden;margin:0 auto;max-width:320px}
+.ab-ev-item{flex:1;text-align:center;padding:9px 8px;border-right:1px solid #EDD9C0}
+.ab-ev-item:last-child{border-right:none}
+.ab-ev-label{font-size:7px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#C8922A;display:block;margin-bottom:2px}
 .ab-ev-val{font-size:11px;font-weight:500;color:#5D3A1A;display:block}
-.ab-sep{border:none;border-top:1px solid #EDD9C0;margin:20px auto 0;width:40px}
-.ab-corpo{padding:24px 20px 0;text-align:center;flex:1}
-.ab-p-destaque{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(20px,5.5vw,26px);font-weight:600;color:#3B2A1E;line-height:1.45;margin-bottom:20px;font-style:italic}
-.ab-p{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(15px,4vw,17px);color:#6B4A2A;line-height:2;margin-bottom:14px}
+.ab-sep{border:none;border-top:1px solid #EDD9C0;margin:20px auto 0;width:36px}
+/* Texto: destaque centrado, corpo alinhado à esquerda */
+.ab-corpo{padding:24px 28px 0;flex:1}
+.ab-p-destaque{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(20px,5.5vw,25px);font-weight:600;color:#3B2A1E;line-height:1.45;margin-bottom:20px;font-style:italic;text-align:center}
+.ab-p{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(14px,3.8vw,16px);color:#6B4A2A;line-height:1.85;margin-bottom:14px;text-align:left}
 .ab-p:last-of-type{margin-bottom:0}
 .ab-p strong{font-weight:600;color:#3B2A1E}
 .ab-citacao{margin-top:18px;padding:14px 16px;border-left:2px solid #C8922A;background:#FFFCF4;font-family:'Cormorant Garamond',Georgia,serif;font-size:15px;font-style:italic;color:#9B6A3A;line-height:1.7;text-align:left}
@@ -2853,26 +2854,24 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
 .btn-pdf{margin-top:14px;background:#3B2A1E;color:#fff;border:none;border-radius:11px;padding:10px 26px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer}
 
 /* PRINT */
-@page{margin:0}
+@page{margin:14mm 18mm}
 @media print{
   body{background:#fff}
   /* Capa e resumo juntos na pagina 1 */
-  #pg0{display:block!important;min-height:0!important;background:none!important;padding:24px 40px 20px}
+  #pg0{display:block!important;min-height:0!important;background:none!important}
   .ab-btn,.ab-ornamento,.ab-assinatura,.ab-citacao{display:none!important}
-  .ab-rodape{padding:0}
+  .ab-rodape{padding:4px 0 8px}
   #pg1{display:block!important}
-  #pg1::before{content:"";display:block;border-top:1px solid #EDD9C0;margin:16px 0}
+  #pg1::before{content:"";display:block;border-top:1px solid #EDD9C0;margin:14px 0}
   .res-voltar-ab,.res-footer-nav,.rc-cta{display:none!important}
   /* Cada cenario em nova pagina */
-  .det-page{display:block!important;page-break-before:always;padding:32px 40px 32px}
+  .det-page{display:block!important;page-break-before:always}
   .det-topbar,.det-rodape-nav,.cta-btn,.btn-pdf{display:none!important}
-  /* Container centralizado no PDF */
+  /* Layout PDF — ocupa largura disponivel apos margens de @page */
   .page{max-width:100%;padding:0}
-  .c-card{margin:16px auto 0;max-width:520px;box-shadow:none;border-color:#ddd;page-break-inside:avoid}
-  .rc{margin:0 auto 8px;max-width:520px;page-break-inside:avoid}
-  .res-hero,.res-ev,.res-secao{padding-left:40px;padding-right:40px}
-  .footer{border-top:1px solid #EDD9C0;padding:10px 40px 0;margin-top:12px}
-  /* Instrucao discreta para o usuario */
+  .c-card{margin:12px 0 0;box-shadow:none;border-color:#ddd;page-break-inside:avoid}
+  .rc{margin:0 0 8px;page-break-inside:avoid}
+  .footer{border-top:1px solid #EDD9C0;padding:10px 0 0;margin-top:14px}
   #print-hint{display:block!important}
 }
 #print-hint{display:none;font-size:9px;color:#bbb;text-align:center;padding:4px 0 0;font-family:'Plus Jakarta Sans',sans-serif}
