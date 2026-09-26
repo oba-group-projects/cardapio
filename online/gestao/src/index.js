@@ -2556,23 +2556,23 @@ async function obaHandlePropostaPublica(request, env, url) {
 
   const paraA = textoAberturaPersonalizado
     ? textoAberturaPersonalizado
-    : ( nomeCliente
-        ? nomeCliente+", que data linda essa que se aproxima."
-        : "Que data linda essa que se aproxima." );
+    : ( dataEvento && nomeCliente
+        ? nomeCliente+", <strong>"+dataEvento+"</strong> vai ser um dia que voc\u00ea vai querer lembrar em cada detalhe."
+        : nomeCliente
+          ? nomeCliente+", que data linda essa que se aproxima."
+          : "Que data linda essa que se aproxima." );
 
-  const paraB = textoAberturaPersonalizado ? "" : (
-    "Um <strong>"+nomeEvento+"</strong> \u00e9 uma das poucas ocasi\u00f5es na vida em que cada detalhe importa de verdade \u2014 e os doces que chegam \u00e0 mesa fazem parte dessa mem\u00f3ria."
-  );
+  const paraB = textoAberturaPersonalizado ? "" :
+    "A mesa de doces \u00e9 onde os olhos brilham antes mesmo da primeira mordida. \u00c9 onde as pessoas param, fotografam, chamam algu\u00e9m \u2014 e \u00e9 exatamente nesse momento que a Oba Doceria entra.";
 
   const paraC = textoAberturaPersonalizado ? "" : (
-    "Preparamos "+
-    "<strong>"+numCenarios+" cen\u00e1rio"+(numCenarios!==1?"s":"")+"</strong>"+
-    (numConvidados?" pensados para voc\u00ea e seus <strong>"+numConvidados+" convidados</strong>.":" pensados especialmente para voc\u00ea.")+
-    " Escolha o que mais combina com o que voc\u00ea imaginou para esse dia."
+    "Preparamos <strong>"+numCenarios+" op\u00e7\u00e3o"+(numCenarios!==1?"es":"")+"</strong>"+
+    (numConvidados?" com carinho para voc\u00ea e seus <strong>"+numConvidados+" convidados</strong>.":" com carinho para o seu "+nomeEvento+".")+
+    " Cada uma reflete um cuidado diferente \u2014 escolha a que mais parece com o que voc\u00ea sonhou."
   );
 
   const paraD = textoAberturaPersonalizado ? "" :
-    "Cada doce que sair da nossa cozinha carrega um pedacinho desse cuidado \u2014 e vai chegar \u00e0 sua mesa exatamente como voc\u00ea merece.";
+    "Do come\u00e7o ao fim, cada detalhe \u00e9 pensado com o mesmo cuidado que voc\u00ea dedicou a esse dia.";
 
   // Calcula totais e monta dados de cada cenario
   const cenariosData = (proposal.scenarios||[]).map(function(s,si){
@@ -2798,7 +2798,7 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
 .res-ev-item:last-child{border-right:none}
 .res-ev-lbl{font-size:7px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#ccc;display:block}
 .res-ev-val{font-size:11px;font-weight:600;color:#3B2A1E;display:block}
-.res-secao{padding:28px 16px 8px;font-size:11px;font-weight:500;color:#9B7A60;text-align:center}
+.res-secao{padding:36px 16px 10px;font-size:11px;font-weight:400;color:#9B7A60;text-align:center;font-style:italic}
 /* Cards de cenario — mais delicados */
 .rc{margin:0 16px 8px;border-radius:10px;border:1px solid #EDD9C0;border-left-width:2px;background:#fff;padding:10px 14px;box-shadow:none}
 .rc-linha{display:flex;align-items:center;gap:10px;justify-content:space-between}
@@ -2815,7 +2815,7 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
 .res-voltar-ab{background:none;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;color:#bbb;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 
 /* DETALHE */
-.det-page{padding-bottom:8px}
+.det-page{padding-top:24px;padding-bottom:8px}
 .det-topbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:10px 14px;background:#fff;border-bottom:1px solid #EDD9C0;position:sticky;top:0;z-index:10}
 .det-voltar{background:none;border:1.5px solid #EDD9C0;border-radius:24px;padding:5px 13px;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;color:#7A5A40;cursor:pointer;white-space:nowrap}
 .det-voltar:hover{background:#FAF5EE}
@@ -2825,8 +2825,8 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
 .c-card{margin:10px auto 0;max-width:480px;border-radius:14px;border:1px solid #EDD9C0;border-top-width:3px;overflow:hidden;background:#fff;box-shadow:0 1px 8px rgba(60,35,20,.05)}
 .c-cabecalho{padding:18px 20px 13px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .c-esq{flex:1;min-width:0}
-.c-rotulo{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:4px}
-.c-nome{font-family:'Cormorant Garamond',Georgia,serif;font-size:21px;font-weight:400;color:#3B2A1E;line-height:1.2}
+.c-rotulo{font-size:9px;font-weight:500;letter-spacing:.5px;display:block;margin-bottom:3px;opacity:.7}
+.c-nome{font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;font-weight:400;color:#3B2A1E;line-height:1.2}
 .c-dir{text-align:right;flex-shrink:0}
 .c-dpc{display:block;font-size:10px;color:#ccc;margin-bottom:3px}
 .c-total{font-size:18px;font-weight:600;display:block;line-height:1}
@@ -2835,7 +2835,7 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
 .c-corpo{padding:13px 20px 18px}
 .tab{width:100%;border-collapse:collapse}
 .tab td{padding:7px 0;border-bottom:1px solid #F5EDE4;font-size:12px;vertical-align:middle}
-.td-n{color:#3B2A1E;font-weight:400}
+.td-n{color:#3B2A1E;font-weight:400;text-transform:capitalize}
 .td-q{text-align:center;color:#ccc;font-size:11px;padding:7px 8px;white-space:nowrap}
 .td-v{text-align:right;font-weight:500;color:#5D3A1A;white-space:nowrap}
 .tr-d td{border-bottom:none;padding:7px 0 0;font-size:11px;color:#059669}
