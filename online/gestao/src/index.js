@@ -2609,11 +2609,13 @@ async function obaHandlePropostaPublica(request, env, url) {
 
     const catLinhas=Object.values(porCat).map(function(c){
       const nm=c.cid.split("-").map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join(" ");
+      // toTitleCase: converte CAPS para Caixa Mista preservando textos ja corretos
+      var toTC=function(s){return s?s.toLowerCase().replace(/(?:^|\s)\S/g,function(a){return a.toUpperCase();}):s;};
       if(c.items&&c.items.length){
         return c.items.map(function(it){
           const parts2=(it.ref_id||"").split(":");
           const p=Number(it.preco_unit||0)||(saborPM[parts2[1]]||0);
-          return "<tr><td class=\"td-n\">"+it.descricao+"</td><td class=\"td-q\">"+it.qtd+"&nbsp;doces</td><td class=\"td-v\">"+R(it.qtd*p)+"</td></tr>";
+          return "<tr><td class=\"td-n\">"+toTC(it.descricao)+"</td><td class=\"td-q\">"+it.qtd+"&nbsp;doces</td><td class=\"td-v\">"+R(it.qtd*p)+"</td></tr>";
         }).join("");
       } else if(c.total){
         const ref=catPM[c.cid]||0;
@@ -2623,7 +2625,8 @@ async function obaHandlePropostaPublica(request, env, url) {
     }).join("");
 
     const livreLinhas=livres.map(function(it){
-      return "<tr><td class=\"td-n\">"+it.descricao+"</td><td class=\"td-q\"></td><td class=\"td-v\">"+R(it.preco_unit)+"</td></tr>";
+      var toTC=function(s){return s?s.toLowerCase().replace(/(?:^|\s)\S/g,function(a){return a.toUpperCase();}):s;};
+      return "<tr><td class=\"td-n\">"+toTC(it.descricao)+"</td><td class=\"td-q\"></td><td class=\"td-v\">"+R(it.preco_unit)+"</td></tr>";
     }).join("");
 
     const descLinha=desc>0?"<tr class=\"tr-d\"><td colspan=\"2\">Desconto</td><td>&minus;&nbsp;"+R(desc)+"</td></tr>":"";
@@ -2835,7 +2838,7 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
 .c-corpo{padding:13px 20px 18px}
 .tab{width:100%;border-collapse:collapse}
 .tab td{padding:7px 0;border-bottom:1px solid #F5EDE4;font-size:12px;vertical-align:middle}
-.td-n{color:#3B2A1E;font-weight:400;text-transform:capitalize}
+.td-n{color:#3B2A1E;font-weight:400}
 .td-q{text-align:center;color:#ccc;font-size:11px;padding:7px 8px;white-space:nowrap}
 .td-v{text-align:right;font-weight:500;color:#5D3A1A;white-space:nowrap}
 .tr-d td{border-bottom:none;padding:7px 0 0;font-size:11px;color:#059669}
@@ -2908,7 +2911,6 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
   <div class="res-hero">
     <img class="res-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png" alt="Oba Doceria" onerror="this.style.display='none'">
     <p class="res-titulo">Cen&aacute;rios preparados para voc&ecirc;</p>
-    <p class="res-sub">${resSub}</p>
   </div>
   ${infoEventoPg1}
   <p class="res-secao">Escolha o seu cen&aacute;rio</p>  ${resumoCards}
