@@ -2571,6 +2571,9 @@ async function obaHandlePropostaPublica(request, env, url) {
     " Escolha o que mais combina com o que voc\u00ea imaginou para esse dia."
   );
 
+  const paraD = textoAberturaPersonalizado ? "" :
+    "Cada doce que sair da nossa cozinha carrega um pedacinho desse cuidado \u2014 e vai chegar \u00e0 sua mesa exatamente como voc\u00ea merece.";
+
   // Calcula totais e monta dados de cada cenario
   const cenariosData = (proposal.scenarios||[]).map(function(s,si){
     const pal  = PAL[si]||PAL[PAL.length-1];
@@ -2784,8 +2787,8 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
 .ab-btn:hover{opacity:.85}
 
 /* PG1 — RESUMO */
-#pg1{display:none}
-.res-hero{padding:20px 20px 14px;text-align:center;background:#FFFDF8;border-bottom:1px solid #EDD9C0}
+.ab-p-encerramento{font-style:italic;color:#9B6A3A}
+#pg1{display:none}.res-hero{padding:20px 20px 14px;text-align:center;background:#FFFDF8;border-bottom:1px solid #EDD9C0}
 .res-logo{height:28px;object-fit:contain;opacity:.82;margin-bottom:10px}
 .res-titulo{font-family:'Cormorant Garamond',Georgia,serif;font-size:19px;font-weight:400;color:#3B2A1E;margin-bottom:2px}
 .res-sub{font-size:10px;color:#9B7A60}
@@ -2795,19 +2798,19 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
 .res-ev-item:last-child{border-right:none}
 .res-ev-lbl{font-size:7px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#ccc;display:block}
 .res-ev-val{font-size:11px;font-weight:600;color:#3B2A1E;display:block}
-.res-secao{padding:20px 16px 6px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:#C8922A}
+.res-secao{padding:28px 16px 8px;font-size:11px;font-weight:500;color:#9B7A60;text-align:center}
 /* Cards de cenario — mais delicados */
 .rc{margin:0 16px 8px;border-radius:10px;border:1px solid #EDD9C0;border-left-width:2px;background:#fff;padding:10px 14px;box-shadow:none}
 .rc-linha{display:flex;align-items:center;gap:10px;justify-content:space-between}
 .rc-esq{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
-.rc-num{font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;font-weight:400;line-height:1;flex-shrink:0;opacity:.4;font-style:italic}
-.rc-badge{display:block;font-size:13px;font-weight:600;color:#3B2A1E;margin-bottom:2px}
+.rc-num{font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;font-weight:400;line-height:1;flex-shrink:0;opacity:.3;font-style:italic}
+.rc-badge{display:block;font-size:13px;font-weight:500;color:#3B2A1E;margin-bottom:2px}
 .rc-pills{display:flex;flex-wrap:wrap;gap:3px}
-.rc-pill{font-size:9px;font-weight:500;background:#FAF5EE;color:#9B7A60;padding:2px 6px;border-radius:20px}
+.rc-pill{font-size:9px;font-weight:400;background:#FAF5EE;color:#9B7A60;padding:1px 6px;border-radius:20px}
 .rc-dir{text-align:right;flex-shrink:0}
-.rc-valor{display:block;font-size:15px;font-weight:600;line-height:1;margin-bottom:6px}
-.rc-cta{display:block;padding:5px 12px;border-radius:20px;border:none;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;cursor:pointer;white-space:nowrap}
-.rc-cta:hover{opacity:.88}
+.rc-valor{display:block;font-size:14px;font-weight:500;line-height:1;margin-bottom:6px}
+.rc-cta{display:block;padding:5px 11px;border-radius:20px;border:none;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:500;cursor:pointer;white-space:nowrap;opacity:.85}
+.rc-cta:hover{opacity:1}
 .res-footer-nav{padding:10px 16px 0;text-align:center}
 .res-voltar-ab{background:none;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;color:#bbb;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 
@@ -2891,6 +2894,7 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
     ${paraA ? `<p class="ab-p-destaque">${paraA}</p>` : ""}
     ${paraB ? `<p class="ab-p">${paraB}</p>` : ""}
     ${paraC ? `<p class="ab-p">${paraC}</p>` : ""}
+    ${paraD ? `<p class="ab-p ab-p-encerramento">${paraD}</p>` : ""}
     ${citacaoHtml}
   </div>
   <div class="ab-rodape">
@@ -2907,8 +2911,7 @@ body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;col
     <p class="res-sub">${resSub}</p>
   </div>
   ${infoEventoPg1}
-  <p class="res-secao">Escolha o seu cen&aacute;rio</p>
-  ${resumoCards}
+  <p class="res-secao">Escolha o seu cen&aacute;rio</p>  ${resumoCards}
   <div class="res-footer-nav">
     <button class="res-voltar-ab" onclick="obaShowPage(0)">&#8592; Voltar &agrave; apresenta&ccedil;&atilde;o</button>
   </div>
