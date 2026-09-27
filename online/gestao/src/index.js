@@ -2326,22 +2326,24 @@ async function obaUpsertProposal(env, proposalId, data, now) {
     convidados = null,
     tipo_evento = null,
     resumo = null,
+    abertura = null,
     validade = null,
     status = "rascunho",
     whatsapp = null,
   } = data;
 
   await env.DB.prepare(`
-    INSERT INTO proposals (proposal_id, cliente, whatsapp, data_evento, convidados, tipo_evento, resumo, validade, status, criado_em, atualizado_em)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO proposals (proposal_id, cliente, whatsapp, data_evento, convidados, tipo_evento, resumo, abertura, validade, status, criado_em, atualizado_em)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ON CONFLICT(proposal_id) DO UPDATE SET
       cliente=excluded.cliente, whatsapp=excluded.whatsapp,
       data_evento=excluded.data_evento,
       convidados=excluded.convidados, tipo_evento=excluded.tipo_evento,
-      resumo=excluded.resumo, validade=excluded.validade,
+      resumo=excluded.resumo, abertura=excluded.abertura,
+      validade=excluded.validade,
       status=excluded.status, atualizado_em=excluded.atualizado_em
   `).bind(
-    proposalId, cliente, whatsapp, data_evento, convidados, tipo_evento, resumo, validade, status, now, now
+    proposalId, cliente, whatsapp, data_evento, convidados, tipo_evento, resumo, abertura, validade, status, now, now
   ).run();
 }
 
@@ -2462,7 +2464,7 @@ async function obaHandleProposalsApi(request, env, url) {
     let body;
     try { body = await request.json(); } catch { return json({ ok: false, error: "json_invalido" }, 400); }
 
-    const allowed = ["rascunho", "enviada", "aceita", "recusada"];
+    const allowed = ["rascunho", "enviada", "em_negociacao", "aceita", "recusada", "arquivada"];
     if (!allowed.includes(body.status)) {
       return json({ ok: false, error: "status_invalido" }, 400);
     }
@@ -2472,6 +2474,21 @@ async function obaHandleProposalsApi(request, env, url) {
 
     if (result.meta.changes === 0) return json({ ok: false, error: "nao_encontrada" }, 404);
     return json({ ok: true, proposal_id: matchStatus[1], status: body.status });
+  }
+
+  // DELETE /api/proposals/:id — excluir proposta (apenas rascunhos)
+  const matchDel = url.pathname.match(/^\/api\/proposals\/([^/]+)$/);
+  if (matchDel && request.method === "DELETE") {
+    const existing = await env.DB.prepare(
+      "SELECT status FROM proposals WHERE proposal_id = ?"
+    ).bind(matchDel[1]).first();
+    if (!existing) return json({ ok: false, error: "nao_encontrada" }, 404);
+    if (existing.status !== "rascunho") {
+      return json({ ok: false, error: "apenas_rascunhos_podem_ser_excluidos" }, 403);
+    }
+    // ON DELETE CASCADE apaga cenarios e itens automaticamente
+    await env.DB.prepare("DELETE FROM proposals WHERE proposal_id = ?").bind(matchDel[1]).run();
+    return json({ ok: true, deleted: matchDel[1] });
   }
 
   return null;

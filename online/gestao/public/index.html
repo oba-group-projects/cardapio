@@ -3065,8 +3065,8 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
 
   // ---------- UTILITÁRIOS ----------
   function fmt(v) { return 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-  function statusLabel(s) { return {rascunho:'Rascunho',enviada:'Enviada',aceita:'Aceita',recusada:'Recusada'}[s]||s; }
-  function statusColor(s) { return {rascunho:'#888',enviada:'#2563eb',aceita:'#059669',recusada:'#dc2626'}[s]||'#888'; }
+  function statusLabel(s) { return {rascunho:'Rascunho',enviada:'Enviada',em_negociacao:'Em negociação',aceita:'Aceita',recusada:'Recusada',arquivada:'Arquivada'}[s]||s; }
+  function statusColor(s) { return {rascunho:'#888',enviada:'#2563eb',em_negociacao:'#C8922A',aceita:'#059669',recusada:'#dc2626',arquivada:'#bbb'}[s]||'#888'; }
   function csrf() {
     const token = String(document.cookie||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('__Host-oba_csrf='));
     return token ? decodeURIComponent(token.slice('__Host-oba_csrf='.length)) : '';
@@ -3091,14 +3091,23 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
           <td><strong>${p.cliente}</strong></td>
           <td>${p.data_evento ? new Date(p.data_evento+'T12:00:00').toLocaleDateString('pt-BR') : '—'}</td>
           <td>${p.convidados ? p.convidados + ' pessoas' : '—'}</td>
-          <td><span style="font-size:11px;padding:2px 8px;border-radius:12px;background:${statusColor(p.status)}22;color:${statusColor(p.status)};font-weight:600">${statusLabel(p.status)}</span></td>
+          <td>
+            <select
+              title="Alterar status"
+              onchange="obaProposalAlterarStatus('${p.proposal_id}', this.value, this)"
+              style="font-size:11px;padding:3px 8px;border-radius:12px;border:1.5px solid ${statusColor(p.status)};background:${statusColor(p.status)}18;color:${statusColor(p.status)};font-weight:600;cursor:pointer;outline:none;appearance:auto">
+              ${['rascunho','enviada','em_negociacao','aceita','recusada','arquivada'].map(s =>
+                `<option value="${s}" ${s===p.status?'selected':''}>${statusLabel(s)}</option>`
+              ).join('')}
+            </select>
+          </td>
           <td>${new Date(p.criado_em).toLocaleDateString('pt-BR')}</td>
-          <td style="display:flex;gap:6px;flex-wrap:wrap">
+          <td style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
             <button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaProposalEditar('${p.proposal_id}')">✏️ Editar</button>
             <button class="secondary" style="padding:4px 10px;font-size:11px;background:#25d366;color:#fff;border:none" onclick="obaProposalEnviarWhatsAppById('${p.proposal_id}')">📱 WhatsApp</button>
             <button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaProposalCopiarLinkById('${p.proposal_id}')">🔗 Link</button>
             <button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaProposalAbrirPDFById('${p.proposal_id}')">📄 PDF</button>
-            <button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaProposalAlterarStatus('${p.proposal_id}','${p.status}')">Status</button>
+            ${p.status === 'rascunho' ? `<button class="secondary" style="padding:4px 10px;font-size:11px;background:#fee2e2;color:#dc2626;border-color:#fca5a5" onclick="obaProposalExcluir('${p.proposal_id}','${p.cliente}')">🗑️ Excluir</button>` : ''}
           </td>
         </tr>
       `).join('');
@@ -3686,21 +3695,40 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
   };
 
   // ---------- ALTERAR STATUS ----------
-  window.obaProposalAlterarStatus = async function(proposalId, statusAtual) {
-    const opcoes = ['rascunho','enviada','aceita','recusada'];
-    const labels = ['Rascunho','Enviada','Aceita','Recusada'];
-    const novo = prompt('Status atual: ' + statusLabel(statusAtual) + '\nEscolha:\n' + opcoes.map((o,i)=>`${i+1}. ${labels[i]}`).join('\n') + '\n\nDigite o número:');
-    const idx = parseInt(novo) - 1;
-    if (isNaN(idx) || idx < 0 || idx >= opcoes.length) return;
+  window.obaProposalAlterarStatus = async function(proposalId, novoStatus, selectEl) {
     try {
       const r = await fetch('/api/proposals/' + proposalId + '/status', {
         method: 'PATCH',
         headers: {'Content-Type':'application/json','X-CSRF-Token':csrf()},
-        body: JSON.stringify({status: opcoes[idx]}),
+        body: JSON.stringify({status: novoStatus}),
+      });
+      const data = await r.json();
+      if (data.ok) {
+        // Atualiza a cor do select sem recarregar a lista inteira
+        if (selectEl) {
+          selectEl.style.borderColor = statusColor(novoStatus);
+          selectEl.style.background = statusColor(novoStatus)+'18';
+          selectEl.style.color = statusColor(novoStatus);
+        }
+        // Se mudou de rascunho, recarrega para mostrar/ocultar botão Excluir
+        carregarLista();
+      } else {
+        alert('Erro ao atualizar status: ' + (data.error||'desconhecido'));
+        carregarLista(); // restaura valor anterior
+      }
+    } catch(e) { alert('Erro de conexão.'); carregarLista(); }
+  };
+
+  window.obaProposalExcluir = async function(proposalId, cliente) {
+    if (!confirm(`Excluir a proposta de "${cliente}"?\n\nEsta ação não pode ser desfeita.`)) return;
+    try {
+      const r = await fetch('/api/proposals/' + proposalId, {
+        method: 'DELETE',
+        headers: {'X-CSRF-Token':csrf()},
       });
       const data = await r.json();
       if (data.ok) carregarLista();
-      else alert('Erro: ' + (data.error||'desconhecido'));
+      else alert('Erro ao excluir: ' + (data.error||'desconhecido'));
     } catch(e) { alert('Erro de conexão.'); }
   };
 
