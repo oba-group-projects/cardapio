@@ -136,138 +136,75 @@ são fixas — o usuário clica para avançar, não rola.
 ---
 
 ### Fase 12A — Módulo de Propostas de Orçamento
-**Status: [ ] Pendente**
+**Status: [x] Concluído — 25/09/2026**
 
-**O que é:**
-Gerador profissional de propostas com 3 cenários, PDF e link compartilhável.
-Substitui o caderno manual e o áudio explicativo no WhatsApp.
+Todas as subfases entregues:
+- **12A-1:** D1 migrations (proposals, scenarios, items) + rotas Worker
+- **12A-2:** Aba Propostas na Central — editor completo, cenários, estimativa financeira
+- **12A-3:** Página pública `/proposta/:id` — 4 páginas, texto emocional, cards delicados, PDF
+- **12A-4:** Status inline editável, botão Excluir, campo Abertura, migration 0007
 
-**Estrutura de uma proposta:**
-```
-Proposta
-├── Dados do evento
-│   ├── Nome do cliente
-│   ├── Data do evento
-│   ├── Número de convidados
-│   └── Tipo de evento (campo livre)
-│
-├── Resumo geral  ← substitui o áudio explicativo
-│   └── Texto livre contextualizando a proposta
-│
-├── Cenário 1 / 2 / 3  (nome padrão editável pela Oba Doceria)
-│   ├── Nome do cenário (padrão: "Cenário 1", editável)
-│   ├── Descrição curta do cenário
-│   ├── Itens do catálogo (produto + quantidade + preço unit. + subtotal)
-│   ├── Adicionais livres (descrição + valor — variam por proposta)
-│   ├── Subtotal calculado automaticamente
-│   ├── Desconto (R$ ou %, avaliado caso a caso)
-│   └── Total final
-│
-└── Rodapé
-    ├── Validade da proposta
-    └── Contato / WhatsApp
-```
-
-**Fluxo na Central:**
-1. Nova Proposta → dados do evento + resumo geral
-2. Para cada cenário: seleciona itens do catálogo, adiciona linhas livres, aplica desconto
-3. Gerar → sistema cria link público + PDF
-4. Revisar/editar antes de enviar (pode regenerar)
-5. Copiar link ou baixar PDF → WhatsApp
-
-**Link público `/proposta/:id`:**
-- Página otimizada para celular
-- 3 cenários navegáveis
-- CTA "Quero este cenário" → WhatsApp com mensagem pré-formatada
-- Sem login, sem formulário — só leitura e contato
-
-**Histórico no D1:**
-- Rascunho / Enviada / Aceita / Recusada
-
-**O que NÃO muda:**
-- Cardápio público
-- Fluxo de compras do cliente
+HEAD atual: `e828a73`
 
 ---
 
-#### Subfase 12A-1 — Infraestrutura D1 + rota Worker
+### Fase 12B — Propostas Corporativas + Sazonais
+**Status: [ ] Em andamento — 25/09/2026**
+
+#### Decisões aprovadas
+
+| Decisão | Definição |
+|---|---|
+| Templates | Separados: Evento / Corporativo / Sazonal |
+| Modelo sazonal | Individual com duplicação |
+| Calculadora de pedido | Não |
+| Desconto por cliente | Não |
+| Galeria de imagens | Até 8 fotos por proposta |
+| Campos sazonais | Prazo pedido, prazo entrega, condições pagamento, pedido mínimo |
+| Campos corporativos | Empresa, demanda, frequência, observações/briefing |
+
+#### Subfase 12B-1 — Migrations
 **Status: [ ] Pendente**
 
-- Tabela `proposals` no D1 (id, cliente, data_evento, convidados, tipo_evento, resumo, validade, status, criado_em)
-- Tabela `proposal_scenarios` (id, proposal_id, nome, descricao, desconto_tipo, desconto_valor, ordem)
-- Tabela `proposal_items` (id, scenario_id, tipo: catálogo|livre, ref_id, descricao, qtd, preco_unit)
-- Rotas no Worker:
-  - `POST /api/proposals` — criar/salvar rascunho
-  - `GET /api/proposals` — listar (autenticado)
-  - `GET /api/proposals/:id` — carregar proposta (autenticado)
-  - `PUT /api/proposals/:id` — atualizar
-  - `PATCH /api/proposals/:id/status` — atualizar status
-  - `GET /proposta/:id` — página pública (sem auth)
+- **0008:** campos `template`, `empresa`, `demanda`, `frequencia`, `orcamento_ref`, `observacoes`, `prazo_pedido`, `prazo_entrega`, `cond_pagamento`, `pedido_minimo` na tabela `proposals`
+- **0009:** tabela `proposal_media` (upload Base64 por proposta, CASCADE)
+- **0010:** campo `faixas` (JSON) na tabela `proposal_items` (tabela de preços por volume)
 
----
-
-#### Subfase 12A-2 — Editor na Central (aba Propostas)
+#### Subfase 12B-2 — Worker (rotas de mídia + duplicar)
 **Status: [ ] Pendente**
 
-- Nova aba "Propostas" na Central
-- Listagem com status visual (Rascunho / Enviada / Aceita / Recusada)
-- Editor completo: dados do evento, resumo geral, 3 cenários
-- Seletor de itens do catálogo com busca e quantidade editável
-- Linhas livres (adicionais): adicionar/remover, descrição + valor
-- Desconto por cenário (toggle R$ / %)
-- Cálculo automático em tempo real
-- Salvar rascunho a qualquer momento
+- `POST /api/proposals/:id/media` — upload de imagem
+- `DELETE /api/proposals/:id/media/:media_id` — remover imagem
+- `GET /api/proposals/:id/media` — listar imagens
+- `POST /api/proposals/:id/duplicate` — duplicar proposta (copia dados + cenários + imagens)
 
----
-
-#### Subfase 12A-3 — Página pública `/proposta/:id`
+#### Subfase 12B-3a — Central: seleção de template + formulário Corporativo
 **Status: [ ] Pendente**
 
-- Layout mobile-first, identidade visual da Oba Doceria
-- Dados do evento + resumo geral no topo
-- Cenários em abas (navegação por toque)
-- Itens com quantidade e subtotal por linha
-- Adicionais e desconto destacados
-- Total final em destaque
-- CTA "Quero este cenário" → WhatsApp com texto pré-formatado
-- Validade visível
+- Modal de seleção ao criar (Evento / Corporativo / Sazonal)
+- Formulário Corporativo: empresa, WhatsApp, tipo de demanda, frequência, observações, validade, texto abertura, galeria de imagens, cenários sem "doces por convidado"
 
----
-
-#### Subfase 12A-4 — Geração de PDF
+#### Subfase 12B-3b — Central: formulário Sazonal
 **Status: [ ] Pendente**
 
-- Geração no browser (sem dependência de servidor externo, zero custo)
-- Usa a mesma estrutura visual da página pública
-- Botão "Baixar PDF" na Central, na tela de revisão
-- Revisão antes de enviar: pode editar e regenerar
+- Formulário Sazonal: empresa (ou geral), prazo pedido, prazo entrega, condições pagamento, pedido mínimo, validade, texto abertura, galeria de imagens
+- Produtos com faixas de preço: nome, descrição, foto, tabela (até/acima de X → preço Y)
 
----
-
-#### Subfase 12A-5 — Testes e homologação
+#### Subfase 12B-4a — Página pública Corporativo
 **Status: [ ] Pendente**
 
-- Criar proposta completa com 3 cenários, adicionais e desconto
-- Verificar cálculos automáticos
-- Abrir link público no celular e confirmar layout
-- Testar CTA WhatsApp
-- Baixar PDF e conferir fidelidade visual
-- Alterar status e confirmar histórico
+- Pg0: abertura com nome da empresa
+- Pg1: galeria de imagens + descrição do projeto
+- Pg2/3: cenários com itens livres
+- CTA WhatsApp adaptado
 
----
+#### Subfase 12B-4b — Página pública Sazonal
+**Status: [ ] Pendente**
 
-### Fase 12B — Categoria "Doces Finos para Eventos" no catálogo
-**Status: [ ] Pendente — após 12A homologada**
-
-**O que é:**
-Nova categoria no catálogo gerenciada pela Central, exclusiva para eventos/festas.
-Sabores desta categoria não aparecem no cardápio do dia a dia.
-
-**O que inclui:**
-- Flag `exclusivo_eventos: true` por categoria no catálogo
-- Categoria gerenciada na Central como qualquer outra (adicionar/editar/inativar sabores)
-- Itens disponíveis para seleção nas propostas de orçamento (Fase 12A)
-- Não aparecem no cardápio público (`/cardapio`)
+- Pg0: abertura com data comemorativa + empresa
+- Pg1: condições (prazo, entrega, pagamento, mínimo) + galeria
+- Pg2/3/4: produtos com tabela de faixas de preço
+- CTA: "Olá, Oba Doceria! Tenho interesse no catálogo. Quais os próximos passos?"
 
 ---
 
@@ -321,9 +258,15 @@ URL própria, disparada para quem solicita orçamento de festa.
 | Data | Passo | Resultado |
 |---|---|---|
 | 20/09/2026 | Plano criado e aprovado | — |
-| 20/09/2026 | Passo 1 concluído | GET /cardapio no Worker funcionando. Status 200, 623KB. /api/catalog público retorna 55 sabores, 6 categorias. |
-| 20/09/2026 | Passo 2 concluído | 40 -> 3 U+FFFD. Scripts em .scripts/. 13/13 validações OK. Commit a8b7284. |
-| 22/09/2026 | Fix divergência preview/cardápio | /api/catalog conectado ao slot PUBLISHED do D1. Commit 09169c4. |
-| 22/09/2026 | Passo 3 concluído | #pag-1/2/3 fixas em 100dvh, overflow:hidden. Commit 77c05a8. Deploy 2cf0ef7f. |
-| 22/09/2026 | fix(scroll) body | body.oba-pagina-fixa reforça bloqueio no body. Commit a242ed6. Deploy pendente. |
-| 22/09/2026 | Planejamento 12A-12C | Estrutura de propostas definida. 12A dividida em 5 subfases. 12B/12C planejadas. PLANO_EXECUCAO.md atualizado. |
+| 20/09/2026 | Passo 1 concluído | GET /cardapio no Worker funcionando. |
+| 20/09/2026 | Passo 2 concluído | Chars corrompidos corrigidos. |
+| 22/09/2026 | Fix divergência preview/cardápio | /api/catalog conectado ao slot PUBLISHED do D1. |
+| 22/09/2026 | Passo 3 concluído | #pag-1/2/3 fixas em 100dvh. |
+| 22/09/2026 | Planejamento 12A | Estrutura de propostas definida. |
+| 23/09/2026 | 12A-1 concluída | D1 migrations + rotas Worker. |
+| 23/09/2026 | 12A-2 concluída | Aba Propostas na Central completa. |
+| 24/09/2026 | 12A-3 concluída | Página pública /proposta/:id — 4 páginas, texto emocional. HEAD: d2e1eff |
+| 25/09/2026 | 12A-3 refinamentos | Caps → caixa mista, res-sub removido. HEAD: ff10cda |
+| 25/09/2026 | 12A-4 concluída | Status inline, Excluir, campo Abertura, migration 0007. HEAD: ecbc167 |
+| 25/09/2026 | Fix mensagem WhatsApp | "Olá, Oba Doceria! Gostei do Cenário X. E agora, quais os próximos passos?" HEAD: 85525cf |
+| 25/09/2026 | 12B aprovada | Templates separados, sazonal individual com duplicação, galeria 8 fotos. |
