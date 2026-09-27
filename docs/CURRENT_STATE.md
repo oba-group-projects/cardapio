@@ -1,36 +1,39 @@
 ﻿# CURRENT STATE
 
-Atualizado: 2026-09-24
+Atualizado: 2026-09-25
 
 ## Git
 Branch: feature/gestao-online-segura
-Commit HEAD: ac87851
+Commit HEAD: 85525cf
 Branch main: 5913078
 
 ## Estado funcional
 - Central privada autenticada e operacional
 - Fluxo DRAFT → PREVIEW → PUBLISHED com rollback e histórico
-- Cardápio público: páginas 1/2/3 fixas, passo 1 sem scroll
-- Vitrine Presenteáveis: lista compacta, tela de detalhe por kit, Degustação integrada
-- Módulo de Propostas de Orçamento (12A-1, 12A-2 e 12A-3 concluídas)
+- Cardápio público funcional
+- Módulo de Propostas completo (12A-1 a 12A-4)
 
 ## Fases concluídas (12A)
-- 12A-1: D1 migrations (proposals, proposal_scenarios, proposal_items) + rotas Worker
-- 12A-2: Aba Propostas na Central (editor completo, cenários, estimativa, CSRF, restauração)
-- 12A-3: Página pública /proposta/:id — redesign com 4 páginas de navegação
-  - PG0 — Abertura personalizada: logo, nome do cliente, bloco de info do evento,
-    texto gerado dinamicamente (evento, data, convidados, cenários), citação opcional,
-    botão "Ver minha proposta"
-  - PG1 — Resumo compacto: 3 cards com borda colorida por cenário, número grande,
-    nome, pills (doces/pessoa, total de doces), valor e botão "Ver detalhes"
-  - PG2/3/4 — Detalhe por cenário: topbar sticky (Voltar + navegar entre cenários),
-    tabela de itens, CTA "Escolhi este cenário — vamos conversar"
-  - WhatsApp: "Oba! Recebi a proposta e quero seguir com o Cenário X – Nome (R$ X). Vamos fechar os detalhes?"
-  - PDF: capa (pg0) + resumo (pg1) + 1 cenário por página via @media print
-  - Strings JS puras (sem template literals aninhados) para estabilidade
+- 12A-1: D1 migrations + rotas Worker (proposals, scenarios, items)
+- 12A-2: Aba Propostas na Central (editor completo)
+- 12A-3: Página pública /proposta/:id — 4 páginas, texto emocional, cards delicados
+  - Pg0: abertura personalizada (campo abertura > resumo > automático)
+  - Pg1: resumo compacto dos 3 cenários
+  - Pg2/3/4: detalhe com tabela, navegação sticky
+  - WhatsApp: "Olá, Oba Doceria! Gostei do Cenário X – Nome. E agora, quais os próximos passos?"
+  - PDF: @page{margin:14mm 18mm}
+- 12A-4: Melhorias na listagem
+  - Status editável inline (select colorido, 6 opções)
+  - Botão Excluir para rascunhos (confirm + CASCADE)
+  - Campo "Texto da abertura" na Central com contador
+  - Migration 0007: coluna abertura no D1
 
 ## Próxima fase
-Deploy: executar EXECUTAR-9AB-DEPLOY.cmd para levar ac87851 ao Cloudflare e homologar ao vivo
+12B — Modelo corporativo:
+- Template Evento / Corporativo ao criar proposta
+- Formulário Corporativo com briefing + itens + fotos
+- Tabela proposal_media (upload por proposta)
+- Layout público com galeria de imagens
 
 ## Links
 - Central: https://oba-cardapio-gestao.obadoceria.workers.dev/
