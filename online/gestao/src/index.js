@@ -2330,20 +2330,40 @@ async function obaUpsertProposal(env, proposalId, data, now) {
     validade = null,
     status = "rascunho",
     whatsapp = null,
+    template = "evento",
+    empresa = null,
+    demanda = null,
+    frequencia = null,
+    orcamento_ref = null,
+    observacoes = null,
+    prazo_pedido = null,
+    prazo_entrega = null,
+    cond_pagamento = null,
+    pedido_minimo = null,
   } = data;
 
   await env.DB.prepare(`
-    INSERT INTO proposals (proposal_id, cliente, whatsapp, data_evento, convidados, tipo_evento, resumo, abertura, validade, status, criado_em, atualizado_em)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO proposals (proposal_id, cliente, whatsapp, data_evento, convidados, tipo_evento,
+      resumo, abertura, validade, status, template, empresa, demanda, frequencia, orcamento_ref,
+      observacoes, prazo_pedido, prazo_entrega, cond_pagamento, pedido_minimo, criado_em, atualizado_em)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ON CONFLICT(proposal_id) DO UPDATE SET
       cliente=excluded.cliente, whatsapp=excluded.whatsapp,
       data_evento=excluded.data_evento,
       convidados=excluded.convidados, tipo_evento=excluded.tipo_evento,
       resumo=excluded.resumo, abertura=excluded.abertura,
-      validade=excluded.validade,
-      status=excluded.status, atualizado_em=excluded.atualizado_em
+      validade=excluded.validade, status=excluded.status,
+      template=excluded.template, empresa=excluded.empresa,
+      demanda=excluded.demanda, frequencia=excluded.frequencia,
+      orcamento_ref=excluded.orcamento_ref, observacoes=excluded.observacoes,
+      prazo_pedido=excluded.prazo_pedido, prazo_entrega=excluded.prazo_entrega,
+      cond_pagamento=excluded.cond_pagamento, pedido_minimo=excluded.pedido_minimo,
+      atualizado_em=excluded.atualizado_em
   `).bind(
-    proposalId, cliente, whatsapp, data_evento, convidados, tipo_evento, resumo, abertura, validade, status, now, now
+    proposalId, cliente, whatsapp, data_evento, convidados, tipo_evento,
+    resumo, abertura, validade, status, template, empresa, demanda, frequencia,
+    orcamento_ref, observacoes, prazo_pedido, prazo_entrega, cond_pagamento, pedido_minimo,
+    now, now
   ).run();
 }
 
@@ -2491,6 +2511,98 @@ async function obaHandleProposalsApi(request, env, url) {
     return json({ ok: true, deleted: matchDel[1] });
   }
 
+  // POST /api/proposals/:id/duplicate — duplicar proposta completa
+  const matchDup = url.pathname.match(/^\/api\/proposals\/([^/]+)\/duplicate$/);
+  if (matchDup && request.method === "POST") {
+    const src = await obaLoadProposal(env, matchDup[1]);
+    if (!src) return json({ ok: false, error: "nao_encontrada" }, 404);
+
+    const newId = obaProposalId();
+    // Copia todos os campos, reset status para rascunho
+    const copy = Object.assign({}, src, { status: "rascunho" });
+    delete copy.proposal_id;
+    await obaUpsertProposal(env, newId, copy, now);
+    if (Array.isArray(src.scenarios) && src.scenarios.length > 0) {
+      const scenariosLimpos = src.scenarios.map(function(s) {
+        const sc = Object.assign({}, s);
+        delete sc.scenario_id; // force novo ID
+        return sc;
+      });
+      await obaUpsertScenarios(env, newId, scenariosLimpos);
+    }
+    // Copia imagens da proposta original
+    const medias = await env.DB.prepare(
+      "SELECT dados,mime,tamanho,legenda,ordem FROM proposal_media WHERE proposal_id = ? ORDER BY ordem"
+    ).bind(matchDup[1]).all();
+    for (const m of (medias.results||[])) {
+      const mid = "pmid_" + crypto.randomUUID().replace(/-/g,"").slice(0,12);
+      await env.DB.prepare(
+        "INSERT INTO proposal_media (media_id,proposal_id,dados,mime,tamanho,legenda,ordem,criado_em) VALUES (?,?,?,?,?,?,?,?)"
+      ).bind(mid, newId, m.dados, m.mime, m.tamanho, m.legenda, m.ordem, now).run();
+    }
+    const saved = await obaLoadProposal(env, newId);
+    return json({ ok: true, proposal: saved }, 201);
+  }
+
+  // POST /api/proposals/:id/media — upload de imagem (max 8 por proposta)
+  const matchMedia = url.pathname.match(/^\/api\/proposals\/([^/]+)\/media$/);
+  if (matchMedia && request.method === "POST") {
+    let body;
+    try { body = await request.json(); } catch { return json({ ok: false, error: "json_invalido" }, 400); }
+
+    // Verifica limite de 8 imagens
+    const count = await env.DB.prepare(
+      "SELECT COUNT(*) as n FROM proposal_media WHERE proposal_id = ?"
+    ).bind(matchMedia[1]).first();
+    if ((count?.n||0) >= 8) return json({ ok: false, error: "limite_8_imagens" }, 400);
+
+    const mid = "pmid_" + crypto.randomUUID().replace(/-/g,"").slice(0,12);
+    await env.DB.prepare(
+      "INSERT INTO proposal_media (media_id,proposal_id,dados,mime,tamanho,legenda,ordem,criado_em) VALUES (?,?,?,?,?,?,?,?)"
+    ).bind(
+      mid, matchMedia[1],
+      body.dados||"", body.mime||"image/jpeg",
+      Number(body.tamanho)||0, body.legenda||null,
+      Number(body.ordem)||1, now
+    ).run();
+    return json({ ok: true, media_id: mid });
+  }
+
+  // GET /api/proposals/:id/media — listar imagens
+  const matchMediaGet = url.pathname.match(/^\/api\/proposals\/([^/]+)\/media$/);
+  if (matchMediaGet && request.method === "GET") {
+    const rows = await env.DB.prepare(
+      "SELECT media_id,mime,tamanho,legenda,ordem FROM proposal_media WHERE proposal_id = ? ORDER BY ordem"
+    ).bind(matchMediaGet[1]).all();
+    return json({ ok: true, media: rows.results||[] });
+  }
+
+  // DELETE /api/proposals/:id/media/:media_id — remover imagem
+  const matchMediaDel = url.pathname.match(/^\/api\/proposals\/([^/]+)\/media\/([^/]+)$/);
+  if (matchMediaDel && request.method === "DELETE") {
+    await env.DB.prepare(
+      "DELETE FROM proposal_media WHERE media_id = ? AND proposal_id = ?"
+    ).bind(matchMediaDel[2], matchMediaDel[1]).run();
+    return json({ ok: true, deleted: matchMediaDel[2] });
+  }
+
+  // GET /api/proposals/:id/media/:media_id/dados — servir imagem (rota publica)
+  const matchMediaServe = url.pathname.match(/^\/api\/proposals\/([^/]+)\/media\/([^/]+)\/dados$/);
+  if (matchMediaServe && request.method === "GET") {
+    const row = await env.DB.prepare(
+      "SELECT dados,mime FROM proposal_media WHERE media_id = ? AND proposal_id = ?"
+    ).bind(matchMediaServe[2], matchMediaServe[1]).first();
+    if (!row) return new Response("not found", { status: 404 });
+    const buf = Uint8Array.from(atob(row.dados.replace(/^data:[^,]+,/,"")), c => c.charCodeAt(0));
+    return new Response(buf, {
+      status: 200,
+      headers: {
+        "Content-Type": row.mime,
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    });
+  }
+
   return null;
 }
 
@@ -2526,6 +2638,11 @@ async function obaHandlePropostaPublica(request, env, url) {
   const catPM={}, saborPM={};
   cats.forEach(c    => { catPM[String(c.id)]   = Number(c.precoReferencia||0); });
   flavors.forEach(f => { saborPM[String(f.id)] = Number(f.preco||0); });
+
+  // Bifurca por template
+  const tmpl = proposal.template || "evento";
+  if (tmpl === "corporativo") return obaHandlePropostaCorporativo(proposal, obaWpp, env, match[1]);
+  if (tmpl === "sazonal")     return obaHandlePropostaSazonal(proposal, obaWpp, env, match[1]);
 
   const R = (v) => {
     const n = Number(v||0).toFixed(2), [i,d]=n.split(".");
@@ -2969,6 +3086,475 @@ function obaShowPage(n){
 
   return new Response(html,{status:200,headers:{"Content-Type":"text/html; charset=utf-8","Cache-Control":"no-store","X-Robots-Tag":"noindex, nofollow"}});
 }
+
+// ============================================================
+// PAGINA PUBLICA — TEMPLATE CORPORATIVO
+// ============================================================
+async function obaHandlePropostaCorporativo(proposal, obaWpp, env, propId) {
+  const R = (v) => { const n=Number(v||0).toFixed(2),[i,d]=n.split(".");return "R$\u00a0"+i.replace(/\B(?=(\d{3})+(?!\d))/g,".")+","+d; };
+  const MESES=["janeiro","fevereiro","mar\u00e7o","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+  const fmtD=(d)=>{ if(!d)return null; try{const[y,m,dy]=d.split("-");return parseInt(dy)+" de "+MESES[parseInt(m)-1]+" de "+y;}catch{return d;} };
+
+  const PAL=[
+    {acento:"#B8860B",fundo:"#FFFDF8",topo:"#C8922A"},
+    {acento:"#9B3A5C",fundo:"#FFF8FA",topo:"#B05070"},
+    {acento:"#5B4A9A",fundo:"#F9F7FF",topo:"#6B5BAA"},
+  ];
+
+  const validade = fmtD(proposal.validade);
+  const nomeEmpresa = proposal.empresa || proposal.cliente || "";
+  const toTC = (s) => s ? s.toLowerCase().replace(/(?:^|\s)\S/g,a=>a.toUpperCase()) : s;
+
+  // Carrega imagens da proposta
+  let mediasHtml = "";
+  try {
+    const mRows = await env.DB.prepare(
+      "SELECT media_id,legenda,ordem FROM proposal_media WHERE proposal_id=? ORDER BY ordem"
+    ).bind(propId).all();
+    if (mRows.results && mRows.results.length) {
+      mediasHtml = mRows.results.map(function(m){
+        const src = "/api/proposals/"+propId+"/media/"+m.media_id+"/dados";
+        const leg = m.legenda ? "<p style=\"font-size:10px;color:#9B7A60;margin-top:4px;text-align:center\">"+m.legenda+"</p>" : "";
+        return "<div style=\"flex-shrink:0;width:calc(50% - 6px)\"><img src=\""+src+"\" style=\"width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;border:1px solid #EDD9C0\" loading=\"lazy\">"+leg+"</div>";
+      }).join("");
+    }
+  } catch(e) {}
+
+  // Cenários
+  const catPM={}, saborPM={};
+  const cenariosData = (proposal.scenarios||[]).map(function(s,si){
+    const pal = PAL[si]||PAL[PAL.length-1];
+    let sub=0;
+    (s.items||[]).forEach(function(it){ sub+=Number(it.qtd||0)*Number(it.preco_unit||0); });
+    let desc=0;
+    if(s.desconto_tipo==="reais") desc=Number(s.desconto_valor||0);
+    else if(s.desconto_tipo==="percentual") desc=sub*(Number(s.desconto_valor||0)/100);
+    const total=Math.max(0,sub-desc);
+
+    const livreLinhas=(s.items||[]).map(function(it){
+      var toTCi=function(x){return x?x.toLowerCase().replace(/(?:^|\s)\S/g,function(a){return a.toUpperCase();}):x;};
+      return "<tr><td class=\"td-n\">"+toTCi(it.descricao)+"</td><td class=\"td-q\"></td><td class=\"td-v\">"+R(it.preco_unit)+"</td></tr>";
+    }).join("");
+    const descLinha=desc>0?"<tr class=\"tr-d\"><td colspan=\"2\">Desconto</td><td>&minus;&nbsp;"+R(desc)+"</td></tr>":"";
+    const introTexto=(s.texto_publico||"").trim()||"";
+    const ctaMsg=encodeURIComponent("Ol\u00e1, Oba Doceria! Gostei do Cen\u00e1rio "+(si+1)+" \u2013 "+(s.nome||"")+ ". E agora, quais os pr\u00f3ximos passos?");
+    const ctaHref=obaWpp?"https://wa.me/55"+obaWpp+"?text="+ctaMsg:"";
+    return {s,si,pal,total,livreLinhas,descLinha,introTexto,ctaHref};
+  });
+
+  const numCenarios = cenariosData.length;
+  const paraA = (proposal.abertura||"").trim() ||
+    (nomeEmpresa ? nomeEmpresa+", preparamos esta proposta com muito cuidado e aten\u00e7\u00e3o \u00e0s necessidades da sua empresa." : "Preparamos esta proposta com muito cuidado.");
+  const paraB = proposal.observacoes
+    ? "Sobre o projeto: "+proposal.observacoes
+    : "Abaixo voc\u00ea encontra "+(numCenarios>1?"os "+numCenarios+" cen\u00e1rios":"a proposta")+" que desenvolvemos especialmente para voc\u00ea.";
+
+  const resumoCards = cenariosData.map(function(d){
+    const s=d.s,si=d.si,pal=d.pal,total=d.total;
+    return (
+      "<div class=\"rc\" style=\"border-left-color:"+pal.acento+"\">"+
+        "<div class=\"rc-linha\">"+
+          "<div class=\"rc-esq\">"+
+            "<span class=\"rc-num\" style=\"color:"+pal.acento+"\">"+(si+1)+"</span>"+
+            "<div><span class=\"rc-badge\">"+(s.nome||("Cen\u00e1rio "+(si+1)))+"</span></div>"+
+          "</div>"+
+          "<div class=\"rc-dir\">"+
+            "<span class=\"rc-valor\" style=\"color:"+pal.acento+"\">"+R(total)+"</span>"+
+            "<button class=\"rc-cta\" style=\"background:"+pal.acento+"\" onclick=\"obaShowPage("+(si+2)+")\">Ver detalhes &rarr;</button>"+
+          "</div>"+
+        "</div>"+
+      "</div>"
+    );
+  }).join("\n");
+
+  const detalhePages = cenariosData.map(function(d){
+    const s=d.s,si=d.si,pal=d.pal,total=d.total,livreLinhas=d.livreLinhas,descLinha=d.descLinha,introTexto=d.introTexto,ctaHref=d.ctaHref;
+    const navBtns = cenariosData.filter(function(x){return x.si!==si;})
+      .map(function(x){return "<button class=\"nav-outro\" style=\"color:"+x.pal.acento+";border-color:"+x.pal.acento+"60\" onclick=\"obaShowPage("+(x.si+2)+")\">Cen\u00e1rio "+(x.si+1)+" \u2013 "+(x.s.nome||"")+"</button>";}).join("");
+    const ctaBtnHtml = ctaHref ? "<a href=\""+ctaHref+"\" target=\"_blank\" class=\"cta-btn\" style=\"background:"+pal.acento+"\">Escolhi este cen\u00e1rio \u2014 vamos conversar</a>" : "";
+    return (
+      "<div id=\"pg"+(si+2)+"\" class=\"det-page\" style=\"display:none\">"+
+        "<div class=\"det-topbar\">"+
+          "<button class=\"det-voltar\" onclick=\"obaShowPage(1)\">&#8592; Todos os cen\u00e1rios</button>"+
+          "<div class=\"det-navbtns\">"+navBtns+"</div>"+
+        "</div>"+
+        "<div class=\"c-card\" style=\"border-top-color:"+pal.topo+";background:"+pal.fundo+"\">"+
+          "<div class=\"c-cabecalho\">"+
+            "<div class=\"c-esq\"><span class=\"c-rotulo\" style=\"color:"+pal.acento+"\">Cen\u00e1rio "+(si+1)+"</span>"+
+            "<h2 class=\"c-nome\">"+(s.nome||("Cen\u00e1rio "+(si+1)))+"</h2></div>"+
+            "<div class=\"c-dir\"><span class=\"c-total\" style=\"color:"+pal.acento+"\">"+R(total)+"</span></div>"+
+          "</div>"+
+          (introTexto?"<div class=\"c-intro\"><p>"+introTexto+"</p></div>":"")+
+          "<div class=\"c-corpo\">"+
+            "<table class=\"tab\"><tbody>"+livreLinhas+descLinha+
+              "<tr class=\"tr-tot\"><td colspan=\"2\">Total</td><td style=\"color:"+pal.acento+"\">"+R(total)+"</td></tr>"+
+            "</tbody></table>"+ctaBtnHtml+
+          "</div>"+
+        "</div>"+
+        "<div class=\"det-rodape-nav\">"+
+          "<button class=\"det-voltar-rodape\" onclick=\"obaShowPage(1)\">&#8592; Todos os cen\u00e1rios</button>"+
+          (navBtns?"<div class=\"det-navbtns-rodape\">"+navBtns+"</div>":"")+
+        "</div>"+
+      "</div>"
+    );
+  }).join("\n");
+
+  const validadeHtml = validade ? "<p>Proposta v&aacute;lida at&eacute; <strong style=\"color:#5D3A1A\">"+validade+"</strong></p>" : "";
+  const wppHtml = obaWpp ? "<p>D&uacute;vidas? <a href=\"https://wa.me/55"+obaWpp+"\">fale pelo WhatsApp</a></p>" : "";
+
+  const html = `<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Proposta para ${nomeEmpresa} &middot; Oba Doceria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#3B2A1E;line-height:1.5}
+.page{max-width:600px;margin:0 auto;padding:0 16px}
+#pg0{min-height:100svh;display:flex;flex-direction:column;background:linear-gradient(160deg,#FFF8EE 0%,#FDF0D8 55%,#F9E4BE 100%)}
+.ab-topo{padding:36px 24px 0;text-align:center}
+.ab-logo{height:38px;object-fit:contain;opacity:.85;margin-bottom:10px}
+.ab-label{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#C8922A;margin-bottom:16px;display:block}
+.ab-evento{display:flex;justify-content:center;background:#FFFCF5;border:1px solid #EDD9C0;border-radius:10px;overflow:hidden;margin:0 auto;max-width:320px}
+.ab-ev-item{flex:1;text-align:center;padding:9px 8px;border-right:1px solid #EDD9C0}
+.ab-ev-item:last-child{border-right:none}
+.ab-ev-label{font-size:7px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#C8922A;display:block;margin-bottom:2px}
+.ab-ev-val{font-size:11px;font-weight:500;color:#5D3A1A;display:block}
+.ab-sep{border:none;border-top:1px solid #EDD9C0;margin:20px auto 0;width:36px}
+.ab-corpo{padding:24px 28px 0;flex:1}
+.ab-p-destaque{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(20px,5.5vw,25px);font-weight:600;color:#3B2A1E;line-height:1.45;margin-bottom:20px;font-style:italic;text-align:center}
+.ab-p{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(14px,3.8vw,16px);color:#6B4A2A;line-height:1.85;margin-bottom:14px;text-align:left}
+.ab-p strong{font-weight:600;color:#3B2A1E}
+.ab-rodape{padding:24px 24px 40px;text-align:center}
+.ab-ornamento{font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;color:#C8922A;opacity:.4;letter-spacing:10px;margin-bottom:14px;display:block}
+.ab-assinatura{font-family:'Cormorant Garamond',Georgia,serif;font-size:15px;font-style:italic;color:#C8922A;margin-bottom:24px;display:block}
+.ab-btn{display:inline-block;background:#3B2A1E;color:#F9E8C8;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.8px;padding:14px 36px;border-radius:50px;border:none;cursor:pointer;text-transform:uppercase}
+/* PG1 — galeria + cenários */
+#pg1{display:none}
+.pg1-hero{padding:20px 20px 14px;text-align:center;background:#FFFDF8;border-bottom:1px solid #EDD9C0}
+.pg1-logo{height:28px;object-fit:contain;opacity:.82;margin-bottom:8px}
+.pg1-titulo{font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;font-weight:400;color:#3B2A1E}
+.galeria{display:flex;flex-wrap:wrap;gap:12px;padding:16px 16px 0}
+.res-secao{padding:20px 16px 10px;font-size:11px;font-weight:400;color:#9B7A60;text-align:center;font-style:italic}
+.rc{margin:0 16px 8px;border-radius:10px;border:1px solid #EDD9C0;border-left-width:2px;background:#fff;padding:10px 14px}
+.rc-linha{display:flex;align-items:center;gap:10px;justify-content:space-between}
+.rc-esq{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
+.rc-num{font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;font-weight:400;opacity:.3;font-style:italic;flex-shrink:0}
+.rc-badge{font-size:13px;font-weight:500;color:#3B2A1E}
+.rc-dir{text-align:right;flex-shrink:0}
+.rc-valor{display:block;font-size:14px;font-weight:500;line-height:1;margin-bottom:6px}
+.rc-cta{display:block;padding:5px 11px;border-radius:20px;border:none;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:500;cursor:pointer;opacity:.85}
+.res-footer-nav{padding:10px 16px 0;text-align:center}
+.res-voltar-ab{background:none;border:none;font-size:11px;font-weight:600;color:#bbb;cursor:pointer;text-decoration:underline}
+/* DETALHE */
+.det-page{padding-top:24px;padding-bottom:8px}
+.det-topbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:10px 14px;background:#fff;border-bottom:1px solid #EDD9C0;position:sticky;top:0;z-index:10}
+.det-voltar{background:none;border:1.5px solid #EDD9C0;border-radius:24px;padding:5px 13px;font-size:11px;font-weight:600;color:#7A5A40;cursor:pointer}
+.det-navbtns{display:flex;gap:5px;flex-wrap:wrap}
+.nav-outro{background:none;border:1.5px solid;border-radius:24px;padding:4px 11px;font-size:10px;font-weight:600;cursor:pointer}
+.c-card{margin:10px auto 0;max-width:480px;border-radius:14px;border:1px solid #EDD9C0;border-top-width:3px;overflow:hidden;background:#fff;box-shadow:0 1px 8px rgba(60,35,20,.05)}
+.c-cabecalho{padding:18px 20px 13px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.c-esq{flex:1;min-width:0}
+.c-rotulo{font-size:9px;font-weight:500;letter-spacing:.5px;display:block;margin-bottom:3px;opacity:.7}
+.c-nome{font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;font-weight:400;color:#3B2A1E}
+.c-dir{text-align:right;flex-shrink:0}
+.c-total{font-size:18px;font-weight:600;display:block}
+.c-intro{padding:0 20px 13px;border-bottom:1px solid #F0E8DE}
+.c-intro p{font-size:12px;color:#7A5A40;font-style:italic}
+.c-corpo{padding:13px 20px 18px}
+.tab{width:100%;border-collapse:collapse}
+.tab td{padding:7px 0;border-bottom:1px solid #F5EDE4;font-size:12px;vertical-align:middle}
+.td-n{color:#3B2A1E;font-weight:400}
+.td-q{text-align:center;color:#ccc;font-size:11px;padding:7px 8px;white-space:nowrap}
+.td-v{text-align:right;font-weight:500;color:#5D3A1A;white-space:nowrap}
+.tr-d td{border-bottom:none;padding:7px 0 0;font-size:11px;color:#059669}
+.tr-d td:last-child{text-align:right}
+.tr-tot td{border:none;padding:12px 0 0;font-size:13px;font-weight:600;border-top:1px solid #EDD9C0}
+.tr-tot td:last-child{text-align:right;font-size:17px;font-weight:700}
+.cta-btn{display:block;margin:14px 0 0;padding:12px;border-radius:11px;text-align:center;color:#fff;font-weight:500;font-size:12px;text-decoration:none;opacity:.9}
+.det-rodape-nav{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:10px 14px;margin-top:4px}
+.det-voltar-rodape{background:none;border:1.5px solid #EDD9C0;border-radius:24px;padding:5px 13px;font-size:11px;font-weight:600;color:#7A5A40;cursor:pointer}
+.det-navbtns-rodape{display:flex;gap:5px;flex-wrap:wrap}
+.footer{margin:20px 16px 0;text-align:center;padding:18px 0 28px;border-top:1px solid #EDD9C0}
+.footer p{font-size:11px;color:#bbb;margin-bottom:4px}
+.footer a{color:#8B4513;font-weight:500;text-decoration:none}
+.footer-brand{font-family:'Cormorant Garamond',Georgia,serif;font-size:13px;font-style:italic;color:#bbb;margin-top:6px}
+.btn-pdf{margin-top:14px;background:#3B2A1E;color:#fff;border:none;border-radius:11px;padding:10px 26px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer}
+@page{margin:14mm 18mm}
+@media print{
+  #pg0{display:block!important;min-height:0!important;background:none!important}
+  .ab-btn,.ab-ornamento,.ab-assinatura{display:none!important}
+  #pg1{display:block!important}
+  .res-voltar-ab,.res-footer-nav,.rc-cta{display:none!important}
+  .det-page{display:block!important;page-break-before:always;padding-top:0}
+  .det-topbar,.det-rodape-nav,.cta-btn,.btn-pdf{display:none!important}
+  .page{max-width:100%;padding:0}
+  .c-card{margin:8px 0 0;max-width:100%;box-shadow:none;border-color:#ddd;page-break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div id="pg0">
+  <div class="ab-topo">
+    <img class="ab-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png" alt="Oba Doceria" onerror="this.style.display='none'">
+    <span class="ab-label">Proposta Corporativa</span>
+    ${nomeEmpresa ? "<div class=\"ab-evento\"><div class=\"ab-ev-item\"><span class=\"ab-ev-label\">Para</span><span class=\"ab-ev-val\">"+nomeEmpresa+"</span></div>"+(proposal.demanda?"<div class=\"ab-ev-item\"><span class=\"ab-ev-label\">Demanda</span><span class=\"ab-ev-val\">"+proposal.demanda+"</span></div>":"")+( validade?"<div class=\"ab-ev-item\"><span class=\"ab-ev-label\">V&aacute;lida at&eacute;</span><span class=\"ab-ev-val\">"+validade+"</span></div>":"")+"</div>" : ""}
+    <hr class="ab-sep">
+  </div>
+  <div class="ab-corpo">
+    <p class="ab-p-destaque">${paraA}</p>
+    <p class="ab-p">${paraB}</p>
+  </div>
+  <div class="ab-rodape">
+    <span class="ab-ornamento">&middot;&ensp;&middot;&ensp;&middot;</span>
+    <span class="ab-assinatura">Feito com cuidado. Servido com amor.</span>
+    <button class="ab-btn" onclick="obaShowPage(1)">Ver proposta &rarr;</button>
+  </div>
+</div>
+
+<div id="pg1" style="display:none">
+  <div class="pg1-hero">
+    <img class="pg1-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png" alt="Oba Doceria" onerror="this.style.display='none'">
+    <p class="pg1-titulo">Proposta para ${nomeEmpresa||"você"}</p>
+  </div>
+  ${mediasHtml ? "<div class=\"galeria\">"+mediasHtml+"</div>" : ""}
+  <p class="res-secao">Cen&aacute;rios disponíveis</p>
+  ${resumoCards}
+  <div class="res-footer-nav">
+    <button class="res-voltar-ab" onclick="obaShowPage(0)">&#8592; Voltar</button>
+  </div>
+  <div class="footer">
+    ${validadeHtml}${wppHtml}
+    <p class="footer-brand">Oba Doceria &middot; Um jeito doce de expressar felicidade</p>
+    <button class="btn-pdf" onclick="window.print()">Salvar como PDF</button>
+  </div>
+</div>
+
+${detalhePages}
+
+</div>
+<script>
+function obaShowPage(n){
+  var ids=['pg0','pg1'];
+  var total=${numCenarios};
+  for(var i=2;i<=total+1;i++)ids.push('pg'+i);
+  ids.forEach(function(id,idx){
+    var el=document.getElementById(id);
+    if(!el)return;
+    if(idx===n){ el.style.display=(idx===0)?'flex':'block'; }
+    else { el.style.display='none'; }
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>`;
+
+  return new Response(html,{status:200,headers:{"Content-Type":"text/html; charset=utf-8","Cache-Control":"no-store","X-Robots-Tag":"noindex, nofollow"}});
+}
+
+// ============================================================
+// PAGINA PUBLICA — TEMPLATE SAZONAL
+// ============================================================
+async function obaHandlePropostaSazonal(proposal, obaWpp, env, propId) {
+  const R = (v) => { const n=Number(v||0).toFixed(2),[i,d]=n.split(".");return "R$\u00a0"+i.replace(/\B(?=(\d{3})+(?!\d))/g,".")+","+d; };
+  const toTC = (s) => s ? s.toLowerCase().replace(/(?:^|\s)\S/g,a=>a.toUpperCase()) : s;
+  const MESES=["janeiro","fevereiro","mar\u00e7o","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+  const fmtD=(d)=>{ if(!d)return null; try{const[y,m,dy]=d.split("-");return parseInt(dy)+" de "+MESES[parseInt(m)-1]+" de "+y;}catch{return d;} };
+
+  const PAL=[
+    {acento:"#B8860B",fundo:"#FFFDF8",topo:"#C8922A"},
+    {acento:"#9B3A5C",fundo:"#FFF8FA",topo:"#B05070"},
+    {acento:"#5B4A9A",fundo:"#F9F7FF",topo:"#6B5BAA"},
+  ];
+
+  const validade = fmtD(proposal.validade);
+  const nomeEmpresa = proposal.empresa || proposal.cliente || "";
+
+  // Carrega imagens
+  let mediasHtml = "";
+  try {
+    const mRows = await env.DB.prepare(
+      "SELECT media_id,legenda,ordem FROM proposal_media WHERE proposal_id=? ORDER BY ordem"
+    ).bind(propId).all();
+    if (mRows.results && mRows.results.length) {
+      mediasHtml = mRows.results.map(function(m){
+        const src = "/api/proposals/"+propId+"/media/"+m.media_id+"/dados";
+        const leg = m.legenda ? "<p style=\"font-size:10px;color:#9B7A60;margin-top:4px;text-align:center\">"+m.legenda+"</p>" : "";
+        return "<div style=\"flex-shrink:0;width:calc(50% - 6px)\"><img src=\""+src+"\" style=\"width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;border:1px solid #EDD9C0\" loading=\"lazy\">"+leg+"</div>";
+      }).join("");
+    }
+  } catch(e) {}
+
+  // Produtos do cenário 1 com faixas de preço
+  const cen1 = proposal.scenarios && proposal.scenarios[0];
+  const produtosHtml = (cen1 && cen1.items ? cen1.items : []).map(function(it, idx){
+    const pal = PAL[idx % PAL.length];
+    let faixas = [];
+    try { if (it.faixas) faixas = JSON.parse(it.faixas); } catch(e) {}
+    const partes = (it.descricao||"").split(" — ");
+    const nomeProd = toTC(partes[0]||it.descricao||"");
+    const descProd = partes[1]||"";
+
+    const tabelaFaixas = faixas.length ? (
+      "<table style=\"width:100%;border-collapse:collapse;margin-top:10px\">"+
+      "<thead><tr><th style=\"font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#C8922A;text-align:left;padding:4px 0;border-bottom:1px solid #EDD9C0\">Quantidade</th>"+
+      "<th style=\"font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#C8922A;text-align:right;padding:4px 0;border-bottom:1px solid #EDD9C0\">Valor unit.</th></tr></thead>"+
+      "<tbody>"+faixas.map(function(f,fi){
+        const prev = faixas[fi-1];
+        const label = f.ate===null
+          ? ("Acima de "+(prev?.ate||"")+" un.")
+          : ("At\u00e9 "+f.ate+" un.");
+        return "<tr><td style=\"font-size:12px;color:#3B2A1E;padding:6px 0;border-bottom:1px solid #F5EDE4\">"+label+"</td>"+
+               "<td style=\"font-size:12px;font-weight:600;color:#5D3A1A;text-align:right;padding:6px 0;border-bottom:1px solid #F5EDE4\">"+R(f.preco)+"</td></tr>";
+      }).join("")+
+      "</tbody></table>"
+    ) : "";
+
+    return (
+      "<div style=\"border:1px solid #EDD9C0;border-top:3px solid "+pal.topo+";border-radius:12px;padding:16px;background:"+pal.fundo+";margin-bottom:12px\">"+
+        "<div style=\"display:flex;justify-content:space-between;align-items:flex-start\">"+
+          "<div>"+
+            "<h3 style=\"font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;font-weight:600;color:#3B2A1E;margin-bottom:2px\">"+nomeProd+"</h3>"+
+            (descProd?"<p style=\"font-size:12px;color:#7A5A40;font-style:italic\">"+descProd+"</p>":"")+
+          "</div>"+
+          (faixas[0]?"<span style=\"font-size:13px;font-weight:600;color:"+pal.acento+"\">a partir de "+R(faixas[faixas.length-1].preco)+"</span>":"")+
+        "</div>"+
+        tabelaFaixas+
+      "</div>"
+    );
+  }).join("\n");
+
+  const paraA = (proposal.abertura||"").trim() ||
+    (nomeEmpresa
+      ? "Chegou a &eacute;poca mais especial! Preparamos este cat&aacute;logo com muito carinho para "+nomeEmpresa+"."
+      : "Chegou a &eacute;poca mais especial! Preparamos este cat&aacute;logo com muito carinho para voc&ecirc;.");
+
+  const ctaMsgSaz = encodeURIComponent("Ol\u00e1, Oba Doceria! Vi o cat\u00e1logo e tenho interesse. E agora, quais os pr\u00f3ximos passos?");
+  const ctaHrefSaz = obaWpp ? "https://wa.me/55"+obaWpp+"?text="+ctaMsgSaz : "";
+
+  const validadeHtml = validade ? "<p>Proposta v&aacute;lida at&eacute; <strong style=\"color:#5D3A1A\">"+validade+"</strong></p>" : "";
+  const wppHtml = obaWpp ? "<p>D&uacute;vidas? <a href=\"https://wa.me/55"+obaWpp+"\">fale pelo WhatsApp</a></p>" : "";
+
+  const html = `<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Catálogo Sazonal &middot; Oba Doceria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#3B2A1E;line-height:1.5}
+.page{max-width:600px;margin:0 auto;padding:0 16px}
+#pg0{min-height:100svh;display:flex;flex-direction:column;background:linear-gradient(160deg,#FFF8EE 0%,#FDF0D8 55%,#F9E4BE 100%)}
+.ab-topo{padding:36px 24px 0;text-align:center}
+.ab-logo{height:38px;object-fit:contain;opacity:.85;margin-bottom:10px}
+.ab-label{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#C8922A;margin-bottom:16px;display:block}
+.cond-bloco{background:#FFFCF5;border:1px solid #EDD9C0;border-radius:10px;padding:12px 16px;margin:0 auto;max-width:360px}
+.cond-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #F5EDE4;font-size:11px}
+.cond-row:last-child{border-bottom:none}
+.cond-lbl{color:#C8922A;font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:1px}
+.cond-val{color:#3B2A1E;font-weight:500;text-align:right;max-width:60%}
+.ab-sep{border:none;border-top:1px solid #EDD9C0;margin:20px auto 0;width:36px}
+.ab-corpo{padding:24px 28px 0;flex:1}
+.ab-p-destaque{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(20px,5.5vw,25px);font-weight:600;color:#3B2A1E;line-height:1.45;margin-bottom:16px;font-style:italic;text-align:center}
+.ab-rodape{padding:24px 24px 40px;text-align:center}
+.ab-ornamento{font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;color:#C8922A;opacity:.4;letter-spacing:10px;margin-bottom:14px;display:block}
+.ab-assinatura{font-family:'Cormorant Garamond',Georgia,serif;font-size:15px;font-style:italic;color:#C8922A;margin-bottom:24px;display:block}
+.ab-btn{display:inline-block;background:#3B2A1E;color:#F9E8C8;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.8px;padding:14px 36px;border-radius:50px;border:none;cursor:pointer;text-transform:uppercase}
+#pg1{display:none}
+.pg1-hero{padding:20px 20px 14px;text-align:center;background:#FFFDF8;border-bottom:1px solid #EDD9C0}
+.pg1-logo{height:28px;object-fit:contain;opacity:.82;margin-bottom:8px}
+.pg1-titulo{font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;font-weight:400;color:#3B2A1E}
+.galeria{display:flex;flex-wrap:wrap;gap:12px;padding:16px 16px 0}
+.sec-titulo{padding:20px 16px 8px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#C8922A}
+.produtos-lista{padding:0 16px}
+.cta-final{display:block;margin:20px 16px 0;padding:14px;border-radius:12px;text-align:center;color:#fff;font-weight:600;font-size:13px;text-decoration:none;background:#C8922A}
+.footer{margin:20px 16px 0;text-align:center;padding:18px 0 28px;border-top:1px solid #EDD9C0}
+.footer p{font-size:11px;color:#bbb;margin-bottom:4px}
+.footer a{color:#8B4513;font-weight:500;text-decoration:none}
+.footer-brand{font-family:'Cormorant Garamond',Georgia,serif;font-size:13px;font-style:italic;color:#bbb;margin-top:6px}
+.btn-pdf{margin-top:14px;background:#3B2A1E;color:#fff;border:none;border-radius:11px;padding:10px 26px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer}
+.voltar-pg0{background:none;border:none;font-size:11px;font-weight:600;color:#bbb;cursor:pointer;text-decoration:underline;margin:10px 16px 0;display:block}
+@page{margin:14mm 18mm}
+@media print{
+  #pg0{display:block!important;min-height:0!important;background:none!important}
+  .ab-btn,.ab-ornamento,.ab-assinatura{display:none!important}
+  #pg1{display:block!important}
+  .voltar-pg0,.btn-pdf,.cta-final{display:none!important}
+  .page{max-width:100%;padding:0}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div id="pg0">
+  <div class="ab-topo">
+    <img class="ab-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png" alt="Oba Doceria" onerror="this.style.display='none'">
+    <span class="ab-label">Cat&aacute;logo Sazonal</span>
+    <div class="cond-bloco">
+      ${proposal.prazo_pedido ? "<div class=\"cond-row\"><span class=\"cond-lbl\">Pedidos at&eacute;</span><span class=\"cond-val\">"+proposal.prazo_pedido+"</span></div>" : ""}
+      ${proposal.prazo_entrega ? "<div class=\"cond-row\"><span class=\"cond-lbl\">Entrega</span><span class=\"cond-val\">"+proposal.prazo_entrega+"</span></div>" : ""}
+      ${proposal.cond_pagamento ? "<div class=\"cond-row\"><span class=\"cond-lbl\">Pagamento</span><span class=\"cond-val\">"+proposal.cond_pagamento+"</span></div>" : ""}
+      ${proposal.pedido_minimo ? "<div class=\"cond-row\"><span class=\"cond-lbl\">M&iacute;nimo</span><span class=\"cond-val\">"+proposal.pedido_minimo+" unidades</span></div>" : ""}
+      ${nomeEmpresa ? "<div class=\"cond-row\"><span class=\"cond-lbl\">Para</span><span class=\"cond-val\">"+nomeEmpresa+"</span></div>" : ""}
+    </div>
+    <hr class="ab-sep">
+  </div>
+  <div class="ab-corpo">
+    <p class="ab-p-destaque">${paraA}</p>
+  </div>
+  <div class="ab-rodape">
+    <span class="ab-ornamento">&middot;&ensp;&middot;&ensp;&middot;</span>
+    <span class="ab-assinatura">Feito com cuidado. Servido com amor.</span>
+    <button class="ab-btn" onclick="obaShowPage(1)">Ver o cat&aacute;logo &rarr;</button>
+  </div>
+</div>
+
+<div id="pg1" style="display:none">
+  <div class="pg1-hero">
+    <img class="pg1-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png" alt="Oba Doceria" onerror="this.style.display='none'">
+    <p class="pg1-titulo">Nossos produtos</p>
+  </div>
+  ${mediasHtml ? "<div class=\"galeria\">"+mediasHtml+"</div>" : ""}
+  <p class="sec-titulo">Op&ccedil;&otilde;es dispon&iacute;veis</p>
+  <div class="produtos-lista">${produtosHtml}</div>
+  ${ctaHrefSaz ? "<a href=\""+ctaHrefSaz+"\" target=\"_blank\" class=\"cta-final\">Tenho interesse &mdash; vamos conversar</a>" : ""}
+  <button class="voltar-pg0" onclick="obaShowPage(0)">&#8592; Voltar</button>
+  <div class="footer">
+    ${validadeHtml}${wppHtml}
+    <p class="footer-brand">Oba Doceria &middot; Um jeito doce de expressar felicidade</p>
+    <button class="btn-pdf" onclick="window.print()">Salvar como PDF</button>
+  </div>
+</div>
+
+</div>
+<script>
+function obaShowPage(n){
+  var pg0=document.getElementById('pg0');
+  var pg1=document.getElementById('pg1');
+  if(!pg0||!pg1)return;
+  pg0.style.display=n===0?'flex':'none';
+  pg1.style.display=n===1?'block':'none';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>`;
+
+  return new Response(html,{status:200,headers:{"Content-Type":"text/html; charset=utf-8","Cache-Control":"no-store","X-Robots-Tag":"noindex, nofollow"}});
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -3024,6 +3610,12 @@ export default {
     if (url.pathname.startsWith("/proposta/")) {
       const propostaResp = await obaHandlePropostaPublica(request, env, url);
       if (propostaResp) return propostaResp;
+    }
+
+    // Rota pública: imagens de propostas (sem autenticação, cache imutável)
+    if (url.pathname.match(/^\/api\/proposals\/[^/]+\/media\/[^/]+\/dados$/) && request.method === "GET") {
+      const mediaResp = await obaHandleProposalsApi(request, env, url);
+      if (mediaResp) return mediaResp;
     }
 
     if (url.pathname === "/__auth/login") {

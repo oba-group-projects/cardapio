@@ -2980,6 +2980,32 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     <button class="primary" onclick="obaProposalNova()">+ Nova Proposta</button>
   </div>
 
+  <!-- MODAL SELEÇÃO DE TEMPLATE -->
+  <div id="proposals-modal-template" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center;padding:20px">
+    <div style="background:#fff;border-radius:16px;padding:28px 24px;max-width:560px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.18)">
+      <h3 style="margin:0 0 6px;font-size:16px;color:#3B2A1E">Que tipo de proposta?</h3>
+      <p style="margin:0 0 20px;font-size:12px;color:#9B7A60">Escolha o modelo para continuar</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+        <button onclick="obaProposalNovaComTemplate('evento')" style="border:1.5px solid #EDD9C0;border-radius:12px;padding:16px 10px;background:#FFFDF8;cursor:pointer;text-align:center">
+          <div style="font-size:26px;margin-bottom:8px">📅</div>
+          <div style="font-size:13px;font-weight:600;color:#3B2A1E;margin-bottom:4px">Evento</div>
+          <div style="font-size:10px;color:#9B7A60">Casamentos, aniversários, formaturas...</div>
+        </button>
+        <button onclick="obaProposalNovaComTemplate('corporativo')" style="border:1.5px solid #EDD9C0;border-radius:12px;padding:16px 10px;background:#FFFDF8;cursor:pointer;text-align:center">
+          <div style="font-size:26px;margin-bottom:8px">🏢</div>
+          <div style="font-size:13px;font-weight:600;color:#3B2A1E;margin-bottom:4px">Corporativo</div>
+          <div style="font-size:10px;color:#9B7A60">Projetos sob medida para empresas</div>
+        </button>
+        <button onclick="obaProposalNovaComTemplate('sazonal')" style="border:1.5px solid #EDD9C0;border-radius:12px;padding:16px 10px;background:#FFFDF8;cursor:pointer;text-align:center">
+          <div style="font-size:26px;margin-bottom:8px">🎁</div>
+          <div style="font-size:13px;font-weight:600;color:#3B2A1E;margin-bottom:4px">Sazonal</div>
+          <div style="font-size:10px;color:#9B7A60">Natal, Páscoa, Dia das Mães...</div>
+        </button>
+      </div>
+      <button onclick="document.getElementById('proposals-modal-template').style.display='none'" style="margin-top:16px;background:none;border:none;color:#9B7A60;font-size:12px;cursor:pointer;width:100%;text-align:center">Cancelar</button>
+    </div>
+  </div>
+
   <!-- LISTAGEM -->
   <div id="proposals-lista">
     <table>
@@ -3009,7 +3035,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     </div>
 
     <!-- DADOS DO EVENTO -->
-    <div class="card" style="margin-bottom:16px">
+    <div class="card" id="prop-bloco-evento" style="margin-bottom:16px">
       <h4 style="margin:0 0 12px;font-size:13px;color:var(--brand)">Dados do Evento</h4>
       <div class="grid">
         <div class="field"><label>Nome do cliente *</label><input id="prop-cliente" placeholder="Ex: Ana Lima"></div>
@@ -3035,10 +3061,94 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       </div>
     </div>
 
+    <!-- DADOS CORPORATIVO -->
+    <div class="card" id="prop-bloco-corporativo" style="margin-bottom:16px;display:none">
+      <h4 style="margin:0 0 12px;font-size:13px;color:var(--brand)">🏢 Dados Corporativos</h4>
+      <div class="grid">
+        <div class="field"><label>Nome do cliente / contato *</label><input id="prop-cliente-corp" placeholder="Ex: João Silva"></div>
+        <div class="field"><label>WhatsApp * <span class="hint">(com DDD)</span></label><input id="prop-whatsapp-corp" type="tel" placeholder="11999998888"></div>
+        <div class="field"><label>Empresa *</label><input id="prop-empresa" placeholder="Ex: Empresa XYZ Ltda"></div>
+        <div class="field"><label>Tipo de demanda</label>
+          <select id="prop-demanda">
+            <option value="">Selecione...</option>
+            <option value="Presenteáveis">Presenteáveis</option>
+            <option value="Kit corporativo">Kit corporativo</option>
+            <option value="Buffet">Buffet</option>
+            <option value="Brindes">Brindes</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </div>
+        <div class="field"><label>Frequência</label>
+          <select id="prop-frequencia">
+            <option value="">Selecione...</option>
+            <option value="Pontual">Pontual</option>
+            <option value="Mensal">Mensal</option>
+            <option value="Recorrente">Recorrente</option>
+          </select>
+        </div>
+        <div class="field"><label>Orçamento de referência <span class="hint">(opcional)</span></label><input id="prop-orcamento-ref" type="number" min="0" step="0.01" placeholder="Ex: 5000"></div>
+        <div class="field"><label>Validade da proposta</label><input id="prop-validade-corp" type="date"></div>
+        <div class="field full"><label>Briefing / observações</label><textarea id="prop-observacoes" rows="4" placeholder="Descreva a ideia, contexto, necessidades específicas..."></textarea></div>
+        <div class="field full">
+          <label style="display:flex;justify-content:space-between;align-items:center">
+            Texto da abertura
+            <span id="prop-abertura-corp-count" style="font-size:10px;color:#bbb;font-weight:400">0 caracteres</span>
+          </label>
+          <textarea id="prop-abertura-corp" rows="4"
+            placeholder="Texto personalizado que abre a proposta. Deixe vazio para gerar automaticamente."
+            style="resize:vertical;font-size:13px;line-height:1.6"
+            oninput="document.getElementById('prop-abertura-corp-count').textContent=this.value.length+' caracteres'"
+          ></textarea>
+        </div>
+      </div>
+      <!-- Galeria de imagens -->
+      <div style="margin-top:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <label style="font-weight:600;font-size:13px">📷 Galeria de imagens <span style="font-size:11px;color:#9B7A60;font-weight:400">(até 8 fotos)</span></label>
+          <button type="button" class="secondary" style="font-size:11px;padding:4px 12px" onclick="obaProposalAdicionarImagem()">+ Adicionar foto</button>
+        </div>
+        <div id="prop-galeria-corp" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+        <input type="file" id="prop-galeria-input" accept="image/*" style="display:none" onchange="obaProposalProcessarImagem(this)">
+      </div>
+    </div>
+
+    <!-- DADOS SAZONAL -->
+    <div class="card" id="prop-bloco-sazonal" style="margin-bottom:16px;display:none">
+      <h4 style="margin:0 0 12px;font-size:13px;color:var(--brand)">🎁 Dados do Catálogo Sazonal</h4>
+      <div class="grid">
+        <div class="field"><label>Empresa / destinatário <span class="hint">(ou deixe vazio para catálogo geral)</span></label><input id="prop-empresa-saz" placeholder="Ex: Empresa XYZ — ou deixe vazio"></div>
+        <div class="field"><label>Validade da proposta</label><input id="prop-validade-saz" type="date"></div>
+        <div class="field"><label>Prazo para pedido</label><input id="prop-prazo-pedido" placeholder="Ex: Pedidos até 30 de novembro de 2026"></div>
+        <div class="field"><label>Prazo de entrega</label><input id="prop-prazo-entrega" placeholder="Ex: Entrega em até 15 dias úteis após confirmação"></div>
+        <div class="field"><label>Condições de pagamento</label><input id="prop-cond-pagamento" placeholder="Ex: 50% no pedido, 50% na entrega"></div>
+        <div class="field"><label>Pedido mínimo <span class="hint">(unidades)</span></label><input id="prop-pedido-minimo" type="number" min="1" placeholder="Ex: 10"></div>
+        <div class="field full"><label>Texto de abertura <span class="hint">(deixe vazio para gerar automaticamente)</span></label><textarea id="prop-abertura-saz" rows="3" placeholder="Ex: Chegou a época mais especial do ano! Preparamos opções exclusivas para presentear seus colaboradores com muito carinho..." style="font-size:13px;line-height:1.6"></textarea></div>
+      </div>
+
+      <!-- Galeria sazonal -->
+      <div style="margin-top:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <label style="font-weight:600;font-size:13px">📷 Galeria de imagens <span style="font-size:11px;color:#9B7A60;font-weight:400">(até 8 fotos dos produtos)</span></label>
+          <button type="button" class="secondary" style="font-size:11px;padding:4px 12px" onclick="obaProposalAdicionarImagem()">+ Adicionar foto</button>
+        </div>
+        <div id="prop-galeria-saz" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+        <input type="file" id="prop-galeria-input-saz" accept="image/*" style="display:none" onchange="obaProposalProcessarImagem(this)">
+      </div>
+
+      <!-- Produtos com faixas de preço -->
+      <div style="margin-top:20px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <label style="font-weight:600;font-size:13px">🏷️ Produtos e faixas de preço</label>
+          <button type="button" class="secondary" style="font-size:11px;padding:4px 12px" onclick="obaAdicionarProdutoSazonal()">+ Produto</button>
+        </div>
+        <div id="prop-produtos-sazonal"></div>
+      </div>
+    </div>
+
     <!-- CENÁRIOS -->
     <div id="proposals-cenarios"></div>
 
-    <button class="secondary" onclick="obaProposalAdicionarCenario()" style="margin-bottom:16px;width:100%">+ Adicionar Cenário</button>
+    <button class="secondary" id="btn-adicionar-cenario" onclick="obaProposalAdicionarCenario()" style="margin-bottom:16px;width:100%">+ Adicionar Cenário</button>
 
     <!-- AÇÕES -->
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
@@ -3062,6 +3172,8 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
 
   let obaProposalAtiva = null;
   let obaProposalCenariosCount = 0;
+  let obaTemplateAtivo = 'evento'; // 'evento' | 'corporativo' | 'sazonal'
+  let obaGaleriaImagens = []; // {dataUrl, mime, legenda, ordem}
 
   // ---------- UTILITÁRIOS ----------
   function fmt(v) { return 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
@@ -3107,6 +3219,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
             <button class="secondary" style="padding:4px 10px;font-size:11px;background:#25d366;color:#fff;border:none" onclick="obaProposalEnviarWhatsAppById('${p.proposal_id}')">📱 WhatsApp</button>
             <button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaProposalCopiarLinkById('${p.proposal_id}')">🔗 Link</button>
             <button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaProposalAbrirPDFById('${p.proposal_id}')">📄 PDF</button>
+            <button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaProposalDuplicar('${p.proposal_id}','${(p.empresa||p.cliente||'').replace(/'/g,'')}')" title="Duplicar proposta">⧉ Duplicar</button>
             ${p.status === 'rascunho' ? `<button class="secondary" style="padding:4px 10px;font-size:11px;background:#fee2e2;color:#dc2626;border-color:#fca5a5" onclick="obaProposalExcluir('${p.proposal_id}','${p.cliente}')">🗑️ Excluir</button>` : ''}
           </td>
         </tr>
@@ -3126,19 +3239,108 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     document.getElementById('proposals-editor').style.display = 'none';
   }
 
+  // ---------- HELPERS DE TEMPLATE ----------
+  function obaAplicarTemplate(tmpl) {
+    obaTemplateAtivo = tmpl || 'evento';
+    const isEvento = obaTemplateAtivo === 'evento';
+    const isCorp   = obaTemplateAtivo === 'corporativo';
+    const isSaz    = obaTemplateAtivo === 'sazonal';
+    document.getElementById('prop-bloco-evento').style.display      = isEvento ? '' : 'none';
+    document.getElementById('prop-bloco-corporativo').style.display  = isCorp   ? '' : 'none';
+    const blocoSaz = document.getElementById('prop-bloco-sazonal');
+    if (blocoSaz) blocoSaz.style.display = isSaz ? '' : 'none';
+    // Cenarios: sazonal usa cenarios para estrutura de produtos também
+    const btnCenario = document.getElementById('btn-adicionar-cenario');
+    if (btnCenario) btnCenario.style.display = isSaz ? 'none' : '';
+    // Label do editor
+    const tLabels = {evento:'📅 Evento', corporativo:'🏢 Corporativo', sazonal:'🎁 Sazonal'};
+    const badge = document.getElementById('proposals-template-badge');
+    if (badge) { badge.textContent = tLabels[obaTemplateAtivo]||''; }
+  }
+
+  function obaLimparFormulario() {
+    ['prop-cliente','prop-whatsapp','prop-data-evento','prop-convidados',
+     'prop-tipo-evento','prop-validade','prop-resumo','prop-msg-wpp','prop-abertura',
+     'prop-cliente-corp','prop-whatsapp-corp','prop-empresa','prop-demanda',
+     'prop-frequencia','prop-orcamento-ref','prop-validade-corp',
+     'prop-observacoes','prop-abertura-corp',
+     'prop-empresa-saz','prop-prazo-pedido','prop-prazo-entrega',
+     'prop-cond-pagamento','prop-pedido-minimo','prop-validade-saz','prop-abertura-saz']
+      .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    const cnt = document.getElementById('prop-abertura-count');
+    if (cnt) cnt.textContent = '0 caracteres';
+    const cnt2 = document.getElementById('prop-abertura-corp-count');
+    if (cnt2) cnt2.textContent = '0 caracteres';
+    obaGaleriaImagens = [];
+    obaRenderizarGaleria();
+    // Limpar produtos sazonais
+    obaProdutosSazonalCount = 0;
+    const ps = document.getElementById('prop-produtos-sazonal');
+    if (ps) ps.innerHTML = '';
+  }
+
+  function obaRenderizarGaleria() {
+    const cont = document.getElementById(obaTemplateAtivo === 'sazonal' ? 'prop-galeria-saz' : 'prop-galeria-corp');
+    if (!cont) return;
+    if (!obaGaleriaImagens.length) { cont.innerHTML = '<p style="font-size:11px;color:#bbb;padding:8px 0">Nenhuma imagem adicionada.</p>'; return; }
+    cont.innerHTML = obaGaleriaImagens.map((img, idx) => `
+      <div style="position:relative;width:80px">
+        <img src="${img.dataUrl}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid #EDD9C0">
+        <button type="button" onclick="obaGaleriaImagens.splice(${idx},1);obaRenderizarGaleria()" style="position:absolute;top:-6px;right:-6px;background:#dc2626;color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;line-height:1">×</button>
+        <input type="text" placeholder="Legenda" value="${img.legenda||''}" oninput="obaGaleriaImagens[${idx}].legenda=this.value" style="width:80px;font-size:9px;margin-top:3px;border:1px solid #EDD9C0;border-radius:4px;padding:2px 4px">
+      </div>`).join('');
+  }
+
+  window.obaProposalAdicionarImagem = function() {
+    if (obaGaleriaImagens.length >= 8) { alert('Máximo de 8 imagens por proposta.'); return; }
+    document.getElementById('prop-galeria-input').click();
+  };
+
+  window.obaProposalProcessarImagem = function(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const canvas = document.createElement('canvas');
+    const img = new Image();
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      img.onload = function() {
+        const MAX = 900;
+        let w = img.width, h = img.height;
+        if (w > MAX || h > MAX) { if (w > h) { h = Math.round(h*MAX/w); w = MAX; } else { w = Math.round(w*MAX/h); h = MAX; } }
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+        const base64 = dataUrl.split(',')[1];
+        const tamanho = Math.round(base64.length * 0.75);
+        obaGaleriaImagens.push({dataUrl, base64, mime:'image/jpeg', legenda:'', tamanho, ordem: obaGaleriaImagens.length+1});
+        obaRenderizarGaleria();
+        input.value = '';
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // ---------- NOVA PROPOSTA ----------
   window.obaProposalNova = function() {
+    document.getElementById('proposals-modal-template').style.display = 'flex';
+  };
+
+  window.obaProposalNovaComTemplate = function(tmpl) {
+    document.getElementById('proposals-modal-template').style.display = 'none';
     obaProposalAtiva = null;
     obaProposalCenariosCount = 0;
+    obaLimparFormulario();
+    obaAplicarTemplate(tmpl);
     document.getElementById('proposals-editor-titulo').textContent = 'Nova Proposta';
     const badge = document.getElementById('proposals-status-badge');
     badge.textContent = 'Rascunho'; badge.style.background = '#eee'; badge.style.color = '#555';
-    ['prop-cliente','prop-whatsapp','prop-data-evento','prop-convidados','prop-tipo-evento','prop-validade','prop-resumo','prop-msg-wpp']
-      .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
     document.getElementById('proposals-cenarios').innerHTML = '';
     adicionarCenario();
-    // Preencher template padrão da mensagem WhatsApp
-    const msgEl = document.getElementById('prop-msg-wpp');
-    if (msgEl) msgEl.value = obaProposalMsgTemplate('', '');
+    if (tmpl === 'evento') {
+      const msgEl = document.getElementById('prop-msg-wpp');
+      if (msgEl) msgEl.value = obaProposalMsgTemplate('', '');
+    }
     mostrarEditor();
   };
 
@@ -3154,27 +3356,95 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       if (!data.ok) { alert('Erro ao carregar proposta.'); return; }
       const p = data.proposal;
       obaProposalAtiva = p;
-      document.getElementById('proposals-editor-titulo').textContent = 'Editando: ' + p.cliente;
+      const tmpl = p.template || 'evento';
+      obaAplicarTemplate(tmpl);
+      document.getElementById('proposals-editor-titulo').textContent = 'Editando: ' + (p.empresa || p.cliente);
       const badge = document.getElementById('proposals-status-badge');
       badge.textContent = statusLabel(p.status);
       badge.style.background = statusColor(p.status) + '22';
       badge.style.color = statusColor(p.status);
-      document.getElementById('prop-cliente').value = p.cliente || '';
-      document.getElementById('prop-whatsapp').value = p.whatsapp || '';
-      document.getElementById('prop-data-evento').value = p.data_evento || '';
-      // Preencher mensagem WhatsApp salva ou gerar template
-      const msgEl = document.getElementById('prop-msg-wpp');
-      if (msgEl) msgEl.value = p.msg_wpp || obaProposalMsgTemplate(p.cliente, p.tipo_evento);
-      document.getElementById('prop-convidados').value = p.convidados || '';
-      document.getElementById('prop-tipo-evento').value = p.tipo_evento || '';
-      document.getElementById('prop-validade').value = p.validade || '';
-      document.getElementById('prop-resumo').value = p.resumo || '';
-      const aberturaEl = document.getElementById('prop-abertura');
-      if (aberturaEl) {
-        aberturaEl.value = p.abertura || '';
-        const cnt = document.getElementById('prop-abertura-count');
-        if (cnt) cnt.textContent = aberturaEl.value.length + ' caracteres';
+
+      // Campos Evento
+      if (tmpl === 'evento') {
+        document.getElementById('prop-cliente').value = p.cliente || '';
+        document.getElementById('prop-whatsapp').value = p.whatsapp || '';
+        document.getElementById('prop-data-evento').value = p.data_evento || '';
+        document.getElementById('prop-convidados').value = p.convidados || '';
+        document.getElementById('prop-tipo-evento').value = p.tipo_evento || '';
+        document.getElementById('prop-validade').value = p.validade || '';
+        document.getElementById('prop-resumo').value = p.resumo || '';
+        const msgEl = document.getElementById('prop-msg-wpp');
+        if (msgEl) msgEl.value = p.msg_wpp || obaProposalMsgTemplate(p.cliente, p.tipo_evento);
+        const abEl = document.getElementById('prop-abertura');
+        if (abEl) { abEl.value = p.abertura || ''; const cnt = document.getElementById('prop-abertura-count'); if (cnt) cnt.textContent = abEl.value.length + ' caracteres'; }
       }
+
+      // Campos Corporativo
+      if (tmpl === 'corporativo') {
+        const g = (id, v) => { const el = document.getElementById(id); if (el) el.value = v||''; };
+        g('prop-cliente-corp', p.cliente); g('prop-whatsapp-corp', p.whatsapp);
+        g('prop-empresa', p.empresa); g('prop-demanda', p.demanda);
+        g('prop-frequencia', p.frequencia); g('prop-orcamento-ref', p.orcamento_ref||'');
+        g('prop-validade-corp', p.validade); g('prop-observacoes', p.observacoes);
+        g('prop-abertura-corp', p.abertura);
+        const cnt = document.getElementById('prop-abertura-corp-count');
+        if (cnt) cnt.textContent = (p.abertura||'').length + ' caracteres';
+        // Carregar galeria
+        obaGaleriaImagens = [];
+        try {
+          const mr = await fetch('/api/proposals/' + proposalId + '/media');
+          const md = await mr.json();
+          if (md.ok) {
+            for (const m of (md.media||[])) {
+              const imgR = await fetch('/api/proposals/'+proposalId+'/media/'+m.media_id+'/dados');
+              const blob = await imgR.blob();
+              const dataUrl = await new Promise(res => { const fr = new FileReader(); fr.onload = e => res(e.target.result); fr.readAsDataURL(blob); });
+              obaGaleriaImagens.push({media_id: m.media_id, dataUrl, mime: m.mime, legenda: m.legenda||'', tamanho: m.tamanho, ordem: m.ordem});
+            }
+          }
+        } catch(e) {}
+        obaRenderizarGaleria();
+      }
+
+      // Campos Sazonal
+      if (tmpl === 'sazonal') {
+        const g = (id, v) => { const el = document.getElementById(id); if (el) el.value = v||''; };
+        g('prop-empresa-saz', p.empresa); g('prop-prazo-pedido', p.prazo_pedido);
+        g('prop-prazo-entrega', p.prazo_entrega); g('prop-cond-pagamento', p.cond_pagamento);
+        g('prop-pedido-minimo', p.pedido_minimo||''); g('prop-validade-saz', p.validade);
+        g('prop-abertura-saz', p.abertura);
+        // Restaurar produtos do cenário 1
+        obaProdutosSazonalCount = 0;
+        const ps = document.getElementById('prop-produtos-sazonal');
+        if (ps) ps.innerHTML = '';
+        const cen1 = p.scenarios && p.scenarios[0];
+        if (cen1 && cen1.items) {
+          cen1.items.forEach(it => {
+            const partes = it.descricao.split(' — ');
+            obaAdicionarProdutoSazonal({
+              nome: partes[0]||it.descricao,
+              descricao: partes[1]||'',
+              faixas: it.faixas||null,
+            });
+          });
+        }
+        // Carregar galeria sazonal
+        obaGaleriaImagens = [];
+        try {
+          const mr = await fetch('/api/proposals/' + proposalId + '/media');
+          const md = await mr.json();
+          if (md.ok) {
+            for (const m of (md.media||[])) {
+              const imgR = await fetch('/api/proposals/'+proposalId+'/media/'+m.media_id+'/dados');
+              const blob = await imgR.blob();
+              const dataUrl = await new Promise(res => { const fr = new FileReader(); fr.onload = e => res(e.target.result); fr.readAsDataURL(blob); });
+              obaGaleriaImagens.push({media_id: m.media_id, dataUrl, mime: m.mime, legenda: m.legenda||'', tamanho: m.tamanho, ordem: m.ordem});
+            }
+          }
+        } catch(e) {}
+        obaRenderizarGaleria();
+      }
+
       obaProposalCenariosCount = 0;
       document.getElementById('proposals-cenarios').innerHTML = '';
       (p.scenarios || []).forEach(s => adicionarCenario(s));
@@ -3660,18 +3930,69 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       });
     });
 
+    const gv = id => { const el = document.getElementById(id); return el ? (el.value||'').trim()||null : null; };
+
+    // Payload base — campos variam por template
     const payload = {
-      cliente,
-      whatsapp: whatsapp || null,
-      data_evento: document.getElementById('prop-data-evento').value || null,
-      convidados: Number(document.getElementById('prop-convidados').value) || null,
-      tipo_evento: document.getElementById('prop-tipo-evento').value || null,
-      resumo: document.getElementById('prop-resumo').value || null,
-      abertura: (document.getElementById('prop-abertura')?.value || '').trim() || null,
-      validade: document.getElementById('prop-validade').value || null,
+      template: obaTemplateAtivo,
       status: statusFinal,
       scenarios,
     };
+
+    if (obaTemplateAtivo === 'evento') {
+      Object.assign(payload, {
+        cliente, whatsapp: whatsapp||null,
+        data_evento: gv('prop-data-evento'),
+        convidados: Number(document.getElementById('prop-convidados')?.value)||null,
+        tipo_evento: gv('prop-tipo-evento'),
+        resumo: gv('prop-resumo'),
+        abertura: gv('prop-abertura'),
+        validade: gv('prop-validade'),
+      });
+    } else if (obaTemplateAtivo === 'corporativo') {
+      Object.assign(payload, {
+        cliente: gv('prop-cliente-corp'),
+        whatsapp: gv('prop-whatsapp-corp'),
+        empresa: gv('prop-empresa'),
+        demanda: gv('prop-demanda'),
+        frequencia: gv('prop-frequencia'),
+        orcamento_ref: parseFloat(document.getElementById('prop-orcamento-ref')?.value)||null,
+        observacoes: gv('prop-observacoes'),
+        abertura: gv('prop-abertura-corp'),
+        validade: gv('prop-validade-corp'),
+      });
+    } else if (obaTemplateAtivo === 'sazonal') {
+      const prodsSaz = obaColetarProdutosSazonais();
+      // Produtos sazonais viram itens livres no cenário 1 com campo faixas
+      Object.assign(payload, {
+        empresa: gv('prop-empresa-saz'),
+        cliente: gv('prop-empresa-saz') || 'Catálogo Sazonal',
+        prazo_pedido: gv('prop-prazo-pedido'),
+        prazo_entrega: gv('prop-prazo-entrega'),
+        cond_pagamento: gv('prop-cond-pagamento'),
+        pedido_minimo: parseInt(document.getElementById('prop-pedido-minimo')?.value)||null,
+        abertura: gv('prop-abertura-saz'),
+        validade: gv('prop-validade-saz'),
+      });
+      // Cria cenário único com os produtos como itens livres com faixas
+      if (prodsSaz.length && (!payload.scenarios || !payload.scenarios.length)) {
+        payload.scenarios = [{
+          nome: 'Produtos',
+          descricao: '',
+          desconto_tipo: 'none',
+          desconto_valor: 0,
+          doces_por_convidado: null,
+          items: prodsSaz.map((p, i) => ({
+            tipo: 'livre',
+            descricao: p.nome + (p.descricao ? ' — ' + p.descricao : ''),
+            qtd: 1,
+            preco_unit: 0,
+            faixas: p.faixas,
+            ordem: i + 1,
+          }))
+        }];
+      }
+    }
 
     try {
       const r = await fetch(
@@ -3683,6 +4004,17 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       const data = await r.json();
       if (!data.ok) { alert('Erro ao salvar: ' + (data.error||'desconhecido')); return; }
       obaProposalAtiva = data.proposal;
+      // Upload das imagens novas (corporativo/sazonal)
+      if (obaGaleriaImagens.length && data.proposal?.proposal_id) {
+        for (const img of obaGaleriaImagens) {
+          if (img.media_id) continue; // já salva, pular
+          await fetch('/api/proposals/' + data.proposal.proposal_id + '/media', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json','X-CSRF-Token':csrf()},
+            body: JSON.stringify({dados: img.base64, mime: img.mime, tamanho: img.tamanho, legenda: img.legenda||null, ordem: img.ordem}),
+          });
+        }
+      }
       // Exibir botões de link/pdf no editor
       const linkActions = document.getElementById('proposals-link-actions');
       if (linkActions) linkActions.style.display = 'flex';
@@ -3718,6 +4050,73 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       }
     } catch(e) { alert('Erro de conexão.'); carregarLista(); }
   };
+
+  window.obaProposalDuplicar = async function(proposalId, nome) {
+    if (!confirm('Duplicar a proposta de "' + nome + '"?\n\nSerá criada uma cópia como Rascunho.')) return;
+    try {
+      const r = await fetch('/api/proposals/' + proposalId + '/duplicate', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json','X-CSRF-Token':csrf()},
+        body: JSON.stringify({}),
+      });
+      const data = await r.json();
+      if (data.ok) { carregarLista(); alert('Proposta duplicada com sucesso!'); }
+      else alert('Erro ao duplicar: ' + (data.error||'desconhecido'));
+    } catch(e) { alert('Erro de conexão.'); }
+  };
+
+  // ---------- PRODUTOS SAZONAIS ----------
+  let obaProdutosSazonalCount = 0;
+
+  window.obaAdicionarProdutoSazonal = function(dados) {
+    obaProdutosSazonalCount++;
+    const pid = 'prod-saz-' + obaProdutosSazonalCount;
+    const nome = dados?.nome || '';
+    const desc = dados?.descricao || '';
+    const faixas = dados?.faixas ? JSON.parse(dados.faixas) : [{ate:9,preco:''},{ate:49,preco:''},{ate:99,preco:''},{ate:null,preco:''}];
+
+    const div = document.createElement('div');
+    div.id = pid;
+    div.style.cssText = 'border:1.5px solid #EDD9C0;border-radius:12px;padding:14px;margin-bottom:12px;background:#FFFDF8';
+    div.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <strong style="font-size:13px;color:#3B2A1E">Produto ${obaProdutosSazonalCount}</strong>
+        <button type="button" onclick="document.getElementById('${pid}').remove()" style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:12px">✕ Remover</button>
+      </div>
+      <div class="grid">
+        <div class="field"><label>Nome do produto *</label><input class="ps-nome" placeholder="Ex: Kit Natal Premium" value="${nome}"></div>
+        <div class="field"><label>Descrição curta</label><input class="ps-desc" placeholder="Ex: Caixa com 6 trufas artesanais" value="${desc}"></div>
+      </div>
+      <div style="margin-top:10px">
+        <label style="font-size:12px;font-weight:600;color:#5D3A1A;display:block;margin-bottom:6px">Faixas de preço por quantidade</label>
+        <div class="ps-faixas" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          ${faixas.map((f,i) => `
+            <div style="display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #EDD9C0;border-radius:8px;padding:8px 10px">
+              <span style="font-size:11px;color:#9B7A60;white-space:nowrap">${f.ate===null?`Acima de ${faixas[i-1]?.ate||''}`:(`Até ${f.ate} un.`)}</span>
+              <span style="font-size:11px;color:#bbb">→</span>
+              <span style="font-size:11px;color:#bbb">R$</span>
+              <input type="number" min="0" step="0.01" class="ps-faixa-preco" data-idx="${i}" value="${f.preco||''}" placeholder="0,00" style="width:70px;border:1px solid #EDD9C0;border-radius:6px;padding:4px 6px;font-size:12px">
+            </div>`).join('')}
+        </div>
+        <p style="font-size:10px;color:#bbb;margin-top:4px">Faixas padrão: até 9 / até 49 / até 99 / acima de 100. Deixe em branco as faixas não utilizadas.</p>
+      </div>`;
+    document.getElementById('prop-produtos-sazonal').appendChild(div);
+  };
+
+  function obaColetarProdutosSazonais() {
+    const prods = [];
+    document.querySelectorAll('#prop-produtos-sazonal > div').forEach(div => {
+      const nome = div.querySelector('.ps-nome')?.value?.trim();
+      if (!nome) return;
+      const desc = div.querySelector('.ps-desc')?.value?.trim()||'';
+      const faixaEls = div.querySelectorAll('.ps-faixa-preco');
+      const faixasBase = [{ate:9},{ate:49},{ate:99},{ate:null}];
+      const faixas = faixasBase.map((f,i) => ({ate:f.ate, preco:parseFloat(faixaEls[i]?.value)||0}))
+        .filter(f => f.preco > 0);
+      prods.push({nome, descricao: desc, faixas: JSON.stringify(faixas)});
+    });
+    return prods;
+  }
 
   window.obaProposalExcluir = async function(proposalId, cliente) {
     if (!confirm(`Excluir a proposta de "${cliente}"?\n\nEsta ação não pode ser desfeita.`)) return;
