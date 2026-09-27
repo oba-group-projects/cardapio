@@ -2650,8 +2650,8 @@ async function obaHandlePropostaPublica(request, env, url) {
     const introTexto=(s.texto_publico||"").trim()||meta.intro;
 
     const ctaMsg=encodeURIComponent(
-      "Oba! Recebi a proposta e quero seguir com o Cen\u00e1rio "+(si+1)+" \u2013 "+meta.rotulo+
-      " ("+R(total)+"). Vamos fechar os detalhes?"
+      "Ol\u00e1, Oba Doceria! Gostei do Cen\u00e1rio "+(si+1)+" \u2013 "+meta.rotulo+
+      " ("+R(total)+"). E agora, quais os pr\u00f3ximos passos?"
     );
     const ctaHref=obaWpp?"https://wa.me/55"+obaWpp+"?text="+ctaMsg:"";
 
