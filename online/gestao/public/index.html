@@ -3078,6 +3078,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
             <option value="Outro">Outro</option>
           </select>
         </div>
+        <div class="field"><label>Frequência <span class="hint">(opcional)</span></label><input id="prop-frequencia" placeholder="Ex: mensal, trimestral, pontual"></div>
         <div class="field"><label>Validade da proposta</label><input id="prop-validade-corp" type="date"></div>
         <div class="field"><label>Texto de abertura <span class="hint">(deixe vazio para gerar automaticamente)</span></label>
           <textarea id="prop-abertura-corp" rows="3" style="font-size:13px;line-height:1.6"
@@ -3130,6 +3131,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         <div class="field"><label>Condições de pagamento</label><input id="prop-cond-pagamento" placeholder="Ex: 50% no pedido, 50% na entrega"></div>
         <div class="field"><label>Pedido mínimo <span class="hint">(unidades)</span></label><input id="prop-pedido-minimo" type="number" min="1" placeholder="Ex: 10"></div>
         <div class="field full"><label>Texto de abertura <span class="hint">(deixe vazio para gerar automaticamente)</span></label><textarea id="prop-abertura-saz" rows="3" style="font-size:13px;line-height:1.6" placeholder="Preenchido automaticamente ao escolher a data."></textarea></div>
+        <div class="field full"><label>Observações / instruções de pedido <span class="hint">(opcional)</span></label><textarea id="prop-observacoes-saz" rows="2" placeholder="Ex: Pedidos por WhatsApp com no mínimo 5 dias de antecedência. Entrega na região..."></textarea></div>
       </div>
       <!-- Opções do catálogo -->
       <div style="margin-top:18px">
@@ -3269,10 +3271,11 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     ['prop-cliente','prop-whatsapp','prop-data-evento','prop-convidados',
      'prop-tipo-evento','prop-validade','prop-resumo','prop-msg-wpp','prop-abertura',
      'prop-cliente-corp','prop-whatsapp-corp','prop-empresa','prop-demanda',
-     'prop-frequencia','prop-orcamento-ref','prop-validade-corp',
-     'prop-observacoes','prop-abertura-corp',
+     'prop-frequencia','prop-validade-corp','prop-observacoes','prop-abertura-corp',
+     'prop-qtd-solicitada','prop-orcamento-max','prop-data-entrega',
      'prop-empresa-saz','prop-prazo-pedido','prop-prazo-entrega',
-     'prop-cond-pagamento','prop-pedido-minimo','prop-validade-saz','prop-abertura-saz']
+     'prop-cond-pagamento','prop-pedido-minimo','prop-validade-saz','prop-abertura-saz',
+     'prop-observacoes-saz']
       .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
     const cnt = document.getElementById('prop-abertura-count');
     if (cnt) cnt.textContent = '0 caracteres';
@@ -3401,6 +3404,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         g('prop-cliente-corp', p.cliente); g('prop-whatsapp-corp', p.whatsapp);
         g('prop-empresa', p.empresa); g('prop-demanda', p.demanda);
         g('prop-validade-corp', p.validade); g('prop-observacoes', p.observacoes);
+        g('prop-frequencia', p.frequencia);
         g('prop-abertura-corp', p.abertura);
         // Novos campos briefing 12B
         g('prop-qtd-solicitada', p.qtd_solicitada||'');
@@ -3424,6 +3428,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         g('prop-prazo-entrega', p.prazo_entrega); g('prop-cond-pagamento', p.cond_pagamento);
         g('prop-pedido-minimo', p.pedido_minimo||''); g('prop-validade-saz', p.validade);
         g('prop-abertura-saz', p.abertura);
+        g('prop-observacoes-saz', p.observacoes);
         // Data comemorativa
         const dcSel = document.getElementById('prop-data-comemorativa');
         if (dcSel && p.data_comemorativa) {
@@ -3852,10 +3857,24 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
 
   // ---------- SALVAR ----------
   window.obaProposalSalvar = async function(statusFinal) {
-    const cliente = document.getElementById('prop-cliente').value.trim();
-    if (!cliente) { alert('Nome do cliente é obrigatório.'); return; }
-    const whatsapp = document.getElementById('prop-whatsapp').value.trim().replace(/\D/g,'');
-    if (!whatsapp) { alert('WhatsApp do cliente é obrigatório.'); return; }
+    // Validação por template
+    let cliente = '';
+    let whatsapp = '';
+    if (obaTemplateAtivo === 'evento') {
+      cliente  = (document.getElementById('prop-cliente')?.value||'').trim();
+      whatsapp = (document.getElementById('prop-whatsapp')?.value||'').trim().replace(/\D/g,'');
+      if (!cliente)  { alert('Nome do cliente é obrigatório.'); return; }
+      if (!whatsapp) { alert('WhatsApp do cliente é obrigatório.'); return; }
+    } else if (obaTemplateAtivo === 'corporativo') {
+      cliente  = (document.getElementById('prop-cliente-corp')?.value||'').trim();
+      whatsapp = (document.getElementById('prop-whatsapp-corp')?.value||'').trim().replace(/\D/g,'');
+      if (!cliente)  { alert('Nome do cliente / contato é obrigatório.'); return; }
+      if (!whatsapp) { alert('WhatsApp é obrigatório.'); return; }
+    } else if (obaTemplateAtivo === 'sazonal') {
+      // Sazonal: cliente é opcional (pode ser genérico)
+      cliente  = (document.getElementById('prop-empresa-saz')?.value||'').trim() || 'Catálogo Sazonal';
+      whatsapp = '';
+    }
 
     // Aviso se algum cenário tem total de doces que não fecha
     const convidados = Number(document.getElementById('prop-convidados')?.value || 0);
@@ -3956,10 +3975,10 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         whatsapp: gv('prop-whatsapp-corp'),
         empresa: gv('prop-empresa'),
         demanda: gv('prop-demanda'),
+        frequencia: gv('prop-frequencia'),
         observacoes: gv('prop-observacoes'),
         abertura: gv('prop-abertura-corp'),
         validade: gv('prop-validade-corp'),
-        // Novos campos briefing 12B
         qtd_solicitada: parseInt(document.getElementById('prop-qtd-solicitada')?.value)||null,
         orcamento_max: parseFloat(document.getElementById('prop-orcamento-max')?.value)||null,
         data_entrega: gv('prop-data-entrega'),
@@ -3976,6 +3995,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         prazo_entrega: gv('prop-prazo-entrega'),
         cond_pagamento: gv('prop-cond-pagamento'),
         pedido_minimo: parseInt(document.getElementById('prop-pedido-minimo')?.value)||null,
+        observacoes: gv('prop-observacoes-saz'),
         abertura: gv('prop-abertura-saz'),
         validade: gv('prop-validade-saz'),
       });
@@ -4105,8 +4125,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     const desc  = dadosExistentes?.descricao || '';
     const vunit = dadosExistentes?.valor_unit != null ? dadosExistentes.valor_unit : '';
     const faixas = (dadosExistentes?.faixas && dadosExistentes.faixas.length)
-      ? dadosExistentes.faixas
-      : [{ate:9,preco:''},{ate:49,preco:''},{ate:99,preco:''},{ate:null,preco:''}];
+      ? dadosExistentes.faixas : [];
 
     // Pré-carregar imagens existentes (ao editar)
     for (const m of (dadosExistentes?.medias||[])) {
@@ -4118,24 +4137,40 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       } catch(e) {}
     }
 
-    const faixaInputs = faixas.map(function(f,fi) {
-      const prevAte = fi > 0 ? faixas[fi-1]?.ate : null;
-      const label = (f.ate === null || f.ate == null)
-        ? ('Acima de ' + (prevAte||'') + ' un.')
-        : ('Até ' + f.ate + ' un.');
-      return '<div style="display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #EDD9C0;border-radius:8px;padding:7px 10px">'
-           + '<span style="font-size:11px;color:#9B7A60;white-space:nowrap">'+label+'</span>'
-           + '<span style="font-size:11px;color:#bbb">→ R$</span>'
-           + '<input type="number" min="0" step="0.01" class="oba-faixa-preco" data-fi="'+fi+'"'
-           + ' value="'+(f.preco||'')+'" placeholder="0,00"'
-           + ' style="width:70px;border:1px solid #EDD9C0;border-radius:6px;padding:4px 6px;font-size:12px">'
-           + '</div>';
-    }).join('');
+    // Bloco de faixas: só para Sazonal, dinâmico
+    let faixasBloco = '';
+    if (tipo === 'sazonal') {
+      const faixaLinhas = faixas.map(function(f, fi) {
+        const ateVal  = (f.ate !== null && f.ate != null) ? f.ate : '';
+        const ateHint = ateVal === '' ? 'sem limite' : ateVal;
+        return '<div class="oba-faixa-linha" style="display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #EDD9C0;border-radius:8px;padding:6px 10px;margin-bottom:6px">'
+             + '<span style="font-size:10px;color:#9B7A60;white-space:nowrap">Até</span>'
+             + '<input type="number" min="1" step="1" class="oba-faixa-ate" placeholder="∞" value="'+ateVal+'"'
+             + ' title="Deixe vazio para \'acima de tudo\'"'
+             + ' style="width:60px;border:1px solid #EDD9C0;border-radius:6px;padding:4px 6px;font-size:12px">'
+             + '<span style="font-size:10px;color:#9B7A60">un. → R$</span>'
+             + '<input type="number" min="0" step="0.01" class="oba-faixa-preco" value="'+(f.preco||'')+'" placeholder="0,00"'
+             + ' style="width:80px;border:1px solid #EDD9C0;border-radius:6px;padding:4px 6px;font-size:12px">'
+             + '<button type="button" onclick="obaRemoverFaixa(this)" title="Remover faixa"'
+             + ' style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:14px;line-height:1;padding:0 4px">&times;</button>'
+             + '</div>';
+      }).join('');
+      faixasBloco =
+        '<div style="margin-top:10px">'
+        + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'
+        + '<label style="font-size:12px;font-weight:600;color:#5D3A1A">Faixas de preço por quantidade</label>'
+        + '<button type="button" class="secondary" style="font-size:10px;padding:3px 10px" onclick="obaAdicionarFaixa(this)">+ Faixa</button>'
+        + '</div>'
+        + '<div class="oba-faixas-container">'+(faixaLinhas||'')+'</div>'
+        + '<p style="font-size:10px;color:#bbb;margin-top:4px">Campo "Até" vazio = "acima de todos". Ex: Até 9 un. → R$ 5,50 / Até 49 → R$ 5,00 / vazio → R$ 4,50</p>'
+        + '</div>';
+    }
 
     const imgPreviewId = did+'-imgs';
     const div = document.createElement('div');
     div.id = did;
     div.dataset.opcaoIdx = String(idx);
+    div.dataset.opcaoTipo = tipo;
     if (optId) div.dataset.optionId = optId;
     div.style.cssText = 'border:1.5px solid #EDD9C0;border-radius:12px;padding:14px;margin-bottom:12px;background:#FFFDF8';
     div.innerHTML =
@@ -4145,14 +4180,11 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       + '</div>'
       + '<div class="grid">'
       + '<div class="field"><label>Nome da opção *</label><input id="'+did+'-nome" placeholder="Ex: Kit Básico" value="'+nome+'"></div>'
-      + '<div class="field"><label>Preço unit. <span class="hint">(R$, opcional)</span></label>'
+      + '<div class="field"><label>Preço unitário <span class="hint">(R$ / un., opcional)</span></label>'
       + '<input id="'+did+'-vunit" type="number" min="0" step="0.01" placeholder="0,00" value="'+vunit+'"></div>'
       + '<div class="field full"><label>Descrição curta</label><input id="'+did+'-desc" placeholder="Ex: Caixa com 6 trufas artesanais" value="'+desc+'"></div>'
       + '</div>'
-      + '<div style="margin-top:10px">'
-      + '<label style="font-size:12px;font-weight:600;color:#5D3A1A;display:block;margin-bottom:6px">Faixas de preço <span class="hint">(deixe 0 as não usadas)</span></label>'
-      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+faixaInputs+'</div>'
-      + '</div>'
+      + faixasBloco
       + '<div style="margin-top:12px">'
       + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
       + '<label style="font-size:12px;font-weight:600;color:#5D3A1A">Fotos <span class="hint">(máx. 5)</span></label>'
@@ -4163,6 +4195,31 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     cont.appendChild(div);
     obaOpcaoRenderizarImagens(idx);
   };
+
+  // Adicionar faixa dinamicamente dentro de um card de opção
+  window.obaAdicionarFaixa = function(btn) {
+    const container = btn.closest('[data-opcao-idx]')?.querySelector('.oba-faixas-container');
+    if (!container) return;
+    const linha = document.createElement('div');
+    linha.className = 'oba-faixa-linha';
+    linha.style.cssText = 'display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #EDD9C0;border-radius:8px;padding:6px 10px;margin-bottom:6px';
+    linha.innerHTML =
+      '<span style="font-size:10px;color:#9B7A60;white-space:nowrap">Até</span>'
+      + '<input type="number" min="1" step="1" class="oba-faixa-ate" placeholder="\u221e"'
+      + ' style="width:60px;border:1px solid #EDD9C0;border-radius:6px;padding:4px 6px;font-size:12px">'
+      + '<span style="font-size:10px;color:#9B7A60">un. → R$</span>'
+      + '<input type="number" min="0" step="0.01" class="oba-faixa-preco" placeholder="0,00"'
+      + ' style="width:80px;border:1px solid #EDD9C0;border-radius:6px;padding:4px 6px;font-size:12px">'
+      + '<button type="button" onclick="obaRemoverFaixa(this)" title="Remover"'
+      + ' style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:14px;line-height:1;padding:0 4px">&times;</button>';
+    container.appendChild(linha);
+  };
+
+  window.obaRemoverFaixa = function(btn) {
+    const linha = btn.closest('.oba-faixa-linha');
+    if (linha) linha.remove();
+  };
+
 
   window.obaRemoverOpcao = function(did, contId, idx) {
     const el = document.getElementById(did);
@@ -4234,11 +4291,17 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       if (!nome) return;
       const desc  = (odiv.querySelector('[id$="-desc"]')?.value||'').trim()||null;
       const vunit = parseFloat(odiv.querySelector('[id$="-vunit"]')?.value)||null;
-      const faixaEls  = odiv.querySelectorAll('.oba-faixa-preco');
-      const faixasBase = [{ate:9},{ate:49},{ate:99},{ate:null}];
-      const faixas = faixasBase.map(function(fb,fi) {
-        return {ate: fb.ate, preco: parseFloat(faixaEls[fi]?.value)||0};
-      }).filter(function(f) { return f.preco > 0; });
+      // Coletar faixas dinâmicas (linhas .oba-faixa-linha)
+      const faixas = [];
+      odiv.querySelectorAll('.oba-faixa-linha').forEach(function(linha) {
+        const ateEl   = linha.querySelector('.oba-faixa-ate');
+        const precoEl = linha.querySelector('.oba-faixa-preco');
+        const preco   = parseFloat(precoEl?.value)||0;
+        if (!preco) return; // ignorar linha sem preço
+        const ateRaw  = ateEl?.value?.trim();
+        const ate     = (ateRaw === '' || ateRaw == null) ? null : parseInt(ateRaw);
+        faixas.push({ate, preco});
+      });
       options.push({option_id: optId, idx, nome, descricao: desc, valor_unit: vunit, faixas});
     });
     return options;
