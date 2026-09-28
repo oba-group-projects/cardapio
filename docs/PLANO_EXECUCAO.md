@@ -266,4 +266,5 @@ URL própria, disparada para quem solicita orçamento de festa.
 | 25/09/2026 | 12A-4 concluída | Status inline, Excluir, campo Abertura, migration 0007. HEAD: ecbc167 |
 | 25/09/2026 | Fix mensagem WhatsApp | "Olá, Oba Doceria! Gostei do Cenário X. E agora, quais os próximos passos?" HEAD: 85525cf |
 | 25/09/2026 | 12B aprovada | Templates separados, sazonal individual com duplicação, galeria 8 fotos. |
-| 27/09/2026 | 12B concluída | Redesign completo com proposal_options. Migrations 0011-0014. Worker + Central + páginas públicas. HEAD: a8d7312 |
+| 27/09/2026 | 12B-rev1 | Fix validação template, faixas dinâmicas, frequência corp, observações sazonal. HEAD: 943df8e |
+| 27/09/2026 | 12B-rev2 | Redesign visual Corporativo (esmeralda+cobre) e Sazonal (paletas temáticas). Faixas De-Até. Migration 0015. HEAD: f2c7809 |

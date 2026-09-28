@@ -4,7 +4,7 @@ Atualizado: 2026-09-27
 
 ## Git
 Branch: feature/gestao-online-segura
-Commit HEAD: a8d7312
+Commit HEAD: f2c7809
 Tag estável anterior: v12B-baseline (ded3c58)
 Branch main: 5913078
 
@@ -12,36 +12,39 @@ Branch main: 5913078
 - Central privada autenticada e operacional
 - Fluxo DRAFT → PREVIEW → PUBLISHED com rollback e histórico
 - Cardápio público funcional
-- Módulo de Propostas completo: Evento (12A) + Corporativo e Sazonal (12B)
+- Módulo de Propostas completo: Evento (12A) + Corporativo e Sazonal (12B + rev1 + rev2)
 
 ## Fases concluídas
-- **12A-1:** D1 migrations + rotas Worker (proposals, scenarios, items)
-- **12A-2:** Aba Propostas na Central (editor completo)
-- **12A-3:** Página pública /proposta/:id — 4 páginas, texto emocional, cards delicados
-- **12A-4:** Status inline, Excluir, campo Abertura, migration 0007
-- **12B completo:** Redesign Corporativo e Sazonal com proposal_options
-  - Migrations 0011-0014: proposal_options, option_id em media, faixas, briefing
-  - Rotas Worker: POST/PUT/DELETE /options, /options/:id/media, duplicate corrigido
-  - Central: obaAdicionarOpcao, obaOpcaoProcessarImagem, obaPreencherCamposSazonais
-  - Páginas públicas corporativo e sazonal usam proposal.options (foto + faixas)
-  - Cenários ocultos em Corp/Sazonal; apenas Evento usa cenários
+- **12A completa:** proposals, scenarios, items, página pública /proposta/:id
+- **12B completa:** proposal_options, faixas, mídia por opção, briefing corporativo
+- **12B-rev1:** fix validação por template, faixas dinâmicas, campo frequência, observações sazonal
+- **12B-rev2:** redesign visual Corporativo e Sazonal + faixas De-Até
+  - Migration 0015: coluna `de` em `proposal_option_faixas`
+  - Corporativo: paleta esmeralda escuro + cobre; pg0 impactante com chips de briefing
+  - Sazonal: paletas temáticas por data comemorativa; pg0 emocional sem condições
+  - Condições do sazonal movidas para rodapé de pg1
+  - Faixas formato "De X a Até Y un." com dois campos editáveis
 
 ## Arquitetura de opções (Corp/Sazonal)
 ```
 proposal
   └── proposal_options (máx. 5)
-        ├── proposal_option_faixas (ate, preco, ordem)
+        ├── proposal_option_faixas (de, ate, preco, ordem)
         └── proposal_media (option_id, dados Base64)
 ```
 
+## Paletas visuais
+- **Evento:** dourado quente #C8922A + bege #F9E4BE + marrom #3B2A1E
+- **Corporativo:** esmeralda #1C3B2E + cobre #C8922A + creme #FAFAF6
+- **Sazonal:** temática por data (Natal=vinho, Páscoa=roxo, Mães=rosa, Pais=azul, Namorados=bordô, Crianças=laranja)
+
 ## Próxima fase — 12C (pendente)
-Catálogo de Festas — vitrine pública `/festas` no Worker, sem fluxo de pedido.
-CTA único: "Quero um orçamento" → WhatsApp.
+Catálogo de Festas — vitrine pública `/festas` no Worker.
 Iniciar somente após 12B homologada em produção.
 
 ## Ponto de retorno seguro
-Tag git: v12B-baseline (commit ded3c58) — estado antes do redesign 12B.
-Commit atual: a8d7312 — 12B completo, deployado.
+Tag git: v12B-baseline (ded3c58) — estado antes do redesign 12B.
+Commit atual: f2c7809 — 12B-rev2 completo, deployado.
 
 ## Links
 - Central: https://oba-cardapio-gestao.obadoceria.workers.dev/

@@ -20,6 +20,33 @@ Formato inspirado em Keep a Changelog.
 - O repositório passa a ser a memória operacional oficial do projeto.
 - Scripts persistentes são preferidos a grandes blocos colados no PSReadLine.
 
+## [12B-rev2] — 2026-09-27 — commit f2c7809
+
+### Added
+- Migration 0015: coluna `de` em `proposal_option_faixas` (formato "De X a Até Y")
+- Corporativo: paleta esmeralda escuro (`#1C3B2E`) + cobre (`#C8922A`); pg0 com fundo escuro, chips de briefing, texto contextualizado; pg1 lista de opções; pg2+ detalhe com foto, faixas, CTA
+- Sazonal: paletas temáticas por data (Natal/Páscoa/Mães/Pais/Namorados/Crianças); pg0 emocional sem condições; condições no rodapé de pg1; hero foto grande em pg2+
+- Faixas formato "De X a Até Y un." com dois campos editáveis na Central
+- `obaAdicionarFaixa` e `obaColetarOptions` suportam campo `de`
+
+### Changed
+- Worker: INSERT/UPDATE faixas inclui campo `de`
+- Sazonal: condições (prazos, pagamento) movidas de pg0 para rodapé de pg1
+
+## [12B-rev1] — 2026-09-27 — commit 943df8e
+
+### Fixed
+- Validação "Nome do cliente obrigatório" bifurca por template
+- Campo frequência corporativo restaurado
+
+### Added
+- Faixas de preço dinâmicas com + Adicionar / ✕ Remover (Sazonal)
+- Campo "Observações / instruções de pedido" no Sazonal
+- Observações exibidas na página pública sazonal
+
+### Changed
+- Corporativo: card de opção sem faixas (só valor unitário)
+
 ## [12B] — 2026-09-27 — commit a8d7312
 
 ### Added
