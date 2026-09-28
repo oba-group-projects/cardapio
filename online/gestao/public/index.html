@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
@@ -3063,7 +3063,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
 
     <!-- DADOS CORPORATIVO -->
     <div class="card" id="prop-bloco-corporativo" style="margin-bottom:16px;display:none">
-      <h4 style="margin:0 0 12px;font-size:13px;color:var(--brand)">🏢 Dados Corporativos</h4>
+      <h4 style="margin:0 0 14px;font-size:13px;color:var(--brand)">🏢 Proposta Corporativa</h4>
       <div class="grid">
         <div class="field"><label>Nome do cliente / contato *</label><input id="prop-cliente-corp" placeholder="Ex: João Silva"></div>
         <div class="field"><label>WhatsApp * <span class="hint">(com DDD)</span></label><input id="prop-whatsapp-corp" type="tel" placeholder="11999998888"></div>
@@ -3078,70 +3078,66 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
             <option value="Outro">Outro</option>
           </select>
         </div>
-        <div class="field"><label>Frequência</label>
-          <select id="prop-frequencia">
-            <option value="">Selecione...</option>
-            <option value="Pontual">Pontual</option>
-            <option value="Mensal">Mensal</option>
-            <option value="Recorrente">Recorrente</option>
-          </select>
-        </div>
-        <div class="field"><label>Orçamento de referência <span class="hint">(opcional)</span></label><input id="prop-orcamento-ref" type="number" min="0" step="0.01" placeholder="Ex: 5000"></div>
         <div class="field"><label>Validade da proposta</label><input id="prop-validade-corp" type="date"></div>
-        <div class="field full"><label>Briefing / observações</label><textarea id="prop-observacoes" rows="4" placeholder="Descreva a ideia, contexto, necessidades específicas..."></textarea></div>
-        <div class="field full">
-          <label style="display:flex;justify-content:space-between;align-items:center">
-            Texto da abertura
-            <span id="prop-abertura-corp-count" style="font-size:10px;color:#bbb;font-weight:400">0 caracteres</span>
-          </label>
-          <textarea id="prop-abertura-corp" rows="4"
-            placeholder="Texto personalizado que abre a proposta. Deixe vazio para gerar automaticamente."
-            style="resize:vertical;font-size:13px;line-height:1.6"
-            oninput="document.getElementById('prop-abertura-corp-count').textContent=this.value.length+' caracteres'"
-          ></textarea>
+        <div class="field"><label>Texto de abertura <span class="hint">(deixe vazio para gerar automaticamente)</span></label>
+          <textarea id="prop-abertura-corp" rows="3" style="font-size:13px;line-height:1.6"
+            placeholder="Texto personalizado que abre a proposta."
+            oninput="document.getElementById('prop-abertura-corp-count').textContent=this.value.length+' car.'"></textarea>
+          <span id="prop-abertura-corp-count" style="font-size:10px;color:#bbb">0 car.</span>
         </div>
       </div>
-      <!-- Galeria de imagens -->
-      <div style="margin-top:16px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-          <label style="font-weight:600;font-size:13px">📷 Galeria de imagens <span style="font-size:11px;color:#9B7A60;font-weight:400">(até 8 fotos)</span></label>
-          <button type="button" class="secondary" style="font-size:11px;padding:4px 12px" onclick="obaProposalAdicionarImagem()">+ Adicionar foto</button>
+      <!-- Briefing recebido da empresa -->
+      <div style="margin-top:14px;padding:12px 14px;background:#FFF8EE;border-radius:10px;border:1px solid #EDD9C0">
+        <p style="font-size:12px;font-weight:600;color:#C8922A;margin-bottom:10px">📋 Briefing da empresa</p>
+        <div class="grid">
+          <div class="field"><label>Quantidade solicitada</label><input id="prop-qtd-solicitada" type="number" min="1" placeholder="Ex: 80 unidades"></div>
+          <div class="field"><label>Orçamento máximo <span class="hint">(R$)</span></label><input id="prop-orcamento-max" type="number" min="0" step="0.01" placeholder="Ex: 4000"></div>
+          <div class="field"><label>Data e hora de entrega</label><input id="prop-data-entrega" type="datetime-local"></div>
+          <div class="field full"><label>Observações / pedido específico</label><textarea id="prop-observacoes" rows="3" placeholder="Ex: Embalagem com logo da empresa, entrega no RH..."></textarea></div>
         </div>
-        <div id="prop-galeria-corp" style="display:flex;flex-wrap:wrap;gap:8px"></div>
-        <input type="file" id="prop-galeria-input" accept="image/*" style="display:none" onchange="obaProposalProcessarImagem(this)">
+      </div>
+      <!-- Opções da proposta -->
+      <div style="margin-top:18px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <p style="font-size:13px;font-weight:600;color:#3B2A1E">Opções propostas <span style="font-size:10px;color:#9B7A60;font-weight:400">(máx. 5)</span></p>
+          <button type="button" class="secondary" style="font-size:11px;padding:5px 14px" onclick="obaAdicionarOpcao('corporativo')">+ Adicionar opção</button>
+        </div>
+        <div id="prop-opcoes-corporativo"></div>
       </div>
     </div>
 
     <!-- DADOS SAZONAL -->
     <div class="card" id="prop-bloco-sazonal" style="margin-bottom:16px;display:none">
-      <h4 style="margin:0 0 12px;font-size:13px;color:var(--brand)">🎁 Dados do Catálogo Sazonal</h4>
+      <h4 style="margin:0 0 14px;font-size:13px;color:var(--brand)">🎁 Catálogo Sazonal</h4>
       <div class="grid">
-        <div class="field"><label>Empresa / destinatário <span class="hint">(ou deixe vazio para catálogo geral)</span></label><input id="prop-empresa-saz" placeholder="Ex: Empresa XYZ — ou deixe vazio"></div>
+        <div class="field"><label>Data comemorativa *</label>
+          <select id="prop-data-comemorativa" onchange="obaPreencherCamposSazonais(this.value)">
+            <option value="">Selecione...</option>
+            <option value="Natal">Natal</option>
+            <option value="Páscoa">Páscoa</option>
+            <option value="Dia das Mães">Dia das Mães</option>
+            <option value="Dia dos Pais">Dia dos Pais</option>
+            <option value="Dia dos Namorados">Dia dos Namorados</option>
+            <option value="Dia das Crianças">Dia das Crianças</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </div>
+        <div class="field" id="prop-data-comemorativa-outro-wrap" style="display:none"><label>Especifique a data</label><input id="prop-data-comemorativa-outro" placeholder="Ex: Festa Junina 2027"></div>
+        <div class="field"><label>Empresa / destinatário <span class="hint">(ou deixe vazio)</span></label><input id="prop-empresa-saz" placeholder="Ex: Empresa XYZ"></div>
         <div class="field"><label>Validade da proposta</label><input id="prop-validade-saz" type="date"></div>
-        <div class="field"><label>Prazo para pedido</label><input id="prop-prazo-pedido" placeholder="Ex: Pedidos até 30 de novembro de 2026"></div>
-        <div class="field"><label>Prazo de entrega</label><input id="prop-prazo-entrega" placeholder="Ex: Entrega em até 15 dias úteis após confirmação"></div>
+        <div class="field"><label>Prazo para pedido</label><input id="prop-prazo-pedido" placeholder="Preenchido automaticamente ao escolher data"></div>
+        <div class="field"><label>Prazo de entrega</label><input id="prop-prazo-entrega" placeholder="Preenchido automaticamente"></div>
         <div class="field"><label>Condições de pagamento</label><input id="prop-cond-pagamento" placeholder="Ex: 50% no pedido, 50% na entrega"></div>
         <div class="field"><label>Pedido mínimo <span class="hint">(unidades)</span></label><input id="prop-pedido-minimo" type="number" min="1" placeholder="Ex: 10"></div>
-        <div class="field full"><label>Texto de abertura <span class="hint">(deixe vazio para gerar automaticamente)</span></label><textarea id="prop-abertura-saz" rows="3" placeholder="Ex: Chegou a época mais especial do ano! Preparamos opções exclusivas para presentear seus colaboradores com muito carinho..." style="font-size:13px;line-height:1.6"></textarea></div>
+        <div class="field full"><label>Texto de abertura <span class="hint">(deixe vazio para gerar automaticamente)</span></label><textarea id="prop-abertura-saz" rows="3" style="font-size:13px;line-height:1.6" placeholder="Preenchido automaticamente ao escolher a data."></textarea></div>
       </div>
-
-      <!-- Galeria sazonal -->
-      <div style="margin-top:16px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-          <label style="font-weight:600;font-size:13px">📷 Galeria de imagens <span style="font-size:11px;color:#9B7A60;font-weight:400">(até 8 fotos dos produtos)</span></label>
-          <button type="button" class="secondary" style="font-size:11px;padding:4px 12px" onclick="obaProposalAdicionarImagem()">+ Adicionar foto</button>
+      <!-- Opções do catálogo -->
+      <div style="margin-top:18px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <p style="font-size:13px;font-weight:600;color:#3B2A1E">Opções do catálogo <span style="font-size:10px;color:#9B7A60;font-weight:400">(máx. 5)</span></p>
+          <button type="button" class="secondary" style="font-size:11px;padding:5px 14px" onclick="obaAdicionarOpcao('sazonal')">+ Adicionar opção</button>
         </div>
-        <div id="prop-galeria-saz" style="display:flex;flex-wrap:wrap;gap:8px"></div>
-        <input type="file" id="prop-galeria-input-saz" accept="image/*" style="display:none" onchange="obaProposalProcessarImagem(this)">
-      </div>
-
-      <!-- Produtos com faixas de preço -->
-      <div style="margin-top:20px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-          <label style="font-weight:600;font-size:13px">🏷️ Produtos e faixas de preço</label>
-          <button type="button" class="secondary" style="font-size:11px;padding:4px 12px" onclick="obaAdicionarProdutoSazonal()">+ Produto</button>
-        </div>
-        <div id="prop-produtos-sazonal"></div>
+        <div id="prop-opcoes-sazonal"></div>
       </div>
     </div>
 
@@ -3149,6 +3145,9 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     <div id="proposals-cenarios"></div>
 
     <button class="secondary" id="btn-adicionar-cenario" onclick="obaProposalAdicionarCenario()" style="margin-bottom:16px;width:100%">+ Adicionar Cenário</button>
+
+    <!-- input file compartilhado para upload de imagens de opções -->
+    <input type="file" id="prop-opcao-img-input" accept="image/*" style="display:none" onchange="obaOpcaoProcessarImagem(this)">
 
     <!-- AÇÕES -->
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
@@ -3249,13 +3248,21 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     document.getElementById('prop-bloco-corporativo').style.display  = isCorp   ? '' : 'none';
     const blocoSaz = document.getElementById('prop-bloco-sazonal');
     if (blocoSaz) blocoSaz.style.display = isSaz ? '' : 'none';
-    // Cenarios: sazonal usa cenarios para estrutura de produtos também
+    // Cenarios: apenas Evento usa cenarios
     const btnCenario = document.getElementById('btn-adicionar-cenario');
-    if (btnCenario) btnCenario.style.display = isSaz ? 'none' : '';
+    if (btnCenario) btnCenario.style.display = isEvento ? '' : 'none';
+    const blocoCenarios = document.getElementById('proposals-cenarios');
+    if (blocoCenarios) blocoCenarios.style.display = isEvento ? '' : 'none';
     // Label do editor
-    const tLabels = {evento:'📅 Evento', corporativo:'🏢 Corporativo', sazonal:'🎁 Sazonal'};
+    const tLabels = {evento:'\uD83D\uDCC5 Evento', corporativo:'\uD83C\uDFE2 Corporativo', sazonal:'\uD83C\uDF81 Sazonal'};
     const badge = document.getElementById('proposals-template-badge');
     if (badge) { badge.textContent = tLabels[obaTemplateAtivo]||''; }
+    // Resetar containers de options ao trocar de template
+    obaOpcoesCount = 0;
+    const contCorp = document.getElementById('prop-opcoes-corporativo');
+    const contSaz  = document.getElementById('prop-opcoes-sazonal');
+    if (contCorp) contCorp.innerHTML = '';
+    if (contSaz)  contSaz.innerHTML  = '';
   }
 
   function obaLimparFormulario() {
@@ -3273,10 +3280,19 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     if (cnt2) cnt2.textContent = '0 caracteres';
     obaGaleriaImagens = [];
     obaRenderizarGaleria();
-    // Limpar produtos sazonais
-    obaProdutosSazonalCount = 0;
-    const ps = document.getElementById('prop-produtos-sazonal');
-    if (ps) ps.innerHTML = '';
+    // Limpar options (corporativo/sazonal — redesign 12B)
+    obaOpcoesCount = 0;
+    const contCorp = document.getElementById('prop-opcoes-corporativo');
+    const contSaz  = document.getElementById('prop-opcoes-sazonal');
+    if (contCorp) contCorp.innerHTML = '';
+    if (contSaz)  contSaz.innerHTML  = '';
+    // Limpar seletor de data comemorativa
+    const dcSel = document.getElementById('prop-data-comemorativa');
+    if (dcSel) { dcSel.value = ''; }
+    const outroWrap = document.getElementById('prop-data-comemorativa-outro-wrap');
+    if (outroWrap) outroWrap.style.display = 'none';
+    const dcOut = document.getElementById('prop-data-comemorativa-outro');
+    if (dcOut) dcOut.value = '';
   }
 
   function obaRenderizarGaleria() {
@@ -3384,26 +3400,21 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         const g = (id, v) => { const el = document.getElementById(id); if (el) el.value = v||''; };
         g('prop-cliente-corp', p.cliente); g('prop-whatsapp-corp', p.whatsapp);
         g('prop-empresa', p.empresa); g('prop-demanda', p.demanda);
-        g('prop-frequencia', p.frequencia); g('prop-orcamento-ref', p.orcamento_ref||'');
         g('prop-validade-corp', p.validade); g('prop-observacoes', p.observacoes);
         g('prop-abertura-corp', p.abertura);
+        // Novos campos briefing 12B
+        g('prop-qtd-solicitada', p.qtd_solicitada||'');
+        g('prop-orcamento-max', p.orcamento_max||'');
+        g('prop-data-entrega', p.data_entrega||'');
         const cnt = document.getElementById('prop-abertura-corp-count');
-        if (cnt) cnt.textContent = (p.abertura||'').length + ' caracteres';
-        // Carregar galeria
-        obaGaleriaImagens = [];
-        try {
-          const mr = await fetch('/api/proposals/' + proposalId + '/media');
-          const md = await mr.json();
-          if (md.ok) {
-            for (const m of (md.media||[])) {
-              const imgR = await fetch('/api/proposals/'+proposalId+'/media/'+m.media_id+'/dados');
-              const blob = await imgR.blob();
-              const dataUrl = await new Promise(res => { const fr = new FileReader(); fr.onload = e => res(e.target.result); fr.readAsDataURL(blob); });
-              obaGaleriaImagens.push({media_id: m.media_id, dataUrl, mime: m.mime, legenda: m.legenda||'', tamanho: m.tamanho, ordem: m.ordem});
-            }
-          }
-        } catch(e) {}
-        obaRenderizarGaleria();
+        if (cnt) cnt.textContent = (p.abertura||'').length + ' car.';
+        // Carregar options (redesign 12B)
+        const contOpt = document.getElementById('prop-opcoes-corporativo');
+        if (contOpt) contOpt.innerHTML = '';
+        obaOpcoesCount = 0;
+        for (const opt of (p.options||[])) {
+          await obaAdicionarOpcao('corporativo', opt);
+        }
       }
 
       // Campos Sazonal
@@ -3413,36 +3424,26 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         g('prop-prazo-entrega', p.prazo_entrega); g('prop-cond-pagamento', p.cond_pagamento);
         g('prop-pedido-minimo', p.pedido_minimo||''); g('prop-validade-saz', p.validade);
         g('prop-abertura-saz', p.abertura);
-        // Restaurar produtos do cenário 1
-        obaProdutosSazonalCount = 0;
-        const ps = document.getElementById('prop-produtos-sazonal');
-        if (ps) ps.innerHTML = '';
-        const cen1 = p.scenarios && p.scenarios[0];
-        if (cen1 && cen1.items) {
-          cen1.items.forEach(it => {
-            const partes = it.descricao.split(' — ');
-            obaAdicionarProdutoSazonal({
-              nome: partes[0]||it.descricao,
-              descricao: partes[1]||'',
-              faixas: it.faixas||null,
-            });
-          });
-        }
-        // Carregar galeria sazonal
-        obaGaleriaImagens = [];
-        try {
-          const mr = await fetch('/api/proposals/' + proposalId + '/media');
-          const md = await mr.json();
-          if (md.ok) {
-            for (const m of (md.media||[])) {
-              const imgR = await fetch('/api/proposals/'+proposalId+'/media/'+m.media_id+'/dados');
-              const blob = await imgR.blob();
-              const dataUrl = await new Promise(res => { const fr = new FileReader(); fr.onload = e => res(e.target.result); fr.readAsDataURL(blob); });
-              obaGaleriaImagens.push({media_id: m.media_id, dataUrl, mime: m.mime, legenda: m.legenda||'', tamanho: m.tamanho, ordem: m.ordem});
-            }
+        // Data comemorativa
+        const dcSel = document.getElementById('prop-data-comemorativa');
+        if (dcSel && p.data_comemorativa) {
+          const opts = Array.from(dcSel.options).map(o => o.value);
+          if (opts.includes(p.data_comemorativa)) {
+            dcSel.value = p.data_comemorativa;
+          } else {
+            dcSel.value = 'Outro';
+            const outroWrap = document.getElementById('prop-data-comemorativa-outro-wrap');
+            if (outroWrap) outroWrap.style.display = '';
+            g('prop-data-comemorativa-outro', p.data_comemorativa);
           }
-        } catch(e) {}
-        obaRenderizarGaleria();
+        }
+        // Carregar options (redesign 12B)
+        const contOptSaz = document.getElementById('prop-opcoes-sazonal');
+        if (contOptSaz) contOptSaz.innerHTML = '';
+        obaOpcoesCount = 0;
+        for (const opt of (p.options||[])) {
+          await obaAdicionarOpcao('sazonal', opt);
+        }
       }
 
       obaProposalCenariosCount = 0;
@@ -3955,18 +3956,22 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         whatsapp: gv('prop-whatsapp-corp'),
         empresa: gv('prop-empresa'),
         demanda: gv('prop-demanda'),
-        frequencia: gv('prop-frequencia'),
-        orcamento_ref: parseFloat(document.getElementById('prop-orcamento-ref')?.value)||null,
         observacoes: gv('prop-observacoes'),
         abertura: gv('prop-abertura-corp'),
         validade: gv('prop-validade-corp'),
+        // Novos campos briefing 12B
+        qtd_solicitada: parseInt(document.getElementById('prop-qtd-solicitada')?.value)||null,
+        orcamento_max: parseFloat(document.getElementById('prop-orcamento-max')?.value)||null,
+        data_entrega: gv('prop-data-entrega'),
       });
     } else if (obaTemplateAtivo === 'sazonal') {
-      const prodsSaz = obaColetarProdutosSazonais();
-      // Produtos sazonais viram itens livres no cenário 1 com campo faixas
+      const dcSel = document.getElementById('prop-data-comemorativa');
+      const dcOutro = document.getElementById('prop-data-comemorativa-outro');
+      const dataCom = (dcSel?.value === 'Outro') ? (dcOutro?.value||'').trim() : (dcSel?.value||'');
       Object.assign(payload, {
         empresa: gv('prop-empresa-saz'),
         cliente: gv('prop-empresa-saz') || 'Catálogo Sazonal',
+        data_comemorativa: dataCom || null,
         prazo_pedido: gv('prop-prazo-pedido'),
         prazo_entrega: gv('prop-prazo-entrega'),
         cond_pagamento: gv('prop-cond-pagamento'),
@@ -3974,24 +3979,6 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         abertura: gv('prop-abertura-saz'),
         validade: gv('prop-validade-saz'),
       });
-      // Cria cenário único com os produtos como itens livres com faixas
-      if (prodsSaz.length && (!payload.scenarios || !payload.scenarios.length)) {
-        payload.scenarios = [{
-          nome: 'Produtos',
-          descricao: '',
-          desconto_tipo: 'none',
-          desconto_valor: 0,
-          doces_por_convidado: null,
-          items: prodsSaz.map((p, i) => ({
-            tipo: 'livre',
-            descricao: p.nome + (p.descricao ? ' — ' + p.descricao : ''),
-            qtd: 1,
-            preco_unit: 0,
-            faixas: p.faixas,
-            ordem: i + 1,
-          }))
-        }];
-      }
     }
 
     try {
@@ -4004,15 +3991,45 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       const data = await r.json();
       if (!data.ok) { alert('Erro ao salvar: ' + (data.error||'desconhecido')); return; }
       obaProposalAtiva = data.proposal;
-      // Upload das imagens novas (corporativo/sazonal)
-      if (obaGaleriaImagens.length && data.proposal?.proposal_id) {
-        for (const img of obaGaleriaImagens) {
-          if (img.media_id) continue; // já salva, pular
-          await fetch('/api/proposals/' + data.proposal.proposal_id + '/media', {
-            method: 'POST',
-            headers: {'Content-Type':'application/json','X-CSRF-Token':csrf()},
-            body: JSON.stringify({dados: img.base64, mime: img.mime, tamanho: img.tamanho, legenda: img.legenda||null, ordem: img.ordem}),
-          });
+      // Sincronizar options via API (criar ou atualizar — corporativo/sazonal)
+      if ((obaTemplateAtivo === 'corporativo' || obaTemplateAtivo === 'sazonal') && data.proposal?.proposal_id) {
+        const pid = data.proposal.proposal_id;
+        const optsParaSalvar = obaColetarOptions(obaTemplateAtivo);
+        const optsSalvas = data.proposal.options || [];
+        for (let oi = 0; oi < optsParaSalvar.length; oi++) {
+          const opt = optsParaSalvar[oi];
+          const existenteId = opt.option_id || (optsSalvas[oi]?.option_id);
+          const body = {nome: opt.nome, descricao: opt.descricao, valor_unit: opt.valor_unit, faixas: opt.faixas, ordem: oi+1};
+          let optId = existenteId;
+          if (existenteId) {
+            await fetch('/api/proposals/'+pid+'/options/'+existenteId, {
+              method:'PUT', headers:{'Content-Type':'application/json','X-CSRF-Token':csrf()},
+              body: JSON.stringify(body),
+            });
+          } else {
+            const or = await fetch('/api/proposals/'+pid+'/options', {
+              method:'POST', headers:{'Content-Type':'application/json','X-CSRF-Token':csrf()},
+              body: JSON.stringify(body),
+            });
+            const od = await or.json();
+            if (od.ok) {
+              optId = od.option_id;
+              // Persistir option_id no div para uso no upload
+              const odiv = document.querySelector('[data-opcao-idx="'+opt.idx+'"]');
+              if (odiv) odiv.dataset.optionId = optId;
+            }
+          }
+          // Upload de imagens novas desta opção
+          if (optId) {
+            const imgPending = obaOpcaoImagens[opt.idx] || [];
+            for (const img of imgPending) {
+              if (img.media_id) continue;
+              await fetch('/api/proposals/'+pid+'/options/'+optId+'/media', {
+                method:'POST', headers:{'Content-Type':'application/json','X-CSRF-Token':csrf()},
+                body: JSON.stringify({dados: img.base64, mime: img.mime, tamanho: img.tamanho, legenda: img.legenda||null, ordem: img.ordem}),
+              });
+            }
+          }
         }
       }
       // Exibir botões de link/pdf no editor
@@ -4065,58 +4082,198 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     } catch(e) { alert('Erro de conexão.'); }
   };
 
-  // ---------- PRODUTOS SAZONAIS ----------
-  let obaProdutosSazonalCount = 0;
+  // ---------- OPTIONS (CORPORATIVO / SAZONAL) — redesign 12B ----------
+  let obaOpcoesCount = 0;
+  // obaOpcaoImagens[idx] = [{base64, dataUrl, mime, tamanho, legenda, ordem, media_id?}]
+  const obaOpcaoImagens = {};
+  let obaOpcaoImgTargetIdx = null;
 
-  window.obaAdicionarProdutoSazonal = function(dados) {
-    obaProdutosSazonalCount++;
-    const pid = 'prod-saz-' + obaProdutosSazonalCount;
-    const nome = dados?.nome || '';
-    const desc = dados?.descricao || '';
-    const faixas = dados?.faixas ? JSON.parse(dados.faixas) : [{ate:9,preco:''},{ate:49,preco:''},{ate:99,preco:''},{ate:null,preco:''}];
+  // Adicionar opção ao container (corporativo ou sazonal)
+  // dadosExistentes: obj da API {option_id, nome, descricao, valor_unit, faixas[], medias[]}
+  window.obaAdicionarOpcao = async function(tipo, dadosExistentes) {
+    const contId = tipo === 'corporativo' ? 'prop-opcoes-corporativo' : 'prop-opcoes-sazonal';
+    const cont = document.getElementById(contId);
+    if (!cont) return;
+    const existentes = cont.querySelectorAll('div[data-opcao-idx]').length;
+    if (existentes >= 5) { alert('Máximo de 5 opções por proposta.'); return; }
 
+    const idx   = obaOpcoesCount++;
+    obaOpcaoImagens[idx] = [];
+    const did   = 'opcao-' + idx;
+    const optId = dadosExistentes?.option_id || '';
+    const nome  = dadosExistentes?.nome || '';
+    const desc  = dadosExistentes?.descricao || '';
+    const vunit = dadosExistentes?.valor_unit != null ? dadosExistentes.valor_unit : '';
+    const faixas = (dadosExistentes?.faixas && dadosExistentes.faixas.length)
+      ? dadosExistentes.faixas
+      : [{ate:9,preco:''},{ate:49,preco:''},{ate:99,preco:''},{ate:null,preco:''}];
+
+    // Pré-carregar imagens existentes (ao editar)
+    for (const m of (dadosExistentes?.medias||[])) {
+      try {
+        const imgR = await fetch('/api/proposals/'+obaProposalAtiva.proposal_id+'/media/'+m.media_id+'/dados');
+        const blob = await imgR.blob();
+        const dataUrl = await new Promise(res => { const fr = new FileReader(); fr.onload = e => res(e.target.result); fr.readAsDataURL(blob); });
+        obaOpcaoImagens[idx].push({media_id: m.media_id, dataUrl, base64: dataUrl, mime: m.mime, legenda: m.legenda||'', tamanho: m.tamanho, ordem: m.ordem});
+      } catch(e) {}
+    }
+
+    const faixaInputs = faixas.map(function(f,fi) {
+      const prevAte = fi > 0 ? faixas[fi-1]?.ate : null;
+      const label = (f.ate === null || f.ate == null)
+        ? ('Acima de ' + (prevAte||'') + ' un.')
+        : ('Até ' + f.ate + ' un.');
+      return '<div style="display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #EDD9C0;border-radius:8px;padding:7px 10px">'
+           + '<span style="font-size:11px;color:#9B7A60;white-space:nowrap">'+label+'</span>'
+           + '<span style="font-size:11px;color:#bbb">→ R$</span>'
+           + '<input type="number" min="0" step="0.01" class="oba-faixa-preco" data-fi="'+fi+'"'
+           + ' value="'+(f.preco||'')+'" placeholder="0,00"'
+           + ' style="width:70px;border:1px solid #EDD9C0;border-radius:6px;padding:4px 6px;font-size:12px">'
+           + '</div>';
+    }).join('');
+
+    const imgPreviewId = did+'-imgs';
     const div = document.createElement('div');
-    div.id = pid;
+    div.id = did;
+    div.dataset.opcaoIdx = String(idx);
+    if (optId) div.dataset.optionId = optId;
     div.style.cssText = 'border:1.5px solid #EDD9C0;border-radius:12px;padding:14px;margin-bottom:12px;background:#FFFDF8';
-    div.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <strong style="font-size:13px;color:#3B2A1E">Produto ${obaProdutosSazonalCount}</strong>
-        <button type="button" onclick="document.getElementById('${pid}').remove()" style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:12px">✕ Remover</button>
-      </div>
-      <div class="grid">
-        <div class="field"><label>Nome do produto *</label><input class="ps-nome" placeholder="Ex: Kit Natal Premium" value="${nome}"></div>
-        <div class="field"><label>Descrição curta</label><input class="ps-desc" placeholder="Ex: Caixa com 6 trufas artesanais" value="${desc}"></div>
-      </div>
-      <div style="margin-top:10px">
-        <label style="font-size:12px;font-weight:600;color:#5D3A1A;display:block;margin-bottom:6px">Faixas de preço por quantidade</label>
-        <div class="ps-faixas" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          ${faixas.map((f,i) => `
-            <div style="display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #EDD9C0;border-radius:8px;padding:8px 10px">
-              <span style="font-size:11px;color:#9B7A60;white-space:nowrap">${f.ate===null?`Acima de ${faixas[i-1]?.ate||''}`:(`Até ${f.ate} un.`)}</span>
-              <span style="font-size:11px;color:#bbb">→</span>
-              <span style="font-size:11px;color:#bbb">R$</span>
-              <input type="number" min="0" step="0.01" class="ps-faixa-preco" data-idx="${i}" value="${f.preco||''}" placeholder="0,00" style="width:70px;border:1px solid #EDD9C0;border-radius:6px;padding:4px 6px;font-size:12px">
-            </div>`).join('')}
-        </div>
-        <p style="font-size:10px;color:#bbb;margin-top:4px">Faixas padrão: até 9 / até 49 / até 99 / acima de 100. Deixe em branco as faixas não utilizadas.</p>
-      </div>`;
-    document.getElementById('prop-produtos-sazonal').appendChild(div);
+    div.innerHTML =
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
+      + '<strong style="font-size:13px;color:#3B2A1E">Opção ' + (existentes+1) + '</strong>'
+      + '<button type="button" onclick="obaRemoverOpcao(\''+did+'\',\''+contId+'\','+idx+')" style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:12px">✕ Remover</button>'
+      + '</div>'
+      + '<div class="grid">'
+      + '<div class="field"><label>Nome da opção *</label><input id="'+did+'-nome" placeholder="Ex: Kit Básico" value="'+nome+'"></div>'
+      + '<div class="field"><label>Preço unit. <span class="hint">(R$, opcional)</span></label>'
+      + '<input id="'+did+'-vunit" type="number" min="0" step="0.01" placeholder="0,00" value="'+vunit+'"></div>'
+      + '<div class="field full"><label>Descrição curta</label><input id="'+did+'-desc" placeholder="Ex: Caixa com 6 trufas artesanais" value="'+desc+'"></div>'
+      + '</div>'
+      + '<div style="margin-top:10px">'
+      + '<label style="font-size:12px;font-weight:600;color:#5D3A1A;display:block;margin-bottom:6px">Faixas de preço <span class="hint">(deixe 0 as não usadas)</span></label>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+faixaInputs+'</div>'
+      + '</div>'
+      + '<div style="margin-top:12px">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
+      + '<label style="font-size:12px;font-weight:600;color:#5D3A1A">Fotos <span class="hint">(máx. 5)</span></label>'
+      + '<button type="button" class="secondary" style="font-size:11px;padding:4px 12px" onclick="obaOpcaoAbrirUpload('+idx+')">+ Foto</button>'
+      + '</div>'
+      + '<div id="'+imgPreviewId+'" style="display:flex;flex-wrap:wrap;gap:8px"></div>'
+      + '</div>';
+    cont.appendChild(div);
+    obaOpcaoRenderizarImagens(idx);
   };
 
-  function obaColetarProdutosSazonais() {
-    const prods = [];
-    document.querySelectorAll('#prop-produtos-sazonal > div').forEach(div => {
-      const nome = div.querySelector('.ps-nome')?.value?.trim();
-      if (!nome) return;
-      const desc = div.querySelector('.ps-desc')?.value?.trim()||'';
-      const faixaEls = div.querySelectorAll('.ps-faixa-preco');
-      const faixasBase = [{ate:9},{ate:49},{ate:99},{ate:null}];
-      const faixas = faixasBase.map((f,i) => ({ate:f.ate, preco:parseFloat(faixaEls[i]?.value)||0}))
-        .filter(f => f.preco > 0);
-      prods.push({nome, descricao: desc, faixas: JSON.stringify(faixas)});
-    });
-    return prods;
+  window.obaRemoverOpcao = function(did, contId, idx) {
+    const el = document.getElementById(did);
+    if (el) el.remove();
+    delete obaOpcaoImagens[idx];
+  };
+
+  window.obaOpcaoAbrirUpload = function(idx) {
+    obaOpcaoImgTargetIdx = idx;
+    const inp = document.getElementById('prop-opcao-img-input');
+    if (inp) { inp.value = ''; inp.click(); }
+  };
+
+  // Handler do <input type=file id="prop-opcao-img-input">
+  window.obaOpcaoProcessarImagem = function(input) {
+    const idx = obaOpcaoImgTargetIdx;
+    if (idx === null || idx === undefined || !input.files || !input.files[0]) return;
+    if ((obaOpcaoImagens[idx]||[]).length >= 5) { alert('Máximo de 5 fotos por opção.'); return; }
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        const MAX = 800;
+        let w = img.width, h = img.height;
+        if (w > MAX || h > MAX) { const r = Math.min(MAX/w, MAX/h); w=Math.round(w*r); h=Math.round(h*r); }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        const base64 = canvas.toDataURL('image/jpeg', 0.82);
+        const tamanho = Math.round(base64.length * 0.75);
+        if (!obaOpcaoImagens[idx]) obaOpcaoImagens[idx] = [];
+        obaOpcaoImagens[idx].push({base64, dataUrl: base64, mime:'image/jpeg', legenda:'', tamanho, ordem: obaOpcaoImagens[idx].length+1});
+        obaOpcaoRenderizarImagens(idx);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  function obaOpcaoRenderizarImagens(idx) {
+    const odiv = document.querySelector('[data-opcao-idx="'+idx+'"]');
+    if (!odiv) return;
+    const previewDiv = odiv.querySelector('[id$="-imgs"]');
+    if (!previewDiv) return;
+    const imgs = obaOpcaoImagens[idx] || [];
+    previewDiv.innerHTML = imgs.map(function(img, ii) {
+      return '<div style="position:relative;display:inline-block">'
+           + '<img src="'+img.dataUrl+'" style="width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid #EDD9C0">'
+           + '<button type="button" onclick="obaOpcaoRemoverImagem('+idx+','+ii+')"'
+           + ' style="position:absolute;top:-6px;right:-6px;background:#dc2626;color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;line-height:1">&times;</button>'
+           + '</div>';
+    }).join('');
   }
+
+  window.obaOpcaoRemoverImagem = function(idx, ii) {
+    if (obaOpcaoImagens[idx]) obaOpcaoImagens[idx].splice(ii,1);
+    obaOpcaoRenderizarImagens(idx);
+  };
+
+  // Coletar options para salvar (usado pelo obaProposalSalvar via API separada)
+  function obaColetarOptions(tipo) {
+    const contId = tipo === 'corporativo' ? 'prop-opcoes-corporativo' : 'prop-opcoes-sazonal';
+    const options = [];
+    document.querySelectorAll('#'+contId+' > div[data-opcao-idx]').forEach(function(odiv) {
+      const idx   = parseInt(odiv.dataset.opcaoIdx);
+      const optId = odiv.dataset.optionId || null;
+      const nome  = (odiv.querySelector('[id$="-nome"]')?.value||'').trim();
+      if (!nome) return;
+      const desc  = (odiv.querySelector('[id$="-desc"]')?.value||'').trim()||null;
+      const vunit = parseFloat(odiv.querySelector('[id$="-vunit"]')?.value)||null;
+      const faixaEls  = odiv.querySelectorAll('.oba-faixa-preco');
+      const faixasBase = [{ate:9},{ate:49},{ate:99},{ate:null}];
+      const faixas = faixasBase.map(function(fb,fi) {
+        return {ate: fb.ate, preco: parseFloat(faixaEls[fi]?.value)||0};
+      }).filter(function(f) { return f.preco > 0; });
+      options.push({option_id: optId, idx, nome, descricao: desc, valor_unit: vunit, faixas});
+    });
+    return options;
+  }
+
+  // Pré-preenchimento automático de campos sazonais ao escolher data comemorativa
+  window.obaPreencherCamposSazonais = function(valor) {
+    const outroWrap = document.getElementById('prop-data-comemorativa-outro-wrap');
+    if (outroWrap) outroWrap.style.display = valor === 'Outro' ? '' : 'none';
+    if (!valor || valor === 'Outro') return;
+    const presets = {
+      'Natal':            {prazo_pedido:'15 de dezembro', prazo_entrega:'22 de dezembro', cond_pagamento:'50% no pedido, 50% na entrega', pedido_minimo:10,
+                           abertura:'Chegou o Natal! \u2728 Este cat\u00e1logo foi preparado com muito carinho para tornar a sua celebra\u00e7\u00e3o ainda mais especial e doce.'},
+      'P\u00e1scoa':      {prazo_pedido:'7 dias antes da P\u00e1scoa', prazo_entrega:'Sexta-feira Santa', cond_pagamento:'50% no pedido, 50% na entrega', pedido_minimo:10,
+                           abertura:'A P\u00e1scoa chegou! \uD83D\uDC23 Preparamos este cat\u00e1logo especialmente para voc\u00ea celebrar com sabor e carinho.'},
+      'Dia das M\u00e3es':{prazo_pedido:'7 de maio', prazo_entrega:'10 de maio', cond_pagamento:'\u00c0 vista ou 50%/50%', pedido_minimo:5,
+                           abertura:'Dia das M\u00e3es merece algo especial. \uD83D\uDC90 Com muito carinho, preparamos este cat\u00e1logo pensando em cada detalhe.'},
+      'Dia dos Pais':     {prazo_pedido:'7 de agosto', prazo_entrega:'10 de agosto', cond_pagamento:'\u00c0 vista ou 50%/50%', pedido_minimo:5,
+                           abertura:'Papai merece os melhores mimos! \uD83C\uDF81 Confira nossas op\u00e7\u00f5es especiais para o Dia dos Pais.'},
+      'Dia dos Namorados':{prazo_pedido:'10 de junho', prazo_entrega:'12 de junho', cond_pagamento:'\u00c0 vista', pedido_minimo:1,
+                           abertura:'O amor merece ser celebrado com do\u00e7ura. \uD83D\uDC95 Este cat\u00e1logo foi preparado especialmente para o Dia dos Namorados.'},
+      'Dia das Crian\u00e7as':{prazo_pedido:'7 de outubro', prazo_entrega:'10 de outubro', cond_pagamento:'\u00c0 vista ou 50%/50%', pedido_minimo:5,
+                           abertura:'As crian\u00e7as merecem a alegria mais doce! \uD83C\uDF89 Confira nossas op\u00e7\u00f5es especiais para o Dia das Crian\u00e7as.'},
+    };
+    const p = presets[valor];
+    if (!p) return;
+    const g = function(id, v) { const el = document.getElementById(id); if (el && !el.value) el.value = v||''; };
+    g('prop-prazo-pedido',   p.prazo_pedido);
+    g('prop-prazo-entrega',  p.prazo_entrega);
+    g('prop-cond-pagamento', p.cond_pagamento);
+    const pmEl = document.getElementById('prop-pedido-minimo');
+    if (pmEl && !pmEl.value) pmEl.value = p.pedido_minimo||'';
+    const abEl = document.getElementById('prop-abertura-saz');
+    if (abEl && !abEl.value) abEl.value = p.abertura||'';
+  };
 
   window.obaProposalExcluir = async function(proposalId, cliente) {
     if (!confirm(`Excluir a proposta de "${cliente}"?\n\nEsta ação não pode ser desfeita.`)) return;
