@@ -3,49 +3,49 @@
 Atualizado: 2026-09-25
 
 Branch: feature/gestao-online-segura
-HEAD: 85525cf
+HEAD: b426272
+Tag estável: v12B-baseline
 
 ## Ultima fase entregue
-12A-4 — Melhorias na listagem de propostas (completo)
+12B (infraestrutura base) — Templates Corporativo e Sazonal
 
-## Commits desta sessão (mais recente primeiro)
+## Commits recentes
 | Commit   | O que fez |
 |----------|-----------|
+| b426272  | feat(12B): templates Corporativo e Sazonal completos |
+| 5f528c0  | docs: atualiza PLANO_EXECUCAO com 12A concluida e 12B aprovada |
+| e828a73  | docs: handoff sessao 12A-3 + 12A-4 |
 | 85525cf  | fix: remove valor da mensagem WhatsApp CTA |
-| e24af53  | fix: mensagem WhatsApp CTA mais proxima e natural |
 | ecbc167  | feat(12A-4): deletar rascunho + status inline + abertura no D1 |
-| ff10cda  | fix(12A-3): remove res-sub + caps para caixa mista via JS |
-| d2e1eff  | feat(12A-3): texto encantador + cenario mais delicado |
-| bebcc3b  | feat(12A-3): paraD encerramento + cards delicados |
-| d45d009  | fix(12A-3): card menor + pg1 respiro + PDF centralizado |
-| a81dc2e  | fix(12A-3): reverte centralização mobile + PDF |
 
-## O que está funcionando
-- Página pública /proposta/:id completa (12A-3):
-  - Pg0: abertura personalizada com texto emocional (usa campo abertura > resumo > automático)
-  - Pg1: resumo compacto dos 3 cenários com cards delicados
-  - Pg2/3/4: detalhe por cenário, navegação sticky, tabela com caixa mista
-  - CTA: "Escolhi este cenário — vamos conversar"
-  - WhatsApp: "Olá, Oba Doceria! Gostei do Cenário X – Nome. E agora, quais os próximos passos?"
-  - PDF: @page{margin:14mm 18mm}, cenários com padding-top para centralizar
-- Central — Propostas (12A-4):
-  - Status editável inline com select colorido (Rascunho/Enviada/Em negociação/Aceita/Recusada/Arquivada)
-  - Botão Excluir visível só para rascunhos (confirm + DELETE com CASCADE)
-  - Campo "Texto da abertura" na Central com contador de caracteres
-  - Migration 0007: coluna abertura na tabela proposals
+## O que está funcionando (v12B-baseline)
+- Cardápio público e Central 100% operacionais
+- Propostas: Evento (completo), Corporativo (base), Sazonal (base)
+- Modal de seleção de template ao criar proposta
+- Rotas de mídia por proposta (upload Base64, serve imagem, DELETE)
+- Duplicar proposta (copia dados + cenários + imagens)
+- Status inline editável (6 opções), Excluir rascunho
 
-## Próxima fase planejada
-12B — Modelo corporativo:
-- Seleção de template ao criar (Evento / Corporativo)
-- Formulário Corporativo: briefing + itens com foto
-- Tabela proposal_media (upload por proposta, D1 Base64)
-- Layout público alternativo com galeria de imagens
+## Próxima implementação — 12B redesign
+**Decisões aprovadas:**
+- `proposal_options`: nova tabela substituindo cenários para Corp/Sazonal
+- `proposal_media`: adicionar coluna `option_id`
+- `proposal_option_faixas`: tabela de preços por volume por opção
+- Campo "data comemorativa" no Sazonal (select + pré-preenchimento)
+- Galeria dentro de cada opção (não global)
+- Briefing Corporativo: quantidade, orçamento máximo, data/hora entrega
+- Máximo 5 opções por proposta Corp/Sazonal
+- Layout opção: foto grande + descrição + faixas de preço
+- Template Evento: NÃO muda
 
-## Arquivos críticos alterados nesta sessão
+**Ponto de retorno:** tag v12B-baseline = commit b426272
+
+## Arquivos críticos
 - online/gestao/src/index.js
 - online/gestao/public/index.html
-- online/gestao/migrations/0007_proposals_abertura.sql
+- online/gestao/migrations/ (0001 a 0010)
 - docs/CURRENT_STATE.md
 - docs/HANDOFF.md
+- docs/PLANO_EXECUCAO.md
 
 Leia AGENTS.md, CURRENT_STATE.md, DECISIONS.md e ROADMAP.md antes de alterar código.
