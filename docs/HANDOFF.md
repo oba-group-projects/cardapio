@@ -1,49 +1,56 @@
 # HANDOFF
 
-Atualizado: 2026-09-25
+Atualizado: 2026-09-27
 
 Branch: feature/gestao-online-segura
-HEAD: b426272
-Tag estável: v12B-baseline
+HEAD: a8d7312
+Tag estável anterior: v12B-baseline (ded3c58)
 
 ## Ultima fase entregue
-12B (infraestrutura base) — Templates Corporativo e Sazonal
+12B completo — Redesign Corporativo e Sazonal com `proposal_options`
 
 ## Commits recentes
 | Commit   | O que fez |
 |----------|-----------|
+| a8d7312  | feat(12B): redesign Corporativo e Sazonal com proposal_options |
+| ded3c58  | docs: checkpoint v12B-baseline — estado estável antes do redesign 12B |
 | b426272  | feat(12B): templates Corporativo e Sazonal completos |
-| 5f528c0  | docs: atualiza PLANO_EXECUCAO com 12A concluida e 12B aprovada |
-| e828a73  | docs: handoff sessao 12A-3 + 12A-4 |
+| e828a73  | docs: handoff sessão 12A-3 + 12A-4 |
 | 85525cf  | fix: remove valor da mensagem WhatsApp CTA |
-| ecbc167  | feat(12A-4): deletar rascunho + status inline + abertura no D1 |
 
-## O que está funcionando (v12B-baseline)
+## O que está funcionando (a8d7312)
 - Cardápio público e Central 100% operacionais
-- Propostas: Evento (completo), Corporativo (base), Sazonal (base)
+- Propostas Evento: completo (cenários, itens, faixas de preço, PDF)
+- Propostas Corporativo: opções com foto, faixas, briefing (qtd/orçamento/entrega)
+- Propostas Sazonal: opções com foto, faixas, data comemorativa, pré-preenchimento
 - Modal de seleção de template ao criar proposta
-- Rotas de mídia por proposta (upload Base64, serve imagem, DELETE)
-- Duplicar proposta (copia dados + cenários + imagens)
+- Rotas de options (POST/PUT/DELETE) + mídia por opção
+- Duplicar proposta: copia opções + faixas + imagens
 - Status inline editável (6 opções), Excluir rascunho
+- Páginas públicas Corporativo e Sazonal: foto grande + faixas + CTA WhatsApp
 
-## Próxima implementação — 12B redesign
-**Decisões aprovadas:**
-- `proposal_options`: nova tabela substituindo cenários para Corp/Sazonal
-- `proposal_media`: adicionar coluna `option_id`
-- `proposal_option_faixas`: tabela de preços por volume por opção
-- Campo "data comemorativa" no Sazonal (select + pré-preenchimento)
-- Galeria dentro de cada opção (não global)
-- Briefing Corporativo: quantidade, orçamento máximo, data/hora entrega
-- Máximo 5 opções por proposta Corp/Sazonal
-- Layout opção: foto grande + descrição + faixas de preço
-- Template Evento: NÃO muda
+## Arquitetura de opções (Corp/Sazonal)
+- Nova tabela `proposal_options` (máx. 5 por proposta)
+- `proposal_media.option_id` vincula imagem à opção
+- `proposal_option_faixas` tabela de preços por volume
+- `proposals`: `qtd_solicitada`, `orcamento_max`, `data_entrega`, `data_comemorativa`
+- Template Evento: usa cenários (sem mudança)
 
-**Ponto de retorno:** tag v12B-baseline = commit b426272
+## Próxima implementação — Fase 12C
+Catálogo de Festas — vitrine pública `/festas`:
+- Rota pública no Worker (sem autenticação)
+- Exibe categorias do catálogo + doces finos para eventos
+- Sem fluxo de pedido — apenas visualização
+- CTA: "Quero um orçamento" → WhatsApp
+- **Pré-requisito:** homologar 12B em produção
+
+## Ponto de retorno seguro
+Tag: `v12B-baseline` = commit `ded3c58` — estado antes do redesign 12B.
 
 ## Arquivos críticos
 - online/gestao/src/index.js
 - online/gestao/public/index.html
-- online/gestao/migrations/ (0001 a 0010)
+- online/gestao/migrations/ (0001 a 0014)
 - docs/CURRENT_STATE.md
 - docs/HANDOFF.md
 - docs/PLANO_EXECUCAO.md

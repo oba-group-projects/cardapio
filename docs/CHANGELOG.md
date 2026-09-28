@@ -20,6 +20,32 @@ Formato inspirado em Keep a Changelog.
 - O repositório passa a ser a memória operacional oficial do projeto.
 - Scripts persistentes são preferidos a grandes blocos colados no PSReadLine.
 
+## [12B] — 2026-09-27 — commit a8d7312
+
+### Added
+- `proposal_options`: tabela de opções para propostas Corporativo e Sazonal (máx. 5)
+- `proposal_option_faixas`: preços por volume por opção (ate, preco, ordem)
+- `proposal_media.option_id`: vincula imagem a uma opção específica
+- `proposals`: campos `qtd_solicitada`, `orcamento_max`, `data_entrega`, `data_comemorativa`
+- Worker: rotas `POST/PUT/DELETE /api/proposals/:id/options`
+- Worker: rotas `POST/DELETE /api/proposals/:id/options/:oid/media`
+- Worker: `duplicate` copia options + faixas + imagens por opção
+- Worker: `obaLoadProposal` carrega options + faixas + medias em cascata
+- Central: `obaAdicionarOpcao(tipo, dadosExistentes)` — card de opção com foto e faixas
+- Central: `obaOpcaoProcessarImagem` — comprime e envia foto por opção
+- Central: `obaPreencherCamposSazonais` — pré-preenchimento automático por data comemorativa
+- Central: `obaColetarOptions` — coleta DOM → API ao salvar
+- Página pública Corporativo: opções com foto, faixas, briefing, CTA por opção
+- Página pública Sazonal: opções com foto principal, tabela de faixas, CTA
+
+### Changed
+- `obaAplicarTemplate`: cenários ocultos para Corp/Sazonal; visíveis só para Evento
+- `obaProposalEditar`: Corp/Sazonal carregam `p.options` em vez de galeria global
+- `obaProposalSalvar`: Corp coleta briefing; Sazonal coleta data comemorativa; ambos sincronizam options via API
+- `obaLimparFormulario`: limpa containers de options em vez de produtos sazonais
+
+## [12A] — 2026-09-25 — commit ecbc167
+
 ## Estado técnico anterior
 
 Última fase funcional homologada:

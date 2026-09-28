@@ -149,62 +149,58 @@ HEAD atual: `e828a73`
 ---
 
 ### Fase 12B — Propostas Corporativas + Sazonais
-**Status: [ ] Em andamento — 25/09/2026**
+**Status: [x] Concluído — 27/09/2026**
 
-#### Decisões aprovadas
+#### Decisões aprovadas e implementadas
 
 | Decisão | Definição |
 |---|---|
 | Templates | Separados: Evento / Corporativo / Sazonal |
-| Modelo sazonal | Individual com duplicação |
-| Calculadora de pedido | Não |
-| Desconto por cliente | Não |
-| Galeria de imagens | Até 8 fotos por proposta |
-| Campos sazonais | Prazo pedido, prazo entrega, condições pagamento, pedido mínimo |
-| Campos corporativos | Empresa, demanda, frequência, observações/briefing |
+| Modelo de opções | `proposal_options` — substitui cenários para Corp/Sazonal |
+| Galeria | Até 5 fotos por opção (vinculadas à opção, não à proposta global) |
+| Briefing Corporativo | `qtd_solicitada`, `orcamento_max`, `data_entrega` |
+| Data comemorativa | Select + pré-preenchimento automático de prazo/abertura |
+| Máximo de opções | 5 por proposta Corp/Sazonal |
+| Duplicar proposta | Copia dados + options + faixas + imagens por opção |
+| Template Evento | NÃO mudou |
 
 #### Subfase 12B-1 — Migrations
-**Status: [ ] Pendente**
+**Status: [x] Concluído**
 
-- **0008:** campos `template`, `empresa`, `demanda`, `frequencia`, `orcamento_ref`, `observacoes`, `prazo_pedido`, `prazo_entrega`, `cond_pagamento`, `pedido_minimo` na tabela `proposals`
-- **0009:** tabela `proposal_media` (upload Base64 por proposta, CASCADE)
-- **0010:** campo `faixas` (JSON) na tabela `proposal_items` (tabela de preços por volume)
+- **0011:** tabela `proposal_options` (option_id, proposal_id, nome, descricao, valor_unit, ordem)
+- **0012:** coluna `option_id` em `proposal_media` (vincula imagem à opção)
+- **0013:** tabela `proposal_option_faixas` (faixa_id, option_id, ate, preco, ordem)
+- **0014:** colunas `qtd_solicitada`, `orcamento_max`, `data_entrega`, `data_comemorativa` em `proposals`
 
-#### Subfase 12B-2 — Worker (rotas de mídia + duplicar)
-**Status: [ ] Pendente**
+#### Subfase 12B-2 — Worker (rotas de options + mídia + duplicar)
+**Status: [x] Concluído**
 
-- `POST /api/proposals/:id/media` — upload de imagem
-- `DELETE /api/proposals/:id/media/:media_id` — remover imagem
-- `GET /api/proposals/:id/media` — listar imagens
-- `POST /api/proposals/:id/duplicate` — duplicar proposta (copia dados + cenários + imagens)
+- `POST/PUT/DELETE /api/proposals/:id/options` — CRUD de opções
+- `POST/DELETE /api/proposals/:id/options/:oid/media` — imagens por opção
+- `POST /api/proposals/:id/duplicate` — copia options + faixas + imagens
+- `obaLoadProposal` carrega options + faixas + medias em cascata
 
-#### Subfase 12B-3a — Central: seleção de template + formulário Corporativo
-**Status: [ ] Pendente**
+#### Subfase 12B-3 — Central: formulários Corporativo e Sazonal
+**Status: [x] Concluído**
 
-- Modal de seleção ao criar (Evento / Corporativo / Sazonal)
-- Formulário Corporativo: empresa, WhatsApp, tipo de demanda, frequência, observações, validade, texto abertura, galeria de imagens, cenários sem "doces por convidado"
+- Modal de seleção de template (Evento / Corporativo / Sazonal)
+- `obaAdicionarOpcao(tipo, dadosExistentes)` — renderiza card de opção com foto, faixas
+- `obaOpcaoProcessarImagem` — comprime e faz preview de foto por opção
+- `obaPreencherCamposSazonais` — pré-preenche prazo/abertura por data comemorativa
+- `obaColetarOptions` — coleta opções do DOM para salvar via API
+- Formulário Corporativo: campos base + briefing (qtd, orçamento, data entrega)
+- Formulário Sazonal: data comemorativa + condições + opções com faixas
+- Cenários ocultos para Corp/Sazonal; exibidos apenas para Evento
+- Salvar sincroniza options via `POST/PUT /options` após salvar proposta
 
-#### Subfase 12B-3b — Central: formulário Sazonal
-**Status: [ ] Pendente**
+#### Subfase 12B-4 — Páginas públicas Corporativo e Sazonal
+**Status: [x] Concluído**
 
-- Formulário Sazonal: empresa (ou geral), prazo pedido, prazo entrega, condições pagamento, pedido mínimo, validade, texto abertura, galeria de imagens
-- Produtos com faixas de preço: nome, descrição, foto, tabela (até/acima de X → preço Y)
+- Corporativo: Pg0 (abertura + briefing), Pg1 (resumo de opções), Pg2..N (detalhe por opção com fotos + faixas + CTA WhatsApp)
+- Sazonal: Pg0 (abertura + condições), Pg1 (opções com foto principal + tabela de faixas + CTA)
+- Ambas usam `proposal.options` em vez de cenários
 
-#### Subfase 12B-4a — Página pública Corporativo
-**Status: [ ] Pendente**
-
-- Pg0: abertura com nome da empresa
-- Pg1: galeria de imagens + descrição do projeto
-- Pg2/3: cenários com itens livres
-- CTA WhatsApp adaptado
-
-#### Subfase 12B-4b — Página pública Sazonal
-**Status: [ ] Pendente**
-
-- Pg0: abertura com data comemorativa + empresa
-- Pg1: condições (prazo, entrega, pagamento, mínimo) + galeria
-- Pg2/3/4: produtos com tabela de faixas de preço
-- CTA: "Olá, Oba Doceria! Tenho interesse no catálogo. Quais os próximos passos?"
+HEAD: `a8d7312`
 
 ---
 
@@ -270,3 +266,4 @@ URL própria, disparada para quem solicita orçamento de festa.
 | 25/09/2026 | 12A-4 concluída | Status inline, Excluir, campo Abertura, migration 0007. HEAD: ecbc167 |
 | 25/09/2026 | Fix mensagem WhatsApp | "Olá, Oba Doceria! Gostei do Cenário X. E agora, quais os próximos passos?" HEAD: 85525cf |
 | 25/09/2026 | 12B aprovada | Templates separados, sazonal individual com duplicação, galeria 8 fotos. |
+| 27/09/2026 | 12B concluída | Redesign completo com proposal_options. Migrations 0011-0014. Worker + Central + páginas públicas. HEAD: a8d7312 |

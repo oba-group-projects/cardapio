@@ -1,45 +1,47 @@
 ﻿# CURRENT STATE
 
-Atualizado: 2026-09-25
+Atualizado: 2026-09-27
 
 ## Git
 Branch: feature/gestao-online-segura
-Commit HEAD: b426272
-Tag estável: v12B-baseline
+Commit HEAD: a8d7312
+Tag estável anterior: v12B-baseline (ded3c58)
 Branch main: 5913078
 
 ## Estado funcional
 - Central privada autenticada e operacional
 - Fluxo DRAFT → PREVIEW → PUBLISHED com rollback e histórico
 - Cardápio público funcional
-- Módulo de Propostas completo (12A + 12B infraestrutura base)
+- Módulo de Propostas completo: Evento (12A) + Corporativo e Sazonal (12B)
 
 ## Fases concluídas
 - **12A-1:** D1 migrations + rotas Worker (proposals, scenarios, items)
 - **12A-2:** Aba Propostas na Central (editor completo)
 - **12A-3:** Página pública /proposta/:id — 4 páginas, texto emocional, cards delicados
 - **12A-4:** Status inline, Excluir, campo Abertura, migration 0007
-- **12B base:** Templates Corporativo e Sazonal — infraestrutura inicial
-  - Migrations 0008/0009/0010: campos template, proposal_media, faixas
-  - Modal de seleção de template (Evento / Corporativo / Sazonal)
-  - Formulários Corporativo e Sazonal na Central
-  - Páginas públicas corporativo e sazonal
-  - Rotas de mídia por proposta + duplicar proposta
+- **12B completo:** Redesign Corporativo e Sazonal com proposal_options
+  - Migrations 0011-0014: proposal_options, option_id em media, faixas, briefing
+  - Rotas Worker: POST/PUT/DELETE /options, /options/:id/media, duplicate corrigido
+  - Central: obaAdicionarOpcao, obaOpcaoProcessarImagem, obaPreencherCamposSazonais
+  - Páginas públicas corporativo e sazonal usam proposal.options (foto + faixas)
+  - Cenários ocultos em Corp/Sazonal; apenas Evento usa cenários
 
-## Próxima fase — 12B redesign (aprovado, não implementado)
-Redesign completo da lógica de Corporativo/Sazonal:
-- Nova tabela `proposal_options` (substitui cenários para corp/sazonal)
-- `proposal_media` ganha coluna `option_id`
-- Nova tabela `proposal_option_faixas`
-- Campo "data comemorativa" no Sazonal com pré-preenchimento automático
-- Galeria dentro de cada opção (não separada)
-- Briefing corporativo: quantidade, orçamento máximo, data/hora entrega
-- Máximo 5 opções por proposta corporativa/sazonal
-- Layout foto + descrição + faixas na página pública
-- **Template Evento NÃO muda**
+## Arquitetura de opções (Corp/Sazonal)
+```
+proposal
+  └── proposal_options (máx. 5)
+        ├── proposal_option_faixas (ate, preco, ordem)
+        └── proposal_media (option_id, dados Base64)
+```
+
+## Próxima fase — 12C (pendente)
+Catálogo de Festas — vitrine pública `/festas` no Worker, sem fluxo de pedido.
+CTA único: "Quero um orçamento" → WhatsApp.
+Iniciar somente após 12B homologada em produção.
 
 ## Ponto de retorno seguro
-Tag git: v12B-baseline (commit b426272) — tudo funcional antes do redesign 12B
+Tag git: v12B-baseline (commit ded3c58) — estado antes do redesign 12B.
+Commit atual: a8d7312 — 12B completo, deployado.
 
 ## Links
 - Central: https://oba-cardapio-gestao.obadoceria.workers.dev/
