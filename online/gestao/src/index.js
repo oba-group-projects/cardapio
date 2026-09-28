@@ -2582,8 +2582,8 @@ async function obaHandleProposalsApi(request, env, url) {
       for (const f of (faixas.results||[])) {
         const fid = "fxa_" + crypto.randomUUID().replace(/-/g,"").slice(0,12);
         await env.DB.prepare(
-          "INSERT INTO proposal_option_faixas (faixa_id,option_id,ate,preco,ordem) VALUES (?,?,?,?,?)"
-        ).bind(fid, newOptId, f.ate, f.preco, f.ordem).run();
+          "INSERT INTO proposal_option_faixas (faixa_id,option_id,de,ate,preco,ordem) VALUES (?,?,?,?,?,?)"
+        ).bind(fid, newOptId, f.de??null, f.ate, f.preco, f.ordem).run();
       }
       // Copia imagens da opção
       const optMedias = await env.DB.prepare(
@@ -2676,7 +2676,7 @@ async function obaHandleProposalsApi(request, env, url) {
       for (let fi=0; fi<body.faixas.length; fi++) {
         const f = body.faixas[fi];
         const fid = "fxa_" + crypto.randomUUID().replace(/-/g,"").slice(0,12);
-        await env.DB.prepare("INSERT INTO proposal_option_faixas (faixa_id,option_id,ate,preco,ordem) VALUES (?,?,?,?,?)").bind(fid,oid,f.ate??null,Number(f.preco)||0,fi+1).run();
+        await env.DB.prepare("INSERT INTO proposal_option_faixas (faixa_id,option_id,de,ate,preco,ordem) VALUES (?,?,?,?,?,?)").bind(fid,oid,f.de??null,f.ate??null,Number(f.preco)||0,fi+1).run();
       }
     }
     return json({ ok: true, option_id: oid });
@@ -2696,7 +2696,7 @@ async function obaHandleProposalsApi(request, env, url) {
       for (let fi=0; fi<body.faixas.length; fi++) {
         const f = body.faixas[fi];
         const fid = "fxa_" + crypto.randomUUID().replace(/-/g,"").slice(0,12);
-        await env.DB.prepare("INSERT INTO proposal_option_faixas (faixa_id,option_id,ate,preco,ordem) VALUES (?,?,?,?,?)").bind(fid,matchOptPut[2],f.ate??null,Number(f.preco)||0,fi+1).run();
+        await env.DB.prepare("INSERT INTO proposal_option_faixas (faixa_id,option_id,de,ate,preco,ordem) VALUES (?,?,?,?,?,?)").bind(fid,matchOptPut[2],f.de??null,f.ate??null,Number(f.preco)||0,fi+1).run();
       }
     }
     return json({ ok: true });
@@ -3218,45 +3218,78 @@ function obaShowPage(n){
 // ============================================================
 // PAGINA PUBLICA — TEMPLATE CORPORATIVO
 // ============================================================
+// ============================================================
+// PAGINA PUBLICA — TEMPLATE CORPORATIVO (redesign 12B-rev2)
+// Paleta: esmeralda escuro + cobre dourado
+// ============================================================
 async function obaHandlePropostaCorporativo(proposal, obaWpp, env, propId) {
   const R = (v) => { const n=Number(v||0).toFixed(2),[i,d]=n.split("."); return "R$\u00a0"+i.replace(/\B(?=(\d{3})+(?!\d))/g,".")+","+d; };
   const MESES=["janeiro","fevereiro","mar\u00e7o","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
   const fmtD =(d)=>{ if(!d)return null; try{const[y,m,dy]=d.split("-");return parseInt(dy)+" de "+MESES[parseInt(m)-1]+" de "+y;}catch{return d;} };
   const fmtDT=(d)=>{ if(!d)return null; try{const[dt,hr]=d.split("T");const[y,m,dy]=dt.split("-");return parseInt(dy)+" de "+MESES[parseInt(m)-1]+(hr?" \u00e0s "+hr.slice(0,5):"");}catch{return d;} };
 
-  const PAL=[
-    {acento:"#B8860B",fundo:"#FFFDF8",topo:"#C8922A"},
-    {acento:"#9B3A5C",fundo:"#FFF8FA",topo:"#B05070"},
-    {acento:"#5B4A9A",fundo:"#F9F7FF",topo:"#6B5BAA"},
-    {acento:"#1B6B4A",fundo:"#F4FCF8",topo:"#2A8A5C"},
-    {acento:"#5A4A1E",fundo:"#FDFBF5",topo:"#7A6A30"},
+  // Paleta esmeralda + cobre
+  const COR = {
+    escuro:   "#1C3B2E",
+    escuro2:  "#2A5240",
+    cobre:    "#C8922A",
+    cobreClr: "#D4A865",
+    texto:    "#F5F0E6",
+    textoDim: "rgba(245,240,230,.6)",
+    fundo:    "#FAFAF6",
+    fundoCrd: "#FFFFFF",
+    verdeTxt: "#1A2E22",
+    verdeAcc: "#2A5240",
+    borda:    "#D4E0D8",
+  };
+
+  const PALS=[
+    {acento:COR.cobre,    topo:COR.escuro,  fundo:"#F7FAF8"},
+    {acento:"#5A8A70",    topo:"#3D6B56",   fundo:"#F4F9F7"},
+    {acento:"#3D6B56",    topo:"#2A5240",   fundo:"#F0F7F4"},
+    {acento:"#7AAA90",    topo:"#5A8A70",   fundo:"#EFF6F3"},
+    {acento:COR.cobreClr, topo:COR.cobre,   fundo:"#FDFAF5"},
   ];
 
   const validade    = fmtD(proposal.validade);
   const nomeEmpresa = proposal.empresa || proposal.cliente || "";
+  const options     = (proposal.options && proposal.options.length) ? proposal.options : [];
+  const numOptions  = options.length;
 
-  // options ja carregadas por obaLoadProposal com faixas e medias
-  const options    = (proposal.options && proposal.options.length) ? proposal.options : [];
-  const numOptions = options.length;
-
-  const paraA = (proposal.abertura||"").trim() ||
-    (nomeEmpresa
-      ? nomeEmpresa+", preparamos esta proposta com muito cuidado e aten\u00e7\u00e3o \u00e0s necessidades da sua empresa."
-      : "Preparamos esta proposta com muito cuidado e aten\u00e7\u00e3o.");
+  // Texto de abertura — usa o customizado ou gera contextualizado
+  const qtdStr  = proposal.qtd_solicitada ? proposal.qtd_solicitada+" unidades" : null;
+  const paraA   = (proposal.abertura||"").trim() ||
+    (nomeEmpresa && qtdStr
+      ? nomeEmpresa+", preparamos esta proposta pensando em cada um dos "+qtdStr+" que voc\u00ea quer presentear."
+      : nomeEmpresa
+        ? "Para "+nomeEmpresa+", preparamos esta proposta com cuidado e aten\u00e7\u00e3o a cada detalhe."
+        : "Preparamos esta proposta com cuidado e aten\u00e7\u00e3o a cada detalhe.");
 
   const paraB = proposal.observacoes
-    ? "Sobre o projeto: "+proposal.observacoes
+    ? proposal.observacoes
     : "Abaixo voc\u00ea encontra "+(numOptions>1?"as "+numOptions+" op\u00e7\u00f5es":"a proposta")+" que desenvolvemos especialmente para voc\u00ea.";
 
-  // Cards de resumo (pg1)
+  // Chips de briefing (pg0)
+  const chips = [
+    proposal.qtd_solicitada ? {l:"Qtd solicitada", v:proposal.qtd_solicitada+" un."} : null,
+    proposal.orcamento_max  ? {l:"Or\u00e7amento m\u00e1x.", v:R(proposal.orcamento_max)} : null,
+    proposal.data_entrega   ? {l:"Entrega em", v:fmtDT(proposal.data_entrega)} : null,
+    proposal.demanda        ? {l:"Tipo", v:proposal.demanda} : null,
+  ].filter(Boolean);
+
+  const chipsHtml = chips.length
+    ? chips.map(c=>"<div class=\"chip\"><span class=\"chip-l\">"+c.l+"</span><span class=\"chip-v\">"+c.v+"</span></div>").join("")
+    : "";
+
+  // Cards resumo pg1
   const resumoCards = options.map(function(opt,oi){
-    const pal  = PAL[oi%PAL.length];
+    const pal = PALS[oi%PALS.length];
     const preco = Number(opt.valor_unit||0);
     const precoHtml = preco>0
-      ? "<span class=\"rc-valor\" style=\"color:"+pal.acento+"\">"+R(preco)+"</span>"
-      : "<span class=\"rc-valor\" style=\"color:#bbb;font-size:11px\">sob consulta</span>";
+      ? "<span class=\"rc-valor\" style=\"color:"+pal.acento+"\">"+R(preco)+"<small>/un.</small></span>"
+      : "<span class=\"rc-valor\" style=\"color:"+COR.cobre+";font-size:11px\">sob consulta</span>";
     return (
-      "<div class=\"rc\" style=\"border-left-color:"+pal.acento+"\">"+
+      "<div class=\"rc\" onclick=\"obaShowPage("+(oi+2)+")\" style=\"border-left-color:"+pal.acento+"\">"+
         "<div class=\"rc-linha\">"+
           "<div class=\"rc-esq\">"+
             "<span class=\"rc-num\" style=\"color:"+pal.acento+"\">"+(oi+1)+"</span>"+
@@ -3265,300 +3298,515 @@ async function obaHandlePropostaCorporativo(proposal, obaWpp, env, propId) {
               (opt.descricao?"<span class=\"rc-sub\">"+opt.descricao+"</span>":"")+
             "</div>"+
           "</div>"+
-          "<div class=\"rc-dir\">"+
-            precoHtml+
-            "<button class=\"rc-cta\" style=\"background:"+pal.acento+"\" onclick=\"obaShowPage("+(oi+2)+")\">Ver detalhes &rarr;</button>"+
-          "</div>"+
+          "<div class=\"rc-dir\">"+precoHtml+"<span class=\"rc-seta\">\u2192</span></div>"+
         "</div>"+
       "</div>"
     );
   }).join("\n");
 
-  // Paginas de detalhe (pg2, pg3, ...)
+  // Páginas detalhe (pg2+)
   const detalhePages = options.map(function(opt,oi){
-    const pal   = PAL[oi%PAL.length];
-    const imgs  = (opt.medias||[]).map(function(m){
-      const src = "/api/proposals/"+propId+"/media/"+m.media_id+"/dados";
-      const leg = m.legenda?"<p style=\"font-size:10px;color:#9B7A60;margin-top:4px;text-align:center\">"+m.legenda+"</p>":"";
-      return "<div style=\"flex-shrink:0;width:calc(50% - 6px)\"><img src=\""+src+"\" style=\"width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;border:1px solid #EDD9C0\" loading=\"lazy\">"+leg+"</div>";
+    const pal = PALS[oi%PALS.length];
+    const imgs = (opt.medias||[]).map(function(m){
+      const src="/api/proposals/"+propId+"/media/"+m.media_id+"/dados";
+      return "<img src=\""+src+"\" class=\"det-img\" loading=\"lazy\" alt=\""+( opt.nome||"")+"\">";
     }).join("");
+    const imgSection = imgs ? "<div class=\"det-galeria\">"+imgs+"</div>" : "";
+
     const faixas = opt.faixas||[];
     const tabelaFaixas = faixas.length ? (
-      "<div style=\"margin-top:14px\">"+
-      "<p style=\"font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:"+pal.acento+";margin-bottom:6px\">Faixas de quantidade</p>"+
-      "<table class=\"tab\"><tbody>"+
-      faixas.map(function(f,fi){
-        const prev  = faixas[fi-1];
-        const label = f.ate===null
-          ? ("Acima de "+(prev&&prev.ate?prev.ate:"")+" unidades")
-          : ("At\u00e9 "+f.ate+" unidades");
-        return "<tr><td class=\"td-n\">"+label+"</td><td class=\"td-v\">"+R(f.preco)+"</td></tr>";
+      "<div class=\"faixas-bloco\">"+
+      "<p class=\"faixas-titulo\" style=\"color:"+pal.acento+"\">Faixas de quantidade</p>"+
+      "<table class=\"faixas-tab\"><tbody>"+
+      faixas.map(function(f){
+        const label = f.de!=null && f.ate!=null
+          ? ("De "+f.de+" a "+f.ate+" un.")
+          : f.de!=null && f.ate==null
+            ? ("A partir de "+f.de+" un.")
+            : f.ate!=null
+              ? ("At\u00e9 "+f.ate+" un.")
+              : "Demais";
+        return "<tr><td class=\"ft-label\">"+label+"</td><td class=\"ft-price\" style=\"color:"+pal.acento+"\">"+R(f.preco)+" <small>/ un.</small></td></tr>";
       }).join("")+
       "</tbody></table></div>"
     ) : (Number(opt.valor_unit||0)>0
-      ? "<div style=\"margin-top:14px\"><table class=\"tab\"><tbody><tr><td class=\"td-n\">Pre\u00e7o por unidade</td><td class=\"td-v\">"+R(opt.valor_unit)+"</td></tr></tbody></table></div>"
+      ? "<div class=\"faixas-bloco\"><table class=\"faixas-tab\"><tbody>"+
+        "<tr><td class=\"ft-label\">Pre\u00e7o por unidade</td><td class=\"ft-price\" style=\"color:"+pal.acento+"\">"+R(opt.valor_unit)+"</td></tr>"+
+        "</tbody></table></div>"
       : "");
-    const navBtns = options.filter(function(_,xi){ return xi!==oi; }).map(function(x){
-      const xi   = options.indexOf(x);
-      const xpal = PAL[xi%PAL.length];
-      return "<button class=\"nav-outro\" style=\"color:"+xpal.acento+";border-color:"+xpal.acento+"60\" onclick=\"obaShowPage("+(xi+2)+")\">Op\u00e7\u00e3o "+(xi+1)+" \u2013 "+(x.nome||"")+"</button>";
+
+    const navBtns = options.filter((_,xi)=>xi!==oi).map(function(x){
+      const xp=PALS[options.indexOf(x)%PALS.length];
+      return "<button class=\"nav-pill\" style=\"color:"+xp.acento+";border-color:"+xp.acento+"40\" onclick=\"obaShowPage("+(options.indexOf(x)+2)+")\">"+
+             (x.nome||("Op\u00e7\u00e3o "+(options.indexOf(x)+1)))+"</button>";
     }).join("");
-    const ctaMsg    = encodeURIComponent("Ol\u00e1, Oba Doceria! Gostei da Op\u00e7\u00e3o "+(oi+1)+" \u2013 "+(opt.nome||"")+" da proposta para "+nomeEmpresa+". E agora, quais os pr\u00f3ximos passos?");
-    const ctaHref   = obaWpp ? "https://wa.me/55"+obaWpp+"?text="+ctaMsg : "";
-    const ctaBtnHtml= ctaHref ? "<a href=\""+ctaHref+"\" target=\"_blank\" class=\"cta-btn\" style=\"background:"+pal.acento+"\">Escolhi esta op\u00e7\u00e3o \u2014 vamos conversar</a>" : "";
+
+    const ctaMsg  = encodeURIComponent("Ol\u00e1, Oba Doceria! Gostei da Op\u00e7\u00e3o "+(oi+1)+" \u2013 "+(opt.nome||"")+" da proposta para "+nomeEmpresa+". Vamos conversar?");
+    const ctaHref = obaWpp ? "https://wa.me/55"+obaWpp+"?text="+ctaMsg : "";
+    const ctaBtn  = ctaHref ? "<a href=\""+ctaHref+"\" target=\"_blank\" class=\"cta-btn\" style=\"background:"+pal.acento+"\">Quero esta op\u00e7\u00e3o \u2014 vamos conversar</a>" : "";
+
     return (
       "<div id=\"pg"+(oi+2)+"\" class=\"det-page\" style=\"display:none\">"+
-        "<div class=\"det-topbar\">"+
-          "<button class=\"det-voltar\" onclick=\"obaShowPage(1)\">&#8592; Todas as op\u00e7\u00f5es</button>"+
-          "<div class=\"det-navbtns\">"+navBtns+"</div>"+
-        "</div>"+
-        "<div class=\"c-card\" style=\"border-top-color:"+pal.topo+";background:"+pal.fundo+"\">"+
-          "<div class=\"c-cabecalho\">"+
-            "<div class=\"c-esq\">"+
-              "<span class=\"c-rotulo\" style=\"color:"+pal.acento+"\">Op\u00e7\u00e3o "+(oi+1)+"</span>"+
-              "<h2 class=\"c-nome\">"+(opt.nome||("Op\u00e7\u00e3o "+(oi+1)))+"</h2>"+
+        "<header class=\"det-bar\">"+
+          "<button class=\"back-btn\" onclick=\"obaShowPage(1)\">\u2190 Todas as op\u00e7\u00f5es</button>"+
+          "<div class=\"det-nav\">"+navBtns+"</div>"+
+        "</header>"+
+        "<div class=\"det-card\" style=\"border-top-color:"+pal.topo+"\">"+
+          "<div class=\"det-head\">"+
+            "<div>"+
+              "<span class=\"det-num\" style=\"color:"+pal.acento+"\">Op\u00e7\u00e3o "+(oi+1)+"</span>"+
+              "<h2 class=\"det-nome\">"+(opt.nome||("Op\u00e7\u00e3o "+(oi+1)))+"</h2>"+
+              (opt.descricao?"<p class=\"det-desc\">"+opt.descricao+"</p>":"")+
             "</div>"+
-            (Number(opt.valor_unit||0)>0
-              ? "<div class=\"c-dir\"><span class=\"c-total\" style=\"color:"+pal.acento+"\">"+R(opt.valor_unit)+"</span><span style=\"font-size:10px;color:#bbb;display:block\">por unidade</span></div>"
-              : "")+
+            (Number(opt.valor_unit||0)>0?"<div class=\"det-price\" style=\"color:"+pal.acento+"\">"+R(opt.valor_unit)+"<small>/un.</small></div>":"")+
           "</div>"+
-          (opt.descricao?"<div class=\"c-intro\"><p>"+opt.descricao+"</p></div>":"")+
-          (imgs?"<div class=\"galeria\" style=\"padding:12px 20px 0\">"+imgs+"</div>":"")+
-          "<div class=\"c-corpo\">"+tabelaFaixas+ctaBtnHtml+"</div>"+
+          imgSection+
+          "<div class=\"det-corpo\">"+tabelaFaixas+ctaBtn+"</div>"+
         "</div>"+
-        "<div class=\"det-rodape-nav\">"+
-          "<button class=\"det-voltar-rodape\" onclick=\"obaShowPage(1)\">&#8592; Todas as op\u00e7\u00f5es</button>"+
-          (navBtns?"<div class=\"det-navbtns-rodape\">"+navBtns+"</div>":"")+
+        "<div class=\"det-bottom-nav\">"+
+          "<button class=\"back-btn\" onclick=\"obaShowPage(1)\">\u2190 Todas as op\u00e7\u00f5es</button>"+
+          "<div class=\"det-nav\">"+navBtns+"</div>"+
         "</div>"+
       "</div>"
     );
   }).join("\n");
 
-  const validadeHtml = validade ? "<p>Proposta v&aacute;lida at&eacute; <strong style=\"color:#5D3A1A\">"+validade+"</strong></p>" : "";
-  const wppHtml      = obaWpp   ? "<p>D&uacute;vidas? <a href=\"https://wa.me/55"+obaWpp+"\">fale pelo WhatsApp</a></p>" : "";
+  const validadeHtml = validade ? "<p>V\u00e1lida at\u00e9 <strong>"+validade+"</strong></p>" : "";
+  const wppHtml      = obaWpp   ? "<p>D\u00favidas? <a href=\"https://wa.me/55"+obaWpp+"\">WhatsApp</a></p>" : "";
 
-  const briefingItems = [
-    proposal.qtd_solicitada ? "<div class=\"cond-row\"><span class=\"cond-lbl\">Qtd solicitada</span><span class=\"cond-val\">"+proposal.qtd_solicitada+" unidades</span></div>" : "",
-    proposal.orcamento_max  ? "<div class=\"cond-row\"><span class=\"cond-lbl\">Or\u00e7amento m\u00e1x.</span><span class=\"cond-val\">"+R(proposal.orcamento_max)+"</span></div>" : "",
-    proposal.data_entrega   ? "<div class=\"cond-row\"><span class=\"cond-lbl\">Entrega em</span><span class=\"cond-val\">"+fmtDT(proposal.data_entrega)+"</span></div>" : "",
-    proposal.demanda        ? "<div class=\"cond-row\"><span class=\"cond-lbl\">Demanda</span><span class=\"cond-val\">"+proposal.demanda+"</span></div>" : "",
-  ].filter(Boolean).join("");
+  const css = `
+*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{background:#F0F5F2;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#1A2E22;line-height:1.55}
+.wrap{max-width:620px;margin:0 auto}
 
-  const css = `*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#3B2A1E;line-height:1.5}
-.page{max-width:600px;margin:0 auto;padding:0 16px}
-#pg0{min-height:100svh;display:flex;flex-direction:column;background:linear-gradient(160deg,#FFF8EE 0%,#FDF0D8 55%,#F9E4BE 100%)}
-.ab-topo{padding:36px 24px 0;text-align:center}
-.ab-logo{height:38px;object-fit:contain;opacity:.85;margin-bottom:10px}
-.ab-label{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#C8922A;margin-bottom:16px;display:block}
-.ab-evento{display:flex;justify-content:center;background:#FFFCF5;border:1px solid #EDD9C0;border-radius:10px;overflow:hidden;margin:0 auto;max-width:360px}
-.ab-ev-item{flex:1;text-align:center;padding:9px 8px;border-right:1px solid #EDD9C0}
-.ab-ev-item:last-child{border-right:none}
-.ab-ev-label{font-size:7px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#C8922A;display:block;margin-bottom:2px}
-.ab-ev-val{font-size:11px;font-weight:500;color:#5D3A1A;display:block}
-.cond-bloco{background:#FFFCF5;border:1px solid #EDD9C0;border-radius:10px;padding:8px 12px;margin:10px auto 0;max-width:360px}
-.cond-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #F5EDE4;font-size:11px}
-.cond-row:last-child{border-bottom:none}
-.cond-lbl{color:#C8922A;font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:1px}
-.cond-val{color:#3B2A1E;font-weight:500;text-align:right;max-width:60%}
-.ab-sep{border:none;border-top:1px solid #EDD9C0;margin:20px auto 0;width:36px}
-.ab-corpo{padding:24px 28px 0;flex:1}
-.ab-p-destaque{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(20px,5.5vw,25px);font-weight:600;color:#3B2A1E;line-height:1.45;margin-bottom:20px;font-style:italic;text-align:center}
-.ab-p{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(14px,3.8vw,16px);color:#6B4A2A;line-height:1.85;margin-bottom:14px;text-align:left}
-.ab-rodape{padding:24px 24px 40px;text-align:center}
-.ab-ornamento{font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;color:#C8922A;opacity:.4;letter-spacing:10px;margin-bottom:14px;display:block}
-.ab-assinatura{font-family:'Cormorant Garamond',Georgia,serif;font-size:15px;font-style:italic;color:#C8922A;margin-bottom:24px;display:block}
-.ab-btn{display:inline-block;background:#3B2A1E;color:#F9E8C8;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.8px;padding:14px 36px;border-radius:50px;border:none;cursor:pointer;text-transform:uppercase}
-#pg1{display:none}
-.pg1-hero{padding:20px 20px 14px;text-align:center;background:#FFFDF8;border-bottom:1px solid #EDD9C0}
-.pg1-logo{height:28px;object-fit:contain;opacity:.82;margin-bottom:8px}
-.pg1-titulo{font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;font-weight:400;color:#3B2A1E}
-.galeria{display:flex;flex-wrap:wrap;gap:12px;padding:16px 16px 0}
-.res-secao{padding:20px 16px 10px;font-size:11px;font-weight:400;color:#9B7A60;text-align:center;font-style:italic}
-.rc{margin:0 16px 8px;border-radius:10px;border:1px solid #EDD9C0;border-left-width:2px;background:#fff;padding:10px 14px}
+/* PG0 — abertura escura */
+#pg0{min-height:100svh;display:flex;flex-direction:column;background:linear-gradient(150deg,${COR.escuro} 0%,${COR.escuro2} 60%,#1E4535 100%);position:relative;overflow:hidden}
+#pg0::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");pointer-events:none}
+.pg0-inner{padding:44px 28px 20px;display:flex;flex-direction:column;flex:1;position:relative;z-index:1}
+.pg0-logo{height:42px;object-fit:contain;opacity:.9;margin-bottom:20px;filter:brightness(0) invert(1)}
+.pg0-eyebrow{font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:${COR.cobreClr};margin-bottom:28px;display:block}
+.pg0-empresa{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(28px,7vw,38px);font-weight:600;color:${COR.texto};line-height:1.2;margin-bottom:16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px}
+.chip{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:7px 12px;display:flex;flex-direction:column;gap:2px}
+.chip-l{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${COR.cobreClr}}
+.chip-v{font-size:11px;font-weight:500;color:${COR.texto}}
+.pg0-divider{border:none;border-top:1px solid rgba(255,255,255,.12);margin:20px 0}
+.pg0-texto{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(17px,4.5vw,21px);font-style:italic;color:rgba(245,240,230,.85);line-height:1.7;margin-bottom:12px}
+.pg0-sub{font-size:12px;color:rgba(245,240,230,.5);line-height:1.6;margin-bottom:32px}
+.pg0-rodape{margin-top:auto;padding:24px 28px 40px;position:relative;z-index:1}
+.pg0-assinatura{font-family:'Cormorant Garamond',Georgia,serif;font-size:13px;font-style:italic;color:rgba(245,240,230,.4);display:block;margin-bottom:18px;text-align:center}
+.pg0-btn{display:block;width:100%;background:${COR.cobre};color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:.8px;padding:16px 24px;border-radius:12px;border:none;cursor:pointer;text-align:center;text-transform:uppercase}
+.pg0-btn:hover{background:${COR.cobreClr}}
+
+/* PG1 — listagem de opções */
+#pg1{display:none;background:${COR.fundo}}
+.pg1-header{background:${COR.escuro};padding:18px 20px 16px;display:flex;align-items:center;gap:12px}
+.pg1-logo{height:28px;object-fit:contain;filter:brightness(0) invert(1);opacity:.9}
+.pg1-title{font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;font-weight:400;color:${COR.texto};flex:1;text-align:center}
+.pg1-empresa{font-size:10px;color:${COR.cobreClr};text-align:center;padding:10px 20px 4px;letter-spacing:1px;text-transform:uppercase}
+.secao-titulo{padding:18px 20px 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:${COR.cobre}}
+.rc{margin:0 16px 8px;border-radius:12px;border:1px solid ${COR.borda};border-left-width:3px;background:${COR.fundoCrd};padding:12px 16px;cursor:pointer;transition:box-shadow .15s}
+.rc:hover{box-shadow:0 2px 12px rgba(44,82,64,.12)}
 .rc-linha{display:flex;align-items:center;gap:10px;justify-content:space-between}
-.rc-esq{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
-.rc-num{font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;font-weight:400;opacity:.3;font-style:italic;flex-shrink:0}
-.rc-badge{font-size:13px;font-weight:500;color:#3B2A1E;display:block}
-.rc-sub{font-size:10px;color:#9B7A60;display:block;margin-top:1px}
-.rc-dir{text-align:right;flex-shrink:0}
-.rc-valor{display:block;font-size:14px;font-weight:500;line-height:1;margin-bottom:6px}
-.rc-cta{display:block;padding:5px 11px;border-radius:20px;border:none;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:500;cursor:pointer;opacity:.85}
-.res-footer-nav{padding:10px 16px 0;text-align:center}
-.res-voltar-ab{background:none;border:none;font-size:11px;font-weight:600;color:#bbb;cursor:pointer;text-decoration:underline}
-.det-page{padding-top:24px;padding-bottom:8px}
-.det-topbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:10px 14px;background:#fff;border-bottom:1px solid #EDD9C0;position:sticky;top:0;z-index:10}
-.det-voltar{background:none;border:1.5px solid #EDD9C0;border-radius:24px;padding:5px 13px;font-size:11px;font-weight:600;color:#7A5A40;cursor:pointer}
-.det-navbtns{display:flex;gap:5px;flex-wrap:wrap}
-.nav-outro{background:none;border:1.5px solid;border-radius:24px;padding:4px 11px;font-size:10px;font-weight:600;cursor:pointer}
-.c-card{margin:10px auto 0;max-width:520px;border-radius:14px;border:1px solid #EDD9C0;border-top-width:3px;overflow:hidden;background:#fff;box-shadow:0 1px 8px rgba(60,35,20,.05)}
-.c-cabecalho{padding:18px 20px 13px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-.c-esq{flex:1;min-width:0}
-.c-rotulo{font-size:9px;font-weight:500;letter-spacing:.5px;display:block;margin-bottom:3px;opacity:.7}
-.c-nome{font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;font-weight:400;color:#3B2A1E}
-.c-dir{text-align:right;flex-shrink:0}
-.c-total{font-size:18px;font-weight:600;display:block}
-.c-intro{padding:0 20px 13px;border-bottom:1px solid #F0E8DE}
-.c-intro p{font-size:12px;color:#7A5A40;font-style:italic}
-.c-corpo{padding:13px 20px 18px}
-.tab{width:100%;border-collapse:collapse}
-.tab td{padding:7px 0;border-bottom:1px solid #F5EDE4;font-size:12px;vertical-align:middle}
-.td-n{color:#3B2A1E;font-weight:400}
-.td-v{text-align:right;font-weight:500;color:#5D3A1A;white-space:nowrap}
-.cta-btn{display:block;margin:14px 0 0;padding:12px;border-radius:11px;text-align:center;color:#fff;font-weight:500;font-size:12px;text-decoration:none;opacity:.9}
-.det-rodape-nav{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:10px 14px;margin-top:4px}
-.det-voltar-rodape{background:none;border:1.5px solid #EDD9C0;border-radius:24px;padding:5px 13px;font-size:11px;font-weight:600;color:#7A5A40;cursor:pointer}
-.det-navbtns-rodape{display:flex;gap:5px;flex-wrap:wrap}
-.footer{margin:20px 16px 0;text-align:center;padding:18px 0 28px;border-top:1px solid #EDD9C0}
-.footer p{font-size:11px;color:#bbb;margin-bottom:4px}
-.footer a{color:#8B4513;font-weight:500;text-decoration:none}
-.footer-brand{font-family:'Cormorant Garamond',Georgia,serif;font-size:13px;font-style:italic;color:#bbb;margin-top:6px}
-.btn-pdf{margin-top:14px;background:#3B2A1E;color:#fff;border:none;border-radius:11px;padding:10px 26px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer}
-@page{margin:14mm 18mm}
-@media print{#pg0{display:block!important;min-height:0!important;background:none!important}.ab-btn,.ab-ornamento,.ab-assinatura{display:none!important}#pg1{display:block!important}.res-voltar-ab,.res-footer-nav,.rc-cta{display:none!important}.det-page{display:block!important;page-break-before:always;padding-top:0}.det-topbar,.det-rodape-nav,.cta-btn,.btn-pdf{display:none!important}.page{max-width:100%;padding:0}.c-card{margin:8px 0 0;max-width:100%;box-shadow:none;border-color:#ddd;page-break-inside:avoid}}`;
+.rc-esq{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.rc-num{font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;font-weight:400;color:${COR.borda};font-style:italic;flex-shrink:0;width:28px}
+.rc-badge{font-size:14px;font-weight:600;color:${COR.verdeTxt};display:block}
+.rc-sub{font-size:11px;color:#7A9A88;display:block;margin-top:2px}
+.rc-dir{text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.rc-valor{font-size:15px;font-weight:600;line-height:1}
+.rc-valor small{font-size:10px;font-weight:400;opacity:.7}
+.rc-seta{font-size:16px;color:${COR.borda}}
+.pg1-footer{margin:16px 16px 0;padding:16px 0 32px;border-top:1px solid ${COR.borda};text-align:center}
+.pg1-footer p{font-size:11px;color:#9AB0A4;margin-bottom:4px}
+.pg1-footer a{color:${COR.cobre};font-weight:500;text-decoration:none}
+.pg1-footer-brand{font-family:'Cormorant Garamond',Georgia,serif;font-size:12px;font-style:italic;color:${COR.borda};margin-top:6px;display:block}
+.btn-pdf{margin-top:12px;background:${COR.escuro};color:#fff;border:none;border-radius:10px;padding:10px 24px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer}
 
-  const html = "<!doctype html>\n<html lang=\"pt-BR\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<meta name=\"robots\" content=\"noindex,nofollow\">\n<title>Proposta para "+nomeEmpresa+" \u00b7 Oba Doceria</title>\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link href=\"https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n<style>\n"+css+"\n</style>\n</head>\n<body>\n<div class=\"page\">\n\n<div id=\"pg0\">\n  <div class=\"ab-topo\">\n    <img class=\"ab-logo\" src=\"https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png\" alt=\"Oba Doceria\" onerror=\"this.style.display='none'\">\n    <span class=\"ab-label\">Proposta Corporativa</span>\n"+(nomeEmpresa?"    <div class=\"ab-evento\"><div class=\"ab-ev-item\"><span class=\"ab-ev-label\">Para</span><span class=\"ab-ev-val\">"+nomeEmpresa+"</span></div>"+(proposal.demanda?"<div class=\"ab-ev-item\"><span class=\"ab-ev-label\">Demanda</span><span class=\"ab-ev-val\">"+proposal.demanda+"</span></div>":"")+(validade?"<div class=\"ab-ev-item\"><span class=\"ab-ev-label\">V\u00e1lida at\u00e9</span><span class=\"ab-ev-val\">"+validade+"</span></div>":"")+"</div>\n":"")+(briefingItems?"    <div class=\"cond-bloco\">"+briefingItems+"</div>\n":"")+"    <hr class=\"ab-sep\">\n  </div>\n  <div class=\"ab-corpo\">\n    <p class=\"ab-p-destaque\">"+paraA+"</p>\n    <p class=\"ab-p\">"+paraB+"</p>\n  </div>\n  <div class=\"ab-rodape\">\n    <span class=\"ab-ornamento\">&middot;&ensp;&middot;&ensp;&middot;</span>\n    <span class=\"ab-assinatura\">Feito com cuidado. Servido com amor.</span>\n    <button class=\"ab-btn\" onclick=\"obaShowPage(1)\">Ver proposta &rarr;</button>\n  </div>\n</div>\n\n<div id=\"pg1\" style=\"display:none\">\n  <div class=\"pg1-hero\">\n    <img class=\"pg1-logo\" src=\"https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png\" alt=\"Oba Doceria\" onerror=\"this.style.display='none'\">\n    <p class=\"pg1-titulo\">Proposta para "+(nomeEmpresa||"voc\u00ea")+"</p>\n  </div>\n  <p class=\"res-secao\">Op\u00e7\u00f5es dispon\u00edveis</p>\n  "+(resumoCards||"<p style=\"text-align:center;color:#bbb;padding:20px 16px;font-size:12px\">Nenhuma op\u00e7\u00e3o cadastrada.</p>")+"\n  <div class=\"res-footer-nav\"><button class=\"res-voltar-ab\" onclick=\"obaShowPage(0)\">&#8592; Voltar</button></div>\n  <div class=\"footer\">\n    "+validadeHtml+wppHtml+"\n    <p class=\"footer-brand\">Oba Doceria &middot; Um jeito doce de expressar felicidade</p>\n    <button class=\"btn-pdf\" onclick=\"window.print()\">Salvar como PDF</button>\n  </div>\n</div>\n\n"+detalhePages+"\n\n</div>\n<script>\nfunction obaShowPage(n){\n  var ids=['pg0','pg1'];\n  var total="+numOptions+";\n  for(var i=2;i<=total+1;i++) ids.push('pg'+i);\n  ids.forEach(function(id,idx){\n    var el=document.getElementById(id);\n    if(!el) return;\n    if(idx===n){ el.style.display=(idx===0)?'flex':'block'; }\n    else { el.style.display='none'; }\n  });\n  window.scrollTo({top:0,behavior:'smooth'});\n}\n<\/script>\n</body>\n</html>";
+/* DETALHE */
+.det-page{background:${COR.fundo};padding-bottom:8px}
+.det-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:10px 14px;background:${COR.escuro};position:sticky;top:0;z-index:10}
+.back-btn{background:none;border:1.5px solid rgba(255,255,255,.2);border-radius:24px;padding:5px 14px;font-size:11px;font-weight:600;color:${COR.texto};cursor:pointer}
+.det-nav{display:flex;gap:6px;flex-wrap:wrap}
+.nav-pill{background:none;border:1.5px solid;border-radius:24px;padding:4px 11px;font-size:10px;font-weight:600;cursor:pointer}
+.det-card{margin:12px 14px 0;border-radius:16px;border:1px solid ${COR.borda};border-top-width:4px;overflow:hidden;background:${COR.fundoCrd};box-shadow:0 2px 16px rgba(28,59,46,.07)}
+.det-head{padding:20px 20px 14px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;border-bottom:1px solid #EEF4F1}
+.det-num{font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:4px;opacity:.7}
+.det-nome{font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;font-weight:600;color:${COR.verdeTxt};line-height:1.2}
+.det-desc{font-size:12px;color:#7A9A88;font-style:italic;margin-top:4px}
+.det-price{font-size:22px;font-weight:700;line-height:1;text-align:right;flex-shrink:0}
+.det-price small{font-size:11px;font-weight:400;display:block;opacity:.7}
+.det-galeria{display:flex;flex-wrap:wrap;gap:8px;padding:16px 20px 0}
+.det-img{width:calc(50% - 4px);aspect-ratio:1;object-fit:cover;border-radius:10px;border:1px solid ${COR.borda}}
+.det-corpo{padding:16px 20px 20px}
+.faixas-bloco{margin-top:4px;margin-bottom:14px}
+.faixas-titulo{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+.faixas-tab{width:100%;border-collapse:collapse}
+.faixas-tab td{padding:7px 0;border-bottom:1px solid #EEF4F1;font-size:12px}
+.ft-label{color:${COR.verdeTxt}}
+.ft-price{text-align:right;font-weight:600;white-space:nowrap}
+.ft-price small{font-weight:400;opacity:.6}
+.cta-btn{display:block;margin-top:16px;padding:14px;border-radius:12px;text-align:center;color:#fff;font-weight:700;font-size:13px;text-decoration:none;letter-spacing:.3px}
+.det-bottom-nav{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:10px 14px;margin-top:6px}
+
+@page{margin:14mm 18mm}
+@media print{
+  #pg0{display:block!important;min-height:0!important;background:${COR.escuro}!important}
+  .pg0-btn,.pg0-assinatura{display:none!important}
+  #pg1{display:block!important}
+  .rc{cursor:default}
+  .det-page{display:block!important;page-break-before:always}
+  .det-bar,.det-bottom-nav,.cta-btn,.btn-pdf{display:none!important}
+  .wrap{max-width:100%;padding:0}
+  .det-card{margin:8px 0 0;box-shadow:none;border-color:#ddd;page-break-inside:avoid}
+}`;
+
+  const html = "<!doctype html>\n<html lang=\"pt-BR\">\n<head>\n"
+    +"<meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n"
+    +"<meta name=\"robots\" content=\"noindex,nofollow\">\n"
+    +"<title>Proposta para "+nomeEmpresa+" \u00b7 Oba Doceria</title>\n"
+    +"<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n"
+    +"<link href=\"https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n"
+    +"<style>"+css+"</style>\n</head>\n<body>\n<div class=\"wrap\">\n\n"
+
+    // PG0 — abertura escura
+    +"<div id=\"pg0\">\n"
+    +"  <div class=\"pg0-inner\">\n"
+    +"    <img class=\"pg0-logo\" src=\"https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png\" alt=\"Oba Doceria\" onerror=\"this.style.display='none'\">\n"
+    +"    <span class=\"pg0-eyebrow\">Proposta Exclusiva</span>\n"
+    +(nomeEmpresa?"    <p class=\"pg0-empresa\">"+nomeEmpresa+"</p>\n":"")
+    +(chipsHtml?"    <div class=\"chips\">"+chipsHtml+"</div>\n":"")
+    +"    <hr class=\"pg0-divider\">\n"
+    +"    <p class=\"pg0-texto\">"+paraA+"</p>\n"
+    +(paraB?"    <p class=\"pg0-sub\">"+paraB+"</p>\n":"")
+    +"  </div>\n"
+    +"  <div class=\"pg0-rodape\">\n"
+    +"    <span class=\"pg0-assinatura\">Feito com cuidado. Servido com amor.</span>\n"
+    +"    <button class=\"pg0-btn\" onclick=\"obaShowPage(1)\">Ver o que preparamos &rarr;</button>\n"
+    +"  </div>\n"
+    +"</div>\n\n"
+
+    // PG1 — opções
+    +"<div id=\"pg1\" style=\"display:none\">\n"
+    +"  <div class=\"pg1-header\">\n"
+    +"    <img class=\"pg1-logo\" src=\"https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png\" alt=\"Oba Doceria\" onerror=\"this.style.display='none'\">\n"
+    +"    <p class=\"pg1-title\">Proposta para "+(nomeEmpresa||"voc\u00ea")+"</p>\n"
+    +"  </div>\n"
+    +"  <p class=\"secao-titulo\">Op\u00e7\u00f5es dispon\u00edveis</p>\n"
+    +(resumoCards||"  <p style=\"text-align:center;color:#9AB0A4;padding:24px;font-size:12px\">Nenhuma op\u00e7\u00e3o cadastrada.</p>")
+    +"\n  <div class=\"pg1-footer\">"+validadeHtml+wppHtml
+    +"    <span class=\"pg1-footer-brand\">Oba Doceria &middot; Um jeito doce de expressar felicidade</span>\n"
+    +"    <button class=\"btn-pdf\" onclick=\"window.print()\">Salvar como PDF</button>\n"
+    +"  </div>\n"
+    +"</div>\n\n"
+
+    // PÁGINAS DETALHE
+    +detalhePages
+
+    +"\n</div>\n<script>\n"
+    +"function obaShowPage(n){\n"
+    +"  var ids=['pg0','pg1'];\n"
+    +"  for(var i=2;i<="+numOptions+"+1;i++) ids.push('pg'+i);\n"
+    +"  ids.forEach(function(id,idx){\n"
+    +"    var el=document.getElementById(id); if(!el) return;\n"
+    +"    el.style.display=(idx===n)?((idx===0)?'flex':'block'):'none';\n"
+    +"  });\n"
+    +"  window.scrollTo({top:0,behavior:'smooth'});\n"
+    +"}\n"
+    +"<\/script>\n</body>\n</html>";
 
   return new Response(html,{status:200,headers:{"Content-Type":"text/html; charset=utf-8","Cache-Control":"no-store","X-Robots-Tag":"noindex, nofollow"}});
 }
-// PAGINA PUBLICA — TEMPLATE SAZONAL
+
+// ============================================================
+// PAGINA PUBLICA — TEMPLATE SAZONAL (redesign 12B-rev2)
+// Paletas temáticas por data. Pg0 escura/encantamento.
+// Condições apenas no rodapé de pg1 (não na abertura).
 // ============================================================
 async function obaHandlePropostaSazonal(proposal, obaWpp, env, propId) {
   const R = (v) => { const n=Number(v||0).toFixed(2),[i,d]=n.split("."); return "R$\u00a0"+i.replace(/\B(?=(\d{3})+(?!\d))/g,".")+","+d; };
-  const MESES=["janeiro","fevereiro","mar\u00e7o","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
-  const fmtD=(d)=>{ if(!d)return null; try{const[y,m,dy]=d.split("-");return parseInt(dy)+" de "+MESES[parseInt(m)-1]+" de "+y;}catch{return d;} };
+  const toTC = (s) => s ? s.toLowerCase().replace(/(?:^|\s)\S/g,a=>a.toUpperCase()) : s;
 
-  const PAL=[
-    {acento:"#B8860B",fundo:"#FFFDF8",topo:"#C8922A"},
-    {acento:"#9B3A5C",fundo:"#FFF8FA",topo:"#B05070"},
-    {acento:"#5B4A9A",fundo:"#F9F7FF",topo:"#6B5BAA"},
-    {acento:"#1B6B4A",fundo:"#F4FCF8",topo:"#2A8A5C"},
-    {acento:"#5A4A1E",fundo:"#FDFBF5",topo:"#7A6A30"},
-  ];
-
-  const validade    = fmtD(proposal.validade);
-  const nomeEmpresa = proposal.empresa || "";
   const dataCom     = proposal.data_comemorativa || "";
+  const nomeEmpresa = proposal.empresa || "";
+  const options     = (proposal.options && proposal.options.length) ? proposal.options : [];
+  const validade    = proposal.validade
+    ? (function(d){ try{const[y,m,dy]=d.split("-"); const MESES=["janeiro","fevereiro","mar\u00e7o","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"]; return parseInt(dy)+" de "+MESES[parseInt(m)-1]+" de "+y; }catch{return d;} })(proposal.validade)
+    : null;
 
-  // options ja carregadas por obaLoadProposal
-  const options = (proposal.options && proposal.options.length) ? proposal.options : [];
+  // Paletas por data comemorativa
+  const TEMAS = {
+    "Natal":             {bg1:"#5C1220", bg2:"#8B1A2F", acento:"#D4A843", borda:"#F0C060", fundo:"#FDF8F0", fundoCrd:"#FFFFFF", txt:"#F9ECD8", txtDim:"rgba(249,236,216,.55)", label:"NATAL 2026"},
+    "P\u00e1scoa":       {bg1:"#2E1A5C", bg2:"#4A3070", acento:"#C8922A", borda:"#A07ACC", fundo:"#FAF8FF", fundoCrd:"#FFFFFF", txt:"#F0EAF8", txtDim:"rgba(240,234,248,.55)", label:"P\u00c1SCOA"},
+    "Dia das M\u00e3es": {bg1:"#6B1A38", bg2:"#9B2850", acento:"#E8A0B8", borda:"#D07090", fundo:"#FFF5F8", fundoCrd:"#FFFFFF", txt:"#FDE8F0", txtDim:"rgba(253,232,240,.55)", label:"DIA DAS M\u00c3ES"},
+    "Dia dos Pais":      {bg1:"#0E2440", bg2:"#1A3860", acento:"#C8922A", borda:"#4A7AB0", fundo:"#F5F8FF", fundoCrd:"#FFFFFF", txt:"#E8EEF8", txtDim:"rgba(232,238,248,.55)", label:"DIA DOS PAIS"},
+    "Dia dos Namorados": {bg1:"#4A0E1A", bg2:"#7A1C30", acento:"#E8A0A8", borda:"#C06080", fundo:"#FFF5F5", fundoCrd:"#FFFFFF", txt:"#FDE8EC", txtDim:"rgba(253,232,236,.55)", label:"DIA DOS NAMORADOS"},
+    "Dia das Crian\u00e7as":{bg1:"#5A2200", bg2:"#8B3A10", acento:"#F5D060", borda:"#E08030", fundo:"#FFFBF2", fundoCrd:"#FFFFFF", txt:"#FDF0D8", txtDim:"rgba(253,240,216,.55)", label:"DIA DAS CRIAN\u00c7AS"},
+  };
+  const T = TEMAS[dataCom] || {bg1:"#1E2A38",bg2:"#2C3E50",acento:"#C8922A",borda:"#C8922A",fundo:"#FAFAF6",fundoCrd:"#FFFFFF",txt:"#F0ECE4",txtDim:"rgba(240,236,228,.55)",label:dataCom.toUpperCase()||"CAT\u00c1LOGO SAZONAL"};
 
-  const paraA = (proposal.abertura||"").trim() ||
-    (dataCom
-      ? (nomeEmpresa
-          ? "Chegou o "+dataCom+"! Preparamos este cat\u00e1logo com muito carinho para "+nomeEmpresa+"."
-          : "Chegou o "+dataCom+"! Preparamos este cat\u00e1logo com muito carinho para voc\u00ea.")
-      : (nomeEmpresa
-          ? "Chegou a \u00e9poca mais especial! Preparamos este cat\u00e1logo com muito carinho para "+nomeEmpresa+"."
-          : "Chegou a \u00e9poca mais especial! Preparamos este cat\u00e1logo com muito carinho para voc\u00ea."));
+  // Texto pg0 — emocional, sem condições
+  const paraA = (proposal.abertura||"").trim() || (function(){
+    const base = {
+      "Natal":             "Este Natal, cada caixa que chega nas m\u00e3os de quem voc\u00ea se importa conta uma hist\u00f3ria. A Oba preparou este cat\u00e1logo para ajudar voc\u00ea a cont\u00e1-la.",
+      "P\u00e1scoa":       "A P\u00e1scoa \u00e9 tempo de gestos que ficam. Preparamos este cat\u00e1logo com o cuidado de quem sabe que cada chocolate \u00e9 mais do que um presente.",
+      "Dia das M\u00e3es": "Nenhum presente substitui o amor, mas um bom doce \u00e9 uma forma bonita de express\u00e1-lo. Este cat\u00e1logo foi feito para tornar o Dia das M\u00e3es ainda mais especial.",
+      "Dia dos Pais":      "Para o pai que merece ser lembrado com carinho e sabor. A Oba preparou op\u00e7\u00f5es exclusivas para tornar esse dia inesquec\u00edvel.",
+      "Dia dos Namorados": "Amor se celebra com presen\u00e7a, com tempo e com os mimos certos. Preparamos este cat\u00e1logo para que voc\u00ea chegue com algo verdadeiramente especial.",
+      "Dia das Crian\u00e7as":"A alegria das crian\u00e7as \u00e9 a nossa maior inspira\u00e7\u00e3o. Este cat\u00e1logo foi preparado para transformar o dia delas em uma festa de sabores.",
+    };
+    const txt = base[dataCom] || "Preparamos este cat\u00e1logo com muito carinho para tornar esta data ainda mais especial e doce.";
+    return nomeEmpresa ? "Para "+nomeEmpresa+": "+txt : txt;
+  })();
 
-  const ctaMsgSaz  = encodeURIComponent("Ol\u00e1, Oba Doceria! Vi o cat\u00e1logo"+(dataCom?" de "+dataCom:"")+" e tenho interesse. E agora, quais os pr\u00f3ximos passos?");
-  const ctaHrefSaz = obaWpp ? "https://wa.me/55"+obaWpp+"?text="+ctaMsgSaz : "";
-  const validadeHtml = validade ? "<p>Proposta v&aacute;lida at&eacute; <strong style=\"color:#5D3A1A\">"+validade+"</strong></p>" : "";
-  const wppHtml      = obaWpp   ? "<p>D&uacute;vidas? <a href=\"https://wa.me/55"+obaWpp+"\">fale pelo WhatsApp</a></p>" : "";
+  // Bloco de condições — vai no RODAPÉ de pg1, não na pg0
+  const condLinhas = [
+    proposal.prazo_pedido   ? {l:"Pedidos at\u00e9", v:proposal.prazo_pedido}   : null,
+    proposal.prazo_entrega  ? {l:"Entrega",           v:proposal.prazo_entrega}  : null,
+    proposal.cond_pagamento ? {l:"Pagamento",          v:proposal.cond_pagamento} : null,
+    proposal.pedido_minimo  ? {l:"M\u00ednimo",        v:proposal.pedido_minimo+" unidades"} : null,
+  ].filter(Boolean);
 
-  // Produtos (options) com imagem, descricao e faixas de preco
-  const produtosHtml = options.map(function(opt,oi){
-    const pal   = PAL[oi%PAL.length];
+  const condHtml = condLinhas.length
+    ? "<div class=\"cond-grid\">"+condLinhas.map(c=>"<div class=\"cond-item\"><span class=\"cond-l\">"+c.l+"</span><span class=\"cond-v\">"+c.v+"</span></div>").join("")+"</div>"
+    : "";
+
+  const obsHtml = proposal.observacoes
+    ? "<p class=\"cond-obs\">"+proposal.observacoes+"</p>"
+    : "";
+
+  // Cards de produto para pg1
+  const produtosHtml = options.map(function(opt, oi){
     const faixas = opt.faixas||[];
-    const toTC = (s) => s ? s.toLowerCase().replace(/(?:^|\s)\S/g,a=>a.toUpperCase()) : s;
-
-    // Primeira imagem da opcao como destaque
-    const imgPrincipal = (opt.medias && opt.medias.length)
-      ? "<img src=\"/api/proposals/"+propId+"/media/"+opt.medias[0].media_id+"/dados\" style=\"width:100%;max-height:200px;object-fit:cover;border-radius:10px 10px 0 0;display:block\" loading=\"lazy\">"
-      : "";
-    // Outras imagens em galeria pequena
-    const outrasImgs = (opt.medias && opt.medias.length > 1)
-      ? "<div style=\"display:flex;flex-wrap:wrap;gap:6px;padding:8px 14px 0\">"+
-          opt.medias.slice(1).map(function(m){
-            return "<img src=\"/api/proposals/"+propId+"/media/"+m.media_id+"/dados\" style=\"width:calc(33.33% - 4px);aspect-ratio:1;object-fit:cover;border-radius:6px\" loading=\"lazy\">";
-          }).join("")+
-        "</div>"
-      : "";
-
-    const tabelaFaixas = faixas.length ? (
-      "<div style=\"padding:0 14px 14px\">"+
-      "<p style=\"font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:"+pal.acento+";margin-bottom:6px\">Faixas de pre\u00e7o</p>"+
-      "<table style=\"width:100%;border-collapse:collapse\"><tbody>"+
-      faixas.map(function(f,fi){
-        const prev  = faixas[fi-1];
-        const label = f.ate===null
-          ? ("Acima de "+(prev&&prev.ate?prev.ate:"")+" un.")
-          : ("At\u00e9 "+f.ate+" un.");
-        return "<tr><td style=\"font-size:12px;color:#3B2A1E;padding:5px 0;border-bottom:1px solid #F5EDE4\">"+label+"</td>"+
-               "<td style=\"font-size:12px;font-weight:600;color:"+pal.acento+";text-align:right;padding:5px 0;border-bottom:1px solid #F5EDE4\">"+R(f.preco)+" / un.</td></tr>";
-      }).join("")+
-      "</tbody></table></div>"
-    ) : (Number(opt.valor_unit||0)>0
-      ? "<div style=\"padding:0 14px 14px\"><table style=\"width:100%;border-collapse:collapse\"><tbody><tr><td style=\"font-size:12px;color:#3B2A1E;padding:5px 0\">Pre\u00e7o por unidade</td><td style=\"font-size:12px;font-weight:600;color:"+pal.acento+";text-align:right\">"+R(opt.valor_unit)+" / un.</td></tr></tbody></table></div>"
-      : "");
+    const imgSrc = (opt.medias && opt.medias.length)
+      ? "/api/proposals/"+propId+"/media/"+opt.medias[0].media_id+"/dados"
+      : null;
+    const precoMin = faixas.length
+      ? faixas.reduce(function(acc,f){ return f.preco<acc?f.preco:acc; }, faixas[0].preco)
+      : Number(opt.valor_unit||0);
 
     return (
-      "<div style=\"border:1px solid #EDD9C0;border-top:3px solid "+pal.topo+";border-radius:12px;overflow:hidden;background:"+pal.fundo+";margin-bottom:14px\">"+
-        imgPrincipal+
-        "<div style=\"padding:12px 14px 8px\">"+
-          "<h3 style=\"font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;font-weight:600;color:#3B2A1E;margin-bottom:4px\">"+toTC(opt.nome||("Op\u00e7\u00e3o "+(oi+1)))+"</h3>"+
-          (opt.descricao?"<p style=\"font-size:12px;color:#7A5A40;font-style:italic;margin-bottom:6px\">"+opt.descricao+"</p>":"")+
-          (faixas.length>0?"<span style=\"font-size:11px;font-weight:600;color:"+pal.acento+"\">a partir de "+R(faixas[faixas.length-1].preco)+" / un.</span>":"")+
+      "<div class=\"prod-card\" onclick=\"obaShowPage("+(oi+2)+")\">"+
+        (imgSrc?"<img src=\""+imgSrc+"\" class=\"prod-img\" loading=\"lazy\" alt=\""+(opt.nome||"")+"\">":"<div class=\"prod-img-placeholder\"></div>")+
+        "<div class=\"prod-body\">"+
+          "<h3 class=\"prod-nome\">"+toTC(opt.nome||("Op\u00e7\u00e3o "+(oi+1)))+"</h3>"+
+          (opt.descricao?"<p class=\"prod-desc\">"+opt.descricao+"</p>":"")+
+          (precoMin>0?"<p class=\"prod-preco\" style=\"color:"+T.acento+"\">a partir de "+R(precoMin)+" / un.</p>":"")+
+          "<span class=\"prod-ver\" style=\"color:"+T.acento+"\">Ver detalhes &rarr;</span>"+
         "</div>"+
-        outrasImgs+
-        tabelaFaixas+
       "</div>"
     );
   }).join("\n");
 
-  const condBloco = [
-    proposal.prazo_pedido   ? "<div class=\"cond-row\"><span class=\"cond-lbl\">Pedidos at&eacute;</span><span class=\"cond-val\">"+proposal.prazo_pedido+"</span></div>" : "",
-    proposal.prazo_entrega  ? "<div class=\"cond-row\"><span class=\"cond-lbl\">Entrega</span><span class=\"cond-val\">"+proposal.prazo_entrega+"</span></div>" : "",
-    proposal.cond_pagamento ? "<div class=\"cond-row\"><span class=\"cond-lbl\">Pagamento</span><span class=\"cond-val\">"+proposal.cond_pagamento+"</span></div>" : "",
-    proposal.pedido_minimo  ? "<div class=\"cond-row\"><span class=\"cond-lbl\">M&iacute;nimo</span><span class=\"cond-val\">"+proposal.pedido_minimo+" unidades</span></div>" : "",
-    nomeEmpresa             ? "<div class=\"cond-row\"><span class=\"cond-lbl\">Para</span><span class=\"cond-val\">"+nomeEmpresa+"</span></div>" : "",
-  ].filter(Boolean).join("");
+  // Páginas de detalhe (pg2+)
+  const detalhePages = options.map(function(opt, oi){
+    const faixas = opt.faixas||[];
+    const imgs = (opt.medias||[]).map(function(m){
+      return "<img src=\"/api/proposals/"+propId+"/media/"+m.media_id+"/dados\" class=\"det-img\" loading=\"lazy\" alt=\""+(opt.nome||"")+"\">"; 
+    }).join("");
 
-  // Observações aparecem logo abaixo do condBloco na pg0
-  const obsHtml = proposal.observacoes
-    ? "<p style=\"font-size:11px;color:#7A5A40;font-style:italic;margin:10px auto 0;max-width:360px;text-align:center\">"+proposal.observacoes+"</p>"
-    : "";
+    const tabelaFaixas = faixas.length ? (
+      "<div class=\"faixas-bloco\">"+
+      "<p class=\"faixas-titulo\" style=\"color:"+T.acento+"\">Faixas de pre\u00e7o</p>"+
+      "<table class=\"faixas-tab\"><tbody>"+
+      faixas.map(function(f){
+        const label = f.de!=null && f.ate!=null
+          ? ("De "+f.de+" a "+f.ate+" un.")
+          : f.de!=null && f.ate==null
+            ? ("A partir de "+f.de+" un.")
+            : f.ate!=null
+              ? ("At\u00e9 "+f.ate+" un.")
+              : "Demais";
+        return "<tr><td class=\"ft-label\">"+label+"</td><td class=\"ft-price\" style=\"color:"+T.acento+"\">"+R(f.preco)+" <small>/ un.</small></td></tr>";
+      }).join("")+
+      "</tbody></table></div>"
+    ) : (Number(opt.valor_unit||0)>0
+      ? "<div class=\"faixas-bloco\"><table class=\"faixas-tab\"><tbody><tr><td class=\"ft-label\">Pre\u00e7o por unidade</td><td class=\"ft-price\" style=\"color:"+T.acento+"\">"+R(opt.valor_unit)+"</td></tr></tbody></table></div>"
+      : "");
 
-  const css = `*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-body{background:#F7F2EC;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#3B2A1E;line-height:1.5}
-.page{max-width:600px;margin:0 auto;padding:0 16px}
-#pg0{min-height:100svh;display:flex;flex-direction:column;background:linear-gradient(160deg,#FFF8EE 0%,#FDF0D8 55%,#F9E4BE 100%)}
-.ab-topo{padding:36px 24px 0;text-align:center}
-.ab-logo{height:38px;object-fit:contain;opacity:.85;margin-bottom:10px}
-.ab-label{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#C8922A;margin-bottom:16px;display:block}
-.cond-bloco{background:#FFFCF5;border:1px solid #EDD9C0;border-radius:10px;padding:12px 16px;margin:0 auto;max-width:360px}
-.cond-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #F5EDE4;font-size:11px}
-.cond-row:last-child{border-bottom:none}
-.cond-lbl{color:#C8922A;font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:1px}
-.cond-val{color:#3B2A1E;font-weight:500;text-align:right;max-width:60%}
-.ab-sep{border:none;border-top:1px solid #EDD9C0;margin:20px auto 0;width:36px}
-.ab-corpo{padding:24px 28px 0;flex:1}
-.ab-p-destaque{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(20px,5.5vw,25px);font-weight:600;color:#3B2A1E;line-height:1.45;margin-bottom:16px;font-style:italic;text-align:center}
-.ab-rodape{padding:24px 24px 40px;text-align:center}
-.ab-ornamento{font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;color:#C8922A;opacity:.4;letter-spacing:10px;margin-bottom:14px;display:block}
-.ab-assinatura{font-family:'Cormorant Garamond',Georgia,serif;font-size:15px;font-style:italic;color:#C8922A;margin-bottom:24px;display:block}
-.ab-btn{display:inline-block;background:#3B2A1E;color:#F9E8C8;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.8px;padding:14px 36px;border-radius:50px;border:none;cursor:pointer;text-transform:uppercase}
+    const ctaMsg  = encodeURIComponent("Ol\u00e1, Oba Doceria! Vi o cat\u00e1logo"+(dataCom?" de "+dataCom:"")+" e me interessei pela op\u00e7\u00e3o \u201c"+(opt.nome||("Op\u00e7\u00e3o "+(oi+1)))+"\u201d. Quais os pr\u00f3ximos passos?");
+    const ctaHref = obaWpp ? "https://wa.me/55"+obaWpp+"?text="+ctaMsg : "";
+    const ctaBtn  = ctaHref ? "<a href=\""+ctaHref+"\" target=\"_blank\" class=\"cta-btn\" style=\"background:"+T.acento+"\">Tenho interesse \u2014 vamos conversar</a>" : "";
+
+    const outrasImgs = (opt.medias||[]).length > 1
+      ? "<div class=\"det-gal-extra\">"+(opt.medias.slice(1).map(function(m){return "<img src=\"/api/proposals/"+propId+"/media/"+m.media_id+"/dados\" class=\"det-img-sm\" loading=\"lazy\">";})).join("")+"</div>"
+      : "";
+
+    return (
+      "<div id=\"pg"+(oi+2)+"\" class=\"det-page\" style=\"display:none\">"+
+        "<header class=\"det-bar\" style=\"background:"+T.bg2+"\">"+
+          "<button class=\"back-btn\" onclick=\"obaShowPage(1)\">\u2190 Cat\u00e1logo</button>"+
+        "</header>"+
+        "<div class=\"det-card\">"+
+          (imgs?"<img src=\"/api/proposals/"+propId+"/media/"+(opt.medias[0].media_id)+"/dados\" class=\"det-hero\" loading=\"lazy\" alt=\""+(opt.nome||"")+"\">"  :"" )+
+          "<div class=\"det-head\">"+
+            "<h2 class=\"det-nome\" style=\"color:#1A1A1A\">"+toTC(opt.nome||("Op\u00e7\u00e3o "+(oi+1)))+"</h2>"+
+            (opt.descricao?"<p class=\"det-desc\">"+opt.descricao+"</p>":"")+
+          "</div>"+
+          outrasImgs+
+          "<div class=\"det-corpo\">"+tabelaFaixas+ctaBtn+"</div>"+
+        "</div>"+
+        "<div class=\"det-bottom-nav\" style=\"background:"+T.bg2+"\">"+
+          "<button class=\"back-btn\" onclick=\"obaShowPage(1)\">\u2190 Cat\u00e1logo</button>"+
+          (obaWpp?"<a href=\"https://wa.me/55"+obaWpp+"\" class=\"wpp-link\">D\u00favidas? WhatsApp</a>":"")+
+        "</div>"+
+      "</div>"
+    );
+  }).join("\n");
+
+  const wppHtml   = obaWpp ? "<a href=\"https://wa.me/55"+obaWpp+"\" class=\"footer-wpp\">D\u00favidas? Fale pelo WhatsApp</a>" : "";
+  const validHtml = validade ? "<p class=\"footer-valid\">Proposta v\u00e1lida at\u00e9 <strong>"+validade+"</strong></p>" : "";
+
+  const css = `
+*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{background:${T.fundo};font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#1A1A1A;line-height:1.55}
+.wrap{max-width:620px;margin:0 auto}
+
+/* PG0 */
+#pg0{min-height:100svh;display:flex;flex-direction:column;background:linear-gradient(155deg,${T.bg1} 0%,${T.bg2} 55%,${T.bg1} 100%);position:relative;overflow:hidden}
+#pg0::after{content:'';position:absolute;bottom:0;left:0;right:0;height:180px;background:linear-gradient(to top,rgba(0,0,0,.25),transparent);pointer-events:none}
+.pg0-inner{padding:48px 28px 24px;display:flex;flex-direction:column;flex:1;position:relative;z-index:1}
+.pg0-logo{height:44px;object-fit:contain;opacity:.85;margin-bottom:18px;filter:brightness(0) invert(1)}
+.pg0-label{font-size:9px;font-weight:800;letter-spacing:5px;text-transform:uppercase;color:${T.acento};display:block;margin-bottom:32px}
+.pg0-data{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(38px,10vw,54px);font-weight:400;color:${T.txt};line-height:1.1;margin-bottom:8px;letter-spacing:-1px}
+.pg0-empresa{font-size:11px;font-weight:500;color:${T.txtDim};letter-spacing:1.5px;margin-bottom:32px}
+.pg0-divider{border:none;border-top:1px solid rgba(255,255,255,.1);margin:0 0 28px}
+.pg0-texto{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(16px,4.2vw,20px);font-style:italic;color:${T.txt};line-height:1.75;margin-bottom:8px}
+.pg0-rodape{padding:24px 28px 44px;position:relative;z-index:1;margin-top:auto}
+.pg0-assinatura{font-family:'Cormorant Garamond',Georgia,serif;font-size:13px;font-style:italic;color:${T.txtDim};display:block;margin-bottom:18px;text-align:center}
+.pg0-btn{display:block;width:100%;background:${T.acento};color:#1A1A1A;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:800;letter-spacing:1px;padding:16px 24px;border-radius:12px;border:none;cursor:pointer;text-align:center;text-transform:uppercase}
+
+/* PG1 */
 #pg1{display:none}
-.pg1-hero{padding:20px 20px 14px;text-align:center;background:#FFFDF8;border-bottom:1px solid #EDD9C0}
-.pg1-logo{height:28px;object-fit:contain;opacity:.82;margin-bottom:8px}
-.pg1-titulo{font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;font-weight:400;color:#3B2A1E}
-.sec-titulo{padding:20px 16px 8px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#C8922A}
-.produtos-lista{padding:0 16px}
-.cta-final{display:block;margin:20px 16px 0;padding:14px;border-radius:12px;text-align:center;color:#fff;font-weight:600;font-size:13px;text-decoration:none;background:#C8922A}
-.voltar-pg0{background:none;border:none;font-size:11px;font-weight:600;color:#bbb;cursor:pointer;text-decoration:underline;margin:10px 16px 0;display:block}
-.footer{margin:20px 16px 0;text-align:center;padding:18px 0 28px;border-top:1px solid #EDD9C0}
-.footer p{font-size:11px;color:#bbb;margin-bottom:4px}
-.footer a{color:#8B4513;font-weight:500;text-decoration:none}
-.footer-brand{font-family:'Cormorant Garamond',Georgia,serif;font-size:13px;font-style:italic;color:#bbb;margin-top:6px}
-.btn-pdf{margin-top:14px;background:#3B2A1E;color:#fff;border:none;border-radius:11px;padding:10px 26px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer}
-@page{margin:14mm 18mm}
-@media print{#pg0{display:block!important;min-height:0!important;background:none!important}.ab-btn,.ab-ornamento,.ab-assinatura{display:none!important}#pg1{display:block!important}.voltar-pg0,.btn-pdf,.cta-final{display:none!important}.page{max-width:100%;padding:0}}`;
+.pg1-hero-bar{background:${T.bg2};padding:16px 20px 14px;display:flex;align-items:center;justify-content:space-between}
+.pg1-logo{height:26px;object-fit:contain;filter:brightness(0) invert(1);opacity:.85}
+.pg1-label-bar{font-size:9px;font-weight:700;letter-spacing:3px;color:${T.acento};text-transform:uppercase}
+.pg1-titulo{font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;font-weight:400;color:#1A1A1A;padding:16px 20px 4px}
+.secao-titulo{padding:8px 20px 12px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:${T.acento};opacity:.7}
 
-  const html = "<!doctype html>\n<html lang=\"pt-BR\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<meta name=\"robots\" content=\"noindex,nofollow\">\n<title>"+(dataCom?"Cat\u00e1logo "+dataCom:"Cat\u00e1logo Sazonal")+" \u00b7 Oba Doceria</title>\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link href=\"https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n<style>\n"+css+"\n</style>\n</head>\n<body>\n<div class=\"page\">\n\n<div id=\"pg0\">\n  <div class=\"ab-topo\">\n    <img class=\"ab-logo\" src=\"https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png\" alt=\"Oba Doceria\" onerror=\"this.style.display='none'\">\n    <span class=\"ab-label\">"+(dataCom||"Cat\u00e1logo Sazonal")+"</span>\n"+(condBloco?"    <div class=\"cond-bloco\">"+condBloco+"</div>\n":"")+(obsHtml?"    "+obsHtml+"\n":"")+"    <hr class=\"ab-sep\">\n  </div>\n  <div class=\"ab-corpo\">\n    <p class=\"ab-p-destaque\">"+paraA+"</p>\n  </div>\n  <div class=\"ab-rodape\">\n    <span class=\"ab-ornamento\">&middot;&ensp;&middot;&ensp;&middot;</span>\n    <span class=\"ab-assinatura\">Feito com cuidado. Servido com amor.</span>\n    <button class=\"ab-btn\" onclick=\"obaShowPage(1)\">Ver o cat\u00e1logo &rarr;</button>\n  </div>\n</div>\n\n<div id=\"pg1\" style=\"display:none\">\n  <div class=\"pg1-hero\">\n    <img class=\"pg1-logo\" src=\"https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png\" alt=\"Oba Doceria\" onerror=\"this.style.display='none'\">\n    <p class=\"pg1-titulo\">"+(dataCom?"Cat\u00e1logo "+dataCom:"Nossos produtos")+"</p>\n  </div>\n  <p class=\"sec-titulo\">Op\u00e7\u00f5es dispon\u00edveis</p>\n  <div class=\"produtos-lista\">"+(produtosHtml||"<p style=\"text-align:center;color:#bbb;padding:20px 0;font-size:12px\">Nenhuma op\u00e7\u00e3o cadastrada.</p>")+"</div>\n"+(ctaHrefSaz?"  <a href=\""+ctaHrefSaz+"\" target=\"_blank\" class=\"cta-final\">Tenho interesse &mdash; vamos conversar</a>\n":"")+"  <button class=\"voltar-pg0\" onclick=\"obaShowPage(0)\">&#8592; Voltar</button>\n  <div class=\"footer\">\n    "+validadeHtml+wppHtml+"\n    <p class=\"footer-brand\">Oba Doceria &middot; Um jeito doce de expressar felicidade</p>\n    <button class=\"btn-pdf\" onclick=\"window.print()\">Salvar como PDF</button>\n  </div>\n</div>\n\n</div>\n<script>\nfunction obaShowPage(n){\n  var pg0=document.getElementById('pg0');\n  var pg1=document.getElementById('pg1');\n  if(!pg0||!pg1) return;\n  pg0.style.display=n===0?'flex':'none';\n  pg1.style.display=n===1?'block':'none';\n  window.scrollTo({top:0,behavior:'smooth'});\n}\n<\/script>\n</body>\n</html>";
+/* Cards de produto */
+.prod-card{margin:0 16px 12px;border-radius:14px;overflow:hidden;background:#fff;border:1px solid #EEE;cursor:pointer;display:flex;flex-direction:column;box-shadow:0 1px 6px rgba(0,0,0,.05);transition:box-shadow .15s}
+.prod-card:hover{box-shadow:0 4px 18px rgba(0,0,0,.1)}
+.prod-img{width:100%;height:200px;object-fit:cover;display:block}
+.prod-img-placeholder{width:100%;height:120px;background:#F5F5F5}
+.prod-body{padding:14px 16px 16px}
+.prod-nome{font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;font-weight:600;color:#1A1A1A;margin-bottom:4px}
+.prod-desc{font-size:12px;color:#888;font-style:italic;margin-bottom:8px}
+.prod-preco{font-size:12px;font-weight:600;margin-bottom:6px}
+.prod-ver{font-size:11px;font-weight:700;letter-spacing:.3px}
+
+/* Condições no rodapé */
+.cond-box{margin:16px 16px 0;padding:14px 16px;background:#fff;border-radius:12px;border:1px solid #EEE}
+.cond-box-titulo{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${T.acento};margin-bottom:10px;opacity:.8}
+.cond-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cond-item{display:flex;flex-direction:column;gap:2px;padding:6px 8px;background:${T.fundo};border-radius:8px}
+.cond-l{font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:${T.acento};opacity:.8}
+.cond-v{font-size:11px;font-weight:500;color:#333}
+.cond-obs{font-size:11px;color:#888;font-style:italic;margin-top:10px;line-height:1.5}
+
+/* Footer pg1 */
+.pg1-footer{margin:16px 16px 0;padding:16px 0 32px;border-top:1px solid #EEE;text-align:center}
+.footer-valid{font-size:11px;color:#999;margin-bottom:6px}
+.footer-valid strong{color:#555}
+.footer-wpp{display:inline-block;font-size:12px;font-weight:600;color:${T.acento};text-decoration:none;margin-bottom:8px}
+.footer-brand{font-family:'Cormorant Garamond',Georgia,serif;font-size:12px;font-style:italic;color:#CCC;display:block;margin-top:6px}
+.btn-pdf{margin-top:12px;background:${T.bg2};color:#fff;border:none;border-radius:10px;padding:10px 24px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer}
+
+/* Detalhe */
+.det-page{background:${T.fundo}}
+.det-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;position:sticky;top:0;z-index:10}
+.back-btn{background:none;border:1.5px solid rgba(255,255,255,.25);border-radius:24px;padding:5px 14px;font-size:11px;font-weight:600;color:#fff;cursor:pointer}
+.det-card{margin:12px 16px 0;border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.07)}
+.det-hero{width:100%;max-height:280px;object-fit:cover;display:block}
+.det-gal-extra{display:flex;gap:8px;padding:8px 16px 0}
+.det-img-sm{width:calc(33.33% - 6px);aspect-ratio:1;object-fit:cover;border-radius:8px}
+.det-head{padding:18px 18px 12px;border-bottom:1px solid #EEE}
+.det-nome{font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;font-weight:600;line-height:1.2}
+.det-desc{font-size:12px;color:#888;font-style:italic;margin-top:4px}
+.det-corpo{padding:16px 18px 20px}
+.faixas-bloco{margin-bottom:14px}
+.faixas-titulo{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+.faixas-tab{width:100%;border-collapse:collapse}
+.faixas-tab td{padding:7px 0;border-bottom:1px solid #F5F5F5;font-size:12px}
+.ft-label{color:#333}
+.ft-price{text-align:right;font-weight:600;white-space:nowrap}
+.ft-price small{font-weight:400;opacity:.6}
+.cta-btn{display:block;margin-top:16px;padding:15px;border-radius:12px;text-align:center;color:#1A1A1A;font-weight:800;font-size:13px;text-decoration:none;letter-spacing:.3px}
+.det-bottom-nav{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;margin-top:6px}
+.wpp-link{font-size:11px;font-weight:600;color:rgba(255,255,255,.7);text-decoration:none}
+
+@page{margin:14mm 18mm}
+@media print{
+  #pg0{display:block!important;min-height:0!important}
+  .pg0-btn,.pg0-assinatura{display:none!important}
+  #pg1{display:block!important}
+  .det-page{display:block!important;page-break-before:always}
+  .det-bar,.det-bottom-nav,.cta-btn,.btn-pdf{display:none!important}
+  .wrap{max-width:100%;padding:0}
+  .det-card{margin:8px 0 0;box-shadow:none;page-break-inside:avoid}
+}`;
+
+  const html = "<!doctype html>\n<html lang=\"pt-BR\">\n<head>\n"
+    +"<meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n"
+    +"<meta name=\"robots\" content=\"noindex,nofollow\">\n"
+    +"<title>"+(dataCom||"Cat\u00e1logo Sazonal")+(nomeEmpresa?" para "+nomeEmpresa:"")+" \u00b7 Oba Doceria</title>\n"
+    +"<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n"
+    +"<link href=\"https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap\" rel=\"stylesheet\">\n"
+    +"<style>"+css+"</style>\n</head>\n<body>\n<div class=\"wrap\">\n\n"
+
+    // PG0 — pura emoção, sem condições
+    +"<div id=\"pg0\">\n"
+    +"  <div class=\"pg0-inner\">\n"
+    +"    <img class=\"pg0-logo\" src=\"https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png\" alt=\"Oba Doceria\" onerror=\"this.style.display='none'\">\n"
+    +"    <span class=\"pg0-label\">"+T.label+"</span>\n"
+    +"    <p class=\"pg0-data\">"+(dataCom||"Cat\u00e1logo Sazonal")+"</p>\n"
+    +(nomeEmpresa?"    <p class=\"pg0-empresa\">Para "+nomeEmpresa+"</p>\n":"")
+    +"    <hr class=\"pg0-divider\">\n"
+    +"    <p class=\"pg0-texto\">"+paraA+"</p>\n"
+    +"  </div>\n"
+    +"  <div class=\"pg0-rodape\">\n"
+    +"    <span class=\"pg0-assinatura\">Feito com cuidado. Servido com amor.</span>\n"
+    +"    <button class=\"pg0-btn\" onclick=\"obaShowPage(1)\">Ver o cat\u00e1logo &rarr;</button>\n"
+    +"  </div>\n"
+    +"</div>\n\n"
+
+    // PG1 — produtos + condições no rodapé
+    +"<div id=\"pg1\" style=\"display:none\">\n"
+    +"  <div class=\"pg1-hero-bar\">\n"
+    +"    <img class=\"pg1-logo\" src=\"https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png\" alt=\"Oba Doceria\" onerror=\"this.style.display='none'\">\n"
+    +"    <span class=\"pg1-label-bar\">"+T.label+"</span>\n"
+    +"  </div>\n"
+    +"  <p class=\"pg1-titulo\">"+(dataCom||"Nossos produtos")+"</p>\n"
+    +"  <p class=\"secao-titulo\">Op\u00e7\u00f5es dispon\u00edveis</p>\n"
+    +(produtosHtml||"  <p style=\"text-align:center;color:#BBB;padding:24px;font-size:12px\">Nenhuma op\u00e7\u00e3o cadastrada.</p>")
+    // Condições no rodapé
+    +(condHtml||obsHtml
+      ? "\n  <div class=\"cond-box\">\n    <p class=\"cond-box-titulo\">Informa\u00e7\u00f5es do cat\u00e1logo</p>\n    "+condHtml+obsHtml+"\n  </div>"
+      : "")
+    +"\n  <div class=\"pg1-footer\">\n    "+validHtml+wppHtml
+    +"    <span class=\"footer-brand\">Oba Doceria &middot; Um jeito doce de expressar felicidade</span>\n"
+    +"    <button class=\"btn-pdf\" onclick=\"window.print()\">Salvar como PDF</button>\n"
+    +"  </div>\n"
+    +"</div>\n\n"
+
+    // PÁGINAS DETALHE
+    +detalhePages
+
+    +"\n</div>\n<script>\n"
+    +"function obaShowPage(n){\n"
+    +"  var ids=['pg0','pg1'];\n"
+    +"  var total="+options.length+";\n"
+    +"  for(var i=2;i<=total+1;i++) ids.push('pg'+i);\n"
+    +"  ids.forEach(function(id,idx){\n"
+    +"    var el=document.getElementById(id); if(!el) return;\n"
+    +"    el.style.display=(idx===n)?((idx===0)?'flex':'block'):'none';\n"
+    +"  });\n"
+    +"  window.scrollTo({top:0,behavior:'smooth'});\n"
+    +"}\n"
+    +"<\/script>\n</body>\n</html>";
 
   return new Response(html,{status:200,headers:{"Content-Type":"text/html; charset=utf-8","Cache-Control":"no-store","X-Robots-Tag":"noindex, nofollow"}});
 }
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);

@@ -4137,32 +4137,37 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       } catch(e) {}
     }
 
-    // Bloco de faixas: só para Sazonal, dinâmico
+    // Bloco de faixas: só para Sazonal, dinâmico — formato "De X a Y"
     let faixasBloco = '';
     if (tipo === 'sazonal') {
+      // Reconstrói faixas com campo "de" calculado automaticamente
       const faixaLinhas = faixas.map(function(f, fi) {
-        const ateVal  = (f.ate !== null && f.ate != null) ? f.ate : '';
-        const ateHint = ateVal === '' ? 'sem limite' : ateVal;
+        const deVal  = fi === 0 ? 1 : '';   // será recalculado visualmente
+        const ateVal = (f.ate !== null && f.ate != null) ? f.ate : '';
         return '<div class="oba-faixa-linha" style="display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #EDD9C0;border-radius:8px;padding:6px 10px;margin-bottom:6px">'
-             + '<span style="font-size:10px;color:#9B7A60;white-space:nowrap">Até</span>'
-             + '<input type="number" min="1" step="1" class="oba-faixa-ate" placeholder="∞" value="'+ateVal+'"'
-             + ' title="Deixe vazio para \'acima de tudo\'"'
-             + ' style="width:60px;border:1px solid #EDD9C0;border-radius:6px;padding:4px 6px;font-size:12px">'
-             + '<span style="font-size:10px;color:#9B7A60">un. → R$</span>'
+             + '<span style="font-size:10px;color:#9B7A60;white-space:nowrap">De</span>'
+             + '<input type="number" min="1" step="1" class="oba-faixa-de" placeholder="1"'
+             + ' value="'+(f.de != null ? f.de : (fi===0?1:''))+'"'
+             + ' style="width:55px;border:1px solid #EDD9C0;border-radius:6px;padding:4px 6px;font-size:12px">'
+             + '<span style="font-size:10px;color:#9B7A60">a</span>'
+             + '<input type="number" min="1" step="1" class="oba-faixa-ate" placeholder="\u221e" value="'+ateVal+'"'
+             + ' title="Deixe vazio para \'em diante\'"'
+             + ' style="width:55px;border:1px solid #EDD9C0;border-radius:6px;padding:4px 6px;font-size:12px">'
+             + '<span style="font-size:10px;color:#9B7A60">un. \u2192 R$</span>'
              + '<input type="number" min="0" step="0.01" class="oba-faixa-preco" value="'+(f.preco||'')+'" placeholder="0,00"'
-             + ' style="width:80px;border:1px solid #EDD9C0;border-radius:6px;padding:4px 6px;font-size:12px">'
-             + '<button type="button" onclick="obaRemoverFaixa(this)" title="Remover faixa"'
+             + ' style="width:72px;border:1px solid #EDD9C0;border-radius:6px;padding:4px 6px;font-size:12px">'
+             + '<button type="button" onclick="obaRemoverFaixa(this)" title="Remover"'
              + ' style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:14px;line-height:1;padding:0 4px">&times;</button>'
              + '</div>';
       }).join('');
       faixasBloco =
         '<div style="margin-top:10px">'
         + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'
-        + '<label style="font-size:12px;font-weight:600;color:#5D3A1A">Faixas de preço por quantidade</label>'
+        + '<label style="font-size:12px;font-weight:600;color:#5D3A1A">Faixas de pre\u00e7o por quantidade</label>'
         + '<button type="button" class="secondary" style="font-size:10px;padding:3px 10px" onclick="obaAdicionarFaixa(this)">+ Faixa</button>'
         + '</div>'
         + '<div class="oba-faixas-container">'+(faixaLinhas||'')+'</div>'
-        + '<p style="font-size:10px;color:#bbb;margin-top:4px">Campo "Até" vazio = "acima de todos". Ex: Até 9 un. → R$ 5,50 / Até 49 → R$ 5,00 / vazio → R$ 4,50</p>'
+        + '<p style="font-size:10px;color:#bbb;margin-top:4px">Ex: De 1 a 10 un. \u2192 R$ 18,00 / De 11 a 30 \u2192 R$ 17,00 / De 31 a vazio = "em diante"</p>'
         + '</div>';
     }
 
@@ -4204,13 +4209,16 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     linha.className = 'oba-faixa-linha';
     linha.style.cssText = 'display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #EDD9C0;border-radius:8px;padding:6px 10px;margin-bottom:6px';
     linha.innerHTML =
-      '<span style="font-size:10px;color:#9B7A60;white-space:nowrap">Até</span>'
+      '<span style="font-size:10px;color:#9B7A60;white-space:nowrap">De</span>'
+      + '<input type="number" min="1" step="1" class="oba-faixa-de" placeholder="1"'
+      + ' style="width:55px;border:1px solid #EDD9C0;border-radius:6px;padding:4px 6px;font-size:12px">'
+      + '<span style="font-size:10px;color:#9B7A60">a</span>'
       + '<input type="number" min="1" step="1" class="oba-faixa-ate" placeholder="\u221e"'
-      + ' style="width:60px;border:1px solid #EDD9C0;border-radius:6px;padding:4px 6px;font-size:12px">'
-      + '<span style="font-size:10px;color:#9B7A60">un. → R$</span>'
+      + ' style="width:55px;border:1px solid #EDD9C0;border-radius:6px;padding:4px 6px;font-size:12px">'
+      + '<span style="font-size:10px;color:#9B7A60">un. \u2192 R$</span>'
       + '<input type="number" min="0" step="0.01" class="oba-faixa-preco" placeholder="0,00"'
-      + ' style="width:80px;border:1px solid #EDD9C0;border-radius:6px;padding:4px 6px;font-size:12px">'
-      + '<button type="button" onclick="obaRemoverFaixa(this)" title="Remover"'
+      + ' style="width:72px;border:1px solid #EDD9C0;border-radius:6px;padding:4px 6px;font-size:12px">'
+      + '<button type="button" onclick="obaRemoverFaixa(this)"'
       + ' style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:14px;line-height:1;padding:0 4px">&times;</button>';
     container.appendChild(linha);
   };
@@ -4291,16 +4299,18 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       if (!nome) return;
       const desc  = (odiv.querySelector('[id$="-desc"]')?.value||'').trim()||null;
       const vunit = parseFloat(odiv.querySelector('[id$="-vunit"]')?.value)||null;
-      // Coletar faixas dinâmicas (linhas .oba-faixa-linha)
       const faixas = [];
       odiv.querySelectorAll('.oba-faixa-linha').forEach(function(linha) {
+        const deEl    = linha.querySelector('.oba-faixa-de');
         const ateEl   = linha.querySelector('.oba-faixa-ate');
         const precoEl = linha.querySelector('.oba-faixa-preco');
         const preco   = parseFloat(precoEl?.value)||0;
-        if (!preco) return; // ignorar linha sem preço
-        const ateRaw  = ateEl?.value?.trim();
-        const ate     = (ateRaw === '' || ateRaw == null) ? null : parseInt(ateRaw);
-        faixas.push({ate, preco});
+        if (!preco) return;
+        const deRaw  = deEl?.value?.trim();
+        const ateRaw = ateEl?.value?.trim();
+        const de  = (deRaw  === '' || deRaw  == null) ? 1    : parseInt(deRaw);
+        const ate = (ateRaw === '' || ateRaw == null) ? null : parseInt(ateRaw);
+        faixas.push({de, ate, preco});
       });
       options.push({option_id: optId, idx, nome, descricao: desc, valor_unit: vunit, faixas});
     });
