@@ -3515,6 +3515,7 @@ body{background:${FUNDO};font-family:'Plus Jakarta Sans',system-ui,sans-serif;co
   }
 }`;
 
+  const obsHtml = proposal.observacoes ? "<p class=\"rodape-obs\">"+proposal.observacoes+"</p>" : "";
   const corpValidadeHtml = validade ? "<p class=\"rodape-info\">Proposta v\u00e1lida at\u00e9 <strong>"+validade+"</strong></p>" : "";
   const corpWppHtml = obaWpp  ? "<p class=\"rodape-info\"><a href=\"https://wa.me/55"+obaWpp+"\" class=\"rodape-wpp\">D\u00favidas? Fale pelo WhatsApp</a></p>" : "";
 
