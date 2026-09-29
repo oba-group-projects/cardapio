@@ -3381,31 +3381,30 @@ body{background:${FUNDO};font-family:'Plus Jakarta Sans',system-ui,sans-serif;co
   flex:1;display:flex;flex-direction:column;
   justify-content:center   /* centra verticalmente */
 }
-.pg0-logo{height:32px;object-fit:contain;opacity:.55;margin-bottom:20px}
+/* Logo tipografia */
+.pg0-logo-txt{
+  font-family:'Cormorant Garamond',Georgia,serif;
+  font-size:26px;font-style:italic;font-weight:400;
+  color:${VERDE};letter-spacing:.5px;
+  margin-bottom:22px;display:block
+}
+/* Eyebrow + nome empresa */
 .pg0-eyebrow{
   font-size:9px;font-weight:700;letter-spacing:4px;
-  text-transform:uppercase;color:${VERDE};opacity:.65;
-  margin-bottom:20px;display:block
+  text-transform:uppercase;color:${VERDE};opacity:.6;
+  margin-bottom:8px;display:block
 }
-/* Ambos os parágrafos em Plus Jakarta Sans — ponto 1 */
-.pg0-p1{
-  font-size:clamp(16px,4.2vw,18px);font-weight:500;
-  color:${TXT};line-height:1.75;margin-bottom:14px
+.pg0-empresa{
+  font-size:clamp(20px,5.5vw,26px);font-weight:700;
+  color:${TXT};line-height:1.2;margin-bottom:20px
 }
-.pg0-p1-div{
-  border:none;border-top:1px solid ${BORDA};
-  width:40px;margin:6px 0 14px
+.pg0-sep{border:none;border-top:1px solid ${BORDA};width:40px;margin:0 0 20px}
+/* Ambos os paragrafos: mesmo estilo, ponto 1 */
+.pg0-p{
+  font-size:clamp(14px,3.8vw,15px);font-weight:400;
+  color:#3D5A48;line-height:1.85;margin-bottom:14px
 }
-.pg0-p2{
-  font-size:clamp(14px,3.6vw,16px);font-weight:400;
-  color:#4A6A54;line-height:1.8;margin-bottom:0
-}
-/* Sem chips — ponto 2: .pg0-chips não existe mais */
-.pg0-para{
-  font-size:12px;font-weight:500;color:${VERDE};
-  opacity:.6;margin-top:14px
-}
-.pg0-foot{
+.pg0-p:last-of-type{margin-bottom:0}
   padding:24px 28px 36px;
   border-top:1px solid ${BORDA};margin-top:24px
 }
@@ -3557,13 +3556,12 @@ body{background:${FUNDO};font-family:'Plus Jakarta Sans',system-ui,sans-serif;co
     background:#fff!important;page-break-after:always
   }
   .pg0-inner{padding:0;justify-content:flex-start;display:block}
-  .pg0-logo{height:28px;margin-bottom:18pt;opacity:1}
-  .pg0-eyebrow{font-size:7pt;margin-bottom:10pt;opacity:1;color:${VERDE}}
-  .pg0-p1{font-size:12pt;color:#1A1A1A;margin-bottom:8pt}
-  .pg0-p1-div{display:block;margin:6pt 0 12pt;border-top:1px solid #DDD;width:40px}
-  .pg0-p2{font-size:11pt;color:#444;margin-bottom:0}
-  .pg0-para{font-size:9pt;color:${VERDE};opacity:.8;margin-top:10pt}
-  .pg0-foot{display:block!important;border-top:1px solid #DDD;padding:10pt 0 0;margin-top:14pt}
+  .pg0-inner{padding:0;justify-content:flex-start;display:block}
+  .pg0-logo-txt{font-size:20pt;margin-bottom:14pt;color:${VERDE}}
+  .pg0-eyebrow{font-size:7pt;margin-bottom:6pt;opacity:1;color:${VERDE}}
+  .pg0-empresa{font-size:16pt;color:#1A1A1A;margin-bottom:12pt}
+  .pg0-sep{display:block;margin:0 0 12pt;border-top:1px solid #DDD;width:40px}
+  .pg0-p{font-size:11pt;color:#3D3D3D;margin-bottom:8pt;line-height:1.7}
   .pg0-btn{display:none!important}
   .pg0-sign{display:none!important}
 
@@ -3598,23 +3596,22 @@ body{background:${FUNDO};font-family:'Plus Jakarta Sans',system-ui,sans-serif;co
     +"<link href=\"https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n"
     +"<style>"+css+"</style>\n</head>\n<body>\n<div class=\"wrap\">\n\n"
 
-    // PG0 — sem chips, ambos parágrafos iguais, 1 tela
+    // PG0 — logo tipografica, eyebrow + nome empresa, paragrafos uniformes
     +"<div id=\"pg0\">\n"
     +"  <div class=\"pg0-inner\">\n"
-    +"    <img class=\"pg0-logo\" src=\"https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png\" alt=\"Oba Doceria\" onerror=\"this.style.display='none'\">\n"
+    +"    <span class=\"pg0-logo-txt\">Oba!</span>\n"
     +"    <span class=\"pg0-eyebrow\">Proposta Exclusiva</span>\n"
-    +"    <p class=\"pg0-p1\">"+p1+"</p>\n"
-    +"    <hr class=\"pg0-p1-div\">\n"
-    +"    <p class=\"pg0-p2\">"+p2+"</p>\n"
-    +(nomeEmpresa?"    <p class=\"pg0-para\">Preparado especialmente para "+nomeEmpresa+"</p>\n":"")
+    +(nomeEmpresa?"    <h1 class=\"pg0-empresa\">"+nomeEmpresa+"</h1>\n":"")
+    +"    <hr class=\"pg0-sep\">\n"
+    +"    <p class=\"pg0-p\">"+p1+"</p>\n"
+    +"    <p class=\"pg0-p\">"+p2+"</p>\n"
     +"  </div>\n"
     +"  <div class=\"pg0-foot\">\n"
     +"    <span class=\"pg0-sign\">Feito com cuidado. Servido com amor.</span>\n"
     +"    <button class=\"pg0-btn\" onclick=\"obaShowPage(1)\">Ver o que preparamos &rarr;</button>\n"
     +"  </div>\n"
     +"</div>\n\n"
-
-    // PG1 — índice visual
+// PG1 — índice visual
     +"<div id=\"pg1\">\n"
     // header off-white
     +"  <div class=\"pg1-hdr\">\n"
