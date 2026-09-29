@@ -3191,9 +3191,55 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
   // ---------- LISTAGEM ----------
   async function carregarLista() {
     const tbody = document.getElementById('proposals-tbody');
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#888">Carregando...</td></tr>';
-
-
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#888">Carregando...</td></tr>';
+    try {
+      const r = await fetch('/api/proposals');
+      const data = await r.json();
+      if (!data.ok || !data.proposals.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#888">Nenhuma proposta ainda. Clique em "+ Nova Proposta" para come\u00e7ar.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.proposals.map(p => {
+        const tmpl = p.template || 'evento';
+        const tmplLabels = {evento:'\uD83D\uDCC5 Evento', corporativo:'\uD83C\uDFE2 Corporativo', sazonal:'\uD83C\uDF81 Sazonal'};
+        const tmplColors = {evento:'#C8922A', corporativo:'#2A5240', sazonal:'#8B1A2F'};
+        const tc = tmplColors[tmpl]||'#888';
+        const tl = tmplLabels[tmpl]||tmpl;
+        const badge = '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:'+tc+'18;color:'+tc+';white-space:nowrap">'+tl+'</span>';
+        let dataDetalhe = '\u2014';
+        if (tmpl === 'evento')      dataDetalhe = p.data_evento ? new Date(p.data_evento+'T12:00:00').toLocaleDateString('pt-BR') : '\u2014';
+        else if (tmpl === 'corporativo') dataDetalhe = p.empresa || p.cliente || '\u2014';
+        else if (tmpl === 'sazonal')     dataDetalhe = p.data_comemorativa || p.empresa || '\u2014';
+        const detalheNum = (tmpl==='evento'&&p.convidados) ? '<br><span style="font-size:10px;color:#888">'+p.convidados+' pessoas</span>' : '';
+        const statusSel = ['rascunho','enviada','em_negociacao','aceita','recusada','arquivada']
+          .map(s => '<option value="'+s+'" '+(s===p.status?'selected':'')+'>'+statusLabel(s)+'</option>').join('');
+        const sc = statusColor(p.status);
+        const pid = p.proposal_id;
+        const cn  = (p.cliente||'').replace(/["']/g,'');
+        const en  = (p.empresa||p.cliente||'').replace(/["']/g,'');
+        const excluirBtn = p.status==='rascunho'
+          ? '<button class="secondary" style="padding:4px 10px;font-size:11px;background:#fee2e2;color:#dc2626;border-color:#fca5a5" onclick="obaProposalExcluir(&quot;'+pid+'&quot;,&quot;'+cn+'&quot;)">\uD83D\uDDD1 Excluir</button>'
+          : '';
+        return '<tr>'
+          +'<td>'+badge+'</td>'
+          +'<td><strong>'+cn+'</strong>'+detalheNum+'</td>'
+          +'<td style="font-size:12px">'+dataDetalhe+'</td>'
+          +'<td><select title="Alterar status" onchange="obaProposalAlterarStatus(&quot;'+pid+'&quot;,this.value,this)"'
+          +' style="font-size:11px;padding:3px 8px;border-radius:12px;border:1.5px solid '+sc+';background:'+sc+'18;color:'+sc+';font-weight:600;cursor:pointer;outline:none;appearance:auto">'+statusSel+'</select></td>'
+          +'<td>'+new Date(p.criado_em).toLocaleDateString('pt-BR')+'</td>'
+          +'<td style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">'
+          +'<button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaProposalEditar(&quot;'+pid+'&quot;)">\u270F\uFE0F Editar</button>'
+          +'<button class="secondary" style="padding:4px 10px;font-size:11px;background:#25d366;color:#fff;border:none" onclick="obaProposalEnviarWhatsAppById(&quot;'+pid+'&quot;)">\uD83D\uDCF1 WhatsApp</button>'
+          +'<button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaProposalCopiarLinkById(&quot;'+pid+'&quot;)">\uD83D\uDD17 Link</button>'
+          +'<button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaProposalAbrirPDFById(&quot;'+pid+'&quot;)">\uD83D\uDCC4 PDF</button>'
+          +'<button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaProposalDuplicar(&quot;'+pid+'&quot;,&quot;'+en+'&quot;)" title="Duplicar">\u29C5 Duplicar</button>'
+          +excluirBtn
+          +'</td></tr>';
+      }).join('');
+    } catch(e) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#dc2626">Erro ao carregar propostas.</td></tr>';
+    }
+  }
   // ---------- NAVEGAÇÃO EDITOR / LISTA ----------
   function mostrarEditor() {
     document.getElementById('proposals-lista').style.display = 'none';
