@@ -3241,16 +3241,25 @@ function obaShowPage(n){
 //      label curto "OPÇÕES"; rodapé separado com PDF outline.
 // Pg2+: header off-white+borda.
 // ============================================================
+// ============================================================
+// PAGINA PUBLICA — CORPORATIVO (12B-rev5c)
+// 1. Logo real PNG centralizada, opacity:1, height:48px
+// 2. Assinatura em Cormorant italico suave
+// 3. Pg1: sem observacoes, validade+WhatsApp em 1 linha
+// 4. Pg1: tipografia maior
+// 5. Pg1: sem logo no header
+// 6. Pg2+: conteudo centralizado apos a foto
+// ============================================================
 async function obaHandlePropostaCorporativo(proposal, obaWpp, env, propId) {
   const R = (v) => { const n=Number(v||0).toFixed(2),[i,d]=n.split("."); return "R$\u00a0"+i.replace(/\B(?=(\d{3})+(?!\d))/g,".")+","+d; };
   const MESES=["janeiro","fevereiro","mar\u00e7o","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
   const fmtD =(d)=>{ if(!d)return null; try{const[y,m,dy]=d.split("-");return parseInt(dy)+" de "+MESES[parseInt(m)-1]+" de "+y;}catch{return d;} };
-  const fmtDT=(d)=>{ if(!d)return null; try{const[dt,hr]=d.split("T");const[y,m,dy]=dt.split("-");return parseInt(dy)+" de "+MESES[parseInt(m)-1]+(hr?" \u00e0s "+hr.slice(0,5):"");}catch{return d;} };
 
   const VERDE = "#2A5240";
   const BORDA = "#C8E0D0";
   const FUNDO = "#F5F8F5";
   const TXT   = "#1A2E22";
+  const LOGO  = "https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png";
 
   const nomeEmpresa = (proposal.empresa||proposal.cliente||"").trim();
   const options     = (proposal.options&&proposal.options.length) ? proposal.options : [];
@@ -3258,7 +3267,7 @@ async function obaHandlePropostaCorporativo(proposal, obaWpp, env, propId) {
   const validade    = fmtD(proposal.validade);
   const qtd         = proposal.qtd_solicitada;
 
-  // ---- Textos pg0 — ambos em Plus Jakarta Sans ----
+  // ---- Textos pg0 ----
   let p1, p2;
   if (qtd && nomeEmpresa) {
     const qtdFmt = Number(qtd).toLocaleString("pt-BR");
@@ -3274,9 +3283,8 @@ async function obaHandlePropostaCorporativo(proposal, obaWpp, env, propId) {
 
   // ---- Índice pg1 ----
   const indiceHtml = options.map(function(opt, oi){
-    const preco   = Number(opt.valor_unit||0);
-    const faixas  = opt.faixas||[];
-    const precoMin = faixas.length ? faixas.reduce((a,f)=>f.preco<a?f.preco:a, faixas[0].preco) : preco;
+    const faixas   = opt.faixas||[];
+    const precoMin = faixas.length ? faixas.reduce((a,f)=>f.preco<a?f.preco:a, faixas[0].preco) : Number(opt.valor_unit||0);
     const precoLabel = precoMin>0
       ? R(precoMin)+(faixas.length?" <span class=\"idx-unit\">/ un. a partir</span>":" <span class=\"idx-unit\">/ un.</span>")
       : "<span style=\"color:#AAA\">sob consulta</span>";
@@ -3299,12 +3307,12 @@ async function obaHandlePropostaCorporativo(proposal, obaWpp, env, propId) {
     );
   }).join("\n");
 
-  // ---- Páginas de detalhe (pg2, pg3...) ----
+  // ---- Páginas de detalhe ----
   const detalhePages = options.map(function(opt, oi){
-    const faixas  = opt.faixas||[];
-    const imgs    = opt.medias||[];
-    const prevOi  = oi > 0 ? oi-1 : null;
-    const nextOi  = oi < numOpts-1 ? oi+1 : null;
+    const faixas = opt.faixas||[];
+    const imgs   = opt.medias||[];
+    const prevOi = oi > 0 ? oi-1 : null;
+    const nextOi = oi < numOpts-1 ? oi+1 : null;
 
     const heroHtml = imgs.length
       ? "<img src=\"/api/proposals/"+propId+"/media/"+imgs[0].media_id+"/dados\" class=\"det-hero\" loading=\"lazy\" alt=\""+(opt.nome||"")+"\">"
@@ -3339,14 +3347,15 @@ async function obaHandlePropostaCorporativo(proposal, obaWpp, env, propId) {
 
     return (
       "<div id=\"pg"+(oi+2)+"\" class=\"det-page\" style=\"display:none\">"
-      // header off-white — ponto 7
+      // header off-white, sem logo (ponto 5), só botão + contador
       +"<header class=\"det-header\">"
       +"  <button class=\"det-back\" onclick=\"obaShowPage(1)\">&#8592; Todas as op\u00e7\u00f5es</button>"
       +"  <span class=\"det-counter\">"+(oi+1)+" de "+numOpts+"</span>"
       +"</header>"
-      // conteúdo
+      // foto hero
       +heroHtml
       +galeriaExtra
+      // conteúdo centralizado (ponto 6)
       +"<div class=\"det-corpo\">"
       +  "<span class=\"det-num\">Op\u00e7\u00e3o "+(oi+1)+"</span>"
       +  "<h2 class=\"det-nome\">"+(opt.nome||("Op\u00e7\u00e3o "+(oi+1)))+"</h2>"
@@ -3359,10 +3368,13 @@ async function obaHandlePropostaCorporativo(proposal, obaWpp, env, propId) {
     );
   }).join("\n");
 
-  // ---- Rodapé pg1 ----
-  const obsHtml      = proposal.observacoes ? "<p class=\"rod-obs\">"+proposal.observacoes+"</p>" : "";
-  const corpValidadeHtml = validade ? "<span class=\"rod-item\">V\u00e1lida at\u00e9 <strong>"+validade+"</strong></span>" : "";
-  const corpWppHtml  = obaWpp ? "<span class=\"rod-item\"><a href=\"https://wa.me/55"+obaWpp+"\" class=\"rod-wpp\">D\u00favidas? WhatsApp</a></span>" : "";
+  // ---- Rodapé pg1 — sem obs, validade+WhatsApp em 1 linha (ponto 3) ----
+  const corpValidadeHtml = validade ? "V\u00e1lida at\u00e9 <strong>"+validade+"</strong>" : "";
+  const corpWppHtml      = obaWpp   ? "<a href=\"https://wa.me/55"+obaWpp+"\" class=\"rod-wpp\">D\u00favidas? WhatsApp</a>" : "";
+  const rodMetaHtml = (corpValidadeHtml||corpWppHtml)
+    ? "<p class=\"rod-meta\">"+(corpValidadeHtml+(corpValidadeHtml&&corpWppHtml?" &middot; ":"")+corpWppHtml)+"</p>"
+    : "";
+  const obsHtml = "";  // removido de pg1 (ponto 3)
 
   // ---- CSS ----
   const css = `
@@ -3372,171 +3384,80 @@ body{background:${FUNDO};font-family:'Plus Jakarta Sans',system-ui,sans-serif;co
 .wrap{max-width:620px;margin:0 auto;background:${FUNDO}}
 
 /* ===================== PG0 ===================== */
-#pg0{
-  min-height:100svh;display:flex;flex-direction:column;
-  background:#F5F8F5
-}
-.pg0-inner{
-  padding:32px 28px 0;
-  flex:1;display:flex;flex-direction:column;
-  justify-content:center   /* centra verticalmente */
-}
-/* Logo tipografia */
-.pg0-logo-txt{
-  font-family:'Cormorant Garamond',Georgia,serif;
-  font-size:26px;font-style:italic;font-weight:400;
-  color:${VERDE};letter-spacing:.5px;
-  margin-bottom:22px;display:block
-}
-/* Eyebrow + nome empresa */
-.pg0-eyebrow{
-  font-size:9px;font-weight:700;letter-spacing:4px;
-  text-transform:uppercase;color:${VERDE};opacity:.6;
-  margin-bottom:8px;display:block
-}
-.pg0-empresa{
-  font-size:clamp(20px,5.5vw,26px);font-weight:700;
-  color:${TXT};line-height:1.2;margin-bottom:20px
-}
-.pg0-sep{border:none;border-top:1px solid ${BORDA};width:40px;margin:0 0 20px}
-/* Ambos os paragrafos: mesmo estilo, ponto 1 */
-.pg0-p{
-  font-size:clamp(14px,3.8vw,15px);font-weight:400;
-  color:#3D5A48;line-height:1.85;margin-bottom:14px
-}
+#pg0{min-height:100svh;display:flex;flex-direction:column;background:#F5F8F5}
+.pg0-inner{padding:32px 28px 0;flex:1;display:flex;flex-direction:column;justify-content:center}
+/* Logo real centralizada — ponto 1 */
+.pg0-logo{height:48px;object-fit:contain;opacity:1;display:block;margin:0 auto 28px}
+.pg0-eyebrow{font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:${VERDE};opacity:.6;margin-bottom:8px;display:block;text-align:center}
+.pg0-empresa{font-size:clamp(22px,5.8vw,28px);font-weight:700;color:${TXT};line-height:1.2;margin-bottom:20px;text-align:center}
+.pg0-sep{border:none;border-top:1px solid ${BORDA};width:40px;margin:0 auto 20px}
+.pg0-p{font-size:clamp(14px,3.8vw,15px);font-weight:400;color:#3D5A48;line-height:1.85;margin-bottom:14px}
 .pg0-p:last-of-type{margin-bottom:0}
-  padding:24px 28px 36px;
-  border-top:1px solid ${BORDA};margin-top:24px
-}
+.pg0-foot{padding:24px 28px 36px;border-top:1px solid ${BORDA};margin-top:24px}
+/* Assinatura Cormorant italic suave — ponto 2 */
 .pg0-sign{
   font-family:'Cormorant Garamond',Georgia,serif;
-  font-size:12px;font-style:italic;color:${VERDE};
-  opacity:.4;display:block;text-align:center;margin-bottom:16px
+  font-size:14px;font-style:italic;font-weight:400;
+  color:${VERDE};opacity:.5;
+  display:block;text-align:center;margin-bottom:18px
 }
-.pg0-btn{
-  display:block;width:100%;
-  background:${VERDE};color:#F5F8F5;
-  font-family:'Plus Jakarta Sans',sans-serif;
-  font-size:13px;font-weight:700;letter-spacing:.8px;
-  padding:16px;border-radius:12px;border:none;
-  cursor:pointer;text-align:center;text-transform:uppercase
-}
+.pg0-btn{display:block;width:100%;background:${VERDE};color:#F5F8F5;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:.8px;padding:16px;border-radius:12px;border:none;cursor:pointer;text-align:center;text-transform:uppercase}
 
 /* ===================== PG1 ===================== */
 #pg1{display:none;background:${FUNDO}}
-/* header off-white — ponto 4 */
-.pg1-hdr{
-  background:#fff;border-bottom:1px solid ${BORDA};
-  padding:10px 20px;display:flex;align-items:center;
-  justify-content:space-between;
-  position:sticky;top:0;z-index:50
-}
-.pg1-hdr-logo{height:20px;object-fit:contain;opacity:.55}
-.btn-inicio{
-  background:none;border:1.5px solid ${BORDA};
-  border-radius:20px;padding:4px 12px;
-  font-size:11px;font-weight:600;color:${VERDE};cursor:pointer
-}
-/* título pg1 — ponto 5 */
-.pg1-intro{padding:22px 24px 6px}
-.pg1-empresa{
-  font-family:'Cormorant Garamond',Georgia,serif;
-  font-size:clamp(22px,5.5vw,28px);font-weight:600;
-  color:${TXT};line-height:1.2;margin-bottom:6px
-}
-.pg1-sub{
-  font-family:'Cormorant Garamond',Georgia,serif;
-  font-size:15px;font-weight:400;font-style:italic;
-  color:#7A9A88
-}
-/* label curto — ponto 5 */
-.pg1-secao{
-  padding:16px 24px 8px;font-size:9px;font-weight:700;
-  text-transform:uppercase;letter-spacing:2.5px;
-  color:${VERDE};opacity:.55
-}
-/* cards do índice */
-.idx-card{
-  display:flex;align-items:center;gap:12px;
-  margin:0 16px 8px;padding:12px;
-  background:#fff;border-radius:12px;
-  border:1px solid ${BORDA};cursor:pointer;
-  transition:box-shadow .15s
-}
-.idx-card:hover,.idx-card:active{box-shadow:0 2px 12px rgba(42,82,64,.12)}
-.idx-img{width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid ${BORDA};flex-shrink:0}
+.pg1-hdr{background:#fff;border-bottom:1px solid ${BORDA};padding:10px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.btn-inicio{background:none;border:1.5px solid ${BORDA};border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;color:${VERDE};cursor:pointer}
+/* Sem logo no header pg1 — ponto 5: espaço reservado para balancear visualmente */
+.pg1-hdr-spacer{width:80px}
+/* tipografia maior — ponto 4 */
+.pg1-intro{padding:24px 24px 6px}
+.pg1-empresa{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(26px,6.5vw,34px);font-weight:600;color:${TXT};line-height:1.15;margin-bottom:7px}
+.pg1-sub{font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;font-weight:400;font-style:italic;color:#7A9A88}
+.pg1-secao{padding:18px 24px 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:${VERDE};opacity:.55}
+/* cards maiores */
+.idx-card{display:flex;align-items:center;gap:13px;margin:0 16px 9px;padding:13px;background:#fff;border-radius:12px;border:1px solid ${BORDA};cursor:pointer;transition:box-shadow .15s}
+.idx-card:hover,.idx-card:active{box-shadow:0 2px 14px rgba(42,82,64,.13)}
+.idx-img{width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid ${BORDA};flex-shrink:0}
 .idx-empty{background:#EDF3EF}
 .idx-body{flex:1;min-width:0}
-.idx-num{font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:${VERDE};opacity:.6;display:block;margin-bottom:2px}
-.idx-nome{font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;font-weight:600;color:${TXT};line-height:1.2;margin-bottom:2px}
+.idx-num{font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:${VERDE};opacity:.6;display:block;margin-bottom:3px}
+.idx-nome{font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;font-weight:600;color:${TXT};line-height:1.2;margin-bottom:3px}
 .idx-desc{font-size:11px;color:#9AB0A0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
-.idx-preco{font-size:12px;font-weight:600;color:${VERDE}}
+.idx-preco{font-size:13px;font-weight:600;color:${VERDE}}
 .idx-unit{font-size:10px;font-weight:400;color:#9AB0A0}
 .idx-chevron{font-size:14px;color:${BORDA};flex-shrink:0}
-
-/* rodapé pg1 — ponto 6: separador + PDF outline */
+/* rodapé pg1 simplificado — ponto 3 */
 .pg1-sep{border:none;border-top:1px solid ${BORDA};margin:20px 24px 0}
-.pg1-rod{padding:14px 24px 32px}
-.rod-obs{font-size:12px;color:#9AB0A0;font-style:italic;line-height:1.5;margin-bottom:8px}
-.rod-meta{display:flex;flex-wrap:wrap;gap:8px 16px;margin-bottom:12px}
-.rod-item{font-size:11px;color:#A0BAA8}
-.rod-item strong{color:#5A7A62}
+.pg1-rod{padding:12px 24px 32px}
+.rod-meta{font-size:11px;color:#A0BAA8;margin-bottom:10px}
+.rod-meta strong{color:#5A7A62}
 .rod-wpp{color:${VERDE};font-weight:600;text-decoration:none}
-.rod-brand{font-family:'Cormorant Garamond',Georgia,serif;font-size:12px;font-style:italic;color:#C8DED0;display:block;margin-bottom:10px}
-/* PDF como outline — ponto 6 */
-.btn-pdf{
-  display:block;width:100%;
-  background:transparent;color:${VERDE};
-  border:1.5px solid ${BORDA};border-radius:10px;
-  padding:10px 24px;font-family:'Plus Jakarta Sans',sans-serif;
-  font-size:12px;font-weight:600;cursor:pointer;text-align:center
-}
+.rod-brand{font-family:'Cormorant Garamond',Georgia,serif;font-size:13px;font-style:italic;color:#C0D4C8;display:block;margin-bottom:12px}
+.btn-pdf{display:block;width:100%;background:transparent;color:${VERDE};border:1.5px solid ${BORDA};border-radius:10px;padding:10px 24px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;text-align:center}
 
 /* ===================== DETALHE ===================== */
 .det-page{background:${FUNDO};display:flex;flex-direction:column;min-height:100svh}
-/* header off-white — ponto 7 */
-.det-header{
-  background:#fff;border-bottom:1px solid ${BORDA};
-  padding:10px 20px;display:flex;align-items:center;
-  justify-content:space-between;
-  position:sticky;top:0;z-index:50
-}
-.det-back{
-  background:none;border:1.5px solid ${BORDA};
-  border-radius:20px;padding:4px 12px;
-  font-size:11px;font-weight:600;color:${VERDE};cursor:pointer
-}
+.det-header{background:#fff;border-bottom:1px solid ${BORDA};padding:10px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.det-back{background:none;border:1.5px solid ${BORDA};border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;color:${VERDE};cursor:pointer}
 .det-counter{font-size:11px;color:#9AB0A0;font-weight:500}
-.det-hero{width:100%;max-height:320px;object-fit:cover;display:block}
+.det-hero{width:100%;max-height:340px;object-fit:cover;display:block}
 .det-galeria{display:flex;gap:6px;padding:8px 20px 0}
 .det-gal-img{width:calc(33.33% - 4px);aspect-ratio:1;object-fit:cover;border-radius:8px;border:1px solid ${BORDA}}
-.det-corpo{padding:22px 24px 24px;flex:1}
-.det-num{font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:${VERDE};opacity:.6;display:block;margin-bottom:6px}
-.det-nome{font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:600;color:${TXT};line-height:1.2;margin-bottom:6px}
-.det-desc{font-size:13px;color:#7A9A84;font-style:italic;margin-bottom:18px;line-height:1.5}
-.faixas-bloco{margin-bottom:20px}
+/* conteúdo centralizado — ponto 6 */
+.det-corpo{padding:24px 28px 28px;text-align:center;flex:1}
+.det-num{font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:${VERDE};opacity:.6;display:block;margin-bottom:8px}
+.det-nome{font-family:'Cormorant Garamond',Georgia,serif;font-size:28px;font-weight:600;color:${TXT};line-height:1.2;margin-bottom:8px}
+.det-desc{font-size:13px;color:#7A9A84;font-style:italic;margin-bottom:20px;line-height:1.5}
+.faixas-bloco{margin-bottom:22px;text-align:left}
 .faixas-titulo{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${VERDE};opacity:.6;margin-bottom:10px}
 .faixas-tab{width:100%;border-collapse:collapse}
 .faixas-tab td{padding:9px 0;border-bottom:1px solid #E8F0EA;font-size:13px}
 .ft-l{color:#3D5A48}
 .ft-p{text-align:right;font-weight:600;color:${TXT}}
 .ft-un{font-size:10px;font-weight:400;color:#9AB0A0}
-.cta-btn{
-  display:block;padding:15px;border-radius:12px;
-  text-align:center;background:${VERDE};color:#fff;
-  font-weight:700;font-size:13px;text-decoration:none;
-  letter-spacing:.3px
-}
-.det-nav{
-  display:flex;justify-content:space-between;
-  align-items:center;padding:12px 20px 32px;gap:10px
-}
-.nav-btn{
-  background:none;border:1.5px solid ${BORDA};
-  border-radius:20px;padding:7px 14px;
-  font-size:11px;font-weight:600;color:${VERDE};cursor:pointer;
-  white-space:nowrap;max-width:46%;overflow:hidden;text-overflow:ellipsis
-}
+.cta-btn{display:block;padding:15px;border-radius:12px;text-align:center;background:${VERDE};color:#fff;font-weight:700;font-size:14px;text-decoration:none;letter-spacing:.3px}
+.det-nav{display:flex;justify-content:space-between;align-items:center;padding:12px 20px 32px;gap:10px}
+.nav-btn{background:none;border:1.5px solid ${BORDA};border-radius:20px;padding:7px 14px;font-size:11px;font-weight:600;color:${VERDE};cursor:pointer;white-space:nowrap;max-width:46%;overflow:hidden;text-overflow:ellipsis}
 .nav-right{margin-left:auto;text-align:right}
 
 /* ===================== PRINT ===================== */
@@ -3547,39 +3468,21 @@ body{background:${FUNDO};font-family:'Plus Jakarta Sans',system-ui,sans-serif;co
   .det-header,.det-nav,.cta-btn,.btn-pdf,
   .pg1-secao,.pg1-rod,.pg1-sep,
   #pg1{display:none!important}
-
   body{background:#fff;font-size:11pt}
   .wrap{max-width:100%;margin:0;background:#fff}
-
-  #pg0{
-    display:block!important;min-height:0!important;
-    background:#fff!important;page-break-after:always
-  }
+  #pg0{display:block!important;min-height:0!important;background:#fff!important;page-break-after:always}
   .pg0-inner{padding:0;justify-content:flex-start;display:block}
-  .pg0-inner{padding:0;justify-content:flex-start;display:block}
-  .pg0-logo-txt{font-size:20pt;margin-bottom:14pt;color:${VERDE}}
-  .pg0-eyebrow{font-size:7pt;margin-bottom:6pt;opacity:1;color:${VERDE}}
+  .pg0-logo{height:36px;margin:0 auto 16pt;opacity:1;display:block}
+  .pg0-eyebrow{font-size:7pt;margin-bottom:5pt;opacity:1;color:${VERDE}}
   .pg0-empresa{font-size:16pt;color:#1A1A1A;margin-bottom:12pt}
-  .pg0-sep{display:block;margin:0 0 12pt;border-top:1px solid #DDD;width:40px}
+  .pg0-sep{display:block;margin:0 auto 12pt;border-top:1px solid #DDD;width:40px}
   .pg0-p{font-size:11pt;color:#3D3D3D;margin-bottom:8pt;line-height:1.7}
-  .pg0-btn{display:none!important}
-  .pg0-sign{display:none!important}
-
-  .det-page{
-    display:block!important;min-height:0!important;
-    background:#fff!important;page-break-before:always
-  }
-  .det-hero{
-    width:100%;max-height:190pt;object-fit:cover;
-    border:1px solid #EEE;border-radius:3pt;
-    display:block;margin-bottom:10pt
-  }
+  .pg0-foot{display:block!important;border-top:1px solid #DDD;padding:10pt 0 0;margin-top:14pt}
+  .det-page{display:block!important;min-height:0!important;background:#fff!important;page-break-before:always}
+  .det-hero{width:100%;max-height:190pt;object-fit:cover;border:1px solid #EEE;border-radius:3pt;display:block;margin-bottom:10pt}
   .det-galeria{display:flex;gap:5pt;margin-bottom:10pt}
-  .det-gal-img{
-    width:calc(33.33% - 4pt);aspect-ratio:1;
-    object-fit:cover;border-radius:3pt;border:1px solid #EEE
-  }
-  .det-corpo{padding:0}
+  .det-gal-img{width:calc(33.33% - 4pt);aspect-ratio:1;object-fit:cover;border-radius:3pt;border:1px solid #EEE}
+  .det-corpo{padding:0;text-align:left}
   .det-num{font-size:7pt;color:${VERDE};opacity:1;margin-bottom:4pt}
   .det-nome{font-size:18pt;color:#1A1A1A;margin-bottom:4pt}
   .det-desc{font-size:10pt;color:#666;margin-bottom:10pt}
@@ -3596,10 +3499,10 @@ body{background:${FUNDO};font-family:'Plus Jakarta Sans',system-ui,sans-serif;co
     +"<link href=\"https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n"
     +"<style>"+css+"</style>\n</head>\n<body>\n<div class=\"wrap\">\n\n"
 
-    // PG0 — logo tipografica, eyebrow + nome empresa, paragrafos uniformes
+    // PG0 — logo real, sem chips, parágrafos uniformes
     +"<div id=\"pg0\">\n"
     +"  <div class=\"pg0-inner\">\n"
-    +"    <span class=\"pg0-logo-txt\">Oba!</span>\n"
+    +"    <img class=\"pg0-logo\" src=\""+LOGO+"\" alt=\"Oba Doceria\" onerror=\"this.style.display='none'\">\n"
     +"    <span class=\"pg0-eyebrow\">Proposta Exclusiva</span>\n"
     +(nomeEmpresa?"    <h1 class=\"pg0-empresa\">"+nomeEmpresa+"</h1>\n":"")
     +"    <hr class=\"pg0-sep\">\n"
@@ -3607,44 +3510,37 @@ body{background:${FUNDO};font-family:'Plus Jakarta Sans',system-ui,sans-serif;co
     +"    <p class=\"pg0-p\">"+p2+"</p>\n"
     +"  </div>\n"
     +"  <div class=\"pg0-foot\">\n"
+    // assinatura Cormorant italic suave
     +"    <span class=\"pg0-sign\">Feito com cuidado. Servido com amor.</span>\n"
     +"    <button class=\"pg0-btn\" onclick=\"obaShowPage(1)\">Ver o que preparamos &rarr;</button>\n"
     +"  </div>\n"
     +"</div>\n\n"
-// PG1 — índice visual
+
+    // PG1 — sem logo no header, tipografia maior
     +"<div id=\"pg1\">\n"
-    // header off-white
     +"  <div class=\"pg1-hdr\">\n"
     +"    <button class=\"btn-inicio\" onclick=\"obaShowPage(0)\">\u2190 In\u00edcio</button>\n"
-    +"    <img class=\"pg1-hdr-logo\" src=\"https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png\" alt=\"Oba Doceria\" onerror=\"this.style.display='none'\">\n"
-    +"    <span style=\"width:70px\"></span>\n"   // spacer para centrar logo
+    +"    <span class=\"pg1-hdr-spacer\"></span>\n"
     +"  </div>\n"
-    // título — Cormorant com nome da empresa, sem "Proposta para"
     +"  <div class=\"pg1-intro\">\n"
     +(nomeEmpresa
       ?"    <h1 class=\"pg1-empresa\">"+nomeEmpresa+"</h1>\n"
       :"    <h1 class=\"pg1-empresa\">Nossa proposta</h1>\n")
     +(numOpts
-      ?"    <p class=\"pg1-sub\">"+( numOpts===1?"Uma op\u00e7\u00e3o elaborada":numOpts+" op\u00e7\u00f5es elaboradas")+" com muito cuidado para voc\u00ea</p>\n"
+      ?"    <p class=\"pg1-sub\">"+(numOpts===1?"Uma op\u00e7\u00e3o elaborada":numOpts+" op\u00e7\u00f5es elaboradas")+" com muito cuidado para voc\u00ea</p>\n"
       :"")
     +"  </div>\n"
-    // label curto
     +"  <p class=\"pg1-secao\">Op\u00e7\u00f5es</p>\n"
-    // cards
     +(indiceHtml||"  <p style=\"text-align:center;color:#9AB0A0;padding:32px;font-size:13px\">Nenhuma op\u00e7\u00e3o cadastrada.</p>")
-    // rodapé separado — ponto 6
+    // rodapé: só validade + WhatsApp numa linha, sem observações
     +"\n  <hr class=\"pg1-sep\">\n"
     +"  <div class=\"pg1-rod\">\n"
-    +obsHtml
-    +(corpValidadeHtml||corpWppHtml
-      ?"    <div class=\"rod-meta\">"+corpValidadeHtml+corpWppHtml+"</div>\n"
-      :"")
+    + rodMetaHtml
     +"    <span class=\"rod-brand\">Oba Doceria \u00b7 Um jeito doce de expressar felicidade</span>\n"
     +"    <button class=\"btn-pdf\" onclick=\"window.print()\">Salvar como PDF</button>\n"
     +"  </div>\n"
     +"</div>\n\n"
 
-    // páginas de detalhe
     + detalhePages
 
     +"\n</div>\n<script>\n"
