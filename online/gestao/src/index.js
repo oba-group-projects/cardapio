@@ -3371,9 +3371,7 @@ async function obaHandlePropostaCorporativo(proposal, obaWpp, env, propId) {
   // ---- Rodapé pg1 — sem obs, validade+WhatsApp em 1 linha (ponto 3) ----
   const corpValidadeHtml = validade ? "V\u00e1lida at\u00e9 <strong>"+validade+"</strong>" : "";
   const corpWppHtml      = obaWpp   ? "<a href=\"https://wa.me/55"+obaWpp+"\" class=\"rod-wpp\">D\u00favidas? WhatsApp</a>" : "";
-  const rodMetaHtml = (corpValidadeHtml||corpWppHtml)
-    ? "<p class=\"rod-meta\">"+(corpValidadeHtml+(corpValidadeHtml&&corpWppHtml?" &middot; ":"")+corpWppHtml)+"</p>"
-    : "";
+  const rodMetaHtml = ""; // validade removida; whatsapp vira botao dedicado
   const obsHtml = "";  // removido de pg1 (ponto 3)
 
   // ---- CSS ----
@@ -3437,6 +3435,7 @@ body{background:${FUNDO};font-family:'Plus Jakarta Sans',system-ui,sans-serif;co
 .btn-pdf{display:block;width:100%;background:${VERDE};color:#F5F8F5;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:.8px;padding:16px;border-radius:12px;border:none;cursor:pointer;text-align:center;text-transform:uppercase}
 
 /* ===================== DETALHE ===================== */
+.btn-wpp{display:block;width:100%;margin-top:10px;padding:14px;border-radius:12px;text-align:center;background:#25d366;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:.5px;text-decoration:none}
 .det-page{background:${FUNDO};display:flex;flex-direction:column;min-height:100svh;padding-top:14vh};display:flex;flex-direction:column;min-height:100svh}
 .det-header{background:#fff;border-bottom:1px solid ${BORDA};padding:10px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
 .det-back{background:none;border:1.5px solid ${BORDA};border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;color:${VERDE};cursor:pointer}
@@ -3539,6 +3538,7 @@ body{background:${FUNDO};font-family:'Plus Jakarta Sans',system-ui,sans-serif;co
     + rodMetaHtml
     +"    <span class=\"rod-brand\">Oba Doceria \u00b7 Um jeito doce de expressar felicidade</span>\n"
     +"    <button class=\"btn-pdf\" onclick=\"window.print()\">Salvar como PDF</button>\n"
+    +(obaWpp?"    <a href=\"https://wa.me/55"+obaWpp+"?text="+encodeURIComponent("D\u00favidas sobre a proposta para "+nomeEmpresa+"?")+"\" target=\"_blank\" class=\"btn-wpp\">D\u00favidas? Entre em contato</a>\n":"")
     +"  </div>\n"
     +"</div>\n\n"
 
