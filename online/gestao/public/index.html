@@ -3192,17 +3192,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
   async function carregarLista() {
     const tbody = document.getElementById('proposals-tbody');
     tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#888">Carregando...</td></tr>';
-    try {
-      const r = await fetch('/api/proposals');
-      const data = await r.json();
-      if (!data.ok || !data.proposals.length) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#888">Nenhuma proposta ainda. Clique em "+ Nova Proposta" para começar.</td></tr>';
-        return;
-      }
 
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#dc2626">Erro ao carregar propostas.</td></tr>';
-    }
-  }
 
   // ---------- NAVEGAÇÃO EDITOR / LISTA ----------
   function mostrarEditor() {
