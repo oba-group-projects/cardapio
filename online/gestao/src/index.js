@@ -3387,11 +3387,11 @@ body{background:${FUNDO};font-family:'Plus Jakarta Sans',system-ui,sans-serif;co
 #pg0{min-height:100svh;display:flex;flex-direction:column;background:#F5F8F5}
 .pg0-inner{padding:32px 28px 0;flex:1;display:flex;flex-direction:column;justify-content:center}
 /* Logo real centralizada — ponto 1 */
-.pg0-logo{height:48px;object-fit:contain;opacity:1;display:block;margin:0 auto 28px}
+.pg0-logo{height:64px;object-fit:contain;opacity:1;display:block;margin:0 auto 24px}
 .pg0-eyebrow{font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:${VERDE};opacity:.6;margin-bottom:8px;display:block;text-align:center}
 .pg0-empresa{font-size:clamp(22px,5.8vw,28px);font-weight:700;color:${TXT};line-height:1.2;margin-bottom:20px;text-align:center}
 .pg0-sep{border:none;border-top:1px solid ${BORDA};width:40px;margin:0 auto 20px}
-.pg0-p{font-size:clamp(14px,3.8vw,15px);font-weight:400;color:#3D5A48;line-height:1.85;margin-bottom:14px}
+.pg0-p{font-size:13px;font-weight:400;color:#3D5A48;line-height:1.7;margin-bottom:12px}
 .pg0-p:last-of-type{margin-bottom:0}
 .pg0-foot{padding:24px 28px 36px;border-top:1px solid ${BORDA};margin-top:24px}
 /* Assinatura Cormorant italic suave — ponto 2 */
@@ -3426,8 +3426,9 @@ body{background:${FUNDO};font-family:'Plus Jakarta Sans',system-ui,sans-serif;co
 .idx-preco{font-size:13px;font-weight:600;color:${VERDE}}
 .idx-unit{font-size:10px;font-weight:400;color:#9AB0A0}
 .idx-chevron{font-size:14px;color:${BORDA};flex-shrink:0}
+.pg1-opcoes-wrap{flex:1}
 /* rodapé pg1 simplificado — ponto 3 */
-.pg1-sep{border:none;border-top:1px solid ${BORDA};margin:20px 24px 0}
+..pg1-sep{border:none;border-top:1px solid ${BORDA};margin-top:auto;margin-left:24px;margin-right:24px;padding-top:0};margin:20px 24px 0}
 .pg1-rod{padding:12px 24px 32px}
 .rod-meta{font-size:11px;color:#A0BAA8;margin-bottom:10px}
 .rod-meta strong{color:#5A7A62}
@@ -3444,7 +3445,7 @@ body{background:${FUNDO};font-family:'Plus Jakarta Sans',system-ui,sans-serif;co
 .det-galeria{display:flex;gap:6px;padding:8px 20px 0}
 .det-gal-img{width:calc(33.33% - 4px);aspect-ratio:1;object-fit:cover;border-radius:8px;border:1px solid ${BORDA}}
 /* conteúdo centralizado — ponto 6 */
-.det-corpo{padding:24px 28px 28px;text-align:center;flex:1}
+.det-corpo{padding:24px 28px 28px;text-align:left}
 .det-num{font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:${VERDE};opacity:.6;display:block;margin-bottom:8px}
 .det-nome{font-family:'Cormorant Garamond',Georgia,serif;font-size:28px;font-weight:600;color:${TXT};line-height:1.2;margin-bottom:8px}
 .det-desc{font-size:13px;color:#7A9A84;font-style:italic;margin-bottom:20px;line-height:1.5}
