@@ -3233,17 +3233,24 @@ function obaShowPage(n){
 // Uma opção por página (pg2, pg3...) + índice em pg1.
 // Layout @media print profissional — uma opção por página A4.
 // ============================================================
+// ============================================================
+// PAGINA PUBLICA — CORPORATIVO (12B-rev5)
+// Pg0: Plus Jakarta Sans para ambos os parágrafos.
+//      Sem chips de briefing. Tudo em 1 tela.
+// Pg1: header off-white+borda; nome empresa em Cormorant;
+//      label curto "OPÇÕES"; rodapé separado com PDF outline.
+// Pg2+: header off-white+borda.
+// ============================================================
 async function obaHandlePropostaCorporativo(proposal, obaWpp, env, propId) {
   const R = (v) => { const n=Number(v||0).toFixed(2),[i,d]=n.split("."); return "R$\u00a0"+i.replace(/\B(?=(\d{3})+(?!\d))/g,".")+","+d; };
   const MESES=["janeiro","fevereiro","mar\u00e7o","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
   const fmtD =(d)=>{ if(!d)return null; try{const[y,m,dy]=d.split("-");return parseInt(dy)+" de "+MESES[parseInt(m)-1]+" de "+y;}catch{return d;} };
   const fmtDT=(d)=>{ if(!d)return null; try{const[dt,hr]=d.split("T");const[y,m,dy]=dt.split("-");return parseInt(dy)+" de "+MESES[parseInt(m)-1]+(hr?" \u00e0s "+hr.slice(0,5):"");}catch{return d;} };
 
-  const VERDE  = "#2A5240";
-  const COBRE  = "#C8922A";
-  const FUNDO  = "#F5F8F5";
-  const BORDA  = "#C8E0D0";
-  const TXT    = "#1A2E22";
+  const VERDE = "#2A5240";
+  const BORDA = "#C8E0D0";
+  const FUNDO = "#F5F8F5";
+  const TXT   = "#1A2E22";
 
   const nomeEmpresa = (proposal.empresa||proposal.cliente||"").trim();
   const options     = (proposal.options&&proposal.options.length) ? proposal.options : [];
@@ -3251,7 +3258,7 @@ async function obaHandlePropostaCorporativo(proposal, obaWpp, env, propId) {
   const validade    = fmtD(proposal.validade);
   const qtd         = proposal.qtd_solicitada;
 
-  // ---- Textos pg0 (Cormorant para ambos) ----
+  // ---- Textos pg0 — ambos em Plus Jakarta Sans ----
   let p1, p2;
   if (qtd && nomeEmpresa) {
     const qtdFmt = Number(qtd).toLocaleString("pt-BR");
@@ -3265,40 +3272,34 @@ async function obaHandlePropostaCorporativo(proposal, obaWpp, env, propId) {
     p2 = "A Oba Doceria nasceu acreditando que cada caixa conta uma hist\u00f3ria. Por isso, antes de montar qualquer proposta, a gente pensa nas pessoas que v\u00e3o receb\u00ea-la \u2014 nos seus gostos, no momento que v\u00e3o viver ao abrir, na mem\u00f3ria que vai ficar. O que voc\u00ea vai encontrar aqui foi feito exatamente assim: com cuidado, com inten\u00e7\u00e3o e com muito carinho.";
   }
 
-  // ---- Chips de briefing ----
-  const chips = [
-    qtd                     ? {l:"Qtd solicitada",        v:Number(qtd).toLocaleString("pt-BR")+" un."} : null,
-    proposal.orcamento_max  ? {l:"Or\u00e7amento m\u00e1x.", v:R(proposal.orcamento_max)} : null,
-    proposal.data_entrega   ? {l:"Entrega em",             v:fmtDT(proposal.data_entrega)} : null,
-    proposal.demanda        ? {l:"Tipo de demanda",        v:proposal.demanda} : null,
-    proposal.frequencia     ? {l:"Frequ\u00eancia",        v:proposal.frequencia} : null,
-  ].filter(Boolean);
-  const chipsHtml = chips.length
-    ? "<div class=\"chips\">"+chips.map(c=>"<div class=\"chip\"><span class=\"chip-l\">"+c.l+"</span><span class=\"chip-v\">"+c.v+"</span></div>").join("")+"</div>"
-    : "";
-
   // ---- Índice pg1 ----
   const indiceHtml = options.map(function(opt, oi){
-    const preco = Number(opt.valor_unit||0);
-    const faixas = opt.faixas||[];
+    const preco   = Number(opt.valor_unit||0);
+    const faixas  = opt.faixas||[];
     const precoMin = faixas.length ? faixas.reduce((a,f)=>f.preco<a?f.preco:a, faixas[0].preco) : preco;
-    const precoLabel = precoMin>0 ? R(precoMin)+(faixas.length?" / un. <small>a partir</small>":" / un.") : "sob consulta";
-    const imgSrc = (opt.medias&&opt.medias.length) ? "/api/proposals/"+propId+"/media/"+opt.medias[0].media_id+"/dados" : null;
+    const precoLabel = precoMin>0
+      ? R(precoMin)+(faixas.length?" <span class=\"idx-unit\">/ un. a partir</span>":" <span class=\"idx-unit\">/ un.</span>")
+      : "<span style=\"color:#AAA\">sob consulta</span>";
+    const imgSrc = (opt.medias&&opt.medias.length)
+      ? "/api/proposals/"+propId+"/media/"+opt.medias[0].media_id+"/dados"
+      : null;
     return (
       "<div class=\"idx-card\" onclick=\"obaShowPage("+(oi+2)+")\">"
-      + (imgSrc ? "<img src=\""+imgSrc+"\" class=\"idx-img\" loading=\"lazy\" alt=\"\">" : "<div class=\"idx-img idx-img-empty\"></div>")
-      + "<div class=\"idx-corpo\">"
-      +   "<span class=\"idx-num\">Op\u00e7\u00e3o "+(oi+1)+"</span>"
-      +   "<p class=\"idx-nome\">"+(opt.nome||("Op\u00e7\u00e3o "+(oi+1)))+"</p>"
-      +   (opt.descricao ? "<p class=\"idx-desc\">"+opt.descricao+"</p>" : "")
-      +   "<span class=\"idx-preco\">"+precoLabel+"</span>"
-      + "</div>"
-      + "<span class=\"idx-seta\">\u2192</span>"
-      + "</div>"
+      +(imgSrc
+        ?"<img src=\""+imgSrc+"\" class=\"idx-img\" loading=\"lazy\" alt=\"\">"
+        :"<div class=\"idx-img idx-empty\"></div>")
+      +"<div class=\"idx-body\">"
+      +  "<span class=\"idx-num\">Op\u00e7\u00e3o "+(oi+1)+"</span>"
+      +  "<p class=\"idx-nome\">"+(opt.nome||("Op\u00e7\u00e3o "+(oi+1)))+"</p>"
+      +  (opt.descricao?"<p class=\"idx-desc\">"+opt.descricao+"</p>":"")
+      +  "<p class=\"idx-preco\">"+precoLabel+"</p>"
+      +"</div>"
+      +"<span class=\"idx-chevron\">&#10095;</span>"
+      +"</div>"
     );
   }).join("\n");
 
-  // ---- Páginas de detalhe (uma por opção) ----
+  // ---- Páginas de detalhe (pg2, pg3...) ----
   const detalhePages = options.map(function(opt, oi){
     const faixas  = opt.faixas||[];
     const imgs    = opt.medias||[];
@@ -3314,13 +3315,13 @@ async function obaHandlePropostaCorporativo(proposal, obaWpp, env, propId) {
 
     const tabelaFaixas = faixas.length
       ? "<div class=\"faixas-bloco\"><p class=\"faixas-titulo\">Faixas de quantidade</p><table class=\"faixas-tab\"><tbody>"
-        + faixas.map(function(f){
-            const lbl = f.de!=null&&f.ate!=null ? "De "+f.de+" a "+f.ate+" un."
-              : f.de!=null&&f.ate==null ? "A partir de "+f.de+" un."
-              : f.ate!=null ? "At\u00e9 "+f.ate+" un." : "Demais";
-            return "<tr><td class=\"ft-l\">"+lbl+"</td><td class=\"ft-p\">"+R(f.preco)+"<span class=\"ft-un\"> / un.</span></td></tr>";
-          }).join("")
-        + "</tbody></table></div>"
+        +faixas.map(function(f){
+          const lbl = f.de!=null&&f.ate!=null?"De "+f.de+" a "+f.ate+" un."
+            :f.de!=null&&f.ate==null?"A partir de "+f.de+" un."
+            :f.ate!=null?"At\u00e9 "+f.ate+" un.":"Demais";
+          return "<tr><td class=\"ft-l\">"+lbl+"</td><td class=\"ft-p\">"+R(f.preco)+"<span class=\"ft-un\"> / un.</span></td></tr>";
+        }).join("")
+        +"</tbody></table></div>"
       : (Number(opt.valor_unit||0)>0
         ? "<div class=\"faixas-bloco\"><table class=\"faixas-tab\"><tbody><tr><td class=\"ft-l\">Pre\u00e7o por unidade</td><td class=\"ft-p\">"+R(opt.valor_unit)+"</td></tr></tbody></table></div>"
         : "");
@@ -3329,36 +3330,39 @@ async function obaHandlePropostaCorporativo(proposal, obaWpp, env, propId) {
     const ctaHref = obaWpp ? "https://wa.me/55"+obaWpp+"?text="+ctaMsg : "";
     const ctaBtn  = ctaHref ? "<a href=\""+ctaHref+"\" target=\"_blank\" class=\"cta-btn\">Quero esta op\u00e7\u00e3o \u2014 vamos conversar</a>" : "";
 
-    const navPrev = prevOi!==null ? "<button class=\"nav-prev\" onclick=\"obaShowPage("+(prevOi+2)+")\">&#8592; Op\u00e7\u00e3o "+(prevOi+1)+"</button>" : "<span></span>";
-    const navNext = nextOi!==null ? "<button class=\"nav-next\" onclick=\"obaShowPage("+(nextOi+2)+")\">Op\u00e7\u00e3o "+(nextOi+1)+" &#8594;</button>" : "<span></span>";
+    const navPrev = prevOi!==null
+      ? "<button class=\"nav-btn\" onclick=\"obaShowPage("+(prevOi+2)+")\">&#8592; "+(options[prevOi].nome||("Op\u00e7\u00e3o "+(prevOi+1)))+"</button>"
+      : "<span></span>";
+    const navNext = nextOi!==null
+      ? "<button class=\"nav-btn nav-right\" onclick=\"obaShowPage("+(nextOi+2)+")\">"+( options[nextOi].nome||("Op\u00e7\u00e3o "+(nextOi+1)))+" &#8594;</button>"
+      : "<span></span>";
 
     return (
       "<div id=\"pg"+(oi+2)+"\" class=\"det-page\" style=\"display:none\">"
-      // header
+      // header off-white — ponto 7
       +"<header class=\"det-header\">"
-      +"  <button class=\"btn-voltar\" onclick=\"obaShowPage(1)\">\u2190 Todas as op\u00e7\u00f5es</button>"
-      +"  <span class=\"det-header-titulo\">"+(oi+1)+" de "+numOpts+"</span>"
+      +"  <button class=\"det-back\" onclick=\"obaShowPage(1)\">&#8592; Todas as op\u00e7\u00f5es</button>"
+      +"  <span class=\"det-counter\">"+(oi+1)+" de "+numOpts+"</span>"
       +"</header>"
       // conteúdo
-      +"<div class=\"det-wrap\">"
-      + heroHtml
-      + galeriaExtra
-      + "<div class=\"det-corpo\">"
-      +   "<span class=\"det-num\">Op\u00e7\u00e3o "+(oi+1)+"</span>"
-      +   "<h2 class=\"det-nome\">"+(opt.nome||("Op\u00e7\u00e3o "+(oi+1)))+"</h2>"
-      +   (opt.descricao ? "<p class=\"det-desc\">"+opt.descricao+"</p>" : "")
-      +   tabelaFaixas
-      +   ctaBtn
-      + "</div>"
+      +heroHtml
+      +galeriaExtra
+      +"<div class=\"det-corpo\">"
+      +  "<span class=\"det-num\">Op\u00e7\u00e3o "+(oi+1)+"</span>"
+      +  "<h2 class=\"det-nome\">"+(opt.nome||("Op\u00e7\u00e3o "+(oi+1)))+"</h2>"
+      +  (opt.descricao?"<p class=\"det-desc\">"+opt.descricao+"</p>":"")
+      +  tabelaFaixas
+      +  ctaBtn
       +"</div>"
-      // navegação entre opções
       +"<div class=\"det-nav\">"+navPrev+navNext+"</div>"
       +"</div>"
     );
   }).join("\n");
 
-  // ---- Rodapé informações ----
-
+  // ---- Rodapé pg1 ----
+  const obsHtml      = proposal.observacoes ? "<p class=\"rod-obs\">"+proposal.observacoes+"</p>" : "";
+  const corpValidadeHtml = validade ? "<span class=\"rod-item\">V\u00e1lida at\u00e9 <strong>"+validade+"</strong></span>" : "";
+  const corpWppHtml  = obaWpp ? "<span class=\"rod-item\"><a href=\"https://wa.me/55"+obaWpp+"\" class=\"rod-wpp\">D\u00favidas? WhatsApp</a></span>" : "";
 
   // ---- CSS ----
   const css = `
@@ -3367,66 +3371,150 @@ html,body{scroll-behavior:smooth}
 body{background:${FUNDO};font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:${TXT};line-height:1.6}
 .wrap{max-width:620px;margin:0 auto;background:${FUNDO}}
 
-/* PG0 */
-#pg0{min-height:100svh;display:flex;flex-direction:column;background:#F5F8F5}
-.pg0-topo{padding:44px 28px 0;flex:1;display:flex;flex-direction:column}
-.pg0-logo{height:34px;object-fit:contain;opacity:.6;margin-bottom:28px}
-.pg0-eyebrow{font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:${VERDE};opacity:.6;margin-bottom:22px;display:block}
-.pg0-p1{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(22px,5.8vw,30px);font-weight:400;font-style:italic;color:${TXT};line-height:1.6;margin-bottom:10px}
-.pg0-divider{border:none;border-top:1px solid ${BORDA};margin:6px 0 18px;width:48px}
-.pg0-p2{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(16px,4vw,20px);font-weight:400;font-style:normal;color:#4A6A54;line-height:1.7;margin-bottom:20px}
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
-.chip{background:#fff;border:1px solid ${BORDA};border-radius:8px;padding:7px 12px;display:flex;flex-direction:column;gap:2px}
-.chip-l{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${VERDE};opacity:.65}
-.chip-v{font-size:12px;font-weight:600;color:${TXT}}
-.pg0-para{font-family:'Cormorant Garamond',Georgia,serif;font-size:13px;color:${VERDE};font-style:italic;opacity:.7;margin-top:10px}
-.pg0-rodape{padding:28px 28px 44px;border-top:1px solid ${BORDA};margin-top:28px}
-.pg0-assinatura{font-family:'Cormorant Garamond',Georgia,serif;font-size:12px;font-style:italic;color:${VERDE};opacity:.4;display:block;text-align:center;margin-bottom:18px}
-.pg0-btn{display:block;width:100%;background:${VERDE};color:#F5F8F5;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:.8px;padding:16px;border-radius:12px;border:none;cursor:pointer;text-align:center;text-transform:uppercase}
+/* ===================== PG0 ===================== */
+#pg0{
+  min-height:100svh;display:flex;flex-direction:column;
+  background:#F5F8F5
+}
+.pg0-inner{
+  padding:32px 28px 0;
+  flex:1;display:flex;flex-direction:column;
+  justify-content:center   /* centra verticalmente */
+}
+.pg0-logo{height:32px;object-fit:contain;opacity:.55;margin-bottom:20px}
+.pg0-eyebrow{
+  font-size:9px;font-weight:700;letter-spacing:4px;
+  text-transform:uppercase;color:${VERDE};opacity:.65;
+  margin-bottom:20px;display:block
+}
+/* Ambos os parágrafos em Plus Jakarta Sans — ponto 1 */
+.pg0-p1{
+  font-size:clamp(16px,4.2vw,18px);font-weight:500;
+  color:${TXT};line-height:1.75;margin-bottom:14px
+}
+.pg0-p1-div{
+  border:none;border-top:1px solid ${BORDA};
+  width:40px;margin:6px 0 14px
+}
+.pg0-p2{
+  font-size:clamp(14px,3.6vw,16px);font-weight:400;
+  color:#4A6A54;line-height:1.8;margin-bottom:0
+}
+/* Sem chips — ponto 2: .pg0-chips não existe mais */
+.pg0-para{
+  font-size:12px;font-weight:500;color:${VERDE};
+  opacity:.6;margin-top:14px
+}
+.pg0-foot{
+  padding:24px 28px 36px;
+  border-top:1px solid ${BORDA};margin-top:24px
+}
+.pg0-sign{
+  font-family:'Cormorant Garamond',Georgia,serif;
+  font-size:12px;font-style:italic;color:${VERDE};
+  opacity:.4;display:block;text-align:center;margin-bottom:16px
+}
+.pg0-btn{
+  display:block;width:100%;
+  background:${VERDE};color:#F5F8F5;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:13px;font-weight:700;letter-spacing:.8px;
+  padding:16px;border-radius:12px;border:none;
+  cursor:pointer;text-align:center;text-transform:uppercase
+}
 
-/* PG1 — índice */
-#pg1{display:none;background:#F5F8F5}
-.pg1-header{background:${VERDE};padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
-.pg1-header-logo{height:22px;filter:brightness(0) invert(1);opacity:.85;object-fit:contain}
-.pg1-header-titulo{font-size:11px;font-weight:500;color:rgba(255,255,255,.75);text-align:center;flex:1;padding:0 10px}
-.btn-voltar{background:none;border:1.5px solid rgba(255,255,255,.3);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;color:rgba(255,255,255,.85);cursor:pointer;white-space:nowrap}
-.pg1-intro{padding:24px 24px 8px}
-.pg1-titulo{font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;font-weight:400;color:${TXT};margin-bottom:4px}
-.pg1-sub{font-size:11px;color:#8AAA90;font-style:italic}
-.secao-label{padding:18px 24px 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:${VERDE};opacity:.55}
-
-/* Índice cards */
-.idx-card{display:flex;align-items:center;gap:14px;margin:0 16px 10px;padding:12px 14px 12px 12px;background:#fff;border-radius:12px;border:1px solid ${BORDA};cursor:pointer;transition:box-shadow .15s}
-.idx-card:hover{box-shadow:0 2px 12px rgba(42,82,64,.12)}
-.idx-img{width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid ${BORDA};flex-shrink:0}
-.idx-img-empty{background:#EDF3EF}
-.idx-corpo{flex:1;min-width:0}
-.idx-num{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:${VERDE};opacity:.6;display:block;margin-bottom:2px}
+/* ===================== PG1 ===================== */
+#pg1{display:none;background:${FUNDO}}
+/* header off-white — ponto 4 */
+.pg1-hdr{
+  background:#fff;border-bottom:1px solid ${BORDA};
+  padding:10px 20px;display:flex;align-items:center;
+  justify-content:space-between;
+  position:sticky;top:0;z-index:50
+}
+.pg1-hdr-logo{height:20px;object-fit:contain;opacity:.55}
+.btn-inicio{
+  background:none;border:1.5px solid ${BORDA};
+  border-radius:20px;padding:4px 12px;
+  font-size:11px;font-weight:600;color:${VERDE};cursor:pointer
+}
+/* título pg1 — ponto 5 */
+.pg1-intro{padding:22px 24px 6px}
+.pg1-empresa{
+  font-family:'Cormorant Garamond',Georgia,serif;
+  font-size:clamp(22px,5.5vw,28px);font-weight:600;
+  color:${TXT};line-height:1.2;margin-bottom:6px
+}
+.pg1-sub{
+  font-family:'Cormorant Garamond',Georgia,serif;
+  font-size:15px;font-weight:400;font-style:italic;
+  color:#7A9A88
+}
+/* label curto — ponto 5 */
+.pg1-secao{
+  padding:16px 24px 8px;font-size:9px;font-weight:700;
+  text-transform:uppercase;letter-spacing:2.5px;
+  color:${VERDE};opacity:.55
+}
+/* cards do índice */
+.idx-card{
+  display:flex;align-items:center;gap:12px;
+  margin:0 16px 8px;padding:12px;
+  background:#fff;border-radius:12px;
+  border:1px solid ${BORDA};cursor:pointer;
+  transition:box-shadow .15s
+}
+.idx-card:hover,.idx-card:active{box-shadow:0 2px 12px rgba(42,82,64,.12)}
+.idx-img{width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid ${BORDA};flex-shrink:0}
+.idx-empty{background:#EDF3EF}
+.idx-body{flex:1;min-width:0}
+.idx-num{font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:${VERDE};opacity:.6;display:block;margin-bottom:2px}
 .idx-nome{font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;font-weight:600;color:${TXT};line-height:1.2;margin-bottom:2px}
-.idx-desc{font-size:11px;color:#8AAA90;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.idx-preco{font-size:12px;font-weight:600;color:${VERDE};display:block;margin-top:4px}
-.idx-preco small{font-size:10px;font-weight:400;color:#8AAA90}
-.idx-seta{font-size:18px;color:${BORDA};flex-shrink:0}
-.pg1-rodape{margin:12px 24px 0;padding:16px 0 32px;border-top:1px solid ${BORDA}}
-.rodape-obs{font-size:12px;color:#8AAA90;font-style:italic;margin-bottom:10px;line-height:1.5}
-.rodape-info{font-size:11px;color:#A0BAA8;margin-bottom:4px}
-.rodape-info strong{color:#5A7A62}
-.rodape-wpp{color:${VERDE};font-weight:600;text-decoration:none}
-.rodape-brand{font-family:'Cormorant Garamond',Georgia,serif;font-size:12px;font-style:italic;color:#C8DED0;display:block;margin-top:8px}
-.btn-pdf{margin-top:12px;background:${TXT};color:#fff;border:none;border-radius:10px;padding:10px 24px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;display:block;width:100%;text-align:center}
+.idx-desc{font-size:11px;color:#9AB0A0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
+.idx-preco{font-size:12px;font-weight:600;color:${VERDE}}
+.idx-unit{font-size:10px;font-weight:400;color:#9AB0A0}
+.idx-chevron{font-size:14px;color:${BORDA};flex-shrink:0}
 
-/* Detalhe */
-.det-page{background:#F5F8F5;min-height:100svh;display:flex;flex-direction:column}
-.det-header{background:${VERDE};padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
-.det-header-titulo{font-size:11px;color:rgba(255,255,255,.6);font-weight:500}
-.det-wrap{flex:1}
+/* rodapé pg1 — ponto 6: separador + PDF outline */
+.pg1-sep{border:none;border-top:1px solid ${BORDA};margin:20px 24px 0}
+.pg1-rod{padding:14px 24px 32px}
+.rod-obs{font-size:12px;color:#9AB0A0;font-style:italic;line-height:1.5;margin-bottom:8px}
+.rod-meta{display:flex;flex-wrap:wrap;gap:8px 16px;margin-bottom:12px}
+.rod-item{font-size:11px;color:#A0BAA8}
+.rod-item strong{color:#5A7A62}
+.rod-wpp{color:${VERDE};font-weight:600;text-decoration:none}
+.rod-brand{font-family:'Cormorant Garamond',Georgia,serif;font-size:12px;font-style:italic;color:#C8DED0;display:block;margin-bottom:10px}
+/* PDF como outline — ponto 6 */
+.btn-pdf{
+  display:block;width:100%;
+  background:transparent;color:${VERDE};
+  border:1.5px solid ${BORDA};border-radius:10px;
+  padding:10px 24px;font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:12px;font-weight:600;cursor:pointer;text-align:center
+}
+
+/* ===================== DETALHE ===================== */
+.det-page{background:${FUNDO};display:flex;flex-direction:column;min-height:100svh}
+/* header off-white — ponto 7 */
+.det-header{
+  background:#fff;border-bottom:1px solid ${BORDA};
+  padding:10px 20px;display:flex;align-items:center;
+  justify-content:space-between;
+  position:sticky;top:0;z-index:50
+}
+.det-back{
+  background:none;border:1.5px solid ${BORDA};
+  border-radius:20px;padding:4px 12px;
+  font-size:11px;font-weight:600;color:${VERDE};cursor:pointer
+}
+.det-counter{font-size:11px;color:#9AB0A0;font-weight:500}
 .det-hero{width:100%;max-height:320px;object-fit:cover;display:block}
 .det-galeria{display:flex;gap:6px;padding:8px 20px 0}
 .det-gal-img{width:calc(33.33% - 4px);aspect-ratio:1;object-fit:cover;border-radius:8px;border:1px solid ${BORDA}}
-.det-corpo{padding:22px 24px 24px}
-.det-num{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:${VERDE};opacity:.6;display:block;margin-bottom:6px}
+.det-corpo{padding:22px 24px 24px;flex:1}
+.det-num{font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:${VERDE};opacity:.6;display:block;margin-bottom:6px}
 .det-nome{font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:600;color:${TXT};line-height:1.2;margin-bottom:6px}
-.det-desc{font-size:13px;color:#7A9A84;font-style:italic;margin-bottom:16px;line-height:1.5}
+.det-desc{font-size:13px;color:#7A9A84;font-style:italic;margin-bottom:18px;line-height:1.5}
 .faixas-bloco{margin-bottom:20px}
 .faixas-titulo{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${VERDE};opacity:.6;margin-bottom:10px}
 .faixas-tab{width:100%;border-collapse:collapse}
@@ -3434,90 +3522,73 @@ body{background:${FUNDO};font-family:'Plus Jakarta Sans',system-ui,sans-serif;co
 .ft-l{color:#3D5A48}
 .ft-p{text-align:right;font-weight:600;color:${TXT}}
 .ft-un{font-size:10px;font-weight:400;color:#9AB0A0}
-.cta-btn{display:block;padding:15px;border-radius:12px;text-align:center;background:${VERDE};color:#fff;font-weight:700;font-size:13px;text-decoration:none;letter-spacing:.3px}
-.det-nav{display:flex;justify-content:space-between;align-items:center;padding:12px 20px 32px;gap:10px}
-.nav-prev,.nav-next{background:none;border:1.5px solid ${BORDA};border-radius:20px;padding:7px 16px;font-size:12px;font-weight:600;color:${VERDE};cursor:pointer}
-.nav-next{margin-left:auto}
+.cta-btn{
+  display:block;padding:15px;border-radius:12px;
+  text-align:center;background:${VERDE};color:#fff;
+  font-weight:700;font-size:13px;text-decoration:none;
+  letter-spacing:.3px
+}
+.det-nav{
+  display:flex;justify-content:space-between;
+  align-items:center;padding:12px 20px 32px;gap:10px
+}
+.nav-btn{
+  background:none;border:1.5px solid ${BORDA};
+  border-radius:20px;padding:7px 14px;
+  font-size:11px;font-weight:600;color:${VERDE};cursor:pointer;
+  white-space:nowrap;max-width:46%;overflow:hidden;text-overflow:ellipsis
+}
+.nav-right{margin-left:auto;text-align:right}
 
-/* ================================================================
-   @MEDIA PRINT — Layout profissional A4
-   Pg 1: abertura | Pg 2+: uma opção por página
-   ================================================================ */
-@page{size:A4 portrait;margin:18mm 20mm 16mm}
+/* ===================== PRINT ===================== */
+@page{size:A4 portrait;margin:16mm 20mm}
 @media print{
-  /* Ocultar tudo exceto pg0 e det-pages */
-  .pg0-btn,.pg0-assinatura,
-  .pg1-header,.btn-voltar,.det-header,.det-nav,.cta-btn,.btn-pdf,
-  .idx-card,.pg1-intro,.secao-label,.pg1-rodape,
+  .pg0-btn,.pg0-sign,
+  .pg1-hdr,.btn-inicio,
+  .det-header,.det-nav,.cta-btn,.btn-pdf,
+  .pg1-secao,.pg1-rod,.pg1-sep,
   #pg1{display:none!important}
 
   body{background:#fff;font-size:11pt}
   .wrap{max-width:100%;margin:0;background:#fff}
 
-  /* ---- Pg de abertura (pg0) ---- */
   #pg0{
     display:block!important;min-height:0!important;
-    background:#fff!important;
-    page-break-after:always
+    background:#fff!important;page-break-after:always
   }
-  .pg0-topo{padding:0;display:block}
-  .pg0-logo{height:32px;margin-bottom:24px;opacity:1}
-  .pg0-eyebrow{color:${VERDE};opacity:1;margin-bottom:16px}
-  .pg0-p1{font-size:18pt;margin-bottom:8pt;color:#1A1A1A}
-  .pg0-divider{display:block;margin:10pt 0;border-top-color:#DDD;width:64px}
-  .pg0-p2{font-size:13pt;color:#444;margin-bottom:16pt}
-  .chips{margin-bottom:12pt}
-  .chip{border-color:#CCC;background:#fff}
-  .chip-l{color:${VERDE};opacity:1}
-  .chip-v{color:#1A1A1A}
-  .pg0-para{color:${VERDE};opacity:.8;font-size:11pt;margin-top:12pt}
-
-  /* Rodapé da pg de abertura */
-  .pg0-rodape{
-    display:block!important;border-top:1px solid #DDD;
-    padding:12pt 0 0;margin-top:20pt
-  }
-  .pg0-assinatura{display:none!important}
+  .pg0-inner{padding:0;justify-content:flex-start;display:block}
+  .pg0-logo{height:28px;margin-bottom:18pt;opacity:1}
+  .pg0-eyebrow{font-size:7pt;margin-bottom:10pt;opacity:1;color:${VERDE}}
+  .pg0-p1{font-size:12pt;color:#1A1A1A;margin-bottom:8pt}
+  .pg0-p1-div{display:block;margin:6pt 0 12pt;border-top:1px solid #DDD;width:40px}
+  .pg0-p2{font-size:11pt;color:#444;margin-bottom:0}
+  .pg0-para{font-size:9pt;color:${VERDE};opacity:.8;margin-top:10pt}
+  .pg0-foot{display:block!important;border-top:1px solid #DDD;padding:10pt 0 0;margin-top:14pt}
   .pg0-btn{display:none!important}
+  .pg0-sign{display:none!important}
 
-  /* ---- Páginas de opção ---- */
   .det-page{
-    display:block!important;
-    min-height:0!important;
-    page-break-before:always;
-    background:#fff!important
+    display:block!important;min-height:0!important;
+    background:#fff!important;page-break-before:always
   }
-  .det-wrap{display:block}
   .det-hero{
-    width:100%;max-height:220pt;object-fit:cover;
-    border:1px solid #EEE;border-radius:4pt;
-    display:block;margin-bottom:12pt
+    width:100%;max-height:190pt;object-fit:cover;
+    border:1px solid #EEE;border-radius:3pt;
+    display:block;margin-bottom:10pt
   }
-  .det-galeria{
-    display:flex;gap:6pt;margin-bottom:12pt
-  }
+  .det-galeria{display:flex;gap:5pt;margin-bottom:10pt}
   .det-gal-img{
-    width:calc(33.33% - 4pt);aspect-ratio:1;object-fit:cover;
-    border-radius:4pt;border:1px solid #EEE
+    width:calc(33.33% - 4pt);aspect-ratio:1;
+    object-fit:cover;border-radius:3pt;border:1px solid #EEE
   }
   .det-corpo{padding:0}
-  .det-num{color:${VERDE};opacity:1;margin-bottom:4pt;font-size:8pt}
-  .det-nome{font-size:20pt;color:#1A1A1A;margin-bottom:4pt}
-  .det-desc{color:#666;margin-bottom:12pt;font-size:11pt}
-  .faixas-bloco{margin-bottom:12pt}
-  .faixas-titulo{color:${VERDE};opacity:1;font-size:8pt}
+  .det-num{font-size:7pt;color:${VERDE};opacity:1;margin-bottom:4pt}
+  .det-nome{font-size:18pt;color:#1A1A1A;margin-bottom:4pt}
+  .det-desc{font-size:10pt;color:#666;margin-bottom:10pt}
+  .faixas-titulo{font-size:7pt;color:${VERDE};opacity:1}
   .faixas-tab td{padding:5pt 0;border-bottom:1px solid #EEE;font-size:10pt}
   .ft-p{color:#1A1A1A}
-
-  /* Rodapé em todas as páginas via CSS counter */
-  body::after{
-    content:'';display:block
-  }
 }`;
-
-  const obsHtml = proposal.observacoes ? "<p class=\"rodape-obs\">"+proposal.observacoes+"</p>" : "";
-  const corpValidadeHtml = validade ? "<p class=\"rodape-info\">Proposta v\u00e1lida at\u00e9 <strong>"+validade+"</strong></p>" : "";
-  const corpWppHtml = obaWpp  ? "<p class=\"rodape-info\"><a href=\"https://wa.me/55"+obaWpp+"\" class=\"rodape-wpp\">D\u00favidas? Fale pelo WhatsApp</a></p>" : "";
 
   const html = "<!doctype html>\n<html lang=\"pt-BR\">\n<head>\n"
     +"<meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n"
@@ -3527,44 +3598,56 @@ body{background:${FUNDO};font-family:'Plus Jakarta Sans',system-ui,sans-serif;co
     +"<link href=\"https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n"
     +"<style>"+css+"</style>\n</head>\n<body>\n<div class=\"wrap\">\n\n"
 
-    // PG0 — abertura
+    // PG0 — sem chips, ambos parágrafos iguais, 1 tela
     +"<div id=\"pg0\">\n"
-    +"  <div class=\"pg0-topo\">\n"
+    +"  <div class=\"pg0-inner\">\n"
     +"    <img class=\"pg0-logo\" src=\"https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png\" alt=\"Oba Doceria\" onerror=\"this.style.display='none'\">\n"
     +"    <span class=\"pg0-eyebrow\">Proposta Exclusiva</span>\n"
     +"    <p class=\"pg0-p1\">"+p1+"</p>\n"
-    +"    <hr class=\"pg0-divider\">\n"
+    +"    <hr class=\"pg0-p1-div\">\n"
     +"    <p class=\"pg0-p2\">"+p2+"</p>\n"
-    + chipsHtml
     +(nomeEmpresa?"    <p class=\"pg0-para\">Preparado especialmente para "+nomeEmpresa+"</p>\n":"")
     +"  </div>\n"
-    +"  <div class=\"pg0-rodape\">\n"
-    +"    <span class=\"pg0-assinatura\">Feito com cuidado. Servido com amor.</span>\n"
+    +"  <div class=\"pg0-foot\">\n"
+    +"    <span class=\"pg0-sign\">Feito com cuidado. Servido com amor.</span>\n"
     +"    <button class=\"pg0-btn\" onclick=\"obaShowPage(1)\">Ver o que preparamos &rarr;</button>\n"
     +"  </div>\n"
     +"</div>\n\n"
 
     // PG1 — índice visual
     +"<div id=\"pg1\">\n"
-    +"  <div class=\"pg1-header\">\n"
-    +"    <button class=\"btn-voltar\" onclick=\"obaShowPage(0)\">\u2190 In\u00edcio</button>\n"
-    +"    <img class=\"pg1-header-logo\" src=\"https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png\" alt=\"Oba Doceria\" onerror=\"this.style.display='none'\">\n"
-    +"    <span class=\"pg1-header-titulo\">"+(nomeEmpresa||"Proposta")+"</span>\n"
+    // header off-white
+    +"  <div class=\"pg1-hdr\">\n"
+    +"    <button class=\"btn-inicio\" onclick=\"obaShowPage(0)\">\u2190 In\u00edcio</button>\n"
+    +"    <img class=\"pg1-hdr-logo\" src=\"https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png\" alt=\"Oba Doceria\" onerror=\"this.style.display='none'\">\n"
+    +"    <span style=\"width:70px\"></span>\n"   // spacer para centrar logo
     +"  </div>\n"
+    // título — Cormorant com nome da empresa, sem "Proposta para"
     +"  <div class=\"pg1-intro\">\n"
-    +"    <h1 class=\"pg1-titulo\">Proposta para "+(nomeEmpresa||"voc\u00ea")+"</h1>\n"
-    +(numOpts?"    <p class=\"pg1-sub\">"+(numOpts===1?"Uma op\u00e7\u00e3o elaborada":numOpts+" op\u00e7\u00f5es elaboradas")+" especialmente para voc\u00ea</p>\n":"")
+    +(nomeEmpresa
+      ?"    <h1 class=\"pg1-empresa\">"+nomeEmpresa+"</h1>\n"
+      :"    <h1 class=\"pg1-empresa\">Nossa proposta</h1>\n")
+    +(numOpts
+      ?"    <p class=\"pg1-sub\">"+( numOpts===1?"Uma op\u00e7\u00e3o elaborada":numOpts+" op\u00e7\u00f5es elaboradas")+" com muito cuidado para voc\u00ea</p>\n"
+      :"")
     +"  </div>\n"
-    +"  <p class=\"secao-label\">Selecione uma op\u00e7\u00e3o para ver os detalhes</p>\n"
+    // label curto
+    +"  <p class=\"pg1-secao\">Op\u00e7\u00f5es</p>\n"
+    // cards
     +(indiceHtml||"  <p style=\"text-align:center;color:#9AB0A0;padding:32px;font-size:13px\">Nenhuma op\u00e7\u00e3o cadastrada.</p>")
-    +"\n  <div class=\"pg1-rodape\">"
-    +obsHtml+corpValidadeHtml+corpWppHtml
-    +"    <span class=\"rodape-brand\">Oba Doceria \u00b7 Um jeito doce de expressar felicidade</span>\n"
+    // rodapé separado — ponto 6
+    +"\n  <hr class=\"pg1-sep\">\n"
+    +"  <div class=\"pg1-rod\">\n"
+    +obsHtml
+    +(corpValidadeHtml||corpWppHtml
+      ?"    <div class=\"rod-meta\">"+corpValidadeHtml+corpWppHtml+"</div>\n"
+      :"")
+    +"    <span class=\"rod-brand\">Oba Doceria \u00b7 Um jeito doce de expressar felicidade</span>\n"
     +"    <button class=\"btn-pdf\" onclick=\"window.print()\">Salvar como PDF</button>\n"
     +"  </div>\n"
     +"</div>\n\n"
 
-    // Páginas de detalhe
+    // páginas de detalhe
     + detalhePages
 
     +"\n</div>\n<script>\n"
@@ -3572,10 +3655,7 @@ body{background:${FUNDO};font-family:'Plus Jakarta Sans',system-ui,sans-serif;co
     +"  var pg0=document.getElementById('pg0');\n"
     +"  var pg1=document.getElementById('pg1');\n"
     +"  var pages=[pg0,pg1];\n"
-    +"  for(var i=2;i<="+(numOpts+1)+";i++){\n"
-    +"    var el=document.getElementById('pg'+i);\n"
-    +"    if(el) pages.push(el);\n"
-    +"  }\n"
+    +"  for(var i=2;i<="+(numOpts+1)+";i++){ var el=document.getElementById('pg'+i); if(el) pages.push(el); }\n"
     +"  pages.forEach(function(el,idx){\n"
     +"    if(!el) return;\n"
     +"    el.style.display=(idx===n)?((idx===0)?'flex':'block'):'none';\n"
@@ -3587,11 +3667,6 @@ body{background:${FUNDO};font-family:'Plus Jakarta Sans',system-ui,sans-serif;co
   return new Response(html,{status:200,headers:{"Content-Type":"text/html; charset=utf-8","Cache-Control":"no-store","X-Robots-Tag":"noindex, nofollow"}});
 }
 
-// ============================================================
-// PAGINA PUBLICA — SAZONAL (12B-rev4)
-// Pg0 editorial em Cormorant. Índice em pg1. Uma opção por página.
-// Layout @media print profissional.
-// ============================================================
 async function obaHandlePropostaSazonal(proposal, obaWpp, env, propId) {
   const R = (v) => { const n=Number(v||0).toFixed(2),[i,d]=n.split("."); return "R$\u00a0"+i.replace(/\B(?=(\d{3})+(?!\d))/g,".")+","+d; };
   const toTC = (s) => s ? s.toLowerCase().replace(/(?:^|\s)\S/g,a=>a.toUpperCase()) : s;
