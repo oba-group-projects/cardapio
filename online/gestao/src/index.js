@@ -3402,7 +3402,7 @@ body{background:${FUNDO};font-family:'Plus Jakarta Sans',system-ui,sans-serif;co
 .pg0-btn{display:block;width:100%;background:${VERDE};color:#F5F8F5;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:.8px;padding:16px;border-radius:12px;border:none;cursor:pointer;text-align:center;text-transform:uppercase}
 
 /* ===================== PG1 ===================== */
-#pg1{display:none;background:${FUNDO};min-height:100svh;display:flex;flex-direction:column;padding-top:10vh}}
+#pg1{background:${FUNDO};min-height:100svh;flex-direction:column;padding-top:8vh;display:none}
 .pg1-hdr{background:#fff;border-bottom:1px solid ${BORDA};padding:10px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
 .btn-inicio{background:none;border:1.5px solid ${BORDA};border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;color:${VERDE};cursor:pointer}
 /* Sem logo no header pg1 — ponto 5: espaço reservado para balancear visualmente */
@@ -3426,7 +3426,7 @@ body{background:${FUNDO};font-family:'Plus Jakarta Sans',system-ui,sans-serif;co
 .idx-chevron{font-size:14px;color:${BORDA};flex-shrink:0}
 .pg1-opcoes-wrap{flex:1}
 /* rodapé pg1 simplificado — ponto 3 */
-..pg1-sep{border:none;border-top:1px solid ${BORDA};margin-top:auto;margin-left:24px;margin-right:24px;padding-top:0};margin:20px 24px 0}
+.pg1-sep{border:none;border-top:1px solid ${BORDA};margin-top:auto;margin-left:24px;margin-right:24px}
 .pg1-rod{padding:24px 24px 40px}
 .rod-meta{font-size:11px;color:#A0BAA8;margin-bottom:10px}
 .rod-meta strong{color:#5A7A62}
@@ -3552,7 +3552,7 @@ body{background:${FUNDO};font-family:'Plus Jakarta Sans',system-ui,sans-serif;co
     +"  for(var i=2;i<="+(numOpts+1)+";i++){ var el=document.getElementById('pg'+i); if(el) pages.push(el); }\n"
     +"  pages.forEach(function(el,idx){\n"
     +"    if(!el) return;\n"
-    +"    el.style.display=(idx===n)?((idx===0)?'flex':'block'):'none';\n"
+    +"    el.style.display=(idx===n)?((idx===0||idx===1)?'flex':'block'):'none';\n"
     +"  });\n"
     +"  window.scrollTo({top:0,behavior:'smooth'});\n"
     +"}\n"
@@ -3907,7 +3907,7 @@ body{background:${T.fundo};font-family:'Plus Jakarta Sans',system-ui,sans-serif;
     +"  }\n"
     +"  pages.forEach(function(el,idx){\n"
     +"    if(!el) return;\n"
-    +"    el.style.display=(idx===n)?((idx===0)?'flex':'block'):'none';\n"
+    +"    el.style.display=(idx===n)?((idx===0||idx===1)?'flex':'block'):'none';\n"
     +"  });\n"
     +"  window.scrollTo({top:0,behavior:'smooth'});\n"
     +"}\n"
