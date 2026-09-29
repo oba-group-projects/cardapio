@@ -3011,9 +3011,9 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     <table>
       <thead>
         <tr>
+          <th>Tipo</th>
           <th>Cliente</th>
-          <th>Evento</th>
-          <th>Convidados</th>
+          <th>Data / Detalhe</th>
           <th>Status</th>
           <th>Criado em</th>
           <th></th>
@@ -3199,33 +3199,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#888">Nenhuma proposta ainda. Clique em "+ Nova Proposta" para começar.</td></tr>';
         return;
       }
-      tbody.innerHTML = data.proposals.map(p => `
-        <tr>
-          <td><strong>${p.cliente}</strong></td>
-          <td>${p.data_evento ? new Date(p.data_evento+'T12:00:00').toLocaleDateString('pt-BR') : '—'}</td>
-          <td>${p.convidados ? p.convidados + ' pessoas' : '—'}</td>
-          <td>
-            <select
-              title="Alterar status"
-              onchange="obaProposalAlterarStatus('${p.proposal_id}', this.value, this)"
-              style="font-size:11px;padding:3px 8px;border-radius:12px;border:1.5px solid ${statusColor(p.status)};background:${statusColor(p.status)}18;color:${statusColor(p.status)};font-weight:600;cursor:pointer;outline:none;appearance:auto">
-              ${['rascunho','enviada','em_negociacao','aceita','recusada','arquivada'].map(s =>
-                `<option value="${s}" ${s===p.status?'selected':''}>${statusLabel(s)}</option>`
-              ).join('')}
-            </select>
-          </td>
-          <td>${new Date(p.criado_em).toLocaleDateString('pt-BR')}</td>
-          <td style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-            <button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaProposalEditar('${p.proposal_id}')">✏️ Editar</button>
-            <button class="secondary" style="padding:4px 10px;font-size:11px;background:#25d366;color:#fff;border:none" onclick="obaProposalEnviarWhatsAppById('${p.proposal_id}')">📱 WhatsApp</button>
-            <button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaProposalCopiarLinkById('${p.proposal_id}')">🔗 Link</button>
-            <button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaProposalAbrirPDFById('${p.proposal_id}')">📄 PDF</button>
-            <button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaProposalDuplicar('${p.proposal_id}','${(p.empresa||p.cliente||'').replace(/'/g,'')}')" title="Duplicar proposta">⧉ Duplicar</button>
-            ${p.status === 'rascunho' ? `<button class="secondary" style="padding:4px 10px;font-size:11px;background:#fee2e2;color:#dc2626;border-color:#fca5a5" onclick="obaProposalExcluir('${p.proposal_id}','${p.cliente}')">🗑️ Excluir</button>` : ''}
-          </td>
-        </tr>
-      `).join('');
-    } catch(e) {
+
       tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#dc2626">Erro ao carregar propostas.</td></tr>';
     }
   }
