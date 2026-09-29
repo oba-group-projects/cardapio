@@ -3404,7 +3404,7 @@ body{background:${FUNDO};font-family:'Plus Jakarta Sans',system-ui,sans-serif;co
 .pg0-btn{display:block;width:100%;background:${VERDE};color:#F5F8F5;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:.8px;padding:16px;border-radius:12px;border:none;cursor:pointer;text-align:center;text-transform:uppercase}
 
 /* ===================== PG1 ===================== */
-#pg1{display:none;background:${FUNDO}}
+#pg1{display:none;background:${FUNDO};min-height:100svh;display:flex;flex-direction:column;padding-top:10vh}}
 .pg1-hdr{background:#fff;border-bottom:1px solid ${BORDA};padding:10px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
 .btn-inicio{background:none;border:1.5px solid ${BORDA};border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;color:${VERDE};cursor:pointer}
 /* Sem logo no header pg1 — ponto 5: espaço reservado para balancear visualmente */
@@ -3433,8 +3433,8 @@ body{background:${FUNDO};font-family:'Plus Jakarta Sans',system-ui,sans-serif;co
 .rod-meta{font-size:11px;color:#A0BAA8;margin-bottom:10px}
 .rod-meta strong{color:#5A7A62}
 .rod-wpp{color:${VERDE};font-weight:600;text-decoration:none}
-.rod-brand{font-family:'Cormorant Garamond',Georgia,serif;font-size:13px;font-style:italic;color:#C0D4C8;display:block;margin-bottom:12px}
-.btn-pdf{display:block;width:100%;background:transparent;color:${VERDE};border:1.5px solid ${BORDA};border-radius:10px;padding:10px 24px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;text-align:center}
+.rod-brand{font-family:'Cormorant Garamond',Georgia,serif;font-size:14px;font-style:italic;font-weight:400;color:${VERDE};opacity:.5;display:block;text-align:center;margin-bottom:16px}
+.btn-pdf{display:block;width:100%;background:${VERDE};color:#F5F8F5;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:.8px;padding:16px;border-radius:12px;border:none;cursor:pointer;text-align:center;text-transform:uppercase}
 
 /* ===================== DETALHE ===================== */
 .det-page{background:${FUNDO};display:flex;flex-direction:column;min-height:100svh;padding-top:14vh};display:flex;flex-direction:column;min-height:100svh}
