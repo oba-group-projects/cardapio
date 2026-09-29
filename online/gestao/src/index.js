@@ -3437,7 +3437,7 @@ body{background:${FUNDO};font-family:'Plus Jakarta Sans',system-ui,sans-serif;co
 .btn-pdf{display:block;width:100%;background:transparent;color:${VERDE};border:1.5px solid ${BORDA};border-radius:10px;padding:10px 24px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;text-align:center}
 
 /* ===================== DETALHE ===================== */
-.det-page{background:${FUNDO};display:flex;flex-direction:column;min-height:100svh}
+.det-page{background:${FUNDO};display:flex;flex-direction:column;min-height:100svh;padding-top:14vh};display:flex;flex-direction:column;min-height:100svh}
 .det-header{background:#fff;border-bottom:1px solid ${BORDA};padding:10px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
 .det-back{background:none;border:1.5px solid ${BORDA};border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;color:${VERDE};cursor:pointer}
 .det-counter{font-size:11px;color:#9AB0A0;font-weight:500}
