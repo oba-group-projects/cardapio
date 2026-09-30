@@ -3413,15 +3413,15 @@ body{background:${FUNDO};font-family:'Plus Jakarta Sans',system-ui,sans-serif;co
 .pg1-sub{font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;font-weight:400;font-style:italic;color:#7A9A88}
 .pg1-secao{padding:18px 24px 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:${VERDE};opacity:.55}
 /* cards maiores */
-.idx-card{display:flex;align-items:center;gap:13px;margin:0 16px 9px;padding:13px;background:#fff;border-radius:12px;border:1px solid ${BORDA};cursor:pointer;transition:box-shadow .15s}
+.idx-card{display:flex;align-items:center;gap:14px;margin:0 16px 10px;padding:16px 14px;background:#fff;border-radius:14px;border:1px solid ${BORDA};cursor:pointer;transition:box-shadow .15s}
 .idx-card:hover,.idx-card:active{box-shadow:0 2px 14px rgba(42,82,64,.13)}
-.idx-img{width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid ${BORDA};flex-shrink:0}
+.idx-img{width:80px;height:80px;object-fit:cover;border-radius:10px;border:1px solid ${BORDA};flex-shrink:0}
 .idx-empty{background:#EDF3EF}
 .idx-body{flex:1;min-width:0}
 .idx-num{font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:${VERDE};opacity:.6;display:block;margin-bottom:3px}
-.idx-nome{font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;font-weight:600;color:${TXT};line-height:1.2;margin-bottom:3px}
-.idx-desc{font-size:11px;color:#9AB0A0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
-.idx-preco{font-size:13px;font-weight:600;color:${VERDE}}
+.idx-nome{font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;font-weight:600;color:${TXT};line-height:1.2;margin-bottom:4px}
+.idx-desc{font-size:12px;color:#9AB0A0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
+.idx-preco{font-size:15px;font-weight:600;color:${VERDE}}
 .idx-unit{font-size:10px;font-weight:400;color:#9AB0A0}
 .idx-chevron{font-size:14px;color:${BORDA};flex-shrink:0}
 .pg1-opcoes-wrap{flex:1}
