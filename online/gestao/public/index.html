@@ -3152,13 +3152,24 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     <input type="file" id="prop-opcao-img-input" accept="image/*" style="display:none" onchange="obaOpcaoProcessarImagem(this)">
 
     <!-- AÇÕES -->
-    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+    <!-- AÇÕES -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <!-- Grupo esquerdo: Cancelar + ações principais -->
+      <button class="secondary" onclick="obaProposalCancelar()" style="color:#6b7280;border-color:#e5e7eb">✕ Cancelar</button>
       <button class="primary" onclick="obaProposalSalvar('rascunho')" style="background:#6b7280">💾 Salvar</button>
       <button class="primary" style="background:#059669" onclick="obaProposalSalvar('enviada')">📤 Enviar Proposta</button>
-      <span id="proposals-link-actions" style="display:none;margin-left:auto;display:flex;gap:8px">
-        <button class="secondary" onclick="obaProposalEnviarWhatsApp()" style="font-size:12px;background:#25d366;color:#fff;border:none">📱 WhatsApp</button>
-        <button class="secondary" onclick="obaProposalCopiarLink()" style="font-size:12px">🔗 Link</button>
-        <button class="secondary" onclick="obaProposalAbrirPDF()" style="font-size:12px">📄 PDF</button>
+      <!-- Grupo direito: compartilhamento (Copiar Link sempre visível) -->
+      <span style="margin-left:auto;display:flex;gap:8px;align-items:center">
+        <button class="secondary" id="btn-copiar-link"
+          onclick="obaProposalCopiarLink()"
+          style="font-size:12px"
+          title="Copiar link da proposta (salve primeiro)">
+          🔗 Copiar Link
+        </button>
+        <span id="proposals-link-actions" style="display:none;display:flex;gap:8px">
+          <button class="secondary" onclick="obaProposalEnviarWhatsApp()" style="font-size:12px;background:#25d366;color:#fff;border:none">📱 WhatsApp</button>
+          <button class="secondary" onclick="obaProposalAbrirPDF()" style="font-size:12px">📄 PDF</button>
+        </span>
       </span>
     </div>
 
@@ -3374,8 +3385,10 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
   };
 
   window.obaProposalCancelar = function() {
-    obaProposalAtiva = null;
-    mostrarLista();
+    if (confirm('Sair sem salvar?\n\nAltera\u00e7\u00f5es n\u00e3o salvas ser\u00e3o perdidas.')) {
+      obaProposalAtiva = null;
+      mostrarLista();
+    }
   };
 
   window.obaProposalEditar = async function(proposalId) {
@@ -4458,12 +4471,20 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
   }
 
   window.obaProposalCopiarLink = function() {
-    if (!obaProposalAtiva?.proposal_id) return;
+    if (!obaProposalAtiva?.proposal_id) {
+      alert('Salve a proposta primeiro para gerar o link.');
+      return;
+    }
     const url = obaProposalUrlById(obaProposalAtiva.proposal_id);
+    const btn = document.getElementById('btn-copiar-link');
     navigator.clipboard.writeText(url)
-      .then(() => {})
-      .catch(() => {});
-    window.open(url, '_blank');
+      .then(function() {
+        if (btn) { const orig = btn.textContent; btn.textContent = '\u2705 Link copiado!'; setTimeout(function(){ btn.textContent = orig; }, 2000); }
+      })
+      .catch(function() {
+        // fallback: abrir em nova aba
+        window.open(url, '_blank');
+      });
   };
 
   window.obaProposalAbrirPDF = function() {

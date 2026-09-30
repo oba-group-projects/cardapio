@@ -357,7 +357,11 @@ async function handleLogin(request, env) {
   const form = await request.formData();
   const password = String(form.get("password") || "");
 
-  if (!constantTimeEqual(password, env.AUTH_PASSWORD)) {
+  // Aceita AUTH_PASSWORD ou AUTH_PASSWORD_2 (dois acessos independentes)
+  const senhaCorreta = constantTimeEqual(password, env.AUTH_PASSWORD) ||
+    (env.AUTH_PASSWORD_2 && constantTimeEqual(password, env.AUTH_PASSWORD_2));
+
+  if (!senhaCorreta) {
     registerFailure(request);
 
     return response(loginPage("invalid"), 401, {
