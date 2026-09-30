@@ -24,11 +24,12 @@ tr[data-editable]{cursor:pointer}tr[data-editable]:hover{background:#fffaf6}.ok{
 dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 24px);box-shadow:0 18px 60px #0003}dialog::backdrop{background:#0007}
 .modal{padding:20px}.modal h2{margin-top:0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.field{display:flex;flex-direction:column;gap:5px}.field.full{grid-column:1/-1}.checks{display:flex;gap:18px;align-items:center}
 .actions{display:flex;justify-content:flex-end;gap:9px;margin-top:18px}.preview-img{width:220px;height:150px;border:1px solid var(--line);border-radius:12px;object-fit:contain;background:#fafafa}.image-box{display:flex;gap:14px;align-items:center;flex-wrap:wrap}.image-tools{display:flex;flex-direction:column;gap:7px;flex:1;min-width:220px}.image-path{font-size:12px;color:var(--muted);word-break:break-all}.image-error{font-size:12px;color:var(--danger);display:none}.hint{font-size:12px;color:var(--muted)}.danger-zone{margin-right:auto}
+/* Barra de ações propostas — responsiva */.proposals-actions{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;padding:4px 0}.proposals-actions-left,.proposals-actions-right{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.btn-sm{padding:6px 11px!important;font-size:12px!important}
 @media(max-width:720px){.grid{grid-template-columns:1fr}.hide-mobile{display:none}table{font-size:13px}}
 </style>
 </head>
 <body>
-<header><h1>Oba Doceria — Gestão do Cardápio</h1><p>Crie, edite, arquive, troque imagens, visualize e publique</p></header>
+<header style="display:flex;justify-content:space-between;align-items:flex-start"><div><h1>Oba Doceria — Gestão do Cardápio</h1><p>Crie, edite, arquive, troque imagens, visualize e publique</p></div><form method="POST" action="/__auth/logout" style="margin:0"><button type="submit" style="background:none;border:1px solid #ddd;border-radius:8px;padding:5px 12px;font-size:11px;color:#888;cursor:pointer" title="Sair da Central">&#128275; Sair</button></form></header>
 <main>
 <div id="mensagem"></div>
 <div id="pendenciasBox"><strong>Alterações pendentes</strong><ul id="listaPendencias"></ul></div>
@@ -3153,24 +3154,19 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
 
     <!-- AÇÕES -->
     <!-- AÇÕES -->
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <!-- Grupo esquerdo: Cancelar + ações principais -->
-      <button class="secondary" onclick="obaProposalCancelar()" style="color:#6b7280;border-color:#e5e7eb">✕ Cancelar</button>
-      <button class="primary" onclick="obaProposalSalvar('rascunho')" style="background:#6b7280">💾 Salvar</button>
-      <button class="primary" style="background:#059669" onclick="obaProposalSalvar('enviada')">📤 Enviar Proposta</button>
-      <!-- Grupo direito: compartilhamento (Copiar Link sempre visível) -->
-      <span style="margin-left:auto;display:flex;gap:8px;align-items:center">
-        <button class="secondary" id="btn-copiar-link"
-          onclick="obaProposalCopiarLink()"
-          style="font-size:12px"
-          title="Copiar link da proposta (salve primeiro)">
-          🔗 Copiar Link
-        </button>
-        <span id="proposals-link-actions" style="display:none;display:flex;gap:8px">
-          <button class="secondary" onclick="obaProposalEnviarWhatsApp()" style="font-size:12px;background:#25d366;color:#fff;border:none">📱 WhatsApp</button>
-          <button class="secondary" onclick="obaProposalAbrirPDF()" style="font-size:12px">📄 PDF</button>
+    <div class="proposals-actions">
+      <div class="proposals-actions-left">
+        <button class="secondary btn-sm" onclick="obaProposalCancelar()" style="color:#6b7280;border-color:#e5e7eb">&#10005; Cancelar</button>
+        <button class="primary btn-sm" onclick="obaProposalSalvar('rascunho')" style="background:#6b7280">&#128190; Salvar</button>
+        <button class="primary btn-sm" style="background:#059669" onclick="obaProposalSalvar('enviada')">&#128228; Enviar</button>
+      </div>
+      <div class="proposals-actions-right">
+        <button class="secondary btn-sm" id="btn-copiar-link" onclick="obaProposalCopiarLink()" title="Copiar link (salve primeiro)">&#128279; Link</button>
+        <span id="proposals-link-actions" style="display:none">
+          <button class="secondary btn-sm" onclick="obaProposalEnviarWhatsApp()" style="background:#25d366;color:#fff;border:none">&#128241; WhatsApp</button>
+          <button class="secondary btn-sm" onclick="obaProposalAbrirPDF()">&#128196; PDF</button>
         </span>
-      </span>
+      </div>
     </div>
 
   </div>
