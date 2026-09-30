@@ -29,17 +29,27 @@ dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 2
 </style>
 </head>
 <body>
-<header style="display:flex;justify-content:space-between;align-items:center"><div><h1>Oba Doceria — Gestão do Cardápio</h1><p>Crie, edite, arquive, troque imagens, visualize e publique</p></div><div style="display:flex;align-items:center;gap:12px;flex-shrink:0"><span id="oba-user-label" style="font-size:12px;color:#7A9A88;font-style:italic"></span><form method="POST" action="/__auth/logout" style="margin:0"><button type="submit" style="background:none;border:1px solid #ddd;border-radius:8px;padding:5px 12px;font-size:11px;color:#888;cursor:pointer" title="Sair da Central">&#128275; Sair</button></form></div></header>
+<header style="display:flex;justify-content:space-between;align-items:center"><div><h1>Oba Doceria — Gestão do Cardápio</h1><p>Crie, edite, arquive, troque imagens, visualize e publique</p></div><div style="display:flex;align-items:center;gap:12px;flex-shrink:0"><span id="oba-user-label" style="font-size:12px;color:#7A9A88;font-style:italic"></span><button onclick="obaLogout()" style="background:none;border:1px solid #ddd;border-radius:8px;padding:5px 12px;font-size:11px;color:#888;cursor:pointer" title="Sair da Central">&#128275; Sair</button></div></header>
 <script>
-// Exibir nome do usuário logado no header
+// Exibir nome do usuario logado no header
 (function(){
-  const cook = document.cookie.split(';').map(function(c){return c.trim();}).find(function(c){return c.startsWith('__Host-oba_user=');});
+  var cook = document.cookie.split(";").map(function(c){return c.trim();}).find(function(c){return c.startsWith("__Host-oba_user=");});
   if (cook) {
-    const nome = decodeURIComponent(cook.split('=')[1]||'');
-    const el = document.getElementById('oba-user-label');
-    if (el && nome) el.textContent = 'Ol\u00e1, ' + nome;
+    var nome = decodeURIComponent(cook.split("=")[1]||"");
+    var el = document.getElementById("oba-user-label");
+    if (el && nome) el.textContent = "Ol\u00e1, " + nome;
   }
 })();
+// Logout com CSRF
+function obaLogout() {
+  var csrfCook = document.cookie.split(";").map(function(c){return c.trim();}).find(function(c){return c.startsWith("__Host-oba_csrf=");});
+  var csrf = csrfCook ? decodeURIComponent(csrfCook.split("=")[1]||"") : "";
+  fetch("/__auth/logout", {
+    method: "POST",
+    headers: {"Content-Type":"application/x-www-form-urlencoded","X-CSRF-Token":csrf}
+  }).then(function(){ window.location.href = "/__auth/login"; })
+    .catch(function(){ window.location.href = "/__auth/login"; });
+}
 </script>
 <main>
 <div id="mensagem"></div>
