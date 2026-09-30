@@ -3436,11 +3436,11 @@ body{background:${FUNDO};font-family:'Plus Jakarta Sans',system-ui,sans-serif;co
 
 /* ===================== DETALHE ===================== */
 .btn-wpp{display:block;width:100%;margin-top:8px;padding:10px 24px;border-radius:10px;text-align:center;background:#25d366;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;letter-spacing:.2px;text-decoration:none}
-.det-page{background:${FUNDO};display:flex;flex-direction:column;min-height:100svh;padding-top:14vh};display:flex;flex-direction:column;min-height:100svh}
+.det-page{background:${FUNDO};display:flex;flex-direction:column;min-height:100svh;justify-content:center};display:flex;flex-direction:column;min-height:100svh}
 .det-header{background:#fff;border-bottom:1px solid ${BORDA};padding:10px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
 .det-back{background:none;border:1.5px solid ${BORDA};border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;color:${VERDE};cursor:pointer}
 .det-counter{font-size:11px;color:#9AB0A0;font-weight:500}
-.det-hero{width:100%;max-height:340px;object-fit:cover;display:block}
+.det-hero{width:100%;max-height:260px;object-fit:cover;display:block}
 .det-galeria{display:flex;gap:6px;padding:8px 20px 0}
 .det-gal-img{width:calc(33.33% - 4px);aspect-ratio:1;object-fit:cover;border-radius:8px;border:1px solid ${BORDA}}
 /* conteúdo centralizado — ponto 6 */
@@ -3451,7 +3451,7 @@ body{background:${FUNDO};font-family:'Plus Jakarta Sans',system-ui,sans-serif;co
 .faixas-bloco{margin-bottom:22px;text-align:left}
 .faixas-titulo{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${VERDE};opacity:.6;margin-bottom:10px}
 .faixas-tab{width:100%;border-collapse:collapse}
-.faixas-tab td{padding:9px 0;border-bottom:1px solid #E8F0EA;font-size:13px}
+.faixas-tab td{padding:6px 0;border-bottom:1px solid #E8F0EA;font-size:13px}
 .ft-l{color:#3D5A48}
 .ft-p{text-align:right;font-weight:600;color:${TXT}}
 .ft-un{font-size:10px;font-weight:400;color:#9AB0A0}
@@ -3598,14 +3598,32 @@ async function obaHandlePropostaSazonal(proposal, obaWpp, env, propId) {
     p1 = partes[0]||""; p2 = partes[1]||"";
   } else {
     const textos = {
-      "Natal":            { p1:"Existe um momento no Natal que todo mundo conhece, mas quase ningu\u00e9m consegue descrever com precis\u00e3o. \u00c9 aquele segundo entre a pessoa pegar o presente e abrir \u2014 quando os olhos brilham um pouco antes mesmo de saber o que est\u00e1 dentro. \u00c9 a antecipa\u00e7\u00e3o da alegria. \u00c9 a prova de que algu\u00e9m pensou nela.", p2:"A Oba preparou este cat\u00e1logo para que voc\u00ea seja exatamente essa pessoa \u2014 a que pensou, a que escolheu com cuidado, a que fez algu\u00e9m se sentir especial nesta \u00e9poca do ano. Cada produto foi desenvolvido para chegar bonito, cheiroso e com todo o afeto que o Natal merece." },
-      "P\u00e1scoa":      { p1:"A P\u00e1scoa tem uma magia que poucas datas conseguem replicar. Talvez seja o chocolate \u2014 mas n\u00e3o \u00e9 s\u00f3 isso. \u00c9 a leveza do clima, a sensa\u00e7\u00e3o de que algo novo est\u00e1 come\u00e7ando. E no meio desse clima, um presente bem pensado tem um peso diferente.", p2:"A Oba Doceria vive disso \u2014 de transformar ingredientes simples em experi\u00eancias que ficam na mem\u00f3ria. Este cat\u00e1logo foi preparado com produtos desenvolvidos especialmente para esta \u00e9poca: sabores que remetem \u00e0 tradi\u00e7\u00e3o, apresenta\u00e7\u00e3o que encanta antes mesmo do primeiro mordida." },
-      "Dia das M\u00e3es":{ p1:"M\u00e3e \u00e9 aquela pessoa que, mesmo quando o presente \u00e9 simples, faz aquela cara de quem recebeu o melhor presente do mundo. Ela n\u00e3o precisa de muito. Ela precisa sentir que foi lembrada com cuidado.", p2:"A Oba sabe o que \u00e9 esse gesto. Cada produto deste cat\u00e1logo foi pensado para ser \u00e0 altura desse amor \u2014 bonito por fora, irresist\u00edvel por dentro, e carregado da inten\u00e7\u00e3o mais bonita que existe: fazer uma m\u00e3e sorrir." },
-      "Dia dos Pais":     { p1:"Pai tem um jeito todo especial de receber presente. Ele agradece, faz aquele sorriso contido, diz que n\u00e3o precisava \u2014 e voc\u00ea sabe que, por dentro, ficou muito feliz. Presentear pai \u00e9 uma arte.", p2:"Este cat\u00e1logo foi preparado com essa premissa. Produtos que encantam sem precisar gritar, embalagens que impressionam sem exagero, sabores que ficam na mem\u00f3ria por dias." },
-      "Dia dos Namorados":{ p1:"Tem uma teoria de que as melhores hist\u00f3rias de amor se constroem nos detalhes. N\u00e3o nos grandes gestos \u2014 esses qualquer um faz. Mas no docinho que chegou de surpresa. Na escolha que prova: eu pensei em voc\u00ea.", p2:"A Oba Doceria existe nesse espa\u00e7o \u2014 no detalhe que faz diferen\u00e7a, na lembran\u00e7a que transforma um dia comum em algo que vai ser contado depois. Este cat\u00e1logo foi preparado para surpreender." },
-      "Dia das Crian\u00e7as":{ p1:"Existe um tipo de alegria que s\u00f3 crian\u00e7as t\u00eam acesso pleno \u2014 aquela alegria sem reservas, sem filtro. \u00c9 o pulo, o grito, o abra\u00e7o que quase derruba. E essa alegria, quando acontece por causa de algo que voc\u00ea escolheu, fica guardada na mem\u00f3ria das duas pessoas.", p2:"A Oba Doceria preparou este cat\u00e1logo pensando exatamente nesse momento. Produtos coloridos, saborosos, pensados para encantar quem ainda enxerga o mundo com os olhos bem abertos." },
+      "Natal": {
+        p1: "Existe um momento no Natal que todo mundo conhece, mas quase ninguém consegue descrever com precisão. É aquele segundo entre a pessoa pegar o presente e abrir — quando os olhos brilham um pouco antes mesmo de saber o que está dentro. É a antecipação da alegria. É a prova de que alguém pensou nela.",
+        p2: "A Oba preparou este catálogo para que você seja exatamente essa pessoa — a que pensou, a que escolheu com cuidado, a que fez alguém se sentir especial nesta época do ano. Cada produto aqui foi desenvolvido para chegar bonito, cheiroso e com todo o afeto que o Natal merece. O que você vai ver nas próximas páginas não é só um cardápio — é uma forma de amor, embrulhada com carinho.",
+      },
+      "Páscoa": {
+        p1: "A Páscoa tem uma magia que poucas datas conseguem replicar. Talvez seja o chocolate — mas não é só isso. É a leveza de abril, o clima mais fresco, a sensação de que algo novo está começando. E no meio desse clima, um presente bem pensado tem um peso diferente: ele diz que a pessoa foi lembrada, que o gesto foi intencional, que há cuidado por trás.",
+        p2: "A Oba Doceria vive disso — de transformar ingredientes simples em experiências que ficam na memória. Este catálogo foi preparado com produtos desenvolvidos especialmente para esta época: sabores que remetem à tradição, apresentação que encanta antes mesmo do primeiro mordida. Escolha o que faz sentido para você, e deixa a gente cuidar do resto.",
+      },
+      "Dia das Mães": {
+        p1: "Mãe é aquela pessoa que, mesmo quando o presente é simples, faz aquela cara de quem recebeu o melhor presente do mundo. Ela não precisa de muito. Ela precisa sentir que foi lembrada com cuidado — que, no meio de tudo, você parou, pensou nela e quis fazer algo especial.",
+        p2: "A Oba sabe o que é esse gesto. Cada produto deste catálogo foi pensado para ser à altura desse amor — bonito por fora, irresistível por dentro, e carregado da intenção mais bonita que existe: fazer uma mãe sorrir. Porque no Dia das Mães, o presente mais valioso é o detalhe que prova que você realmente a conhece.",
+      },
+      "Dia dos Pais": {
+        p1: "Pai tem um jeito todo especial de receber presente. Ele agradece, faz aquele sorriso contido, diz que não precisava — e você sabe que, por dentro, ficou muito feliz. Presentear pai é uma arte: precisa ser algo que ele não compraria pra si mesmo, mas que claramente foi escolhido pensando nele.",
+        p2: "Este catálogo foi preparado com essa premissa. Produtos que encantam sem precisar gritar, embalagens que impressionam sem exagero, sabores que ficam na memória por dias. A Oba Doceria acredita que um presente bem pensado faz mais barulho do que qualquer coisa comprada na pressa — e é exatamente isso que você vai encontrar aqui.",
+      },
+      "Dia dos Namorados": {
+        p1: "Tem uma teoria de que as melhores histórias de amor se constroem nos detalhes. Não nos grandes gestos — esses qualquer um faz. Mas no docinho que chegou de surpresa numa tarde de terça. No presente embalado com cuidado quando não era aniversário de nada. Na escolha que prova: eu pensei em você.",
+        p2: "A Oba Doceria existe nesse espaço — no detalhe que faz diferença, na lembrança que transforma um dia comum em algo que vai ser contado depois. Este catálogo foi preparado para o Dia dos Namorados com produtos desenvolvidos para surpreender: sabores intensos, apresentação que encanta, e tudo pensado para chegar como uma declaração bonita, sem precisar de palavras.",
+      },
+      "Dia das Crianças": {
+        p1: "Existe um tipo de alegria que só crianças têm acesso pleno — aquela alegria sem reservas, sem filtro, sem o peso do precisa ser discreto. É o pulo, o grito, o abraço que quase derruba. E essa alegria, quando acontece por causa de algo que você escolheu, fica guardada na memória das duas pessoas: a criança que recebeu, e você que deu.",
+        p2: "A Oba Doceria preparou este catálogo pensando exatamente nesse momento. Produtos coloridos, saborosos, pensados para encantar quem ainda enxerga o mundo com os olhos bem abertos. Porque criança merece presente pensado com carinho — e você merece ver esse sorriso que não tem preço.",
+      },
     };
-    const txt = textos[dataCom] || { p1:"Algumas datas no calend\u00e1rio merecem mais do que uma mensagem no celular. Merecem um gesto concreto, algo que a pessoa possa segurar nas m\u00e3os e sentir que houve inten\u00e7\u00e3o por tr\u00e1s.", p2:"Este cat\u00e1logo foi preparado com produtos desenvolvidos para esta data espec\u00edfica: sabores que combinam com o clima, apresenta\u00e7\u00e3o que encanta antes mesmo de abrir, e tudo com o cuidado artesanal que \u00e9 a marca registrada da Oba." };
+    const txt = textos[dataCom] || { p1:"Algumas datas no calend\u00e1rio merecem mais do que uma mensagem no celular. Merecem um gesto concreto, algo que a pessoa possa segurar nas m\u00e3os e sentir que houve inten\u00e7\u00e3o por tr\u00e1s. \u00c9 nesse espa\u00e7o que a Oba Doceria vive \u2014 no gesto que diz, sem palavras: eu parei, pensei em voc\u00ea, e quis que fosse especial.", p2:"Este cat\u00e1logo foi preparado com produtos desenvolvidos para esta data espec\u00edfica: sabores que combinam com o clima, apresenta\u00e7\u00e3o que encanta antes mesmo de abrir, e tudo com o cuidado artesanal que \u00e9 a marca registrada da Oba. Escolha o que faz mais sentido \u2014 e deixa o resto com a gente." }
     p1 = nomeEmpresa ? "Para "+nomeEmpresa+": "+txt.p1 : txt.p1;
     p2 = txt.p2;
   }
@@ -3747,11 +3765,11 @@ body{background:${T.fundo};font-family:'Plus Jakarta Sans',system-ui,sans-serif;
 .btn-wpp{display:block;width:100%;margin-top:8px;padding:10px 24px;border-radius:10px;text-align:center;background:#25d366;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;letter-spacing:.2px;text-decoration:none}
 
 /* DETALHE */
-.det-page{background:${T.fundo};display:flex;flex-direction:column;min-height:100svh;padding-top:14vh}
+.det-page{background:${T.fundo};display:flex;flex-direction:column;min-height:100svh;justify-content:center}
 .det-header{background:#fff;border-bottom:1px solid ${T.borda};padding:10px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
 .det-back{background:none;border:1.5px solid ${T.borda};border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;color:${T.acento};cursor:pointer}
 .det-counter{font-size:11px;color:#9AB0A0;font-weight:500}
-.det-hero{width:100%;max-height:340px;object-fit:cover;display:block}
+.det-hero{width:100%;max-height:260px;object-fit:cover;display:block}
 .det-galeria{display:flex;gap:6px;padding:8px 20px 0;background:#fff}
 .det-gal-img{width:calc(33.33% - 4px);aspect-ratio:1;object-fit:cover;border-radius:8px;border:1px solid ${T.borda}}
 .det-corpo{padding:24px 28px 28px;text-align:left;flex:1}
@@ -3761,7 +3779,7 @@ body{background:${T.fundo};font-family:'Plus Jakarta Sans',system-ui,sans-serif;
 .faixas-bloco{margin-bottom:22px}
 .faixas-titulo{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
 .faixas-tab{width:100%;border-collapse:collapse}
-.faixas-tab td{padding:9px 0;border-bottom:1px solid #F0F0F0;font-size:13px}
+.faixas-tab td{padding:6px 0;border-bottom:1px solid #F0F0F0;font-size:13px}
 .ft-l{color:#444}
 .ft-p{text-align:right;font-weight:600;white-space:nowrap}
 .ft-un{font-size:10px;font-weight:400;opacity:.6}
