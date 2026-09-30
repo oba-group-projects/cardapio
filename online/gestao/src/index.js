@@ -319,23 +319,20 @@ async function handleLogin(request, env) {
   return response("", 303, headers);
 }
 
-function handleLogout() {
+function handleLogout(isAjax) {
   const headers = new Headers();
-
-  headers.set("Location", "/__auth/login");
-
-  headers.append(
-    "Set-Cookie",
-    `${COOKIE_NAME}=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0`
-  );
-
-  headers.append(
-    "Set-Cookie",
-    `${CSRF_COOKIE}=; Path=/; Secure; SameSite=Strict; Max-Age=0`
-  );
-
+  headers.append("Set-Cookie", `${COOKIE_NAME}=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0`);
+  headers.append("Set-Cookie", `${CSRF_COOKIE}=; Path=/; Secure; SameSite=Strict; Max-Age=0`);
   headers.append("Set-Cookie", "__Host-oba_user=; Path=/; Secure; SameSite=Strict; Max-Age=0");
 
+  if (isAjax) {
+    // Chamada via fetch/JS — retorna JSON, o JS faz o redirect
+    headers.set("Content-Type", "application/json");
+    return new Response(JSON.stringify({ ok: true }), { status: 200, headers });
+  }
+
+  // Chamada via form — redireciona normalmente
+  headers.set("Location", "/__auth/login");
   return response("", 303, headers);
 }
 
@@ -3904,7 +3901,9 @@ export default {
         return json({ ok: false, error: "csrf" }, 403);
       }
 
-      return handleLogout();
+      // Se vier via fetch (JS), retornar JSON; se form, redirecionar
+      const isAjax = request.headers.get("X-CSRF-Token") !== null;
+      return handleLogout(isAjax);
     }
 
     // Rota pública: lista imagens do GitHub (antes de obaHandleMediaServe para não ser capturada como ID)
