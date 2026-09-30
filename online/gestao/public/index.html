@@ -4380,18 +4380,36 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     if (outroWrap) outroWrap.style.display = valor === 'Outro' ? '' : 'none';
     if (!valor || valor === 'Outro') return;
     const presets = {
-      'Natal':            {prazo_pedido:'15 de dezembro', prazo_entrega:'22 de dezembro', cond_pagamento:'50% no pedido, 50% na entrega', pedido_minimo:10,
-                           abertura:'Chegou o Natal! \u2728 Este cat\u00e1logo foi preparado com muito carinho para tornar a sua celebra\u00e7\u00e3o ainda mais especial e doce.'},
-      'P\u00e1scoa':      {prazo_pedido:'7 dias antes da P\u00e1scoa', prazo_entrega:'Sexta-feira Santa', cond_pagamento:'50% no pedido, 50% na entrega', pedido_minimo:10,
-                           abertura:'A P\u00e1scoa chegou! \uD83D\uDC23 Preparamos este cat\u00e1logo especialmente para voc\u00ea celebrar com sabor e carinho.'},
-      'Dia das M\u00e3es':{prazo_pedido:'7 de maio', prazo_entrega:'10 de maio', cond_pagamento:'\u00c0 vista ou 50%/50%', pedido_minimo:5,
-                           abertura:'Dia das M\u00e3es merece algo especial. \uD83D\uDC90 Com muito carinho, preparamos este cat\u00e1logo pensando em cada detalhe.'},
-      'Dia dos Pais':     {prazo_pedido:'7 de agosto', prazo_entrega:'10 de agosto', cond_pagamento:'\u00c0 vista ou 50%/50%', pedido_minimo:5,
-                           abertura:'Papai merece os melhores mimos! \uD83C\uDF81 Confira nossas op\u00e7\u00f5es especiais para o Dia dos Pais.'},
-      'Dia dos Namorados':{prazo_pedido:'10 de junho', prazo_entrega:'12 de junho', cond_pagamento:'\u00c0 vista', pedido_minimo:1,
-                           abertura:'O amor merece ser celebrado com do\u00e7ura. \uD83D\uDC95 Este cat\u00e1logo foi preparado especialmente para o Dia dos Namorados.'},
-      'Dia das Crian\u00e7as':{prazo_pedido:'7 de outubro', prazo_entrega:'10 de outubro', cond_pagamento:'\u00c0 vista ou 50%/50%', pedido_minimo:5,
-                           abertura:'As crian\u00e7as merecem a alegria mais doce! \uD83C\uDF89 Confira nossas op\u00e7\u00f5es especiais para o Dia das Crian\u00e7as.'},
+      'Natal': {
+        prazo_pedido:'15 de dezembro', prazo_entrega:'22 de dezembro',
+        cond_pagamento:'50% no pedido, 50% na entrega', pedido_minimo:10,
+        abertura:'Existe um momento no Natal que todo mundo conhece, mas quase ningu\u00e9m consegue descrever com precis\u00e3o. \u00c9 aquele segundo entre a pessoa pegar o presente e abrir \u2014 quando os olhos brilham um pouco antes mesmo de saber o que est\u00e1 dentro. \u00c9 a antecipa\u00e7\u00e3o da alegria. \u00c9 a prova de que algu\u00e9m pensou nela.\n\nA Oba preparou este cat\u00e1logo para que voc\u00ea seja exatamente essa pessoa \u2014 a que pensou, a que escolheu com cuidado, a que fez algu\u00e9m se sentir especial nesta \u00e9poca do ano. Cada produto aqui foi desenvolvido para chegar bonito, cheiroso e com todo o afeto que o Natal merece.',
+      },
+      'P\u00e1scoa': {
+        prazo_pedido:'7 dias antes da P\u00e1scoa', prazo_entrega:'Sexta-feira Santa',
+        cond_pagamento:'50% no pedido, 50% na entrega', pedido_minimo:10,
+        abertura:'A P\u00e1scoa tem uma magia que poucas datas conseguem replicar. Talvez seja o chocolate \u2014 mas n\u00e3o \u00e9 s\u00f3 isso. \u00c9 a leveza de abril, o clima mais fresco, a sensa\u00e7\u00e3o de que algo novo est\u00e1 come\u00e7ando. E no meio desse clima, um presente bem pensado tem um peso diferente: ele diz que a pessoa foi lembrada, que o gesto foi intencional, que h\u00e1 cuidado por tr\u00e1s.\n\nA Oba Doceria vive disso \u2014 de transformar ingredientes simples em experi\u00eancias que ficam na mem\u00f3ria. Este cat\u00e1logo foi preparado com produtos desenvolvidos especialmente para esta \u00e9poca: sabores que remetem \u00e0 tradi\u00e7\u00e3o, apresenta\u00e7\u00e3o que encanta antes mesmo do primeiro mordida. Escolha o que faz sentido para voc\u00ea, e deixa a gente cuidar do resto.',
+      },
+      'Dia das M\u00e3es': {
+        prazo_pedido:'7 de maio', prazo_entrega:'10 de maio',
+        cond_pagamento:'\u00c0 vista ou 50%/50%', pedido_minimo:5,
+        abertura:'M\u00e3e \u00e9 aquela pessoa que, mesmo quando o presente \u00e9 simples, faz aquela cara de quem recebeu o melhor presente do mundo. Ela n\u00e3o precisa de muito. Ela precisa sentir que foi lembrada com cuidado \u2014 que, no meio de tudo, voc\u00ea parou, pensou nela e quis fazer algo especial.\n\nA Oba sabe o que \u00e9 esse gesto. Cada produto deste cat\u00e1logo foi pensado para ser \u00e0 altura desse amor \u2014 bonito por fora, irresist\u00edvel por dentro, e carregado da inten\u00e7\u00e3o mais bonita que existe: fazer uma m\u00e3e sorrir.',
+      },
+      'Dia dos Pais': {
+        prazo_pedido:'7 de agosto', prazo_entrega:'10 de agosto',
+        cond_pagamento:'\u00c0 vista ou 50%/50%', pedido_minimo:5,
+        abertura:'Pai tem um jeito todo especial de receber presente. Ele agradece, faz aquele sorriso contido, diz que n\u00e3o precisava \u2014 e voc\u00ea sabe que, por dentro, ficou muito feliz. Presentear pai \u00e9 uma arte: precisa ser algo que ele n\u00e3o compraria pra si mesmo, mas que claramente foi escolhido pensando nele.\n\nEste cat\u00e1logo foi preparado com essa premissa. Produtos que encantam sem precisar gritar, embalagens que impressionam sem exagero, sabores que ficam na mem\u00f3ria por dias. A Oba Doceria acredita que um presente bem pensado faz mais barulho do que qualquer coisa comprada na pressa.',
+      },
+      'Dia dos Namorados': {
+        prazo_pedido:'10 de junho', prazo_entrega:'12 de junho',
+        cond_pagamento:'\u00c0 vista', pedido_minimo:1,
+        abertura:'Tem uma teoria de que as melhores hist\u00f3rias de amor se constroem nos detalhes. N\u00e3o nos grandes gestos \u2014 esses qualquer um faz. Mas no docinho que chegou de surpresa numa tarde de ter\u00e7a. No presente embalado com cuidado quando n\u00e3o era anivers\u00e1rio de nada. Na escolha que prova: eu pensei em voc\u00ea.\n\nA Oba Doceria existe nesse espa\u00e7o \u2014 no detalhe que faz diferen\u00e7a, na lembran\u00e7a que transforma um dia comum em algo que vai ser contado depois.',
+      },
+      'Dia das Crian\u00e7as': {
+        prazo_pedido:'7 de outubro', prazo_entrega:'10 de outubro',
+        cond_pagamento:'\u00c0 vista ou 50%/50%', pedido_minimo:5,
+        abertura:'Existe um tipo de alegria que s\u00f3 crian\u00e7as t\u00eam acesso pleno \u2014 aquela alegria sem reservas, sem filtro. \u00c9 o pulo, o grito, o abra\u00e7o que quase derruba. E essa alegria, quando acontece por causa de algo que voc\u00ea escolheu, fica guardada na mem\u00f3ria das duas pessoas: a crian\u00e7a que recebeu, e voc\u00ea que deu.\n\nA Oba Doceria preparou este cat\u00e1logo pensando exatamente nesse momento. Produtos coloridos, saborosos, pensados para encantar quem ainda enxerga o mundo com os olhos bem abertos.',
+      },
     };
     const p = presets[valor];
     if (!p) return;
