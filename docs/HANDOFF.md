@@ -1,48 +1,35 @@
 # HANDOFF
 
-Atualizado: 2026-09-27
+Atualizado: 2026-09-30
 
 Branch: feature/gestao-online-segura
-HEAD: f2c7809
+HEAD: b93cc02
 Tag estável anterior: v12B-baseline (ded3c58)
 
 ## Ultima fase entregue
-12B-rev2 — Redesign visual Corporativo e Sazonal + faixas De-Até
+12B-rev7 — Textos aprovados no sazonal, ajustes visuais finais
 
 ## Commits recentes
 | Commit   | O que fez |
 |----------|-----------|
-| f2c7809  | feat(12B-rev2): redesign visual Corp/Sazonal + faixas De-Ate |
-| 943df8e  | fix(12B-rev1): validacao por template, faixas dinamicas, frequencia, obs sazonal |
-| 843d06e  | docs: handoff sessao 12B |
-| a8d7312  | feat(12B): redesign Corporativo e Sazonal com proposal_options |
-| ded3c58  | docs: checkpoint v12B-baseline |
+| b93cc02  | fix: textos sazonal aprovados em obaPreencherCamposSazonais; abertura limpada no D1 |
+| 404b857  | feat(12B-rev7): textos aprovados sazonal; det-page justify-center; foto 260px; faixas 6px |
+| badbd53  | feat(12B-rev6): sazonal layout corp; copiar opcao sazonal; duplicar corp |
+| fca1a79  | fix: botoes pg1 menos agressivos — PDF outline discreto, WhatsApp menor e mais leve |
+| 334e798  | fix: cards opcoes maiores — foto 80px, nome 22px, preco 15px, padding maior |
 
-## O que está funcionando (f2c7809)
-- Propostas Evento: cenários, itens, faixas, PDF — sem mudança
-- Propostas Corporativo:
-  - Pg0 escura: esmeralda + cobre, chips de briefing, texto contextualizado
-  - Pg1: lista de opções com acento verde-esmeralda
-  - Pg2+: detalhe com foto, faixas De-Até, CTA WhatsApp por opção
-- Propostas Sazonal:
-  - Pg0 escura emocional com paleta temática por data comemorativa
-  - Pg1: cards de produto com foto hero + faixas De-Até + "a partir de"
-  - Condições (prazos, pagamento) no rodapé de pg1, não na abertura
-  - Pg2+: hero grande, galeria extra, faixas, CTA WhatsApp
-- Faixas formato "De X a Até Y un." com dois campos editáveis na Central
-- Migration 0015: coluna `de` em `proposal_option_faixas`
+## O que está funcionando (b93cc02)
+- Proposta Corporativa: pg0 logo 64px + texto 2 parágrafos PlusJakarta 13px + assinatura Cormorant suave; pg1 índice com cards 80px/22px/15px + rodapé no fundo; pg2+ uma opção por página centralizada verticalmente
+- Proposta Sazonal: mesmo layout do corporativo com paletas temáticas por data; textos emocionais aprovados (2 parágrafos completos) para cada data comemorativa; condições em 1 linha compacta na pg0
+- Tabela de propostas na Central: coluna Tipo com badge colorido por template
+- Copiar última opção ao adicionar nova (Sazonal)
+- Botão Duplicar em cada card de opção (Corp/Sazonal)
+- PDF @media print profissional: pg abertura + uma opção por folha A4
 
-## Paletas visuais
-| Template | Pg0 | Acento | Fundo claro |
-|----------|-----|--------|-------------|
-| Evento | dourado romântico | #C8922A | #FFF8EE |
-| Corporativo | esmeralda #1C3B2E | #C8922A cobre | #FAFAF6 |
-| Natal | vinho #5C1220 | #D4A843 ouro | #FDF8F0 |
-| Páscoa | roxo #2E1A5C | #C8922A | #FAF8FF |
-| Dia das Mães | rosa-bordô #6B1A38 | #E8A0B8 | #FFF5F8 |
-| Dia dos Pais | azul noturno #0E2440 | #C8922A | #F5F8FF |
-| Dia dos Namorados | bordô #4A0E1A | #E8A0A8 | #FFF5F5 |
-| Dia das Crianças | laranja escuro #5A2200 | #F5D060 | #FFFBF2 |
+## Comportamento do campo `abertura`
+O Worker usa `proposal.abertura` se preenchido. Se NULL/vazio, usa os textos do objeto `textos{}` por data.
+O campo foi zerado no D1 para todas as propostas sazonais existentes (via UPDATE).
+Ao criar nova proposta sazonal na Central, `obaPreencherCamposSazonais()` preenche com os textos aprovados.
 
 ## Próxima implementação — Fase 12C
 Catálogo de Festas — vitrine pública `/festas`:
