@@ -3137,7 +3137,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       <div style="margin-top:18px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
           <p style="font-size:13px;font-weight:600;color:#3B2A1E">Opções do catálogo <span style="font-size:10px;color:#9B7A60;font-weight:400">(máx. 5)</span></p>
-          <button type="button" class="secondary" style="font-size:11px;padding:5px 14px" onclick="obaAdicionarOpcao('sazonal')">+ Adicionar opção</button>
+          <button type="button" class="secondary" style="font-size:11px;padding:5px 14px" onclick="obaAdicionarOpcaoSazonal()">+ Adicionar opção</button>
         </div>
         <div id="prop-opcoes-sazonal"></div>
       </div>
@@ -4189,9 +4189,12 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     if (optId) div.dataset.optionId = optId;
     div.style.cssText = 'border:1.5px solid #EDD9C0;border-radius:12px;padding:14px;margin-bottom:12px;background:#FFFDF8';
     div.innerHTML =
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
-      + '<strong style="font-size:13px;color:#3B2A1E">Opção ' + (existentes+1) + '</strong>'
-      + '<button type="button" onclick="obaRemoverOpcao(\''+did+'\',\''+contId+'\','+idx+')" style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:12px">✕ Remover</button>'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
+      + '<strong style="font-size:13px;color:#3B2A1E">Op\u00e7\u00e3o ' + (existentes+1) + '</strong>'
+      + '<div style="display:flex;gap:6px">'
+      + '<button type="button" onclick="obaDuplicarOpcao(&quot;'+did+'&quot;,&quot;'+tipo+'&quot;)" style="background:none;border:1px solid #C8E0D0;color:#2A5240;cursor:pointer;font-size:11px;padding:3px 10px;border-radius:8px">\u29C5 Duplicar</button>'
+      + '<button type="button" onclick="obaRemoverOpcao(&quot;'+did+'&quot;,&quot;'+contId+'&quot;,'+idx+')" style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:12px">&#10005; Remover</button>'
+      + '</div>'
       + '</div>'
       + '<div class="grid">'
       + '<div class="field"><label>Nome da opção *</label><input id="'+did+'-nome" placeholder="Ex: Kit Básico" value="'+nome+'"></div>'
@@ -4243,6 +4246,50 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     const el = document.getElementById(did);
     if (el) el.remove();
     delete obaOpcaoImagens[idx];
+  };
+
+  // Duplicar opcao corporativo: copia dados sem imagens
+  window.obaDuplicarOpcao = async function(srcDid, tipo) {
+    const srcDiv = document.getElementById(srcDid);
+    if (!srcDiv) return;
+    const nome  = srcDiv.querySelector('[id\$="-nome"]')?.value || '';
+    const desc  = srcDiv.querySelector('[id\$="-desc"]')?.value || '';
+    const vunit = srcDiv.querySelector('[id\$="-vunit"]')?.value || '';
+    const faixas = [];
+    srcDiv.querySelectorAll('.oba-faixa-linha').forEach(function(l) {
+      const de    = l.querySelector('.oba-faixa-de')?.value?.trim();
+      const ate   = l.querySelector('.oba-faixa-ate')?.value?.trim();
+      const preco = parseFloat(l.querySelector('.oba-faixa-preco')?.value)||0;
+      if (!preco) return;
+      faixas.push({ de: de?parseInt(de):null, ate: ate?parseInt(ate):null, preco });
+    });
+    await obaAdicionarOpcao(tipo, { nome, descricao: desc, valor_unit: vunit?parseFloat(vunit):null, faixas });
+  };
+
+  // Adicionar opcao sazonal copiando a ultima existente automaticamente
+  window.obaAdicionarOpcaoSazonal = async function() {
+    const cont = document.getElementById('prop-opcoes-sazonal');
+    if (!cont) return;
+    const existentes = cont.querySelectorAll('div[data-opcao-idx]');
+    if (existentes.length === 0) {
+      // Nenhuma existente — criar em branco normalmente
+      await obaAdicionarOpcao('sazonal');
+      return;
+    }
+    // Copiar dados da ultima opcao
+    const last = existentes[existentes.length - 1];
+    const nome  = last.querySelector('[id\$="-nome"]')?.value || '';
+    const desc  = last.querySelector('[id\$="-desc"]')?.value || '';
+    const vunit = last.querySelector('[id\$="-vunit"]')?.value || '';
+    const faixas = [];
+    last.querySelectorAll('.oba-faixa-linha').forEach(function(l) {
+      const de    = l.querySelector('.oba-faixa-de')?.value?.trim();
+      const ate   = l.querySelector('.oba-faixa-ate')?.value?.trim();
+      const preco = parseFloat(l.querySelector('.oba-faixa-preco')?.value)||0;
+      if (!preco) return;
+      faixas.push({ de: de?parseInt(de):null, ate: ate?parseInt(ate):null, preco });
+    });
+    await obaAdicionarOpcao('sazonal', { nome, descricao: desc, valor_unit: vunit?parseFloat(vunit):null, faixas });
   };
 
   window.obaOpcaoAbrirUpload = function(idx) {
