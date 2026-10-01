@@ -1746,6 +1746,7 @@ $('formConfig').onsubmit=async e=>{
         <div style="margin-left:auto;display:flex;gap:6px">
           <button type="button" class="secondary" style="padding:4px 8px;font-size:11px" onclick="obaMoverBotao(this,-1)" title="Mover para cima">↑</button>
           <button type="button" class="secondary" style="padding:4px 8px;font-size:11px" onclick="obaMoverBotao(this,1)"  title="Mover para baixo">↓</button>
+          <button type="button" class="secondary oba-btn-visivel-toggle" style="padding:4px 8px;font-size:11px" onclick="obaToggleVisivelBotao(this)" title="Alternar visibilidade">${(!b||b.visivel!==false)?'👁':'🚫'}</button>
           <button type="button" class="secondary" style="padding:4px 8px;font-size:11px" onclick="obaDuplicarBotao(this)"  title="Duplicar botão">⧉</button>
           <button type="button" class="danger"    style="padding:4px 8px;font-size:11px" onclick="obaRemoverBotao(this)"  title="Remover">✕</button>
         </div>
@@ -1798,7 +1799,7 @@ $('formConfig').onsubmit=async e=>{
           </label>
           <label class="oba-toggle-label">
             <input type="checkbox" class="pg3-btn-visivel" ${(!b||b.visivel!==false)?'checked':''}
-              onchange="obaAtualizarPreviewBotao(this.closest('.oba-botao-card'))"> Visível no cardápio
+              onchange="obaAtualizarPreviewBotao(this.closest('.oba-botao-card'));const _t=this.closest('.oba-botao-card').querySelector('.oba-btn-visivel-toggle');if(_t)_t.textContent=this.checked?'👁':'🚫';"> Visível no cardápio
           </label>
         </div>
       </div>`;
@@ -1853,6 +1854,18 @@ $('formConfig').onsubmit=async e=>{
     const novoEl=lista.lastElementChild;
     card.after(novoEl);    /* move para logo após o original */
     obaAtualizarNumeracaoBotoes();
+  };
+
+  /* Toggle de visibilidade direto no header — sincroniza com checkbox interno */
+  window.obaToggleVisivelBotao=function(btn){
+    const card=btn.closest('.oba-botao-card');
+    if(!card)return;
+    const checkbox=card.querySelector('.pg3-btn-visivel');
+    if(!checkbox)return;
+    checkbox.checked=!checkbox.checked;
+    btn.textContent=checkbox.checked?'👁':'🚫';
+    btn.title=checkbox.checked?'Visível — clique para ocultar':'Oculto — clique para mostrar';
+    obaAtualizarPreviewBotao(card);
   };
 
   /* Move um botão para cima ou para baixo */
