@@ -497,13 +497,14 @@
   },
   {
     "ativo": true,
-    "categoriaId": "especiais-2",
+    "categoriaId": "especiais-1",
+    "descricao": "",
     "disponivel": true,
     "id": "crocante-de-nutella",
     "imagem": "Images/Sabores_Doces/Crocante de Nutella.jpeg",
     "nome": "Crocante de Nutella",
     "ordem": 410,
-    "preco": 3.5,
+    "preco": 3,
     "sazonal": false,
     "tags": []
   },
@@ -739,7 +740,7 @@
   },
   {
     "ativo": true,
-    "categoriaId": "especiais-2",
+    "categoriaId": "especiais-1",
     "descricao": "",
     "disponivel": true,
     "id": "sabor-surpresa-de-uva-com-chocolate-ao-leite",
