@@ -1192,6 +1192,15 @@ function checks(item){
   });return w;
 }
 
+function obaSortCategorias(cats){
+  const romanVal=s=>{const m=s.match(/\s+(I{1,3}|IV|VI{0,3}|IX)$/i);if(!m)return 0;const r={I:1,II:2,III:3,IV:4,V:5,VI:6,VII:7,VIII:8,IX:9};return r[(m[1]||'').toUpperCase()]||0;};
+  return [...cats].sort((a,b)=>{
+    const base=n=>n.replace(/\s+(I{1,3}|IV|VI{0,3}|IX)$/i,'').trim();
+    const cmp=base(a.nome).localeCompare(base(b.nome),'pt-BR');
+    return cmp!==0?cmp:romanVal(a.nome)-romanVal(b.nome);
+  });
+}
+
 function selectField(id,label,options,value,full=false){
   const w=document.createElement('div');w.className='field'+(full?' full':'');
   const l=document.createElement('label');l.textContent=label;
@@ -1276,7 +1285,7 @@ function abrirEditor(tipo,id=null,duplicar=false){
   if(tipo==='flavors'){
     $('editorTitulo').textContent=novo?'Novo sabor':'Editar sabor';
     box.append(field('edNome','Nome',duplicar?(item.nome+' - cópia'):item.nome,'text',true));
-    box.append(selectField('edCategoria','Categoria',catalogo.categories.filter(c=>c.ativo!==false).map(c=>({text:c.nome,value:c.id})),item.categoriaId));
+    box.append(selectField('edCategoria','Categoria',obaSortCategorias(catalogo.categories.filter(c=>c.ativo!==false)).map(c=>({text:c.nome,value:c.id})),item.categoriaId));
     box.append(field('edPreco','Preço (R$)',Number(item.preco??0).toFixed(2),'number'));
     box.append(field('edDescricao','Descrição',item.descricao??'','textarea',true));
     box.append(imgField(item,tipo));box.append(checks(item));
@@ -1410,7 +1419,7 @@ function renderTudo(){
 
 async function carregar(){
   catalogo=await obaLoadDraftCatalog();
-  const f=$('filtroCategoria');f.replaceChildren(new Option('Todas as categorias',''));catalogo.categories.forEach(c=>f.add(new Option(c.nome,c.id)));
+  const f=$('filtroCategoria');f.replaceChildren(new Option('Todas as categorias',''));obaSortCategorias(catalogo.categories).forEach(c=>f.add(new Option(c.nome,c.id)));
   $('cfgWhatsapp').value=catalogo.config?.store?.whatsapp??'';$('cfgLocale').value=catalogo.config?.store?.locale??'pt-BR';$('cfgCurrency').value=catalogo.config?.store?.currency??'BRL';$('cfgPayments').value=Array.isArray(catalogo.config?.checkout?.paymentMethods)?catalogo.config.checkout.paymentMethods.join(', '):'';
   const cfgExibirPrecos=$('cfgExibirPrecos');if(cfgExibirPrecos)cfgExibirPrecos.checked=catalogo.config?.store?.exibirPrecos!==false;  obaPopularFormTema();
   renderTudo();await atualizarStatus();

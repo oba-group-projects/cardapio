@@ -262,7 +262,80 @@ function csrfValid(request) {
   );
 }
 
+function loginPage(error = "") {
+  const safeError = error
+    ? '<p role="alert" class="error">Acesso nao autorizado.</p>'
+    : "";
 
+  return `<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Oba Doceria - Gestao</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:#f6f3ee;
+  color:#28231f
+}
+main{
+  width:min(92vw,420px);
+  background:#fff;
+  padding:32px;
+  border-radius:18px;
+  box-shadow:0 12px 40px rgba(0,0,0,.10)
+}
+h1{margin-top:0}
+label{display:block;margin:18px 0 8px}
+input{
+  width:100%;
+  padding:13px;
+  font:inherit;
+  border:1px solid #bbb;
+  border-radius:9px
+}
+button{
+  width:100%;
+  margin-top:20px;
+  padding:13px;
+  border:0;
+  border-radius:9px;
+  font:inherit;
+  font-weight:700;
+  cursor:pointer
+}
+.error{color:#a00}
+.small{font-size:.85rem;opacity:.7}
+</style>
+</head>
+<body>
+<main>
+<h1>Gestao Oba Doceria</h1>
+<p>Acesso administrativo.</p>
+${safeError}
+<form method="post" action="/__auth/login" autocomplete="off">
+<label for="password">Senha</label>
+<input
+  id="password"
+  name="password"
+  type="password"
+  required
+  minlength="12"
+  autocomplete="current-password">
+<button type="submit">Entrar</button>
+</form>
+<p class="small">Area privada.</p>
+</main>
+</body>
+</html>`;
+}
 
 async function handleLogin(request, env) {
   if (!env.AUTH_PASSWORD || !env.AUTH_SESSION_SECRET) {
@@ -283,14 +356,14 @@ async function handleLogin(request, env) {
 
   const form = await request.formData();
   const password = String(form.get("password") || "");
-  const username = String(form.get("username") || "").trim().slice(0, 40);
 
-  // Aceita AUTH_PASSWORD ou AUTH_PASSWORD_2 — identifica qual usuaria entrou
-  const isSenha1 = constantTimeEqual(password, env.AUTH_PASSWORD);
-  const isSenha2 = env.AUTH_PASSWORD_2 && constantTimeEqual(password, env.AUTH_PASSWORD_2);
+  // Aceita AUTH_PASSWORD ou AUTH_PASSWORD_2 (dois acessos independentes)
+  const senhaCorreta = constantTimeEqual(password, env.AUTH_PASSWORD) ||
+    (env.AUTH_PASSWORD_2 && constantTimeEqual(password, env.AUTH_PASSWORD_2));
 
-  if ((!isSenha1 && !isSenha2) || !username) {
+  if (!senhaCorreta) {
     registerFailure(request);
+
     return response(loginPage("invalid"), 401, {
       "Content-Type": "text/html; charset=utf-8",
     });
@@ -300,39 +373,44 @@ async function handleLogin(request, env) {
 
   const session = await createSession(env);
   const csrf = randomToken();
-  // Sanitizar nome para cookie
-  const safeUsername = username.replace(/[^a-zA-Z\u00C0-\u024F\s]/g, "").trim() || "Usu\u00e1ria";
 
   const headers = new Headers();
+
   headers.set("Location", "/");
 
-  headers.append("Set-Cookie",
-    `${COOKIE_NAME}=${session}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${SESSION_SECONDS}`);
+  headers.append(
+    "Set-Cookie",
+    `${COOKIE_NAME}=${session}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${SESSION_SECONDS}`
+  );
 
-  // Cookie de nome (visiivel ao JS, nao e credencial de autenticacao)
-  headers.append("Set-Cookie",
-    `__Host-oba_user=${encodeURIComponent(safeUsername)}; Path=/; Secure; SameSite=Strict; Max-Age=${SESSION_SECONDS}`);
-
-  headers.append("Set-Cookie",
-    `${CSRF_COOKIE}=${csrf}; Path=/; Secure; SameSite=Strict; Max-Age=${SESSION_SECONDS}`);
+  /*
+   * CSRF precisa estar disponivel ao JavaScript administrativo
+   * para ser enviado no header X-CSRF-Token.
+   * Nao e credencial de autenticacao.
+   */
+  headers.append(
+    "Set-Cookie",
+    `${CSRF_COOKIE}=${csrf}; Path=/; Secure; SameSite=Strict; Max-Age=${SESSION_SECONDS}`
+  );
 
   return response("", 303, headers);
 }
 
-function handleLogout(isAjax) {
+function handleLogout() {
   const headers = new Headers();
-  headers.append("Set-Cookie", `${COOKIE_NAME}=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0`);
-  headers.append("Set-Cookie", `${CSRF_COOKIE}=; Path=/; Secure; SameSite=Strict; Max-Age=0`);
-  headers.append("Set-Cookie", "__Host-oba_user=; Path=/; Secure; SameSite=Strict; Max-Age=0");
 
-  if (isAjax) {
-    // Chamada via fetch/JS — retorna JSON, o JS faz o redirect
-    headers.set("Content-Type", "application/json");
-    return new Response(JSON.stringify({ ok: true }), { status: 200, headers });
-  }
-
-  // Chamada via form — redireciona normalmente
   headers.set("Location", "/__auth/login");
+
+  headers.append(
+    "Set-Cookie",
+    `${COOKIE_NAME}=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0`
+  );
+
+  headers.append(
+    "Set-Cookie",
+    `${CSRF_COOKIE}=; Path=/; Secure; SameSite=Strict; Max-Age=0`
+  );
+
   return response("", 303, headers);
 }
 
@@ -3901,9 +3979,7 @@ export default {
         return json({ ok: false, error: "csrf" }, 403);
       }
 
-      // Se vier via fetch (JS), retornar JSON; se form, redirecionar
-      const isAjax = request.headers.get("X-CSRF-Token") !== null;
-      return handleLogout(isAjax);
+      return handleLogout();
     }
 
     // Rota pública: lista imagens do GitHub (antes de obaHandleMediaServe para não ser capturada como ID)
