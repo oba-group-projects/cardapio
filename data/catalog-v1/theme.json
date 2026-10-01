@@ -144,7 +144,6 @@
   },
   "paginas_customizadas": [
     {
-      "ativo": true,
       "config": {
         "citacao": "",
         "ctaAcao": "",
@@ -152,7 +151,7 @@
         "ctaUrl": "",
         "texto": ""
       },
-      "id": "secmuprssg1",
+      "id": "secmupt7eyl",
       "linkMenu": {
         "ativo": true,
         "destaque": false,
@@ -166,6 +165,7 @@
       "titulo": ""
     },
     {
+      "ativo": true,
       "config": {
         "citacao": "",
         "ctaAcao": "",
@@ -173,9 +173,9 @@
         "ctaUrl": "",
         "texto": ""
       },
-      "id": "secmupsa459",
+      "id": "secmupt7g98",
       "linkMenu": {
-        "ativo": false,
+        "ativo": true,
         "destaque": false,
         "icone": "fa-solid fa-star",
         "label": "",
@@ -184,7 +184,7 @@
       "posicao": "menu",
       "subtitulo": "",
       "template": "informativa",
-      "titulo": "TESTE"
+      "titulo": "teste"
     }
   ],
   "schemaVersion": 2,
