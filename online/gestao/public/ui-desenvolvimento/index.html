@@ -3938,14 +3938,17 @@ async function hidratarTemaDoModeloMestre() {
         /* Copiar classes do pag-3 para layout idêntico */
         secao.className = 'min-h-screen hidden flex-col items-center justify-center px-6 py-10 pb-28 fade-page max-w-md mx-auto';
 
-        /* Header com mesma logo e subtítulo */
-        const logoSrc = pag3 ? (pag3.querySelector('#oba-pag3-logo')?.src || '') : '';
+        /* Header com mesma logo e subtítulo — herda tamanho da pag-3 */
+        const logoEl3 = pag3 ? pag3.querySelector('#oba-pag3-logo') : null;
+        const logoSrc = logoEl3?.src || '';
+        const logoWidth = logoEl3?.style.width || '144px';
         const subtituloTxt = pag3 ? (pag3.querySelector('#oba-pag3-subtitulo')?.textContent || '') : '';
+        const subtituloColor = pag3 ? (pag3.querySelector('#oba-pag3-subtitulo')?.style.color || '') : '';
 
         secao.innerHTML = `
           <header class="text-center mb-10 w-full">
-            <img src="${logoSrc}" class="w-36 h-auto mx-auto mb-6 object-contain" alt="Logo">
-            <h2 class="text-[11px] text-[#8B4513]/60 font-semibold uppercase tracking-[0.2em]">${subtituloTxt}</h2>
+            <img src="${logoSrc}" style="width:${logoWidth}" class="h-auto mx-auto mb-6 object-contain" alt="Logo">
+            <h2 class="text-[11px] font-semibold uppercase tracking-[0.2em]" style="color:${subtituloColor||'rgba(139,69,19,0.6)'}">${subtituloTxt}</h2>
           </header>
           <div id="${pageId}-botoes" class="w-full space-y-4"></div>
           <button class="mt-10 py-3 px-6 text-[10px] font-bold text-[#8B4513]/50 uppercase tracking-widest border border-transparent hover:border-[#8B4513]/20 rounded-full transition-all"
@@ -3960,7 +3963,6 @@ async function hidratarTemaDoModeloMestre() {
         if (nextPageId) {
           const verMaisOverflow = document.createElement('button');
           verMaisOverflow.onclick = () => obaNavOverflow(nextPageId);
-          verMaisOverflow.className = 'w-full p-5 bg-amber-50 border-2 border-[#8B4513]/40 text-[#8B4513] rounded-[2rem] text-left flex justify-between items-center active:scale-95 transition-all shadow-sm';
           verMaisOverflow.className = 'w-full py-2 px-5 bg-amber-50/70 border border-[#8B4513]/20 text-[#8B4513] rounded-[1.5rem] flex justify-center items-center gap-2 active:scale-95 transition-all';
           const restanteOverflow = botoesVisiveis.length - (idx + 2) * MAX_POR_PAGINA;
           const contOverflow = Math.max(restanteOverflow, botoesVisiveis.slice((idx + 2) * MAX_POR_PAGINA).length);
