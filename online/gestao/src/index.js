@@ -327,7 +327,6 @@ ${safeError}
   name="password"
   type="password"
   required
-  minlength="12"
   autocomplete="current-password">
 <button type="submit">Entrar</button>
 </form>
@@ -3979,6 +3978,17 @@ export default {
         return json({ ok: false, error: "csrf" }, 403);
       }
 
+      // Se vier via fetch (JS), retorna JSON; se form, redireciona
+      const isAjax = request.headers.get("X-CSRF-Token") !== null;
+      if (isAjax) {
+        // Limpar cookies e retornar JSON para que o JS faça o redirect
+        const lHeaders = new Headers();
+        lHeaders.append("Set-Cookie", `${COOKIE_NAME}=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0`);
+        lHeaders.append("Set-Cookie", `${CSRF_COOKIE}=; Path=/; Secure; SameSite=Strict; Max-Age=0`);
+        lHeaders.append("Set-Cookie", "__Host-oba_user=; Path=/; Secure; SameSite=Strict; Max-Age=0");
+        lHeaders.set("Content-Type", "application/json");
+        return new Response(JSON.stringify({ ok: true }), { status: 200, headers: lHeaders });
+      }
       return handleLogout();
     }
 
