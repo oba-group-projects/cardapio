@@ -30,3 +30,7 @@ FASE*.ps1
 CENTRAL_*_ATUAL.zip
 *.bundle
 Projeto_Gemini/
+
+# Wrangler cache local
+.wrangler/
+online/gestao/.wrangler/

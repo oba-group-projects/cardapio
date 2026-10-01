@@ -8,7 +8,7 @@
 
 O cardápio existe em dois lugares hoje:
 - **GitHub Pages** (`oba-group-projects.github.io/cardapio/`) — lê arquivos JSON estáticos do GitHub
-- **Worker** (`oba-cardapio-gestao.obadoceria.workers.dev/`) — lê dados do banco D1
+- **Worker** (`oba-cardapio-gestao.obadoceria.workers.dev/`) —+ lê dados do banco D1
 
 Isso criou sincronização instável, divergência de versões e complexidade desnecessária.
 A decisão aprovada é unificar tudo no Worker e eliminar o GitHub Pages como cardápio público.
@@ -204,8 +204,23 @@ HEAD: `a8d7312`
 
 ---
 
+### Melhorias de UX pós-12B
+**Status: [x] Concluído — 30/09/2026**
+
+Conjunto de melhorias aprovadas e implementadas após homologação da 12B:
+
+- **Autenticação simplificada:** senha única `Oba2026!` para todos os acessos; campo Nome removido; `minlength` removido do HTML
+- **Ordenação nas tabelas:** clique no `<th>` ordena A→Z / Z→A com seta indicadora; padrão Nome A→Z ao carregar
+- **Dropdowns de Categoria:** ordenados por grupo + número romano (Clássicos I→II, Especiais I→II→III, Tradicionais I→II)
+- **Cards de resumo:** número grande = ativos; "de X" discreto = total (só se houver inativos)
+- **Toggle ativo/pausado na Edição Visual:** checkbox por página/módulo fixo e por Seção Extra; inativar oculta do cardápio público preservando conteúdo na Central
+
+HEAD: `5fbff2a`
+
+---
+
 ### Fase 12C — Catálogo de Festas (vitrine pública)
-**Status: [ ] Pendente — após 12B homologada**
+**Status: [ ] Pendente — após homologação do estado atual**
 
 **O que é:**
 Página de vitrine pública para clientes de eventos, sem fluxo de pedido.
@@ -268,3 +283,8 @@ URL própria, disparada para quem solicita orçamento de festa.
 | 25/09/2026 | 12B aprovada | Templates separados, sazonal individual com duplicação, galeria 8 fotos. |
 | 27/09/2026 | 12B-rev1 | Fix validação template, faixas dinâmicas, frequência corp, observações sazonal. HEAD: 943df8e |
 | 27/09/2026 | 12B-rev2 | Redesign visual Corporativo (esmeralda+cobre) e Sazonal (paletas temáticas). Faixas De-Até. Migration 0015. HEAD: f2c7809 |
+| 30/09/2026 | Autenticação simplificada | Senha Oba2026!, campo Nome removido, minlength removido. |
+| 30/09/2026 | Ordenação tabelas Central | Clique no th ordena colunas A→Z/Z→A. Dropdowns Categoria ordenados por grupo+romano. |
+| 30/09/2026 | Cards de resumo | Ativos em destaque, total discreto. |
+| 30/09/2026 | Toggle ativo/pausado | Edição Visual: checkbox por página/módulo e Seção Extra. HEAD: 5fbff2a |
+| 30/09/2026 | Fechamento de sessão | Docs atualizados, tag v12C-pre criada, bundle de backup gerado. |
