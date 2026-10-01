@@ -3908,9 +3908,9 @@ async function hidratarTemaDoModeloMestre() {
             if (p3b) { p3b.classList.remove('hidden'); p3b.classList.add('flex'); }
             window.scrollTo({ top: 0, behavior: 'smooth' });
           };
-          verMais.className = 'w-full p-5 bg-amber-50 border-2 border-[#8B4513]/40 text-[#8B4513] rounded-[2rem] text-left flex justify-between items-center active:scale-95 transition-all shadow-sm';
+          verMais.className = 'w-full py-2 px-5 bg-amber-50/70 border border-[#8B4513]/20 text-[#8B4513] rounded-[1.5rem] flex justify-center items-center gap-2 active:scale-95 transition-all';
           const proximasOpcoes = botoesVisiveis.length - MAX_POR_PAGINA;
-          verMais.innerHTML = `<div><span class="block text-[9px] uppercase tracking-widest font-bold opacity-60 mb-1">Mais opções</span><span class="text-sm font-semibold">Ver mais (${proximasOpcoes} ${proximasOpcoes === 1 ? 'opção' : 'opções'})  →</span></div><i class="fa-solid fa-chevron-right text-lg text-[#8B4513] opacity-50"></i>`;
+          verMais.innerHTML = `<span class="text-[10px] font-semibold tracking-wide opacity-70">Ver mais (${proximasOpcoes} ${proximasOpcoes === 1 ? 'opção' : 'opções'})  →</span>`;
           container.appendChild(verMais);
         }
       }
@@ -3961,9 +3961,10 @@ async function hidratarTemaDoModeloMestre() {
           const verMaisOverflow = document.createElement('button');
           verMaisOverflow.onclick = () => obaNavOverflow(nextPageId);
           verMaisOverflow.className = 'w-full p-5 bg-amber-50 border-2 border-[#8B4513]/40 text-[#8B4513] rounded-[2rem] text-left flex justify-between items-center active:scale-95 transition-all shadow-sm';
+          verMaisOverflow.className = 'w-full py-2 px-5 bg-amber-50/70 border border-[#8B4513]/20 text-[#8B4513] rounded-[1.5rem] flex justify-center items-center gap-2 active:scale-95 transition-all';
           const restanteOverflow = botoesVisiveis.length - (idx + 2) * MAX_POR_PAGINA;
           const contOverflow = Math.max(restanteOverflow, botoesVisiveis.slice((idx + 2) * MAX_POR_PAGINA).length);
-          verMaisOverflow.innerHTML = `<div><span class="block text-[9px] uppercase tracking-widest font-bold opacity-60 mb-1">Mais opções</span><span class="text-sm font-semibold">Ver mais (${contOverflow > 0 ? contOverflow : ''} ${contOverflow === 1 ? 'opção' : 'opções'})  →</span></div><i class="fa-solid fa-chevron-right text-lg text-[#8B4513] opacity-50"></i>`;
+          verMaisOverflow.innerHTML = `<span class="text-[10px] font-semibold tracking-wide opacity-70">Ver mais (${contOverflow > 0 ? contOverflow : ''} ${contOverflow === 1 ? 'opção' : 'opções'})  →</span>`;
           botoesContainer.appendChild(verMaisOverflow);
         }
       });
