@@ -3825,7 +3825,7 @@ async function hidratarTemaDoModeloMestre() {
         ...botoes,
         ...secoesComLink.map(sec => ({
           id:       'auto-sec-' + sec.id,
-          label:    sec.linkMenu.label    || sec.titulo || sec.id,
+          label:    sec.linkMenu.label    || sec.titulo || '',
           sublabel: sec.linkMenu.sublabel || '',
           icone:    sec.linkMenu.icone    || 'fa-solid fa-star',
           acao:     'sec-' + sec.id,
@@ -3877,7 +3877,7 @@ async function hidratarTemaDoModeloMestre() {
          Cada página tem "Ver mais  →" se houver próxima página,
          e "← Voltar ao menu" se for overflow.
       ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←← */
-      const botoesVisiveis = botoesComSecoesCustom.filter(b => b.visivel !== false);
+      const botoesVisiveis = botoesComSecoesCustom.filter(b => b.visivel !== false && b.label);
       const grupos = [];
       for (let i = 0; i < botoesVisiveis.length; i += MAX_POR_PAGINA) {
         grupos.push(botoesVisiveis.slice(i, i + MAX_POR_PAGINA));
