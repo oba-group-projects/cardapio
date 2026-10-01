@@ -1,9 +1,9 @@
 [
   {
-    "ativo": true,
+    "ativo": false,
     "categoriaId": "tradicionais-1",
     "descricao": "Brigadeiro artesanal com sabor suave de cappuccino, cremoso e equilibrado.",
-    "disponivel": true,
+    "disponivel": false,
     "id": "cappuccino",
     "imagem": "Images/Sabores_Doces/Cappuccino.jpeg",
     "nome": "Cappuccino",
