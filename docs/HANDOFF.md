@@ -1,45 +1,40 @@
 # HANDOFF
 
-Atualizado: 2026-09-30
+Atualizado: 2026-10-01
 
 Branch: feature/gestao-online-segura
-HEAD: 5fbff2a
-Tag estável anterior: v12B-baseline (ded3c58)
-Tag de marco atual: v12C-pre (5fbff2a)
+HEAD: c527348
+Tag estável anterior: v12C-pre (2477185)
+Tag de marco atual: v12C-pre-2 (c527348)
 
 ## Última fase entregue
-Melhorias de UX pós-12B — ordenação, cards ativos, toggle ativo/pausado na Edição Visual
+Melhorias de UX sessão 01/10 — duplicação, toggle visibilidade, "Ver mais" compacto, overflow consistente
 
 ## Commits recentes relevantes
 | Commit   | O que fez |
 |----------|-----------|
-| 5fbff2a  | feat: toggle ativo/pausado para páginas fixas e seções extras na Edição Visual |
-| f2d48ca  | feat: toggle ativo/pausado (antes do rebase) |
-| db12b80  | feat: cards mostram ativos em destaque e total discreto |
-| df3c81b  | feat: ordenação por coluna nas tabelas da Central (click no th) |
-| 88224a4  | feat: ordenar categorias por grupo e número romano nos dropdowns |
-| 0d5eeb3  | fix: remover minlength=12 do campo senha no login |
+| c527348  | fix: páginas overflow herdam logo/subtítulo da pag-3; limpa className duplicado |
+| 02a5ec5  | fix: botão automático de seção sem label/título não aparece no menu |
+| 08329fa  | feat: botão Ver mais compacto; toggle visibilidade no header do card de botão |
+| d6c90f9  | feat: duplicar botão do menu e seção extra na Edição Visual |
 
-## O que está funcionando (5fbff2a)
-- **Autenticação:** senha `Oba2026!`, sem campo Nome, sem distinção de usuário
-- **Tabelas da Central:** ordenação por coluna (clique no `<th>`) com seta A→Z / Z→A; padrão Nome A→Z
-- **Dropdowns de Categoria:** ordenados por grupo + número romano em todos os formulários
-- **Cards de resumo:** número grande = ativos; "de X" = total (aparece só se houver inativos)
-- **Toggle ativo/pausado:** checkbox em cada página/módulo fixo e em cada Seção Extra
-  - Inativar oculta do cardápio público, preserva conteúdo na Central
-  - pag-1 inativa → entra direto na pag-2 (ou pag-3 se ambas inativas)
-  - pag-2 inativa → CTA da pag-1 vai direto para pag-3
-  - Vitrine/Modais inativos → botões de acesso somem do cardápio
-  - Seções Extras inativas → não renderizadas nem exibidas no menu
+## O que está funcionando (c527348)
+- **Duplicar botão do menu:** ⧉ no header de cada card de botão; cópia inserida logo após o original com todos os campos copiados
+- **Duplicar Seção Extra:** ⧉ no header; cópia nasce pausada (`ativo:false`, `linkMenu.ativo:false`, título "Cópia de X")
+- **Toggle visibilidade 👁/🚫:** ícone no header do card sincronizado com checkbox "Visível no cardápio"; funciona nos dois sentidos
+- **"Ver mais" compacto:** linha fina e discreta; não ocupa espaço de botão normal; evita corte do logo/título da Pág 3
+- **Overflow consistente:** páginas 3b, 3c... herdam logo (tamanho configurado) e subtítulo da Pág 3
+- **Fix:** seção sem label e título não gera botão no menu (não usa mais o ID como fallback)
+
+## Comportamento de duplicação
+- **Botão do menu:** cópia com mesmos dados, `visivel:true` — nasce visível, igual ao original
+- **Seção Extra:** cópia com `ativo:false` e `linkMenu.ativo:false` — nasce pausada, deve ser editada antes de ativar
 
 ## Arquivos críticos
 - `online/gestao/src/index.js` — Worker (autenticação, rotas, CSRF)
 - `online/gestao/public/index.html` — Central de Gestão
 - `online/gestao/public/ui-desenvolvimento/index.html` — Cardápio público
 - `online/gestao/migrations/` — D1 migrations (0001 a 0015)
-- `docs/CURRENT_STATE.md`
-- `docs/HANDOFF.md`
-- `docs/PLANO_EXECUCAO.md`
 
 ## Próxima implementação — Fase 12C
 Catálogo de Festas — vitrine pública `/festas`:
@@ -49,6 +44,6 @@ Catálogo de Festas — vitrine pública `/festas`:
 - **Pré-requisito:** homologar estado atual em produção
 
 ## Ponto de retorno seguro
-Tag: `v12C-pre` = commit `5fbff2a` — estado atual estável, pré-fase 12C.
+Tag: `v12C-pre-2` = commit `c527348` — estado atual estável.
 
 Leia AGENTS.md, CURRENT_STATE.md, DECISIONS.md antes de alterar código.

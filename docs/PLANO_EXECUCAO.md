@@ -288,3 +288,7 @@ URL própria, disparada para quem solicita orçamento de festa.
 | 30/09/2026 | Cards de resumo | Ativos em destaque, total discreto. |
 | 30/09/2026 | Toggle ativo/pausado | Edição Visual: checkbox por página/módulo e Seção Extra. HEAD: 5fbff2a |
 | 30/09/2026 | Fechamento de sessão | Docs atualizados, tag v12C-pre criada, bundle de backup gerado. |
+| 01/10/2026 | Duplicar botão/seção | ⧉ no header de cards; seção duplicada nasce pausada. |
+| 01/10/2026 | Toggle visibilidade | 👁/🚫 no header do card de botão do menu. |
+| 01/10/2026 | Ver mais compacto | Linha discreta, sem bloco largo; overflow herda layout pag-3. |
+| 01/10/2026 | Fechamento de sessão | Docs atualizados, tag v12C-pre-2, bundle de backup gerado. |
