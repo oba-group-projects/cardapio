@@ -1746,6 +1746,7 @@ $('formConfig').onsubmit=async e=>{
         <div style="margin-left:auto;display:flex;gap:6px">
           <button type="button" class="secondary" style="padding:4px 8px;font-size:11px" onclick="obaMoverBotao(this,-1)" title="Mover para cima">↑</button>
           <button type="button" class="secondary" style="padding:4px 8px;font-size:11px" onclick="obaMoverBotao(this,1)"  title="Mover para baixo">↓</button>
+          <button type="button" class="secondary" style="padding:4px 8px;font-size:11px" onclick="obaDuplicarBotao(this)"  title="Duplicar botão">⧉</button>
           <button type="button" class="danger"    style="padding:4px 8px;font-size:11px" onclick="obaRemoverBotao(this)"  title="Remover">✕</button>
         </div>
       </div>
@@ -1828,6 +1829,32 @@ $('formConfig').onsubmit=async e=>{
     card.remove();
     obaAtualizarNumeracaoBotoes();
   };
+
+  /* Duplica um botão — insere cópia logo abaixo do original */
+  window.obaDuplicarBotao=function(btn){
+    const card=btn.closest('.oba-botao-card');
+    if(!card)return;
+    const copia={
+      label:   card.querySelector('.pg3-btn-label')?.value.trim()||'',
+      sublabel:card.querySelector('.pg3-btn-sublabel')?.value.trim()||'',
+      acao:    card.querySelector('.pg3-btn-acao')?.value||'caixas',
+      url:     card.querySelector('.pg3-btn-url')?.value.trim()||'',
+      icone:   card.querySelector('.pg3-btn-icone')?.value||'fa-solid fa-star',
+      destaque:card.querySelector('.pg3-btn-destaque')?.checked===true,
+      visivel: card.querySelector('.pg3-btn-visivel')?.checked!==false
+    };
+    /* Insere imediatamente após o card original */
+    const novoCard=document.createElement('div');
+    const lista=card.parentElement;
+    card.after(novoCard);  /* placeholder para posição correta */
+    novoCard.remove();     /* removemos o placeholder */
+    /* Cria o card real com obaAdicionarCardBotao (adiciona no final) e depois move */
+    obaAdicionarCardBotao(copia);
+    const novoEl=lista.lastElementChild;
+    card.after(novoEl);    /* move para logo após o original */
+    obaAtualizarNumeracaoBotoes();
+  };
+
   /* Move um botão para cima ou para baixo */
   window.obaMoverBotao=function(btn,dir){
     const card=btn.closest('.oba-botao-card');
@@ -2456,6 +2483,7 @@ $('formConfig').onsubmit=async e=>{
         <span style="width:22px;height:22px;border-radius:50%;background:var(--brand);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${total+1}</span>
         <span style="font-size:13px;font-weight:700;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${sec.titulo||'Nova seção'}</span>
         <span style="font-size:11px;color:var(--muted);flex-shrink:0">${tmplDef.label}</span>
+        <button type="button" class="secondary" style="padding:4px 8px;font-size:11px" onclick="obaDuplicarSecaoCustom(this)" title="Duplicar seção">⧉</button>
         <button type="button" class="danger" style="padding:4px 8px;font-size:11px" onclick="obaRemoverSecaoCustom(this)" title="Remover seção">✕</button>
       </div>
 
@@ -2656,6 +2684,32 @@ $('formConfig').onsubmit=async e=>{
   };
 
   /* Remove seção */
+  /* Duplica uma seção extra — cópia nasce pausada com novo ID */
+  window.obaDuplicarSecaoCustom = function(btn) {
+    const card = btn.closest('.oba-secao-card');
+    if (!card) return;
+    const original = obaLerSecaoDoCard(card);
+    const novoId = obaGerarIdSecao();
+    const copia = {
+      ...original,
+      id: novoId,
+      ativo: false,  /* nasce pausada — revisar antes de ativar */
+      titulo: (original.titulo ? 'Cópia de ' + original.titulo : 'Nova seção'),
+      linkMenu: {
+        ...original.linkMenu,
+        label: (original.linkMenu?.label ? 'Cópia de ' + original.linkMenu.label : ''),
+        ativo: false  /* botão de menu também nasce desativado */
+      }
+    };
+    const lista = $('secoes-extras-lista');
+    const vazio = $('secoes-extras-vazio');
+    obaAdicionarCardSecao(copia);
+    /* Move o novo card para logo após o original */
+    const novoCard = lista.lastElementChild;
+    card.after(novoCard);
+    if (vazio) vazio.style.display = 'none';
+  };
+
   window.obaRemoverSecaoCustom = async function(btn) {
     if (!confirm('Remover esta seção do cardápio?')) return;
     const card = btn.closest('.oba-secao-card');
