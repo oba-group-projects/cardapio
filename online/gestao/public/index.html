@@ -17,6 +17,7 @@ input,select,textarea{padding:9px 11px;border:1px solid var(--line);border-radiu
 .tabs{display:flex;gap:7px;flex-wrap:wrap;margin:16px 0}.tab{background:#eee5dd;color:var(--text)}.tab.active{background:var(--brand);color:#fff}
 section{display:none;padding:17px}.panel.active{display:block}.toolbar{margin-bottom:11px}.toolbar h2{margin:0 auto 0 0}
 table{width:100%;border-collapse:collapse}th,td{padding:9px;text-align:left;border-bottom:1px solid var(--line)}th{font-size:12px;color:var(--muted)}
+th[data-sort]{cursor:pointer;user-select:none;white-space:nowrap}th[data-sort]:hover{color:var(--primary)}th[data-sort]::after{content:'';margin-left:5px}th[data-sort].sort-asc::after{content:'↑'}th[data-sort].sort-desc::after{content:'↓'}
 tr[data-editable]{cursor:pointer}tr[data-editable]:hover{background:#fffaf6}.ok{color:var(--ok);font-weight:700}.off{color:var(--danger);font-weight:700}
 .badge{display:inline-block;background:#f4e9df;padding:4px 8px;border-radius:999px;font-size:12px}
 #mensagem{display:none;margin-bottom:12px;padding:11px;border-radius:9px}#mensagem.okbox{display:block;background:#eaf8ef;color:#145e36}#mensagem.errbox{display:block;background:#fff0f0;color:#8b2828}
@@ -84,11 +85,11 @@ function obaLogout() {
 <button class="tab" data-tab="proposals">📋 Propostas</button>
 </div>
 
-<section id="panel-flavors" class="panel active"><div class="toolbar"><h2>Sabores</h2><button class="primary" data-new="flavors">+ Novo sabor</button><input id="buscaSabor" placeholder="Buscar sabor"><select id="filtroCategoria"><option value="">Todas as categorias</option></select></div><table><thead><tr><th>Nome</th><th>Categoria</th><th>Preço</th><th class="hide-mobile">Imagem</th><th>Status</th></tr></thead><tbody id="body-flavors"></tbody></table></section>
-<section id="panel-categories" class="panel"><div class="toolbar"><h2>Categorias</h2><button class="primary" data-new="categories">+ Nova categoria</button></div><table><thead><tr><th>Nome</th><th>Preço ref.</th><th>Ordem</th><th>Status</th></tr></thead><tbody id="body-categories"></tbody></table></section>
-<section id="panel-boxes" class="panel"><div class="toolbar"><h2>Caixas</h2><button class="primary" data-new="boxes">+ Nova caixa</button></div><table><thead><tr><th>Nome</th><th>Capacidade</th><th>Máx. sabores</th><th>Preço fixo</th><th>Status</th></tr></thead><tbody id="body-boxes"></tbody></table></section>
-<section id="panel-products" class="panel"><div class="toolbar"><h2>Produtos</h2><button class="primary" data-new="products">+ Novo produto</button></div><table><thead><tr><th>Nome</th><th>Tipo</th><th>Preço</th><th class="hide-mobile">Imagem</th><th>Status</th></tr></thead><tbody id="body-products"></tbody></table></section>
-<section id="panel-options" class="panel"><div class="toolbar"><h2>Opcionais</h2><button class="primary" data-new="options">+ Novo opcional</button></div><table><thead><tr><th>Nome</th><th>Preço</th><th>Ordem</th><th>Status</th></tr></thead><tbody id="body-options"></tbody></table></section>
+<section id="panel-flavors" class="panel active"><div class="toolbar"><h2>Sabores</h2><button class="primary" data-new="flavors">+ Novo sabor</button><input id="buscaSabor" placeholder="Buscar sabor"><select id="filtroCategoria"><option value="">Todas as categorias</option></select></div><table><thead><tr><th data-sort="nome" data-tipo="flavors" onclick="obaSetSort('flavors','nome')">Nome</th><th data-sort="categoriaId" data-tipo="flavors" onclick="obaSetSort('flavors','categoriaId')">Categoria</th><th data-sort="preco" data-tipo="flavors" onclick="obaSetSort('flavors','preco')">Preço</th><th class="hide-mobile">Imagem</th><th>Status</th></tr></thead><tbody id="body-flavors"></tbody></table></section>
+<section id="panel-categories" class="panel"><div class="toolbar"><h2>Categorias</h2><button class="primary" data-new="categories">+ Nova categoria</button></div><table><thead><tr><th data-sort="nome" data-tipo="categories" onclick="obaSetSort('categories','nome')">Nome</th><th data-sort="precoReferencia" data-tipo="categories" onclick="obaSetSort('categories','precoReferencia')">Preço ref.</th><th data-sort="ordem" data-tipo="categories" onclick="obaSetSort('categories','ordem')">Ordem</th><th>Status</th></tr></thead><tbody id="body-categories"></tbody></table></section>
+<section id="panel-boxes" class="panel"><div class="toolbar"><h2>Caixas</h2><button class="primary" data-new="boxes">+ Nova caixa</button></div><table><thead><tr><th data-sort="nome" data-tipo="boxes" onclick="obaSetSort('boxes','nome')">Nome</th><th data-sort="capacidade" data-tipo="boxes" onclick="obaSetSort('boxes','capacidade')">Capacidade</th><th data-sort="maxSabores" data-tipo="boxes" onclick="obaSetSort('boxes','maxSabores')">Máx. sabores</th><th data-sort="precoFixo" data-tipo="boxes" onclick="obaSetSort('boxes','precoFixo')">Preço fixo</th><th>Status</th></tr></thead><tbody id="body-boxes"></tbody></table></section>
+<section id="panel-products" class="panel"><div class="toolbar"><h2>Produtos</h2><button class="primary" data-new="products">+ Novo produto</button></div><table><thead><tr><th data-sort="nome" data-tipo="products" onclick="obaSetSort('products','nome')">Nome</th><th data-sort="tipo" data-tipo="products" onclick="obaSetSort('products','tipo')">Tipo</th><th data-sort="preco" data-tipo="products" onclick="obaSetSort('products','preco')">Preço</th><th class="hide-mobile">Imagem</th><th>Status</th></tr></thead><tbody id="body-products"></tbody></table></section>
+<section id="panel-options" class="panel"><div class="toolbar"><h2>Opcionais</h2><button class="primary" data-new="options">+ Novo opcional</button></div><table><thead><tr><th data-sort="nome" data-tipo="options" onclick="obaSetSort('options','nome')">Nome</th><th data-sort="preco" data-tipo="options" onclick="obaSetSort('options','preco')">Preço</th><th data-sort="ordem" data-tipo="options" onclick="obaSetSort('options','ordem')">Ordem</th><th>Status</th></tr></thead><tbody id="body-options"></tbody></table></section>
 <section id="panel-combos" class="panel"><div class="toolbar"><h2>Combos</h2><button class="primary" data-new="combos">+ Novo combo</button></div><table><thead><tr><th>Nome</th><th>Preço</th><th>Imagem</th><th>Status</th></tr></thead><tbody id="body-combos"></tbody></table></section>
 <section id="panel-config" class="panel">
   <h2>Loja</h2>
@@ -1399,6 +1400,47 @@ async function arquivarAtual(){
   catalogo[tipo]=items;$('editor').close();renderTudo();addPendencia('Arquivado: '+item.nome);msg('Item arquivado. Backup: '+res.backup);
 }
 
+// Estado de ordenação por tabela: {col, dir} onde dir = 1 (A→Z) ou -1 (Z→A)
+const obaSort = {
+  flavors:    {col:'nome', dir:1},
+  categories: {col:'nome', dir:1},
+  boxes:      {col:'nome', dir:1},
+  products:   {col:'nome', dir:1},
+  options:    {col:'nome', dir:1},
+  combos:     {col:'nome', dir:1},
+};
+
+function obaSortItems(items, tipo) {
+  const {col, dir} = obaSort[tipo] || {col:'nome', dir:1};
+  return [...items].sort((a, b) => {
+    let va = a[col] ?? '', vb = b[col] ?? '';
+    // numérico para preço/capacidade
+    if (col === 'preco' || col === 'capacidade' || col === 'maxSabores' || col === 'precoFixo' || col === 'precoReferencia' || col === 'ordem') {
+      return (Number(va) - Number(vb)) * dir;
+    }
+    return String(va).localeCompare(String(vb), 'pt-BR') * dir;
+  });
+}
+
+function obaSetSort(tipo, col) {
+  if (obaSort[tipo].col === col) {
+    obaSort[tipo].dir *= -1;
+  } else {
+    obaSort[tipo].col = col;
+    obaSort[tipo].dir = 1;
+  }
+  renderTudo();
+}
+
+function obaUpdateSortHeaders() {
+  document.querySelectorAll('th[data-sort]').forEach(th => {
+    const tipo = th.dataset.tipo, col = th.dataset.sort;
+    const s = obaSort[tipo];
+    th.classList.toggle('sort-asc',  s.col === col && s.dir === 1);
+    th.classList.toggle('sort-desc', s.col === col && s.dir === -1);
+  });
+}
+
 function renderTudo(){
   $('nSabores').textContent=catalogo.flavors.length;$('nCategorias').textContent=catalogo.categories.length;$('nCaixas').textContent=catalogo.boxes.length;$('nProdutos').textContent=catalogo.products.length;$('nOpcionais').textContent=catalogo.options.length;$('nCombos').textContent=catalogo.combos.length;
 
@@ -1407,14 +1449,15 @@ function renderTudo(){
   const bodies={};
   for(const t of ['flavors','categories','boxes','products','options','combos']){bodies[t]=$('body-'+t);bodies[t].replaceChildren()}
 
-  catalogo.flavors.filter(x=>(!termo||String(x.nome).toLowerCase().includes(termo))&&(!cat||String(x.categoriaId)===cat)).forEach(x=>{
+  catalogo.flavors.filter(x=>(!termo||String(x.nome).toLowerCase().includes(termo))&&(!cat||String(x.categoriaId)===cat)).sort((a,b)=>{const s=obaSort.flavors;let va=s.col==='categoriaId'?(cats.get(String(a.categoriaId))||''):a[s.col]??'',vb=s.col==='categoriaId'?(cats.get(String(b.categoriaId))||''):b[s.col]??'';return s.col==='preco'?(Number(va)-Number(vb))*s.dir:String(va).localeCompare(String(vb),'pt-BR')*s.dir;}).forEach(x=>{
     const tr=document.createElement('tr');tr.dataset.editable='1';tr.onclick=()=>abrirEditor('flavors',x.id);tr.append(td(x.nome),td(cats.get(String(x.categoriaId))||x.categoriaId),td(moeda(x.preco)),td(x.imagem||'—','hide-mobile'),statusTd(x,'flavors'));bodies.flavors.append(tr)
   });
-  catalogo.categories.forEach(x=>{const tr=document.createElement('tr');tr.dataset.editable='1';tr.onclick=()=>abrirEditor('categories',x.id);tr.append(td(x.nome),td(x.precoReferencia==null?'—':moeda(x.precoReferencia)),td(x.ordem),statusTd(x,'categories'));bodies.categories.append(tr)});
-  catalogo.boxes.forEach(x=>{const tr=document.createElement('tr');tr.dataset.editable='1';tr.onclick=()=>abrirEditor('boxes',x.id);tr.append(td(x.nome),td(x.capacidade),td(x.maxSabores),td(x.precoFixo==null?'—':moeda(x.precoFixo)),statusTd(x,'boxes'));bodies.boxes.append(tr)});
-  catalogo.products.forEach(x=>{const tr=document.createElement('tr');tr.dataset.editable='1';tr.onclick=()=>abrirEditor('products',x.id);tr.append(td(x.nome),td(x.tipo),td(moeda(x.preco)),td(x.imagem||'—','hide-mobile'),statusTd(x,'products'));bodies.products.append(tr)});
-  catalogo.options.forEach(x=>{const tr=document.createElement('tr');tr.dataset.editable='1';tr.onclick=()=>abrirEditor('options',x.id);tr.append(td(x.nome),td(moeda(x.preco)),td(x.ordem),statusTd(x,'options'));bodies.options.append(tr)});
-  catalogo.combos.forEach(x=>{const tr=document.createElement('tr');tr.dataset.editable='1';tr.onclick=()=>abrirEditor('combos',x.id);tr.append(td(x.nome),td(moeda(x.preco)),td(x.imagem||'—'),statusTd(x,'combos'));bodies.combos.append(tr)});
+  obaSortItems(catalogo.categories,'categories').forEach(x=>{const tr=document.createElement('tr');tr.dataset.editable='1';tr.onclick=()=>abrirEditor('categories',x.id);tr.append(td(x.nome),td(x.precoReferencia==null?'—':moeda(x.precoReferencia)),td(x.ordem),statusTd(x,'categories'));bodies.categories.append(tr)});
+  obaSortItems(catalogo.boxes,'boxes').forEach(x=>{const tr=document.createElement('tr');tr.dataset.editable='1';tr.onclick=()=>abrirEditor('boxes',x.id);tr.append(td(x.nome),td(x.capacidade),td(x.maxSabores),td(x.precoFixo==null?'—':moeda(x.precoFixo)),statusTd(x,'boxes'));bodies.boxes.append(tr)});
+  obaSortItems(catalogo.products,'products').forEach(x=>{const tr=document.createElement('tr');tr.dataset.editable='1';tr.onclick=()=>abrirEditor('products',x.id);tr.append(td(x.nome),td(x.tipo),td(moeda(x.preco)),td(x.imagem||'—','hide-mobile'),statusTd(x,'products'));bodies.products.append(tr)});
+  obaSortItems(catalogo.options,'options').forEach(x=>{const tr=document.createElement('tr');tr.dataset.editable='1';tr.onclick=()=>abrirEditor('options',x.id);tr.append(td(x.nome),td(moeda(x.preco)),td(x.ordem),statusTd(x,'options'));bodies.options.append(tr)});
+  obaSortItems(catalogo.combos,'combos').forEach(x=>{const tr=document.createElement('tr');tr.dataset.editable='1';tr.onclick=()=>abrirEditor('combos',x.id);tr.append(td(x.nome),td(moeda(x.preco)),td(x.imagem||'—'),statusTd(x,'combos'));bodies.combos.append(tr)});
+  obaUpdateSortHeaders();
 }
 
 async function carregar(){
