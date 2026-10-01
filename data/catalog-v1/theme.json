@@ -142,7 +142,51 @@
       "titulo": ""
     }
   },
-  "paginas_customizadas": [],
+  "paginas_customizadas": [
+    {
+      "ativo": true,
+      "config": {
+        "citacao": "",
+        "ctaAcao": "",
+        "ctaLabel": "",
+        "ctaUrl": "",
+        "texto": ""
+      },
+      "id": "secmuprssg1",
+      "linkMenu": {
+        "ativo": true,
+        "destaque": false,
+        "icone": "fa-solid fa-star",
+        "label": "",
+        "sublabel": ""
+      },
+      "posicao": "menu",
+      "subtitulo": "",
+      "template": "informativa",
+      "titulo": ""
+    },
+    {
+      "config": {
+        "citacao": "",
+        "ctaAcao": "",
+        "ctaLabel": "",
+        "ctaUrl": "",
+        "texto": ""
+      },
+      "id": "secmupsa459",
+      "linkMenu": {
+        "ativo": false,
+        "destaque": false,
+        "icone": "fa-solid fa-star",
+        "label": "",
+        "sublabel": ""
+      },
+      "posicao": "menu",
+      "subtitulo": "",
+      "template": "informativa",
+      "titulo": "TESTE"
+    }
+  ],
   "schemaVersion": 2,
   "tema": {
     "arredondamento": "20",
