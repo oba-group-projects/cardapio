@@ -3661,6 +3661,14 @@ async function hidratarTemaDoModeloMestre() {
     if (elSub1) elSub1.style.display = bv.exibirSubtitulo === false ? 'none' : '';
     const elCTA1 = document.querySelector('#pag-1 button[onclick="navegarPara(2)"]');
     if (elCTA1) elCTA1.style.display = bv.exibirCTA === false ? 'none' : '';
+    /* ativo: se falso, oculta pag-1 e navega direto para pag-2 (ou pag-3 se ambas inativas) */
+    if (bv.ativo === false) {
+      const elP1 = document.getElementById('pag-1');
+      if (elP1) { elP1.classList.add('hidden'); elP1.classList.remove('flex'); }
+      // Redireciona entrada: se pag-2 também inativa vai pra pag-3, senão pag-2
+      const ne2 = (p.nossa_essencia || {});
+      navegarPara(ne2.ativo === false ? 3 : 2);
+    }
 
     /* Nossa Essência */
     const ne = p.nossa_essencia || {};
@@ -3712,6 +3720,13 @@ async function hidratarTemaDoModeloMestre() {
     if (elCitacao2) elCitacao2.style.display = ne.exibirCitacao === false ? 'none' : '';
     const elSep2 = document.querySelector('#pag-2 .bg-orange-200\\/60');
     if (elSep2) elSep2.style.display = ne.exibirSeparador === false ? 'none' : '';
+    /* ativo: se falso, oculta pag-2 e ajusta o botão CTA da pag-1 para ir direto para pag-3 */
+    if (ne.ativo === false) {
+      const elP2 = document.getElementById('pag-2');
+      if (elP2) { elP2.classList.add('hidden'); elP2.classList.remove('flex'); }
+      // Botão CTA da pag-1 passa a ir para pag-3
+      if (elCTA1) elCTA1.setAttribute('onclick', 'navegarPara(3)');
+    }
 
     /* Menu Principal */
     const mp = p.menu_principal || {};
@@ -3728,6 +3743,10 @@ async function hidratarTemaDoModeloMestre() {
     if (elPag3 && mp.corFundo) elPag3.style.backgroundColor = mp.corFundo;
     const elSub3 = document.getElementById('oba-pag3-subtitulo');
     if (elSub3 && mp.corSubtitulo) elSub3.style.color = mp.corSubtitulo;
+    /* ativo: se falso, oculta pag-3 — cliente vai direto para o fluxo */
+    if (mp.ativo === false && elPag3) {
+      elPag3.classList.add('hidden'); elPag3.classList.remove('flex');
+    }
 
     /* R11A: tipografia por página · Pág 3 subtítulo, labels e sublabels */
     if (mp.tamSubtitulo) {
@@ -3776,7 +3795,7 @@ async function hidratarTemaDoModeloMestre() {
       /* Seções customizadas com linkMenu.ativo geram botão no menu.
          O overflow (R10B) cuida automaticamente do limite de 4 por página. */
       const secoesComLink = Array.isArray(tema.paginas_customizadas)
-        ? tema.paginas_customizadas.filter(s => s && s.id && s.linkMenu && s.linkMenu.ativo !== false)
+        ? tema.paginas_customizadas.filter(s => s && s.id && s.ativo !== false && s.linkMenu && s.linkMenu.ativo !== false)
         : [];
 
       /* Pré-registra ações sec-* no acaoMap para TODAS as seções customizadas
@@ -3992,9 +4011,9 @@ async function hidratarTemaDoModeloMestre() {
     /* Remove seções customizadas antigas antes de re-renderizar */
     document.querySelectorAll('[data-oba-secao-custom]').forEach(el => el.remove());
 
-    /* secoesCustom: todas as seções com template definido para renderizar */
+    /* secoesCustom: apenas seções ativas com template definido para renderizar */
     const secoesCustom = Array.isArray(tema.paginas_customizadas)
-      ? tema.paginas_customizadas.filter(s => s && s.id && s.template)
+      ? tema.paginas_customizadas.filter(s => s && s.id && s.template && s.ativo !== false)
       : [];
 
     /* Renderiza cada seção customizada */
@@ -4101,12 +4120,21 @@ async function hidratarTemaDoModeloMestre() {
     const vp = p.vitrine_presentes || {};
     _set('oba-vitrine-titulo',     vp.titulo);
     _set('oba-vitrine-subtitulo',  vp.subtitulo);
+    /* ativo: se falso, oculta a seção de kits/vitrine no fluxo */
+    if (vp.ativo === false) {
+      const elVitrine = document.getElementById('secao-kits');
+      if (elVitrine) elVitrine.style.display = 'none';
+    }
 
     /* Modal Personalizados */
     const pm = p.personalizados_modal || {};
     _set('oba-pers-titulo',        pm.titulo);
     _set('oba-pers-info-titulo',   pm.info_titulo);
     _set('oba-pers-pacotes-titulo',pm.pacotes_titulo);
+    /* ativo: se falso, desabilita o botão de acesso ao modal */
+    if (pm.ativo === false) {
+      document.querySelectorAll('[data-oba-business-channel="personalizados"]').forEach(el => el.style.display = 'none');
+    }
     /* R11B: info_items dinâmicos · substitui os <p> no bloco de Informações */
     const infoLista = document.getElementById('oba-pers-info-lista');
     if (infoLista && Array.isArray(pm.info_items) && pm.info_items.length > 0) {
@@ -4145,6 +4173,10 @@ async function hidratarTemaDoModeloMestre() {
     /* Modal Eventos */
     const em = p.eventos_modal || {};
     _set('oba-eventos-titulo', em.titulo);
+    /* ativo: se falso, desabilita o botão de acesso ao modal */
+    if (em.ativo === false) {
+      document.querySelectorAll('[data-oba-business-channel="eventos"]').forEach(el => el.style.display = 'none');
+    }
     /* R11B: labels editáveis dos campos */
     const evNome = document.getElementById('eve-nome');
     const evTipo = document.getElementById('eve-tipo');
