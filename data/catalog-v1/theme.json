@@ -1,6 +1,7 @@
 {
   "paginas": {
     "boas_vindas": {
+      "ativo": true,
       "botaoCTA": "",
       "corFundo": "",
       "corTitulo": "",
@@ -18,6 +19,7 @@
       "titulo": "Bem Vindo!"
     },
     "eventos_modal": {
+      "ativo": true,
       "label_botao": "",
       "label_convidados": "",
       "label_data": "",
@@ -26,6 +28,7 @@
       "titulo": ""
     },
     "menu_principal": {
+      "ativo": true,
       "botoes": [
         {
           "acao": "caixas",
@@ -38,10 +41,20 @@
           "visivel": true
         },
         {
+          "acao": "caixas",
+          "destaque": true,
+          "icone": "fa-solid fa-box-open",
+          "id": "btn-1",
+          "label": "Doces Finos",
+          "sublabel": "Montagem",
+          "url": "",
+          "visivel": true
+        },
+        {
           "acao": "presenteaveis",
           "destaque": false,
           "icone": "fa-solid fa-gift",
-          "id": "btn-1",
+          "id": "btn-2",
           "label": "Presenteáveis / Especiais",
           "sublabel": "Kits & Presentes",
           "url": "",
@@ -51,7 +64,7 @@
           "acao": "personalizados",
           "destaque": false,
           "icone": "fa-solid fa-wand-magic-sparkles",
-          "id": "btn-2",
+          "id": "btn-3",
           "label": "Doces Personalizados",
           "sublabel": "Exclusivo",
           "url": "",
@@ -61,7 +74,7 @@
           "acao": "eventos",
           "destaque": false,
           "icone": "fa-solid fa-champagne-glasses",
-          "id": "btn-3",
+          "id": "btn-4",
           "label": "Grandes Eventos",
           "sublabel": "Proposta",
           "url": "",
@@ -81,6 +94,7 @@
       "tamanhoLogo": "medio"
     },
     "nossa_essencia": {
+      "ativo": true,
       "citacao": "",
       "corFundo": "",
       "corTexto": "",
@@ -99,6 +113,7 @@
       "titulo": ""
     },
     "personalizados_modal": {
+      "ativo": true,
       "info_items": [
         "Modelagem artesanal.",
         "Mínimo: 20 unidades."
@@ -122,6 +137,7 @@
       "titulo": ""
     },
     "vitrine_presentes": {
+      "ativo": true,
       "subtitulo": "",
       "titulo": ""
     }
@@ -148,6 +164,6 @@
     "tamanhoSubtitulo": "11",
     "tamanhoTitulo": "26"
   },
-  "updatedAt": "2026-09-22",
+  "updatedAt": "2026-10-01",
   "variante": "classica"
 }
