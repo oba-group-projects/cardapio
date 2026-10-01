@@ -42,7 +42,7 @@
         },
         {
           "acao": "caixas",
-          "destaque": true,
+          "destaque": false,
           "icone": "fa-solid fa-box-open",
           "id": "btn-1",
           "label": "Doces Finos",
