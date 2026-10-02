@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -2225,16 +2225,16 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
         <div class="p-4 bg-orange-50 rounded-2xl border border-orange-100">
           <h4 id="oba-pers-info-titulo" class="font-bold mb-2 uppercase text-[10px]">Informações</h4>
           <div id="oba-pers-info-lista">
-            <p id="oba-pers-info-1">⬢ Modelagem artesanal.</p>
-            <p id="oba-pers-info-2">⬢ Mínimo: 20 unidades.</p>
+            <p id="oba-pers-info-1">· Modelagem artesanal.</p>
+            <p id="oba-pers-info-2">· Mínimo: 20 unidades.</p>
           </div>
         </div>
         <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100">
           <h4 id="oba-pers-pacotes-titulo" class="font-bold mb-2 uppercase text-[10px]">Pacotes Especiais</h4>
           <div id="oba-pers-pacotes-lista">
-            <p>⬢ 20 doces: <b id="oba-pers-preco-20">R$ 196,00</b></p>
-            <p>⬢ 35 doces: <b id="oba-pers-preco-35">R$ 280,00</b></p>
-            <p>⬢ 50 doces: <b id="oba-pers-preco-50">R$ 375,00</b></p>
+            <p>· 20 doces: <b id="oba-pers-preco-20">R$ 196,00</b></p>
+            <p>· 35 doces: <b id="oba-pers-preco-35">R$ 280,00</b></p>
+            <p>· 50 doces: <b id="oba-pers-preco-50">R$ 375,00</b></p>
           </div>
         </div>
       </div>
@@ -4145,7 +4145,7 @@ async function hidratarTemaDoModeloMestre() {
       pm.info_items.forEach(item => {
         if (!item) return;
         const p = document.createElement('p');
-        p.textContent = '⬢ ' + item;
+        p.textContent = '· ' + item;
         infoLista.appendChild(p);
       });
     } else if (infoLista && Array.isArray(pm.info_items) && pm.info_items.length === 0) {
@@ -4160,7 +4160,7 @@ async function hidratarTemaDoModeloMestre() {
         const p = document.createElement('p');
         const b = document.createElement('b');
         b.textContent = 'R$ ' + pk.preco;
-        p.textContent = '⬢ ' + pk.quantidade + ' doces: ';
+        p.textContent = '· ' + pk.quantidade + ' doces: ';
         p.appendChild(b);
         pacotesLista.appendChild(p);
       });
@@ -6460,8 +6460,8 @@ function atualizarModalQuantidadeDoce() {
       estado.faltamParaMinimo;
 
     status.textContent =
-      `${totalProjetado} doces ⬢ ` +
-      `faltam ${faltam} para o mínimo ⬢ ` +
+      `${totalProjetado} doces · ` +
+      `faltam ${faltam} para o mínimo · ` +
       `${saboresProjetados}/${estado.limiteSabores} sabores`;
 
     return;
@@ -6469,7 +6469,7 @@ function atualizarModalQuantidadeDoce() {
 
 
   let texto =
-    `${totalProjetado} doces ⬢ mínimo atingido ✅ ⬢ ` +
+    `${totalProjetado} doces · mínimo atingido ✅ · ` +
     `${saboresProjetados}/${estado.limiteSabores} sabores`;
 
 
@@ -6486,7 +6486,7 @@ function atualizarModalQuantidadeDoce() {
 
 
     texto +=
-      ` ⬢ faltam ${faltam} doces para liberar até ` +
+      ` · faltam ${faltam} doces para liberar até ` +
       `${estado.proximaLiberacaoSabores.sabores} sabores`;
   }
 
@@ -13897,7 +13897,7 @@ function mostrarNotificacao(msg) {
     if (status) {
 
       status.textContent =
-        `${total}/${capacidade} doces ⬢ ${itens.length} ${itens.length === 1 ? 'sabor' : 'sabores'}`;
+        `${total}/${capacidade} doces · ${itens.length} ${itens.length === 1 ? 'sabor' : 'sabores'}`;
     }
   }
 
@@ -14138,7 +14138,7 @@ function mostrarNotificacao(msg) {
 
 
     totalEl.textContent =
-      `${total} ${total === 1 ? 'doce' : 'doces'} ⬢ ${itens.length} ${itens.length === 1 ? 'sabor' : 'sabores'}`;
+      `${total} ${total === 1 ? 'doce' : 'doces'} · ${itens.length} ${itens.length === 1 ? 'sabor' : 'sabores'}`;
 
 
     modal.hidden =
@@ -15245,7 +15245,7 @@ function mostrarNotificacao(msg) {
     if (status) {
 
       status.textContent =
-        `${total}/${capacidade} doces ⬢ ${sabores} ${sabores === 1 ? 'sabor' : 'sabores'}`;
+        `${total}/${capacidade} doces · ${sabores} ${sabores === 1 ? 'sabor' : 'sabores'}`;
     }
   }
 
@@ -17809,13 +17809,13 @@ function mostrarNotificacao(msg) {
         if (total < 25) {
 
           resumo.textContent =
-            `Caixa personalizada · ${total} doces ⬢ mínimo 25 ⬢ até ${limite} sabores`;
+            `Caixa personalizada · ${total} doces · mínimo 25 · até ${limite} sabores`;
 
         }
         else {
 
           resumo.textContent =
-            `Caixa personalizada · ${total} doces ⬢ até ${limite} sabores`;
+            `Caixa personalizada · ${total} doces · até ${limite} sabores`;
         }
       }
 
@@ -17857,7 +17857,7 @@ function mostrarNotificacao(msg) {
         if (detalhe) {
 
           detalhe.textContent =
-            `${total} doces ⬢ ${sabores} ` +
+            `${total} doces · ${sabores} ` +
             `${sabores === 1 ? 'sabor' : 'sabores'}`;
         }
       }
@@ -18081,8 +18081,8 @@ function mostrarNotificacao(msg) {
       if (resumo) {
 
         resumo.textContent =
-          `${total} doces ⬢ ` +
-          `${sabores} ${sabores === 1 ? 'sabor' : 'sabores'} ⬢ ` +
+          `${total} doces · ` +
+          `${sabores} ${sabores === 1 ? 'sabor' : 'sabores'} · ` +
           `até ${limite} sabores nesta faixa`;
       }
 
@@ -18332,7 +18332,7 @@ function mostrarNotificacao(msg) {
       if (resumo) {
 
         resumo.textContent =
-          `${total} doces ⬢ ` +
+          `${total} doces · ` +
           `${sabores} ${sabores === 1 ? 'sabor' : 'sabores'}`;
       }
 
@@ -19518,31 +19518,31 @@ function mostrarNotificacao(msg) {
 
 
     let textoStatus =
-      `${total} doces ⬢ ${sabores} de até ${limite} sabores`;
+      `${total} doces · ${sabores} de até ${limite} sabores`;
 
 
     if (total < 25) {
 
       textoStatus +=
-        ` ⬢ faltam ${25 - total} doces para o mínimo`;
+        ` · faltam ${25 - total} doces para o mínimo`;
 
     }
     else {
 
       textoStatus +=
-        ' ⬢ mínimo atingido ✅';
+        ' · mínimo atingido ✅';
 
 
       if (total < 50) {
 
         textoStatus +=
-          ` ⬢ ${50 - total} doces para liberar até 10 sabores`;
+          ` · ${50 - total} doces para liberar até 10 sabores`;
 
       }
       else if (total < 100) {
 
         textoStatus +=
-          ` ⬢ ${100 - total} doces para liberar até 14 sabores`;
+          ` · ${100 - total} doces para liberar até 14 sabores`;
       }
     }
 
@@ -20757,7 +20757,7 @@ function mostrarNotificacao(msg) {
 
 
         badge.innerHTML =
-          `<i class="fa-solid fa-check"></i> Selecionado ⬢ ${qtd}🎉`;
+          `<i class="fa-solid fa-check"></i> Selecionado · ${qtd}🎉`;
 
 
         card.appendChild(
@@ -21522,13 +21522,13 @@ input {
       if (total < 25) {
 
         resumo.textContent =
-          `Caixa personalizada · ${total} doces ⬢ mínimo 25 ⬢ até ${limite} sabores`;
+          `Caixa personalizada · ${total} doces · mínimo 25 · até ${limite} sabores`;
 
       }
       else {
 
         resumo.textContent =
-          `Caixa personalizada · ${total} doces ⬢ até ${limite} sabores`;
+          `Caixa personalizada · ${total} doces · até ${limite} sabores`;
       }
     }
 
@@ -21590,15 +21590,15 @@ input {
 
 
           detalhe.textContent =
-            `${total} doces ⬢ ${sabores} ` +
-            `${sabores === 1 ? 'sabor' : 'sabores'} ⬢ ` +
+            `${total} doces · ${sabores} ` +
+            `${sabores === 1 ? 'sabor' : 'sabores'} · ` +
             `faltam ${faltam}`;
 
         }
         else {
 
           detalhe.textContent =
-            `${total} doces ⬢ ${sabores}/${limite} sabores ⬢ ` +
+            `${total} doces · ${sabores}/${limite} sabores · ` +
             `mínimo atingido ✅`;
         }
       }
@@ -21742,7 +21742,7 @@ input {
 
         badge.innerHTML =
           `<i class="fa-solid fa-check"></i>` +
-          ` ESCOLHIDO ⬢ ${qtd}🎉`;
+          ` ESCOLHIDO · ${qtd}🎉`;
 
 
         imagem.appendChild(
@@ -21998,8 +21998,8 @@ input {
       if (resumo) {
 
         resumo.textContent =
-          `${total} doces ⬢ ` +
-          `${sabores} ${sabores === 1 ? 'sabor' : 'sabores'} ⬢ ` +
+          `${total} doces · ` +
+          `${sabores} ${sabores === 1 ? 'sabor' : 'sabores'} · ` +
           `até ${limite} sabores nesta faixa`;
       }
 
@@ -26282,7 +26282,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
     if (resumo) {
 
       resumo.textContent =
-        `${total} ${total === 1 ? 'doce' : 'doces'} ⬢ ` +
+        `${total} ${total === 1 ? 'doce' : 'doces'} · ` +
         `${sabores} ${sabores === 1 ? 'sabor' : 'sabores'}`;
     }
 
@@ -27106,7 +27106,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
       resumo.textContent =
-        `${composicao.doces} doces ⬢ ` +
+        `${composicao.doces} doces · ` +
         `${composicao.sabores} ${
           composicao.sabores === 1
             ? 'sabor'
@@ -28423,7 +28423,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
 /* ================================================================
-   RESUMO 25 DOCES ⬢ 5 SABORES
+   RESUMO 25 DOCES · 5 SABORES
 ================================================================ */
 
 #r117b-cart-list
@@ -30141,8 +30141,8 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
       return (
-        `${total}/${meta} doces ⬢ ` +
-        `${blocoSabores} ⬢ ` +
+        `${total}/${meta} doces · ` +
+        `${blocoSabores} · ` +
         frase
       );
     }
@@ -30151,8 +30151,8 @@ button[onclick*="fecharModalQuantidadeDoce"] {
     if (total >= meta) {
 
       return (
-        `↓ Caixa completa ⬢ ` +
-        `${total}/${meta} doces ⬢ ` +
+        `↓ Caixa completa · ` +
+        `${total}/${meta} doces · ` +
         blocoSabores
       );
     }
@@ -30169,8 +30169,8 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 
     return (
-      `${total}/${meta} doces ⬢ ` +
-      `${blocoSabores} ⬢ ` +
+      `${total}/${meta} doces · ` +
+      `${blocoSabores} · ` +
       frase
     );
   }
@@ -32547,8 +32547,8 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
         novoTexto =
           (
-            `${total} doces ⬢ ` +
-            `${sabores} de até ${limiteSabores} sabores ⬢ ` +
+            `${total} doces · ` +
+            `${sabores} de até ${limiteSabores} sabores · ` +
             (
               faltam === 1
                 ? 'falta 1 doce para atingir o mínimo'
@@ -32566,9 +32566,9 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
         novoTexto =
           (
-            `↓ Mínimo atingido ⬢ ` +
-            `${total} doces ⬢ ` +
-            `${sabores} sabores ⬢ ` +
+            `↓ Mínimo atingido · ` +
+            `${total} doces · ` +
+            `${sabores} sabores · ` +
             (
               excedenteSabores === 1
                 ? 'remova 1 sabor para esta faixa'
@@ -32581,8 +32581,8 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
         novoTexto =
           (
-            `↓ Mínimo atingido ⬢ ` +
-            `${total} doces ⬢ ` +
+            `↓ Mínimo atingido · ` +
+            `${total} doces · ` +
             `${sabores} de até ${limiteSabores} sabores`
           );
       }
