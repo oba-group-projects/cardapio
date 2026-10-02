@@ -1519,6 +1519,7 @@ async function carregar(){
 }
 
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
+  if(!b.dataset.tab)return; /* ignora o trigger do dropdown */
   document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));
   document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
   $('panel-'+b.dataset.tab).classList.add('active');
