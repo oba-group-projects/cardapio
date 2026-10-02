@@ -3,47 +3,34 @@
 Atualizado: 2026-10-01
 
 Branch: feature/gestao-online-segura
-HEAD: c527348
-Tag estável anterior: v12C-pre (2477185)
-Tag de marco atual: v12C-pre-2 (c527348)
+HEAD: baca909
+Tag de marco atual: v12C-pre-3 (baca909)
 
-## Última fase entregue
-Melhorias de UX sessão 01/10 — duplicação, toggle visibilidade, "Ver mais" compacto, overflow consistente
+## Última entrega
+Dropdown "Catálogo" na barra de navegação da Central
 
 ## Commits recentes relevantes
 | Commit   | O que fez |
 |----------|-----------|
-| c527348  | fix: páginas overflow herdam logo/subtítulo da pag-3; limpa className duplicado |
-| 02a5ec5  | fix: botão automático de seção sem label/título não aparece no menu |
-| 08329fa  | feat: botão Ver mais compacto; toggle visibilidade no header do card de botão |
-| d6c90f9  | feat: duplicar botão do menu e seção extra na Edição Visual |
+| baca909  | feat: dropdown Catálogo com classe própria (sem conflito com .tab) |
+| ca5af6e  | revert: rollback para v12C-pre-2 durante debug do dropdown |
+| 6755162  | docs: handoff sessão 01/10 parte 1 |
+| c527348  | fix: páginas overflow herdam logo/subtítulo da pag-3 |
 
-## O que está funcionando (c527348)
-- **Duplicar botão do menu:** ⧉ no header de cada card de botão; cópia inserida logo após o original com todos os campos copiados
-- **Duplicar Seção Extra:** ⧉ no header; cópia nasce pausada (`ativo:false`, `linkMenu.ativo:false`, título "Cópia de X")
-- **Toggle visibilidade 👁/🚫:** ícone no header do card sincronizado com checkbox "Visível no cardápio"; funciona nos dois sentidos
-- **"Ver mais" compacto:** linha fina e discreta; não ocupa espaço de botão normal; evita corte do logo/título da Pág 3
-- **Overflow consistente:** páginas 3b, 3c... herdam logo (tamanho configurado) e subtítulo da Pág 3
-- **Fix:** seção sem label e título não gera botão no menu (não usa mais o ID como fallback)
+## O que está funcionando (baca909)
+- **Dropdown Catálogo:** botão `oba-catalogo-btn` abre menu com Sabores, Categorias, Caixas, Produtos, Opcionais, Combos; animação suave; fecha ao clicar fora; botão fica marrom quando aba interna está ativa
+- **Barra de navegação:** 5 itens — Catálogo ▾, Loja, Edição Visual, Mídia, Propostas
+- Tudo da v12C-pre-2 continua funcionando (duplicar, toggle, ver mais, overflow)
 
-## Comportamento de duplicação
-- **Botão do menu:** cópia com mesmos dados, `visivel:true` — nasce visível, igual ao original
-- **Seção Extra:** cópia com `ativo:false` e `linkMenu.ativo:false` — nasce pausada, deve ser editada antes de ativar
-
-## Arquivos críticos
-- `online/gestao/src/index.js` — Worker (autenticação, rotas, CSRF)
-- `online/gestao/public/index.html` — Central de Gestão
-- `online/gestao/public/ui-desenvolvimento/index.html` — Cardápio público
-- `online/gestao/migrations/` — D1 migrations (0001 a 0015)
+## Detalhe técnico do dropdown
+- Trigger usa classe `oba-catalogo-btn` — **nunca** `.tab` — evita conflito com handler de tabs
+- Fechar: `mousedown` com `contains()` no wrap — mais confiável que `click` no document
+- IDs: `oba-catalogo-wrap`, `oba-catalogo-btn`, `oba-catalogo-menu`
 
 ## Próxima implementação — Fase 12C
-Catálogo de Festas — vitrine pública `/festas`:
-- Rota pública sem autenticação
-- Exibe categorias + doces finos para eventos
-- Sem fluxo de pedido — CTA único WhatsApp
-- **Pré-requisito:** homologar estado atual em produção
+Catálogo de Festas — vitrine pública `/festas`.
 
 ## Ponto de retorno seguro
-Tag: `v12C-pre-2` = commit `c527348` — estado atual estável.
+Tag: `v12C-pre-3` = commit `baca909`.
 
 Leia AGENTS.md, CURRENT_STATE.md, DECISIONS.md antes de alterar código.

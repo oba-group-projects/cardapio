@@ -292,3 +292,5 @@ URL própria, disparada para quem solicita orçamento de festa.
 | 01/10/2026 | Toggle visibilidade | 👁/🚫 no header do card de botão do menu. |
 | 01/10/2026 | Ver mais compacto | Linha discreta, sem bloco largo; overflow herda layout pag-3. |
 | 01/10/2026 | Fechamento de sessão | Docs atualizados, tag v12C-pre-2, bundle de backup gerado. |
+| 01/10/2026 | Dropdown Catálogo | Agrupa 6 abas em menu suspenso; barra reduzida de 10 para 5 itens. HEAD: baca909 |
+| 01/10/2026 | Fechamento de sessão | Docs atualizados, tag v12C-pre-3, bundle de backup gerado. |
