@@ -14,15 +14,7 @@ button,input,select,textarea{font:inherit}button{border:0;border-radius:9px;padd
 input,select,textarea{padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:#fff}textarea{min-height:80px;resize:vertical}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px}.card,section{background:#fff;border:1px solid var(--line);border-radius:14px}.card{padding:13px}
 .numero{font-size:24px;font-weight:800;color:var(--brand)}.total{font-size:11px;color:var(--muted);margin-top:-2px}.label{color:var(--muted)}
-.tabs{display:flex;gap:7px;flex-wrap:wrap;margin:16px 0;align-items:center}.tab{background:#eee5dd;color:var(--text)}.tab.active{background:var(--brand);color:#fff}
-.tab-dropdown{position:relative;display:inline-block}
-.tab-dropdown-menu{visibility:hidden;opacity:0;pointer-events:none;flex-direction:column;position:absolute;top:calc(100% + 6px);left:0;z-index:200;background:#fff;border:1px solid #e8d5b5;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.12),0 2px 6px rgba(0,0,0,.06);padding:6px;min-width:170px;display:flex;transition:opacity .15s,visibility .15s,transform .15s;transform:translateY(-6px)}
-.tab-dropdown-menu.open{visibility:visible;opacity:1;pointer-events:auto;transform:translateY(0)}
-.tab-dropdown-menu .tab{width:100%;text-align:left;border-radius:8px;padding:9px 14px;font-size:13px;background:transparent;transition:background .12s}
-.tab-dropdown-menu .tab:hover{background:#f5ece4}
-.tab-dropdown-menu .tab.active{background:var(--brand);color:#fff}
-.tab-dropdown-trigger{display:flex;align-items:center;gap:5px}
-.tab-dropdown-trigger.catalogo-ativo{background:var(--brand);color:#fff}
+.tabs{display:flex;gap:7px;flex-wrap:wrap;margin:16px 0}.tab{background:#eee5dd;color:var(--text)}.tab.active{background:var(--brand);color:#fff}
 section{display:none;padding:17px}.panel.active{display:block}.toolbar{margin-bottom:11px}.toolbar h2{margin:0 auto 0 0}
 table{width:100%;border-collapse:collapse}th,td{padding:9px;text-align:left;border-bottom:1px solid var(--line)}th{font-size:12px;color:var(--muted)}
 th[data-sort]{cursor:pointer;user-select:none;white-space:nowrap}th[data-sort]:hover{color:var(--primary)}th[data-sort]::after{content:'';margin-left:5px}th[data-sort].sort-asc::after{content:'↑'}th[data-sort].sort-desc::after{content:'↓'}
@@ -81,17 +73,12 @@ function obaLogout() {
 </div>
 
 <div class="tabs">
-<div class="tab-dropdown" id="catalogo-dropdown">
-  <button class="tab tab-dropdown-trigger" id="catalogo-trigger" onclick="obaToggleCatalogo(event)">📦 Catálogo ▾</button>
-  <div class="tab-dropdown-menu" id="catalogo-menu">
-    <button class="tab" data-tab="flavors">Sabores</button>
-    <button class="tab" data-tab="categories">Categorias</button>
-    <button class="tab" data-tab="boxes">Caixas</button>
-    <button class="tab" data-tab="products">Produtos</button>
-    <button class="tab" data-tab="options">Opcionais</button>
-    <button class="tab" data-tab="combos">Combos</button>
-  </div>
-</div>
+<button class="tab active" data-tab="flavors">Sabores</button>
+<button class="tab" data-tab="categories">Categorias</button>
+<button class="tab" data-tab="boxes">Caixas</button>
+<button class="tab" data-tab="products">Produtos</button>
+<button class="tab" data-tab="options">Opcionais</button>
+<button class="tab" data-tab="combos">Combos</button>
 <button class="tab" data-tab="config">Loja</button>
 <button class="tab" data-tab="visual">✏️ Edição Visual</button>
 <button class="tab" data-tab="midia">🖼️ Mídia</button>
@@ -575,7 +562,7 @@ function obaLogout() {
           <p style="margin:0;font-size:12px;color:#8B4513">
             💡 <b>Para editar os produtos da vitrine</b> (nomes, preços, imagens), vá para a aba
             <button type="button" class="secondary" style="padding:3px 8px;font-size:11px;margin:0 2px"
-              onclick="document.querySelectorAll('.tab').forEach(b=>{b.classList.toggle('active',b.dataset.tab==='products')});document.querySelectorAll('.panel').forEach(p=>{p.classList.remove('active')});document.getElementById('panel-products').classList.add('active');const _t=$('catalogo-trigger');if(_t)_t.classList.add('catalogo-ativo');window.scrollTo({top:0,behavior:'smooth'})">
+              onclick="document.querySelectorAll('.tab').forEach(b=>{b.classList.toggle('active',b.dataset.tab==='products')});document.querySelectorAll('.panel').forEach(p=>{p.classList.remove('active')});document.getElementById('panel-products').classList.add('active');window.scrollTo({top:0,behavior:'smooth'})">
               Produtos
             </button>
             no menu principal da Central.
@@ -1517,29 +1504,7 @@ async function carregar(){
   renderTudo();await atualizarStatus();
 }
 
-document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
-  if(!b.dataset.tab)return; /* ignora o trigger do dropdown */
-  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));
-  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
-  $('panel-'+b.dataset.tab).classList.add('active');
-  /* Fecha dropdown e atualiza trigger */
-  const menu=$('catalogo-menu');const trigger=$('catalogo-trigger');
-  if(menu)menu.classList.remove('open');
-  const catalogoTabs=['flavors','categories','boxes','products','options','combos'];
-  if(trigger)trigger.classList.toggle('catalogo-ativo',catalogoTabs.includes(b.dataset.tab));
-});
-window.obaToggleCatalogo=function(e){
-  e.stopPropagation();
-  const menu=$('catalogo-menu');
-  if(menu)menu.classList.toggle('open');
-};
-document.addEventListener('click',function(e){
-  const dropdown=$('catalogo-dropdown');
-  const menu=$('catalogo-menu');
-  if(menu&&dropdown&&!dropdown.contains(e.target)){menu.classList.remove('open');}
-});
-/* Ativa Sabores por padrão */
-(function(){const first=document.querySelector('.tab[data-tab="flavors"]');if(first)first.click();})();
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));$('panel-'+b.dataset.tab).classList.add('active')});
 document.querySelectorAll('[data-new]').forEach(b=>b.onclick=()=>abrirEditor(b.dataset.new));
 $('buscaSabor').oninput=renderTudo;$('filtroCategoria').onchange=renderTudo;
 $('cancelarBtn').onclick=()=>$('editor').close();
