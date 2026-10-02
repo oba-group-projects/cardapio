@@ -14,11 +14,15 @@ button,input,select,textarea{font:inherit}button{border:0;border-radius:9px;padd
 input,select,textarea{padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:#fff}textarea{min-height:80px;resize:vertical}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px}.card,section{background:#fff;border:1px solid var(--line);border-radius:14px}.card{padding:13px}
 .numero{font-size:24px;font-weight:800;color:var(--brand)}.total{font-size:11px;color:var(--muted);margin-top:-2px}.label{color:var(--muted)}
-.tabs{display:flex;gap:7px;flex-wrap:wrap;margin:16px 0}.tab{background:#eee5dd;color:var(--text)}.tab.active{background:var(--brand);color:#fff}
+.tabs{display:flex;gap:7px;flex-wrap:wrap;margin:16px 0;align-items:center}.tab{background:#eee5dd;color:var(--text)}.tab.active{background:var(--brand);color:#fff}
 .tab-dropdown{position:relative;display:inline-block}
-.tab-dropdown-menu{display:none;position:absolute;top:100%;left:0;z-index:100;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.10);padding:6px;min-width:160px;margin-top:4px;display:flex;flex-direction:column;gap:4px}
+.tab-dropdown-menu{display:none;flex-direction:column;position:absolute;top:calc(100% + 6px);left:0;z-index:200;background:#fff;border:1px solid #e8d5b5;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.12),0 2px 6px rgba(0,0,0,.06);padding:6px;min-width:170px;animation:obaDropIn .15s ease}
+@keyframes obaDropIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 .tab-dropdown-menu.open{display:flex}
-.tab-dropdown-menu .tab{width:100%;text-align:left;border-radius:7px;padding:7px 12px}
+.tab-dropdown-menu .tab{width:100%;text-align:left;border-radius:8px;padding:9px 14px;font-size:13px;background:transparent;transition:background .12s}
+.tab-dropdown-menu .tab:hover{background:#f5ece4}
+.tab-dropdown-menu .tab.active{background:var(--brand);color:#fff}
+.tab-dropdown-trigger{display:flex;align-items:center;gap:5px}
 .tab-dropdown-trigger.catalogo-ativo{background:var(--brand);color:#fff}
 section{display:none;padding:17px}.panel.active{display:block}.toolbar{margin-bottom:11px}.toolbar h2{margin:0 auto 0 0}
 table{width:100%;border-collapse:collapse}th,td{padding:9px;text-align:left;border-bottom:1px solid var(--line)}th{font-size:12px;color:var(--muted)}
