@@ -2855,6 +2855,14 @@ $('formConfig').onsubmit=async e=>{
       })).filter(b => b.label);
     }
 
+    /* Validação: seção ativa + botão marcado + label vazio → bloqueia */
+    if (ativo !== false && linkAtivo && !linkLabel) {
+      msg('⚠️ Preencha o "Label do botão" antes de salvar. Sem ele, o botão não aparecerá no menu do cardápio.', 'erro');
+      const labelInput = card.querySelector('.secao-link-label');
+      if (labelInput) labelInput.focus();
+      return;
+    }
+
     const secaoObj = {
       id, template: tmpl, titulo, subtitulo, posicao,
       linkMenu: { ativo: linkAtivo, label: linkLabel, sublabel: linkSublabel, icone: linkIcone, destaque: linkDestaque },
@@ -2874,10 +2882,7 @@ $('formConfig').onsubmit=async e=>{
     try {
       const res = await obaSaveDraftWith('tema', temaAtual);
       addPendencia('Seção extra salva: ' + (titulo || 'Nova seção'));
-      const avisoLabel = (ativo !== false && linkAtivo && !linkLabel)
-        ? ' ⚠️ O botão não aparecerá no menu — preencha o Label do botão.'
-        : '';
-      msg('Seção "' + (titulo || 'Nova seção') + '" salva.' + avisoLabel + (avisoLabel ? '' : ' Backup: ' + res.backup));
+      msg('Seção "' + (titulo || 'Nova seção') + '" salva. Backup: ' + res.backup);
     } catch(err) { msg(String(err.message||err), 'erro'); }
   };
 
