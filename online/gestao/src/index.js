@@ -1696,7 +1696,7 @@ async function obaGitHubSyncCardapioHtml(env, request) {
 
 /* OBA_PUBLISH_API_BEGIN */
 
-async function obaHandlePublishApi(request, env, url) {
+async function obaHandlePublishApi(request, env, url, ctx) {
   if (
     url.pathname !== "/api/publish" &&
     url.pathname !== "/api/publish/rollback" &&
@@ -1905,11 +1905,27 @@ async function obaHandlePublishApi(request, env, url) {
       throw new Error("published_post_write_mismatch");
     }
 
-    /* R9D — Sincronizar JSONs e HTML do cardápio no GitHub em background (fire and forget) */
-    obaGitHubSyncPublished(env, after.payload, after.revision_id)
-      .catch(err => console.error("[9D] Sync GitHub falhou:", String(err)));
-    obaGitHubSyncCardapioHtml(env, request)
-      .catch(err => console.error("[9D-HTML] Sync HTML falhou:", String(err)));
+    /* R9D — Sincronizar JSONs e HTML do cardápio no GitHub via ctx.waitUntil
+     * (fire-and-forget seguro: não bloqueia a resposta, mas o runtime aguarda
+     * a conclusão antes de encerrar o isolate) */
+    const syncPromise = Promise.all([
+      obaGitHubSyncPublished(env, after.payload, after.revision_id)
+        .catch(err => console.error("[9D] Sync GitHub falhou:", String(err))),
+      obaGitHubSyncCardapioHtml(env, request)
+        .catch(err => console.error("[9D-HTML] Sync HTML falhou:", String(err)))
+    ]);
+    if (ctx && typeof ctx.waitUntil === "function") {
+      ctx.waitUntil(syncPromise);
+    }
+
+    /* Gate pós-write: lê slots para confirmar publicação.
+     * Falha aqui não desfaz a publicação — apenas omite slots da resposta. */
+    let slotsAfter;
+    try {
+      slotsAfter = await obaCatalogSlotsState(env);
+    } catch {
+      slotsAfter = { DRAFT: null, PREVIEW: null, PUBLISHED: after.revision_id };
+    }
 
     return obaApiJson({
       ok: true,
@@ -1919,7 +1935,7 @@ async function obaHandlePublishApi(request, env, url) {
       previous_revision_id: published.revision_id,
       promotion_id: promotionId,
       reused: false,
-      slots: await obaCatalogSlotsState(env)
+      slots: slotsAfter
     });
   }
 
@@ -3871,7 +3887,7 @@ body{background:${T.fundo};font-family:'Plus Jakarta Sans',system-ui,sans-serif;
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
     if (url.pathname === "/health") {
@@ -4060,80 +4076,86 @@ export default {
     }
 
     if (url.pathname.startsWith("/api/")) {
-      const obaMediaResponse =
-        await obaHandleMediaApi(
-          request,
-          env,
-          url
+      try {
+        const obaMediaResponse =
+          await obaHandleMediaApi(
+            request,
+            env,
+            url
+          );
+
+        if (obaMediaResponse) {
+          return obaMediaResponse;
+        }
+
+        const obaPublishResponse =
+          await obaHandlePublishApi(
+            request,
+            env,
+            url,
+            ctx
+          );
+
+        if (obaPublishResponse) {
+          return obaPublishResponse;
+        }
+
+        const obaPreviewResponse =
+          await obaHandlePreviewApi(
+            request,
+            env,
+            url
+          );
+
+        if (obaPreviewResponse) {
+          return obaPreviewResponse;
+        }
+
+        const obaDraftResponse =
+          await obaHandleDraftApi(
+            request,
+            env,
+            url
+          );
+
+        if (obaDraftResponse) {
+          return obaDraftResponse;
+        }
+
+        const obaCatalogReadResponse =
+          await obaHandleCatalogReadApi(
+            request,
+            env
+          );
+
+        if (obaCatalogReadResponse) {
+          return obaCatalogReadResponse;
+        }
+
+        // Rotas de mídia autenticadas (upload POST + DELETE)
+        if (url.pathname.startsWith("/api/media") || url.pathname === "/api/upload-image") {
+          const obaMediaResponse2 = await obaHandleMediaApi(request, env, url);
+          if (obaMediaResponse2) return obaMediaResponse2;
+        }
+
+        // Fase 12A — Propostas de orçamento
+        if (url.pathname.startsWith("/api/proposals")) {
+          const obaProposalsResponse = await obaHandleProposalsApi(request, env, url);
+          if (obaProposalsResponse) return obaProposalsResponse;
+        }
+
+        return json(
+          {
+            ok: false,
+            error: "not_implemented",
+          },
+          501
         );
-
-      if (obaMediaResponse) {
-        return obaMediaResponse;
+      } catch (err) {
+        const msg = err && err.message ? String(err.message) : "internal_error";
+        console.error("[worker] Excecao nao tratada em /api/:", msg, String(err));
+        return json({ ok: false, error: msg }, 500);
       }
-
-      const obaPublishResponse =
-        await obaHandlePublishApi(
-          request,
-          env,
-          url
-        );
-
-      if (obaPublishResponse) {
-        return obaPublishResponse;
-      }
-
-      const obaPreviewResponse =
-        await obaHandlePreviewApi(
-          request,
-          env,
-          url
-        );
-
-      if (obaPreviewResponse) {
-        return obaPreviewResponse;
-      }
-
-const obaDraftResponse =
-        await obaHandleDraftApi(
-          request,
-          env,
-          url
-        );
-
-      if (obaDraftResponse) {
-        return obaDraftResponse;
-      }
-
-
-    const obaCatalogReadResponse =
-      await obaHandleCatalogReadApi(
-        request,
-        env
-      );
-
-    if (obaCatalogReadResponse) {
-      return obaCatalogReadResponse;
-    }
-
-    // Rotas de mídia autenticadas (upload POST + DELETE)
-    if (url.pathname.startsWith("/api/media") || url.pathname === "/api/upload-image") {
-      const obaMediaResponse = await obaHandleMediaApi(request, env, url);
-      if (obaMediaResponse) return obaMediaResponse;
-    }
-
-    // Fase 12A — Propostas de orçamento
-    if (url.pathname.startsWith("/api/proposals")) {
-      const obaProposalsResponse = await obaHandleProposalsApi(request, env, url);
-      if (obaProposalsResponse) return obaProposalsResponse;
-    }
-
-return json(
-        {
-          ok: false,
-          error: "not_implemented",
-        },
-        501
-      );
     }
 
     return env.ASSETS.fetch(request);
