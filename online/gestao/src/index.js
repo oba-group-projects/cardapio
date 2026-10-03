@@ -3900,6 +3900,34 @@ export default {
      * Usa o mesmo mecanismo do /__preview mas com published-bootstrap.js
      * que lê /api/catalog em vez de /api/preview.
      * ---------------------------------------------------------------- */
+    /* Rota pública: catálogo de sabores */
+    if (url.pathname === "/catalogo" && request.method === "GET") {
+      const assetUrl = new URL(request.url);
+      assetUrl.pathname = "/ui-catalogo/index.html";
+      assetUrl.search = "";
+      assetUrl.hash = "";
+      const asset = await env.ASSETS.fetch(new Request(assetUrl.toString(), { method: "GET" }));
+      if (!asset.ok) {
+        return new Response("Catálogo temporariamente indisponível.", {
+          status: 502,
+          headers: { "Content-Type": "text/plain; charset=utf-8" }
+        });
+      }
+      const source = await asset.text();
+      const inject = "<base href='/'><script src='/published-bootstrap.js'></script>";
+      const html = source.includes("<head>")
+        ? source.replace("<head>", "<head>" + inject)
+        : inject + source;
+      return new Response(html, {
+        status: 200,
+        headers: {
+          "Content-Type": "text/html; charset=utf-8",
+          "Cache-Control": "public, max-age=60, stale-while-revalidate=300",
+          "X-Content-Type-Options": "nosniff"
+        }
+      });
+    }
+
     if (url.pathname === "/cardapio" && request.method === "GET") {
       const assetUrl = new URL(request.url);
       assetUrl.pathname = "/ui-desenvolvimento/index.html";
