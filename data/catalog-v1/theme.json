@@ -16,7 +16,7 @@
       "tamSubtitulo": "",
       "tamTitulo": "",
       "tamanhoLogo": "medio",
-      "titulo": "Bem Vindo!"
+      "titulo": "Seja Bem-Vindo!"
     },
     "eventos_modal": {
       "ativo": true,
@@ -48,7 +48,7 @@
           "label": "Doces Finos",
           "sublabel": "Montagem",
           "url": "",
-          "visivel": true
+          "visivel": false
         },
         {
           "acao": "presenteaveis",
@@ -142,52 +142,7 @@
       "titulo": ""
     }
   },
-  "paginas_customizadas": [
-    {
-      "ativo": true,
-      "config": {
-        "citacao": "",
-        "ctaAcao": "",
-        "ctaLabel": "",
-        "ctaUrl": "",
-        "texto": ""
-      },
-      "id": "secmupt7eyl",
-      "linkMenu": {
-        "ativo": true,
-        "destaque": false,
-        "icone": "fa-solid fa-star",
-        "label": "",
-        "sublabel": ""
-      },
-      "posicao": "menu",
-      "subtitulo": "",
-      "template": "informativa",
-      "titulo": ""
-    },
-    {
-      "ativo": true,
-      "config": {
-        "citacao": "",
-        "ctaAcao": "",
-        "ctaLabel": "",
-        "ctaUrl": "",
-        "texto": ""
-      },
-      "id": "secmupt7g98",
-      "linkMenu": {
-        "ativo": true,
-        "destaque": false,
-        "icone": "fa-solid fa-star",
-        "label": "",
-        "sublabel": ""
-      },
-      "posicao": "menu",
-      "subtitulo": "",
-      "template": "informativa",
-      "titulo": "teste"
-    }
-  ],
+  "paginas_customizadas": [],
   "schemaVersion": 2,
   "tema": {
     "arredondamento": "20",
@@ -209,6 +164,6 @@
     "tamanhoSubtitulo": "11",
     "tamanhoTitulo": "26"
   },
-  "updatedAt": "2026-10-01",
+  "updatedAt": "2026-10-03",
   "variante": "classica"
 }
