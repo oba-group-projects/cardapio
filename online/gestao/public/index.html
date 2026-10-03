@@ -6032,23 +6032,14 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     const preview = await api('/api/preview');
 
     if (!preview || !preview.revision_id) {
-      throw new Error('Preview ainda nao foi criado.');
+      throw new Error('Preview ainda nao foi criado. Clique em "Visualizar Preview" primeiro.');
     }
-
-    const confirmado = window.confirm(
-      'Publicar exatamente a revisao aprovada no Preview?\n\n' +
-      preview.revision_id
-    );
-
-    if (!confirmado) return;
 
     const result = await api(
       '/api/publish',
       {
         method:'POST',
-        headers:{
-          'Content-Type':'application/json'
-        },
+        headers:{'Content-Type':'application/json'},
         body:JSON.stringify({
           confirm:'PUBLISH',
           expected_revision_id:preview.revision_id
@@ -6057,7 +6048,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     );
 
     if (!result || !result.ok || !result.revision_id) {
-      throw new Error('Publicacao nao confirmada pela API.');
+      throw new Error('Publicacao nao confirmada pela API. Tente novamente.');
     }
 
     if (typeof atualizarStatus === 'function') {
@@ -6065,18 +6056,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     }
 
     if (typeof msg === 'function') {
-      msg(
-        result.reused
-          ? 'Preview ja estava publicado.'
-          : 'Publicacao concluida com seguranca.'
-      );
-    }
-    else {
-      alert(
-        result.reused
-          ? 'Preview ja estava publicado.'
-          : 'Publicacao concluida com seguranca.'
-      );
+      msg(result.reused ? 'Cardapio ja estava atualizado.' : 'Publicacao concluida com seguranca. O cardapio foi atualizado.');
     }
   }
 
