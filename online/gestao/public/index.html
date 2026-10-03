@@ -1362,7 +1362,14 @@ function abrirEditor(tipo,id=null,duplicar=false){
     $('editorTitulo').textContent=novo?'Nova categoria':'Editar categoria';
     box.append(field('edNome','Nome',duplicar?(item.nome+' - cópia'):item.nome,'text',true));
     box.append(field('edPrecoReferencia','Preço de referência (R$)',item.precoReferencia==null?'':Number(item.precoReferencia).toFixed(2),'number'));
-    box.append(field('edOrdem','Ordem',item.ordem??nextOrder(tipo),'number'));box.append(checks(item));
+    box.append(field('edOrdem','Ordem',item.ordem??nextOrder(tipo),'number'));
+    /* Campo Grupo do Catálogo */
+    const wGrupo=document.createElement('div');wGrupo.className='field full';
+    const lGrupo=document.createElement('label');lGrupo.textContent='Grupo no Catálogo de Sabores';
+    const sGrupo=document.createElement('select');sGrupo.id='edGrupoCatalogo';
+    [['','Não aparece no Catálogo'],['artesanais','Doces Artesanais'],['finos','Doces Finos']].forEach(([v,t])=>{const o=new Option(t,v);if((item.grupoCatalogo||'')===(v))o.selected=true;sGrupo.add(o);});
+    wGrupo.append(lGrupo,sGrupo);box.append(wGrupo);
+    box.append(checks(item));
   }
   if(tipo==='boxes'){
     $('editorTitulo').textContent=novo?'Nova caixa':'Editar caixa';
@@ -1411,6 +1418,7 @@ async function salvarEditor(){
   }
   if(tipo==='categories'){
     item.nome=$('edNome').value.trim();item.precoReferencia=$('edPrecoReferencia').value===''?null:Number($('edPrecoReferencia').value);item.ordem=Number($('edOrdem').value||nextOrder(tipo));
+    item.grupoCatalogo=$('edGrupoCatalogo')?.value||'';
     if(novo)item.id=novoId(tipo,item.nome);
   }
   if(tipo==='boxes'){
