@@ -294,3 +294,9 @@ URL própria, disparada para quem solicita orçamento de festa.
 | 01/10/2026 | Fechamento de sessão | Docs atualizados, tag v12C-pre-2, bundle de backup gerado. |
 | 01/10/2026 | Dropdown Catálogo | Agrupa 6 abas em menu suspenso; barra reduzida de 10 para 5 itens. HEAD: baca909 |
 | 01/10/2026 | Fechamento de sessão | Docs atualizados, tag v12C-pre-3, bundle de backup gerado. |
+| 02/10/2026 | Separador visual | ⬢ → · em 50 ocorrências no cardápio público. |
+| 02/10/2026 | Barra de contexto | Alterações não salvas nas páginas fixas da Edição Visual. |
+| 02/10/2026 | Validação seção extra | Bloqueio de salvamento sem label quando seção ativa + botão marcado. |
+| 02/10/2026 | Fluxo Preview/Publicar | Separado em 3 botões: Visualizar Preview / Publicar após Preview / Visualizar cardápio. |
+| 02/10/2026 | Planejamento 12C | Estrutura aprovada: /catalogo, 4 subfases, slot isolado D1, grupos Doces Artesanais/Finos. |
+| 02/10/2026 | Fechamento de sessão | Docs atualizados, tag v12C-pre-4, bundle de backup gerado. |
