@@ -2,6 +2,7 @@
   {
     "ativo": true,
     "disponivel": true,
+    "grupoCatalogo": "artesanais",
     "id": "tradicionais-1",
     "nome": "Tradicionais I",
     "ordem": 10,
@@ -9,6 +10,8 @@
   },
   {
     "ativo": true,
+    "disponivel": true,
+    "grupoCatalogo": "artesanais",
     "id": "tradicionais-2",
     "nome": "Tradicionais II",
     "ordem": 20,
@@ -17,6 +20,7 @@
   {
     "ativo": true,
     "disponivel": true,
+    "grupoCatalogo": "artesanais",
     "id": "classicos",
     "nome": "Clássicos I",
     "ordem": 30,
@@ -25,6 +29,7 @@
   {
     "ativo": true,
     "disponivel": true,
+    "grupoCatalogo": "artesanais",
     "id": "especiais-1",
     "nome": "Clássicos II",
     "ordem": 40,
@@ -32,6 +37,8 @@
   },
   {
     "ativo": true,
+    "disponivel": true,
+    "grupoCatalogo": "artesanais",
     "id": "especiais-2",
     "nome": "Especiais II",
     "ordem": 50,
@@ -39,6 +46,8 @@
   },
   {
     "ativo": true,
+    "disponivel": true,
+    "grupoCatalogo": "finos",
     "id": "especiais-3",
     "nome": "Especiais III",
     "ordem": 60,
@@ -47,6 +56,7 @@
   {
     "ativo": true,
     "disponivel": true,
+    "grupoCatalogo": "artesanais",
     "id": "categoria-especiais-i",
     "nome": "Especiais I",
     "ordem": 61,
