@@ -38,7 +38,7 @@
           "label": "Caixas de Doces",
           "sublabel": "Montagem",
           "url": "",
-          "visivel": false
+          "visivel": true
         },
         {
           "acao": "caixas",
