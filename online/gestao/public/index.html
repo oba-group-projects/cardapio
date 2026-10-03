@@ -30,6 +30,13 @@ tr[data-editable]{cursor:pointer}tr[data-editable]:hover{background:#fffaf6}.ok{
 .badge{display:inline-block;background:#f4e9df;padding:4px 8px;border-radius:999px;font-size:12px}
 #mensagem{display:none;margin-bottom:12px;padding:11px;border-radius:9px}#mensagem.okbox{display:block;background:#eaf8ef;color:#145e36}#mensagem.errbox{display:block;background:#fff0f0;color:#8b2828}
 #pendenciasBox{display:none;background:#fff8e8;border:1px solid #ead4a5;border-radius:12px;padding:12px;margin-bottom:13px}#pendenciasBox.show{display:block}
+#oba-ctx-bar{display:none;align-items:center;justify-content:space-between;gap:12px;background:#fff8ec;border:1px solid #e8c97a;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#7a4f00}
+#oba-ctx-bar.show{display:flex}
+#oba-ctx-bar strong{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#oba-ctx-bar .ctx-btns{display:flex;gap:8px;flex-shrink:0}
+#oba-ctx-bar .ctx-salvar{background:var(--brand);color:#fff;border:none;border-radius:7px;padding:6px 14px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+#oba-ctx-bar .ctx-descartar{background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:7px;padding:6px 12px;font:inherit;font-size:12px;cursor:pointer}
+#oba-ctx-bar .ctx-descartar:hover{background:#f5ece4}
 dialog{border:0;border-radius:15px;padding:0;max-width:660px;width:calc(100% - 24px);box-shadow:0 18px 60px #0003}dialog::backdrop{background:#0007}
 .modal{padding:20px}.modal h2{margin-top:0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.field{display:flex;flex-direction:column;gap:5px}.field.full{grid-column:1/-1}.checks{display:flex;gap:18px;align-items:center}
 .actions{display:flex;justify-content:flex-end;gap:9px;margin-top:18px}.preview-img{width:220px;height:150px;border:1px solid var(--line);border-radius:12px;object-fit:contain;background:#fafafa}.image-box{display:flex;gap:14px;align-items:center;flex-wrap:wrap}.image-tools{display:flex;flex-direction:column;gap:7px;flex:1;min-width:220px}.image-path{font-size:12px;color:var(--muted);word-break:break-all}.image-error{font-size:12px;color:var(--danger);display:none}.hint{font-size:12px;color:var(--muted)}.danger-zone{margin-right:auto}
@@ -63,6 +70,13 @@ function obaLogout() {
 <main>
 <div id="mensagem"></div>
 <div id="pendenciasBox"><strong>Alterações pendentes</strong><ul id="listaPendencias"></ul></div>
+<div id="oba-ctx-bar">
+  <strong id="oba-ctx-msg">● Alterações não salvas</strong>
+  <div class="ctx-btns">
+    <button class="ctx-descartar" onclick="obaCtxDescartar()">Descartar</button>
+    <button class="ctx-salvar" onclick="obaCtxSalvar()">Salvar</button>
+  </div>
+</div>
 
 <div class="topbar">
 <button class="secondary" id="previewBtn">Visualizar cardápio</button>
@@ -2835,8 +2849,8 @@ $('formConfig').onsubmit=async e=>{
 
     try {
       const res = await obaSaveDraftWith('tema', temaAtual);
-      addPendencia('Seção extra salva: ' + (titulo || id));
-      msg('Seção "' + (titulo || id) + '" salva. Backup: ' + res.backup);
+      addPendencia('Seção extra salva: ' + (titulo || 'Nova seção'));
+      msg('Seção "' + (titulo || 'Nova seção') + '" salva. Backup: ' + res.backup);
     } catch(err) { msg(String(err.message||err), 'erro'); }
   };
 
@@ -2884,6 +2898,95 @@ $('publicarBtn').onclick=()=>{
 $('publicarBtn').textContent='Publicar apos Preview';;
 
 carregar().catch(e=>msg(String(e.message||e),'erro'));
+
+/* ================================================================
+   BARRA DE CONTEXTO — alterações não salvas nas páginas fixas
+================================================================ */
+(function(){
+  /* Estado interno */
+  let _ctxFormAtivo = null;   /* id do form com alterações */
+  let _ctxNomeAtivo = null;   /* nome legível da seção */
+  let _ctxPronto = false;     /* false durante carga inicial (obaPopularFormTema) */
+
+  const nomes = {
+    formPg1:'Página 1 — Boas-vindas',
+    formPg2:'Página 2 — Nossa Essência',
+    formPg3:'Página 3 — Menu Principal',
+    formVitrine:'Vitrine de Presentes',
+    formPers:'Modal — Doces Personalizados',
+    formEventos:'Modal — Orçamentos de Eventos',
+    formTema:'Tema Global'
+  };
+
+  function obaCtxMostrar(formId) {
+    _ctxFormAtivo = formId;
+    _ctxNomeAtivo = nomes[formId] || formId;
+    const bar = document.getElementById('oba-ctx-bar');
+    const msg2 = document.getElementById('oba-ctx-msg');
+    if (bar && msg2) {
+      msg2.textContent = '● Alterações não salvas em "' + _ctxNomeAtivo + '"';
+      bar.classList.add('show');
+      bar.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }
+  }
+
+  function obaCtxOcultar() {
+    _ctxFormAtivo = null;
+    _ctxNomeAtivo = null;
+    const bar = document.getElementById('oba-ctx-bar');
+    if (bar) bar.classList.remove('show');
+  }
+
+  /* Chamado pelo botão Salvar da barra */
+  window.obaCtxSalvar = function() {
+    if (!_ctxFormAtivo) return;
+    const frm = document.getElementById(_ctxFormAtivo);
+    if (frm) frm.requestSubmit ? frm.requestSubmit() : frm.dispatchEvent(new Event('submit', {bubbles:true, cancelable:true}));
+    obaCtxOcultar();
+  };
+
+  /* Chamado pelo botão Descartar da barra */
+  window.obaCtxDescartar = function() {
+    _ctxPronto = false;                /* bloqueia detecção durante restauração */
+    obaPopularFormTema();              /* restaura todos os campos ao estado salvo */
+    obaCtxOcultar();
+    setTimeout(() => { _ctxPronto = true; }, 300); /* reativa após restauração */
+  };
+
+  /* Detecta mudanças: listener por delegação em cada form fixo */
+  function obaCtxIniciar() {
+    _ctxPronto = false;
+    /* Pequeno delay para garantir que obaPopularFormTema terminou */
+    setTimeout(() => { _ctxPronto = true; }, 300);
+
+    Object.keys(nomes).forEach(fid => {
+      const frm = document.getElementById(fid);
+      if (!frm) return;
+      ['input','change'].forEach(evt => {
+        frm.addEventListener(evt, () => {
+          if (!_ctxPronto) return;           /* ignora durante carga */
+          if (_ctxFormAtivo === fid) return; /* já está mostrando para este form */
+          obaCtxMostrar(fid);
+        });
+      });
+      /* Oculta barra quando o form é submetido com sucesso */
+      frm.addEventListener('submit', () => obaCtxOcultar());
+    });
+  }
+
+  /* Inicia após a carga do catálogo (obaPopularFormTema é chamado dentro de carregar()) */
+  const _origCarregar = window.carregar;
+  if (typeof carregar === 'function') {
+    /* Hook: após carregar() resolver, inicia listeners */
+    const origFn = carregar;
+    window._obaCtxIniciarAposCarregar = function() {
+      origFn().then(() => obaCtxIniciar()).catch(e => msg(String(e.message||e),'erro'));
+    };
+  }
+
+  /* Fallback: inicia listeners após 1s se o hook não funcionar */
+  setTimeout(obaCtxIniciar, 1000);
+})();
 
 /* ================================================================
    FASE 11D — GALERIA DE MÍDIAS
