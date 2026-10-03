@@ -2583,7 +2583,9 @@ $('formConfig').onsubmit=async e=>{
           </label>
         </div>
         <div class="field"><label>Label do botão</label>
-          <input class="secao-link-label" value="${lm.label||''}" placeholder="Ex: Doces Sazonais">
+          <input class="secao-link-label" value="${lm.label||''}" placeholder="Ex: Doces Sazonais"
+            oninput="obaValidarLabelSecao(this)">
+          <p class="secao-label-aviso hint" style="display:${(lm.ativo!==false&&!lm.label)?'block':'none'};color:#a06000;margin-top:4px">⚠️ Preencha o label para que o botão apareça no menu do cardápio.</p>
         </div>
         <div class="field"><label>Sublabel do botão</label>
           <input class="secao-link-sublabel" value="${lm.sublabel||''}" placeholder="Ex: Novidades">
@@ -2743,6 +2745,27 @@ $('formConfig').onsubmit=async e=>{
 
   /* Remove seção */
   /* Duplica uma seção extra — cópia nasce pausada com novo ID */
+  /* Valida label do botão da seção — mostra/oculta aviso inline */
+  window.obaValidarLabelSecao = function(input) {
+    const card = input.closest('.oba-secao-card');
+    if (!card) return;
+    const linkAtivo = card.querySelector('.secao-link-ativo')?.checked !== false;
+    const aviso = card.querySelector('.secao-label-aviso');
+    if (aviso) aviso.style.display = (linkAtivo && !input.value.trim()) ? 'block' : 'none';
+  };
+
+  /* Quando o checkbox "Adicionar botão" muda, reavalia o aviso */
+  document.addEventListener('change', function(e) {
+    if (!e.target.classList.contains('secao-link-ativo')) return;
+    const card = e.target.closest('.oba-secao-card');
+    if (!card) return;
+    const labelInput = card.querySelector('.secao-link-label');
+    const aviso = card.querySelector('.secao-label-aviso');
+    if (aviso && labelInput) {
+      aviso.style.display = (e.target.checked && !labelInput.value.trim()) ? 'block' : 'none';
+    }
+  });
+
   window.obaDuplicarSecaoCustom = function(btn) {
     const card = btn.closest('.oba-secao-card');
     if (!card) return;
@@ -2795,6 +2818,7 @@ $('formConfig').onsubmit=async e=>{
     const titulo = card.querySelector('.secao-titulo')?.value.trim() || '';
     const subtitulo = card.querySelector('.secao-subtitulo')?.value.trim() || '';
     const posicao = card.querySelector('.secao-posicao')?.value || 'menu';
+    const ativo = card.querySelector('.secao-ativo')?.checked !== false;
     const linkAtivo = card.querySelector('.secao-link-ativo')?.checked !== false;
     const linkLabel = card.querySelector('.secao-link-label')?.value.trim() || '';
     const linkSublabel = card.querySelector('.secao-link-sublabel')?.value.trim() || '';
@@ -2850,7 +2874,10 @@ $('formConfig').onsubmit=async e=>{
     try {
       const res = await obaSaveDraftWith('tema', temaAtual);
       addPendencia('Seção extra salva: ' + (titulo || 'Nova seção'));
-      msg('Seção "' + (titulo || 'Nova seção') + '" salva. Backup: ' + res.backup);
+      const avisoLabel = (ativo !== false && linkAtivo && !linkLabel)
+        ? ' ⚠️ O botão não aparecerá no menu — preencha o Label do botão.'
+        : '';
+      msg('Seção "' + (titulo || 'Nova seção') + '" salva.' + avisoLabel + (avisoLabel ? '' : ' Backup: ' + res.backup));
     } catch(err) { msg(String(err.message||err), 'erro'); }
   };
 
