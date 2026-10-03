@@ -1905,21 +1905,11 @@ async function obaHandlePublishApi(request, env, url) {
       throw new Error("published_post_write_mismatch");
     }
 
-    /* R9D — Sincronizar JSONs do cardápio público no GitHub após publicação */
-    const syncResult = await obaGitHubSyncPublished(
-      env,
-      after.payload,
-      after.revision_id
-    ).catch(err => {
-      console.error("[9D] Sync GitHub falhou:", String(err));
-      return { ok: false, reason: "sync_exception", detail: String(err) };
-    });
-
-    /* R9D-HTML — Sincronizar HTML do cardápio para main (GitHub Pages) */
-    const syncHtmlResult = await obaGitHubSyncCardapioHtml(env, request).catch(err => {
-      console.error("[9D-HTML] Sync HTML falhou:", String(err));
-      return { ok: false, reason: "sync_html_exception", detail: String(err) };
-    });
+    /* R9D — Sincronizar JSONs e HTML do cardápio no GitHub em background (fire and forget) */
+    obaGitHubSyncPublished(env, after.payload, after.revision_id)
+      .catch(err => console.error("[9D] Sync GitHub falhou:", String(err)));
+    obaGitHubSyncCardapioHtml(env, request)
+      .catch(err => console.error("[9D-HTML] Sync HTML falhou:", String(err)));
 
     return obaApiJson({
       ok: true,
@@ -1929,8 +1919,6 @@ async function obaHandlePublishApi(request, env, url) {
       previous_revision_id: published.revision_id,
       promotion_id: promotionId,
       reused: false,
-      github_sync: syncResult,
-      github_sync_html: syncHtmlResult,
       slots: await obaCatalogSlotsState(env)
     });
   }
