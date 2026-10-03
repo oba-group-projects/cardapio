@@ -79,8 +79,8 @@ function obaLogout() {
 </div>
 
 <div class="topbar">
-<button class="secondary" id="previewBtn">Visualizar cardápio</button>
-<button class="primary" id="publicarBtn">Publicar alterações</button>
+<button class="secondary" id="previewBtn">Visualizar Preview</button>
+<button class="primary" id="publicarBtn" disabled>Publicar após Preview</button>
 <button class="secondary" id="historicoBtn">Histórico de versões</button>
 <span id="statusBadge" class="badge">Verificando...</span>
 </div>
@@ -1168,19 +1168,24 @@ async function atualizarStatus(){
     const draft=await api('/api/draft',{cache:'no-store'});
     const preview=await api('/api/preview',{cache:'no-store'});
     const b=$('statusBadge');
+    const pub=$('publicarBtn');
     const slots=preview.slots||{};
     if(!draft.revision_id){
       b.textContent='Rascunho vazio';
       b.className='badge off';
+      if(pub)pub.disabled=true;
     }else if(slots.PREVIEW!==draft.revision_id){
       b.textContent='Rascunho aguardando Preview';
       b.className='badge off';
+      if(pub)pub.disabled=true;
     }else if(slots.PUBLISHED!==draft.revision_id){
       b.textContent='Preview pronto para publicar';
       b.className='badge off';
+      if(pub)pub.disabled=false;
     }else{
       b.textContent='Sem alteracoes publicaveis';
       b.className='badge ok';
+      if(pub)pub.disabled=true;
     }
     window.__obaStatusPublicacao={draft,preview,slots};
   }catch{}
@@ -2921,13 +2926,10 @@ $('previewBtn').onclick=async()=>{
     window.open('/__preview?cb='+Date.now(),'_blank','noopener,noreferrer');
     msg('Preview privado atualizado. O cardapio publicado continua intacto.');
   }catch(err){msg(String(err.message||err),'erro')}
-  finally{b.disabled=false;b.textContent='Visualizar cardapio'}
+  finally{b.disabled=false;b.textContent='Visualizar Preview'}
 };
 
-$('publicarBtn').onclick=()=>{
-  msg('Publicacao oficial protegida. Valide primeiro o Preview privado; PREVIEW -> PUBLISHED sera habilitado na proxima fase.','erro');
-};
-$('publicarBtn').textContent='Publicar apos Preview';;
+/* publicarBtn — conectado ao handler obaPublishPreview em oba-publish-8e9f */
 
 carregar().catch(e=>msg(String(e.message||e),'erro'));
 
