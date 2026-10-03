@@ -113,7 +113,7 @@
       "titulo": ""
     },
     "personalizados_modal": {
-      "ativo": true,
+      "ativo": false,
       "info_items": [
         "Modelagem artesanal.",
         "Mínimo: 20 unidades."
