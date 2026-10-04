@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<title>Catálogo Oba Doceria</title>
+<title>Catálogo Oba Doceria v2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -422,23 +422,14 @@ function catSetLogo(el, fromTema, fallback) {
 
 /* ── MONTAR PG 1 (unificada) ── */
 function catMontarPg1(dados) {
-  /* Logo */
+  /* Logo — usa tema se disponível, senão fallback GitHub */
   catSetLogo(
     document.getElementById('cat-pg1-logo'),
     dados.tema?.paginas?.boas_vindas?.logo,
     CAT_LOGO_VERTICAL
   );
-  /* Título e texto — usa defaults do HTML, sobrescreve se o tema tiver valores */
-  const bv = dados.tema?.paginas?.boas_vindas || {};
-  const ne = dados.tema?.paginas?.nossa_essencia || {};
-  if (bv.titulo && bv.titulo.trim()) {
-    const el = document.getElementById('cat-pg1-titulo');
-    if (el) el.textContent = bv.titulo;
-  }
-  if (ne.texto && ne.texto.trim()) {
-    const el = document.getElementById('cat-pg1-p1');
-    if (el) el.textContent = ne.texto;
-  }
+  /* Título e textos do catálogo NÃO são sobrescritos pelo tema do cardápio.
+     O catálogo tem sua própria identidade — os defaults do HTML são canônicos. */
 }
 
 /* ── MONTAR PG 3 ── */
