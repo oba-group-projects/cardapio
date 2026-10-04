@@ -1,68 +1,35 @@
 ﻿# CURRENT STATE
 
-Atualizado: 2026-10-04
+Atualizado: 2026-10-04 (sessão 2)
 
 ## Git
 Branch: feature/gestao-online-segura
-Commit HEAD: 8da620d
-Tag de marco anterior: v12C-pre-4 (9c011b3)
+Commit HEAD: 48dd22c
 
 ## Estado funcional
 - Central privada autenticada e operacional (senha Oba2026!)
 - Fluxo DRAFT → PREVIEW → PUBLISHED funcional e aprovado
-- Badge de status atualiza automaticamente após cada salvamento
+- Badge atualiza automaticamente após cada salvamento
 - Cardápio público funcional em /cardapio
-- Catálogo público funcional em /catalogo — APROVADO
-- Módulo de Propostas completo (12A + 12B)
+- Catálogo público funcional em /catalogo — APROVADO, paleta fechada
 
-## Catálogo (/catalogo) — entregue e aprovado nesta sessão
+## Catálogo — estado final aprovado
 
-### Layout editorial (Pg1 unificada)
-- Logo vertical no topo esquerdo (100px, fallback textual "Oba / DOCERIA")
-- Rótulo "CATÁLOGO —" em uppercase tracking
-- Título Cormorant Garamond 48px/600: "Descubra a Oba"
-- Dois parágrafos de texto
-- CTA "Conhecer nossos sabores →" vai direto para Pg3
+Paleta: Verde Sálvia médio (#6B9E7A, #F4F8F4)
+Layout: editorial, Pg1 unificada, float-bar 3 botões, lightbox card branco
+Encoding: UTF-8 sem BOM — usar apenas str_replace/fs_write para editar
 
-### Pg3 — Menu de grupos
-- Logo horizontal centralizada
-- Subtítulo 15px uppercase: "ESCOLHA O TIPO DE DOCE"
-- Botões Doces Artesanais (destaque terracota) e Doces Finos
-- Botão Voltar pill com borda
+## Cardápio — pendente evolução visual
 
-### Pg4 — Sabores
-- Título 32px/600 em terracota
-- Subtítulo 11px uppercase tracking
-- Abas agrupadas por nome base (Tradicionais / Clássicos / Especiais)
-- Grid 2 colunas com sombra suave e lupa
-- Scroll funcionando (position:relative removido)
-- Float-bar fora do #pg-4: [← Voltar] [Pedir WPP] [Montar pedido]
-- Lightbox: card branco + foto aspect-ratio:1 + nome + ×
-
-### Paleta Rosa Creme
-- --brand: #C2735A (terracota suave)
-- --bg: #FDF6F0 (creme rosado)
-- --line: #F0D5C8 (bege rosado)
-
-## Worker — melhorias desta sessão
-- Handler: (request, env, ctx)
-- ctx.waitUntil para sync GitHub
-- try/catch global no bloco /api/
-- Gate pós-write protegido
-
-## Fase 12C — Catálogo de Sabores
-- ✅ 12C-1: Campo grupoCatalogo nas categorias
-- ✅ 12C-2: Rota /catalogo + HTML
-- ✅ 12C-3: Dados reais conectados + redesign visual aprovado
-- ⬜ 12C-4: Edição Visual do Catálogo na Central
-
-## Próximo
-- Redesign Pg1/Pg2 do cardápio seguindo padrão do catálogo
-- Ver restrições críticas no HANDOFF.md antes de tocar
+Abordagem: B+ (evolução CSS + textos, sem reconstrução)
+- Pg1: "Seu momento começa aqui." como título default
+- Pg2: texto condensado, assinatura "Feito à mão, com amor e precisão."
+- Preservar: querySelector, glass-card, bg-orange-200/60, todos os IDs
+- NÃO alterar paleta nem fluxo de compra
 
 ## Pontos de retorno seguros
-- Tag v12C-pre-4 = 9c011b3 (antes desta sessão)
-- HEAD atual = 8da620d (estável, aprovado)
+- HEAD atual = 48dd22c (aprovado)
+- Tag = v12C-pre-4 = 9c011b3 (anterior)
 
 ## Links
 - Central: https://oba-cardapio-gestao.obadoceria.workers.dev/

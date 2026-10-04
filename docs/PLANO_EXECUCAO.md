@@ -303,3 +303,4 @@ URL própria, disparada para quem solicita orçamento de festa.
 | 03/10/2026 | fix: badge publicação | atualizarStatus() em 6 pontos de salvamento. Causa raiz: badge desatualizado deixava publicarBtn disabled. Testado e aprovado. |
 | 03/10/2026 | fix: Worker robustez | ctx.waitUntil para sync GitHub, try/catch /api/, gate pós-write protegido. HEAD: 5cc7dad |
 | 04/10/2026 | 12C-3 melhorias catálogo | abas agrupadas, lightbox, ?start=3, float-bar, redesign Rosa Creme, layout editorial Pg1+Pg2 unificadas. HEAD: 8da620d |
+| 04/10/2026 | Paleta Verde Sálvia | #6B9E7A aprovada. Fix encoding BOM. HEAD: 48dd22c |
