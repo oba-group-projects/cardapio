@@ -65,7 +65,7 @@
     padding: 52px 28px 0;
   }
   .pg1-logo {
-    width: 72px; height: auto; object-fit: contain;
+    width: 100px; height: auto; object-fit: contain;
     margin-bottom: 36px;
   }
   .pg1-rotulo {
@@ -73,7 +73,7 @@
     margin-bottom: 20px;
   }
   .pg1-rotulo-texto {
-    font-size: 10px; font-weight: 700; letter-spacing: .28em;
+    font-size: 13px; font-weight: 700; letter-spacing: .28em;
     text-transform: uppercase; color: var(--muted);
   }
   .pg1-rotulo-linha {
@@ -431,11 +431,11 @@ function catMontarPg1(dados) {
   /* Título e texto — usa defaults do HTML, sobrescreve se o tema tiver valores */
   const bv = dados.tema?.paginas?.boas_vindas || {};
   const ne = dados.tema?.paginas?.nossa_essencia || {};
-  if (bv.titulo) {
+  if (bv.titulo && bv.titulo.trim()) {
     const el = document.getElementById('cat-pg1-titulo');
     if (el) el.textContent = bv.titulo;
   }
-  if (ne.texto) {
+  if (ne.texto && ne.texto.trim()) {
     const el = document.getElementById('cat-pg1-p1');
     if (el) el.textContent = ne.texto;
   }
