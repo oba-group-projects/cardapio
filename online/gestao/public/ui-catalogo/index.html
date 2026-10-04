@@ -91,7 +91,7 @@
   /* Título principal */
   .pg1-titulo {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 52px; font-weight: 300; line-height: 1.05;
+    font-size: 48px; font-weight: 600; line-height: 1.05;
     color: var(--text); letter-spacing: -.01em;
     padding: 0 28px;
     margin-bottom: 28px;
@@ -138,7 +138,7 @@
     display: block; margin: 0 auto 16px;
   }
   .pg3-subtitulo {
-    font-size: 13px; text-transform: uppercase; letter-spacing: .25em;
+    font-size: 15px; text-transform: uppercase; letter-spacing: .25em;
     color: var(--muted); text-align: center; margin-bottom: 36px;
     font-weight: 700;
   }
@@ -169,14 +169,14 @@
   /* ═══════════════════════════════════════════════════
      PG 4 — SABORES
   ═══════════════════════════════════════════════════ */
-  #pg-4 { padding-top: 48px; }
+  #pg-4 { padding-top: 0; }
   .pg4-header { text-align: center; margin-bottom: 6px; width: 100%; padding: 0 20px; }
   .pg4-titulo {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 28px; font-weight: 600; color: var(--brand); margin-bottom: 4px;
+    font-size: 32px; font-weight: 600; color: var(--brand); margin-bottom: 4px;
   }
   .pg4-subtitulo {
-    font-size: 10px; text-transform: uppercase; letter-spacing: .2em;
+    font-size: 11px; text-transform: uppercase; letter-spacing: .22em;
     color: var(--muted); margin-bottom: 14px;
   }
   .pg4-sep {
@@ -248,19 +248,20 @@
   }
   .oba-btn-voltar-dest:active { background: var(--brand-light); border-color: var(--brand); }
 
-  /* Botão Voltar fixo no topo da Pg4 */
+  /* Botão Voltar Pg4 — no fluxo normal, topo da página */
   .pg4-voltar-topo {
-    position: absolute; top: 14px; left: 16px; z-index: 10;
-    background: rgba(255,255,255,.88); backdrop-filter: blur(4px);
-    border: 1px solid var(--line); border-radius: 999px;
-    padding: 7px 16px;
+    background: transparent;
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    color: var(--brand);
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 12px; font-weight: 600; color: var(--brand);
-    cursor: pointer; display: flex; align-items: center; gap: 5px;
-    box-shadow: 0 2px 8px rgba(194,115,90,.12);
+    font-size: 13px; font-weight: 600; letter-spacing: .04em;
+    cursor: pointer; padding: 11px 24px;
+    display: inline-block; text-align: center;
+    margin: 20px 20px 8px;
+    transition: border-color .15s, background .15s;
   }
-  /* pg-4 precisa de position:relative para o botão absolute funcionar */
-  #pg-4 { position: relative; }
+  .pg4-voltar-topo:active { background: var(--brand-light); border-color: var(--brand); }
 
   /* Botões flutuantes — controlados por JS (só visíveis na Pg4) */
   .oba-float-bar {
@@ -417,8 +418,8 @@
      PÁGINA 4 — SABORES DO GRUPO
 ══════════════════════════════════════════════════ -->
 <div class="oba-page" id="pg-4">
-  <!-- Botão Voltar fixo no topo — sempre acessível sem scroll -->
-  <button class="pg4-voltar-topo" onclick="catNavegar(3)">← Grupos</button>
+  <!-- Botão Voltar no topo do fluxo — primeiro elemento visível -->
+  <button class="pg4-voltar-topo" onclick="catNavegar(3)">← Voltar</button>
 
   <div class="pg4-header">
     <h2 class="pg4-titulo" id="cat-pg4-titulo"></h2>
@@ -427,7 +428,7 @@
   </div>
   <div class="oba-abas" id="cat-abas"></div>
   <div class="oba-sabores-grid" id="cat-sabores"></div>
-  <div style="height:90px"></div><!-- espaço para a float-bar não cobrir o último card -->
+  <div style="height:90px"></div>
 </div>
 
 <!-- Botões flutuantes — fora do #pg-4 para position:fixed funcionar corretamente -->
