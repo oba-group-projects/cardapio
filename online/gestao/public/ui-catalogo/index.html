@@ -88,17 +88,19 @@
 
   /* ── PG 4 — SABORES ── */
   #pg-4 { padding-top: 48px; }
+  #pg-4 > * { width: 100%; max-width: 100%; min-width: 0; }
   .pg4-header { text-align: center; margin-bottom: 20px; width: 100%; }
   .pg4-titulo { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 400; color: var(--brand); margin-bottom: 4px; }
   .pg4-subtitulo { font-size: 11px; text-transform: uppercase; letter-spacing: .15em; color: var(--muted); }
 
   /* Abas de categoria */
-  .oba-abas { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 20px; width: 100%; scrollbar-width: none; }
+  .oba-abas { display: flex; gap: 8px; overflow-x: auto; overflow-y: visible; padding-bottom: 4px; margin-bottom: 20px; width: 100%; max-width: 100%; min-width: 0; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
   .oba-abas::-webkit-scrollbar { display: none; }
   .oba-aba {
     flex-shrink: 0; background: var(--brand-light); color: var(--brand);
     border: none; border-radius: 999px; padding: 7px 16px;
     font: inherit; font-size: 12px; font-weight: 500; cursor: pointer; transition: all .15s;
+    white-space: nowrap;
   }
   .oba-aba.active { background: var(--brand); color: #fff; }
 
@@ -163,12 +165,52 @@
   #loading .dot:nth-child(2) { animation-delay: .15s; }
   #loading .dot:nth-child(3) { animation-delay: .3s; }
   @keyframes pulse { 0%,100%{opacity:.2;transform:scale(.8)} 50%{opacity:1;transform:scale(1)} }
+
+  /* ── LIGHTBOX ── */
+  #cat-lightbox {
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(0,0,0,.82);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 20px;
+    opacity: 0; pointer-events: none;
+    transition: opacity .2s ease;
+  }
+  #cat-lightbox.open { opacity: 1; pointer-events: auto; }
+  #cat-lightbox img {
+    max-width: min(88vw, 420px); max-height: 60vh;
+    object-fit: contain; border-radius: 1rem;
+    box-shadow: 0 20px 60px rgba(0,0,0,.5);
+    display: block;
+  }
+  #cat-lightbox .lb-nome {
+    color: #fff; font-size: 15px; font-weight: 600;
+    text-align: center; margin-top: 16px;
+  }
+  #cat-lightbox .lb-preco {
+    color: rgba(255,255,255,.75); font-size: 13px;
+    text-align: center; margin-top: 4px;
+  }
+  #cat-lightbox .lb-fechar {
+    position: absolute; top: 16px; right: 20px;
+    background: rgba(255,255,255,.15); border: none;
+    color: #fff; font-size: 22px; line-height: 1;
+    width: 38px; height: 38px; border-radius: 50%;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
 </style>
 </head>
 <body>
 
 <!-- Loading -->
 <div id="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+
+<!-- Lightbox -->
+<div id="cat-lightbox" onclick="catFecharLightbox()">
+  <button class="lb-fechar" onclick="catFecharLightbox()" aria-label="Fechar">×</button>
+  <img id="cat-lb-img" src="" alt="">
+  <p class="lb-nome" id="cat-lb-nome"></p>
+  <p class="lb-preco" id="cat-lb-preco"></p>
+</div>
 
 <!-- Página 1 — Abertura -->
 <div class="oba-page" id="pg-1">
@@ -214,7 +256,7 @@
       <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.117.549 4.107 1.512 5.84L0 24l6.335-1.481A11.942 11.942 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.003-1.37l-.36-.214-3.72.869.935-3.614-.235-.372A9.818 9.818 0 012.182 12C2.182 6.58 6.58 2.182 12 2.182c5.42 0 9.818 4.398 9.818 9.818 0 5.42-4.398 9.818-9.818 9.818z"/></svg>
       Pedir via WhatsApp
     </button>
-    <button class="oba-float-btn-cardapio" id="cat-btn-cardapio" onclick="window.location.href='/cardapio'">
+    <button class="oba-float-btn-cardapio" id="cat-btn-cardapio" onclick="window.location.href='/cardapio?start=3'">
       Montar pedido →
     </button>
   </div>
@@ -326,7 +368,7 @@ function catAbrirGrupo(grupo, titulo, subtitulo, dados) {
   catNavegar(4);
 }
 
-/* ── MONTAR ABAS DE CATEGORIA ── */
+/* ── MONTAR ABAS DE CATEGORIA (agrupadas por nome base) ── */
 function catMontarAbas(cats) {
   const container = document.getElementById('cat-abas');
   container.innerHTML = '';
@@ -338,12 +380,22 @@ function catMontarAbas(cats) {
   btnTodos.onclick = () => catSelecionarAba('todos', btnTodos);
   container.appendChild(btnTodos);
 
+  /* Agrupa categorias pelo nome base (remove sufixo " I", " II", " III", etc.)
+     para não mostrar "Tradicionais I" e "Tradicionais II" como abas separadas */
+  const grupos = new Map(); // nomeBase → [cat, ...]
   cats.sort((a, b) => (a.ordem ?? 0) - (b.ordem ?? 0)).forEach(cat => {
+    const nomeBase = cat.nome.replace(/\s+[IVX]+$/i, '').trim();
+    if (!grupos.has(nomeBase)) grupos.set(nomeBase, []);
+    grupos.get(nomeBase).push(cat);
+  });
+
+  grupos.forEach((catList, nomeBase) => {
+    const ids = catList.map(c => c.id);
     const btn = document.createElement('button');
     btn.className = 'oba-aba';
-    btn.textContent = cat.nome;
-    btn.dataset.cat = cat.id;
-    btn.onclick = () => catSelecionarAba(cat.id, btn);
+    btn.textContent = nomeBase;
+    btn.dataset.cat = ids.join(','); // múltiplos IDs separados por vírgula
+    btn.onclick = () => catSelecionarAba(ids.join(','), btn);
     container.appendChild(btn);
   });
 }
@@ -361,10 +413,15 @@ function catRenderizarSabores(dados, grupo, catId) {
   const cats = (dados.categorias || []).filter(c => c.grupoCatalogo === grupo && c.ativo !== false);
   const catIds = new Set(cats.map(c => String(c.id)));
 
+  /* catId pode ser 'todos' ou IDs separados por vírgula (agrupamento por nome base) */
+  const filtroIds = catId !== 'todos'
+    ? new Set(catId.split(',').map(s => s.trim()))
+    : null;
+
   let sabores = (dados.sabores || []).filter(s => {
     if (s.ativo === false || s.disponivel === false) return false;
     if (!catIds.has(String(s.categoriaId))) return false;
-    if (catId !== 'todos' && String(s.categoriaId) !== String(catId)) return false;
+    if (filtroIds && !filtroIds.has(String(s.categoriaId))) return false;
     return true;
   }).sort((a, b) => String(a.nome).localeCompare(String(b.nome), 'pt-BR'));
 
@@ -379,6 +436,7 @@ function catRenderizarSabores(dados, grupo, catId) {
   sabores.forEach(s => {
     const card = document.createElement('div');
     card.className = 'oba-sabor-card';
+    card.style.cursor = 'pointer';
 
     const imgUrl = catImageUrl(s.imagem);
     if (imgUrl) {
@@ -408,8 +466,35 @@ function catRenderizarSabores(dados, grupo, catId) {
     }
 
     card.appendChild(info);
+
+    /* Clique abre lightbox */
+    const precoTxt = (_catExibirPrecos && s.preco != null)
+      ? 'R$ ' + Number(s.preco).toFixed(2).replace('.', ',')
+      : '';
+    card.onclick = () => catAbrirLightbox(catImageUrl(s.imagem), s.nome, precoTxt);
+
     grid.appendChild(card);
   });
+}
+
+/* ── LIGHTBOX ── */
+function catAbrirLightbox(imgUrl, nome, preco) {
+  const lb = document.getElementById('cat-lightbox');
+  const img = document.getElementById('cat-lb-img');
+  const nomeEl = document.getElementById('cat-lb-nome');
+  const precoEl = document.getElementById('cat-lb-preco');
+  if (!lb) return;
+  if (img) { img.src = imgUrl || ''; img.style.display = imgUrl ? '' : 'none'; }
+  if (nomeEl) nomeEl.textContent = nome || '';
+  if (precoEl) { precoEl.textContent = preco || ''; precoEl.style.display = preco ? '' : 'none'; }
+  lb.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function catFecharLightbox() {
+  const lb = document.getElementById('cat-lightbox');
+  if (lb) lb.classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 function catPlaceholder() {
