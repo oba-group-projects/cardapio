@@ -1,67 +1,68 @@
 ﻿# CURRENT STATE
 
-Atualizado: 2026-10-03
+Atualizado: 2026-10-04
 
 ## Git
 Branch: feature/gestao-online-segura
-Commit HEAD: 5cc7dad
+Commit HEAD: 8da620d
 Tag de marco anterior: v12C-pre-4 (9c011b3)
-Tag de marco atual: v12C-pre-4 (base — sem nova tag, sessão de bugfix)
 
 ## Estado funcional
 - Central privada autenticada e operacional (senha Oba2026!)
-- Fluxo DRAFT → PREVIEW → PUBLISHED separado, funcional e aprovado
+- Fluxo DRAFT → PREVIEW → PUBLISHED funcional e aprovado
 - Badge de status atualiza automaticamente após cada salvamento
 - Cardápio público funcional em /cardapio
+- Catálogo público funcional em /catalogo — APROVADO
 - Módulo de Propostas completo (12A + 12B)
-- Rota /catalogo implementada (12C-2 parcial — HTML sem dados reais)
 
-## Correções desta sessão (03/10)
+## Catálogo (/catalogo) — entregue e aprovado nesta sessão
 
-### Fluxo de publicação — bug resolvido
-- **Causa raiz:** badge de status não atualizava após salvar → botão Publicar permanecia `disabled` com conteúdo pendente
-- **Solução:** `atualizarStatus()` adicionado em todos os 6 pontos de salvamento do catálogo/tema
-- **Testado e aprovado** em produção
+### Layout editorial (Pg1 unificada)
+- Logo vertical no topo esquerdo (100px, fallback textual "Oba / DOCERIA")
+- Rótulo "CATÁLOGO —" em uppercase tracking
+- Título Cormorant Garamond 48px/600: "Descubra a Oba"
+- Dois parágrafos de texto
+- CTA "Conhecer nossos sabores →" vai direto para Pg3
 
-### Worker — melhorias de robustez
-- Handler: `(request, env, ctx)` — ctx disponível para waitUntil
-- Sync GitHub: fire-and-forget via `ctx.waitUntil(Promise.all([...]))` — não bloqueia resposta
-- Gate pós-write: `obaCatalogSlotsState` protegido com try/catch
-- Bloco `/api/`: try/catch global → retorna JSON 500 em vez de página de erro Cloudflare
+### Pg3 — Menu de grupos
+- Logo horizontal centralizada
+- Subtítulo 15px uppercase: "ESCOLHA O TIPO DE DOCE"
+- Botões Doces Artesanais (destaque terracota) e Doces Finos
+- Botão Voltar pill com borda
 
-## Melhorias acumuladas — sessões anteriores
+### Pg4 — Sabores
+- Título 32px/600 em terracota
+- Subtítulo 11px uppercase tracking
+- Abas agrupadas por nome base (Tradicionais / Clássicos / Especiais)
+- Grid 2 colunas com sombra suave e lupa
+- Scroll funcionando (position:relative removido)
+- Float-bar fora do #pg-4: [← Voltar] [Pedir WPP] [Montar pedido]
+- Lightbox: card branco + foto aspect-ratio:1 + nome + ×
 
-### Separador visual no cardápio
-- Substituído ⬢ por · (U+00B7) — suporte universal
+### Paleta Rosa Creme
+- --brand: #C2735A (terracota suave)
+- --bg: #FDF6F0 (creme rosado)
+- --line: #F0D5C8 (bege rosado)
 
-### Barra de contexto "alterações não salvas"
-- Aparece automaticamente ao editar campos das páginas fixas
-- Botão "Salvar" submete o formulário ativo
-- Botão "Descartar" restaura todos os campos
-
-### Validação de label ao salvar Seção Extra
-- Aviso inline + bloqueio quando seção ativa + botão marcado + label vazio
-
-### Fluxo DRAFT → PREVIEW → PUBLISHED separado
-- "Visualizar Preview" → gera PREVIEW e abre /__preview
-- "Publicar após Preview" → só habilitado quando badge = "Preview pronto para publicar"
-- "Visualizar cardápio" → abre /cardapio público
+## Worker — melhorias desta sessão
+- Handler: (request, env, ctx)
+- ctx.waitUntil para sync GitHub
+- try/catch global no bloco /api/
+- Gate pós-write protegido
 
 ## Fase 12C — Catálogo de Sabores
-Estrutura aprovada:
-- Rota pública /catalogo no Worker (sem autenticação) — implementada
-- HTML ui-catalogo/index.html — implementado (estático)
-- Pendente: conectar dados reais (12C-3)
+- ✅ 12C-1: Campo grupoCatalogo nas categorias
+- ✅ 12C-2: Rota /catalogo + HTML
+- ✅ 12C-3: Dados reais conectados + redesign visual aprovado
+- ⬜ 12C-4: Edição Visual do Catálogo na Central
 
-Subfases:
-- ✅ 12C-1: Campo grupoCatalogo no editor de Categorias
-- ✅ 12C-2: Rota /catalogo + HTML estático
-- ⬜ 12C-3: Conectar dados reais (sabores, fotos, preços)
-- ⬜ 12C-4: Aba "Catálogo" na Central com configurações
+## Próximo
+- Redesign Pg1/Pg2 do cardápio seguindo padrão do catálogo
+- Ver restrições críticas no HANDOFF.md antes de tocar
 
 ## Pontos de retorno seguros
-- Tag v12C-pre-4 = 9c011b3 (estável anterior)
-- HEAD atual = 5cc7dad (estável, aprovado em produção)
+- Tag v12C-pre-4 = 9c011b3 (antes desta sessão)
+- HEAD atual = 8da620d (estável, aprovado)
 
 ## Links
 - Central: https://oba-cardapio-gestao.obadoceria.workers.dev/
