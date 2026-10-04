@@ -11,14 +11,14 @@
 <style>
   /* ── PALETA ROSA CREME ── */
   :root {
-    --brand:       #C2735A;   /* terracota suave */
-    --brand-dark:  #A55A40;   /* terracota escuro — hover/active */
-    --brand-light: #FAE8E0;   /* terracota muito claro — fundo aba inativa */
-    --text:        #3B2A1E;   /* marrom escuro — texto principal */
-    --muted:       #9C7B6E;   /* marrom médio — textos secundários */
-    --bg:          #FDF6F0;   /* creme rosado — fundo geral */
+    --brand:       #C2735A;
+    --brand-dark:  #A55A40;
+    --brand-light: #FAE8E0;
+    --text:        #3B2A1E;
+    --muted:       #9C7B6E;
+    --bg:          #FDF6F0;
     --card-bg:     #fff;
-    --line:        #F0D5C8;   /* bege rosado — bordas */
+    --line:        #F0D5C8;
     --wpp:         #25D366;
   }
 
@@ -29,87 +29,110 @@
     overflow: hidden; -webkit-tap-highlight-color: transparent;
   }
 
-  /* ── ANIMAÇÃO DE ENTRADA ── */
-  @keyframes catFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  /* ── ANIMAÇÕES ── */
+  @keyframes catFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes catPulse  { 0%,100%{opacity:.2;transform:scale(.8)} 50%{opacity:1;transform:scale(1)} }
 
-  /* ── PÁGINAS ── */
+  /* ── PÁGINAS (estrutura base) ── */
   .oba-page {
     position: fixed; inset: 0;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    padding: 32px 24px;
+    display: flex; flex-direction: column;
     opacity: 0; pointer-events: none;
-    transition: opacity .3s ease;
+    transition: opacity .28s ease;
   }
-  .oba-page.active { opacity: 1; pointer-events: auto; animation: catFadeIn .3s ease-out forwards; }
-  #pg-3, #pg-4 { justify-content: flex-start; overflow-y: auto; padding-bottom: 110px; }
+  .oba-page.active {
+    opacity: 1; pointer-events: auto;
+    animation: catFadeIn .32s ease-out forwards;
+  }
+  #pg-3, #pg-4 { overflow-y: auto; padding-bottom: 110px; }
   #pg-4 { align-items: stretch; }
   #pg-4 > * { width: 100%; max-width: 100%; min-width: 0; }
 
-  /* ── PG 1 — ABERTURA ── */
+  /* ═══════════════════════════════════════════════════
+     PG 1 — ABERTURA UNIFICADA (ex Pg1 + Pg2)
+     Layout: coluna, alinhado à esquerda, scroll se necessário
+  ═══════════════════════════════════════════════════ */
   #pg-1 {
-    background: linear-gradient(160deg, #FDF6F0 60%, #FAE8E0 100%);
-  }
-  #pg-1 .pg1-logo {
-    width: 140px; height: auto; object-fit: contain;
-    margin-bottom: 32px;
-    filter: drop-shadow(0 4px 16px rgba(194,115,90,.18));
-  }
-  #pg-1 .pg1-titulo {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 36px; font-weight: 600; letter-spacing: .18em;
-    text-transform: uppercase; color: var(--brand);
-    text-align: center; line-height: 1.2; margin-bottom: 10px;
-  }
-  #pg-1 .pg1-subtitulo {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 16px; font-style: italic; font-weight: 300;
-    color: var(--muted); letter-spacing: .06em;
-    text-align: center; margin-bottom: 44px;
+    justify-content: flex-start;
+    overflow-y: auto;
+    padding: 0;
+    background: var(--bg);
   }
 
-  /* ── PG 2 — NOSSA ESSÊNCIA ── */
-  #pg-2 .pg2-logo {
-    width: 80px; height: 80px; object-fit: contain; border-radius: 50%;
+  /* Topo: logo + rótulo de seção */
+  .pg1-topo {
+    display: flex; flex-direction: column; align-items: flex-start;
+    padding: 52px 28px 0;
+  }
+  .pg1-logo {
+    width: 72px; height: auto; object-fit: contain;
+    margin-bottom: 36px;
+  }
+  .pg1-rotulo {
+    display: flex; align-items: center; gap: 12px;
     margin-bottom: 20px;
-    box-shadow: 0 4px 20px rgba(194,115,90,.2);
   }
-  #pg-2 .pg2-card {
-    background: rgba(255,255,255,.7); backdrop-filter: blur(12px);
-    border: 1px solid rgba(194,115,90,.12);
-    border-radius: 2.5rem; padding: 28px 24px;
-    text-align: center; max-width: 380px; width: 100%;
+  .pg1-rotulo-texto {
+    font-size: 10px; font-weight: 700; letter-spacing: .28em;
+    text-transform: uppercase; color: var(--muted);
   }
-  #pg-2 .pg2-titulo {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 26px; font-weight: 600; color: var(--brand);
-    letter-spacing: .08em; margin-bottom: 12px;
-  }
-  #pg-2 .pg2-sep {
-    width: 36px; height: 2px;
-    background: var(--brand-light); border-radius: 2px;
-    margin: 0 auto 16px;
-  }
-  #pg-2 .pg2-texto {
-    font-size: 13px; line-height: 1.85; color: var(--text);
-    font-weight: 300;
-  }
-  #pg-2 .pg2-citacao {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 15px; font-style: italic; color: var(--muted);
-    margin-top: 16px; line-height: 1.5;
+  .pg1-rotulo-linha {
+    width: 28px; height: 1px; background: var(--muted); opacity: .5;
   }
 
-  /* ── PG 3 — MENU ── */
-  #pg-3 { padding-top: 52px; }
-  #pg-3 .pg3-logo {
-    width: 110px; height: auto; object-fit: contain;
+  /* Título principal */
+  .pg1-titulo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 52px; font-weight: 300; line-height: 1.05;
+    color: var(--text); letter-spacing: -.01em;
+    padding: 0 28px;
+    margin-bottom: 28px;
+  }
+
+  /* Corpo de texto */
+  .pg1-corpo {
+    padding: 0 28px;
+    display: flex; flex-direction: column; gap: 16px;
+    margin-bottom: 40px;
+  }
+  .pg1-paragrafo {
+    font-size: 14px; font-weight: 300; line-height: 1.85;
+    color: var(--muted);
+  }
+
+  /* CTA fixo na parte inferior */
+  .pg1-cta-wrap {
+    padding: 0 28px 44px;
+    margin-top: auto;
+  }
+  .pg1-cta {
+    display: block; width: 100%;
+    background: var(--text); color: #fff;
+    border: none; border-radius: 999px;
+    padding: 17px 24px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px; font-weight: 600; letter-spacing: .04em;
+    cursor: pointer; text-align: center;
+    transition: background .15s, transform .1s;
+    box-shadow: 0 8px 24px rgba(59,42,30,.18);
+  }
+  .pg1-cta:active { background: var(--brand-dark); transform: scale(.98); }
+
+  /* ═══════════════════════════════════════════════════
+     PG 3 — MENU DE GRUPOS
+  ═══════════════════════════════════════════════════ */
+  #pg-3 {
+    padding-top: 52px;
+    align-items: center;
+  }
+  .pg3-logo {
+    width: 100px; height: auto; object-fit: contain;
     display: block; margin: 0 auto 16px;
   }
-  #pg-3 .pg3-subtitulo {
+  .pg3-subtitulo {
     font-size: 10px; text-transform: uppercase; letter-spacing: .25em;
     color: var(--muted); text-align: center; margin-bottom: 36px;
-    font-weight: 600;
+    font-weight: 700;
   }
   .oba-cat-btn {
     width: 100%; max-width: 400px;
@@ -125,31 +148,39 @@
     background: var(--brand); border-color: var(--brand);
     box-shadow: 0 6px 20px rgba(194,115,90,.3);
   }
-  .oba-cat-btn .btn-sub { display: block; font-size: 9px; text-transform: uppercase; letter-spacing: .18em; color: var(--muted); margin-bottom: 4px; font-weight: 600; }
+  .oba-cat-btn .btn-sub {
+    display: block; font-size: 9px; text-transform: uppercase;
+    letter-spacing: .18em; color: var(--muted); margin-bottom: 4px; font-weight: 700;
+  }
   .oba-cat-btn .btn-lbl { display: block; font-size: 16px; font-weight: 700; color: var(--text); }
   .oba-cat-btn.destaque .btn-sub { color: rgba(255,255,255,.65); }
   .oba-cat-btn.destaque .btn-lbl { color: #fff; }
   .oba-cat-btn .btn-ico { font-size: 22px; opacity: .35; }
   .oba-cat-btn.destaque .btn-ico { opacity: .8; }
 
-  /* ── PG 4 — SABORES ── */
+  /* ═══════════════════════════════════════════════════
+     PG 4 — SABORES
+  ═══════════════════════════════════════════════════ */
   #pg-4 { padding-top: 48px; }
-  .pg4-header { text-align: center; margin-bottom: 6px; width: 100%; }
+  .pg4-header { text-align: center; margin-bottom: 6px; width: 100%; padding: 0 20px; }
   .pg4-titulo {
     font-family: 'Cormorant Garamond', serif;
     font-size: 28px; font-weight: 600; color: var(--brand); margin-bottom: 4px;
   }
   .pg4-subtitulo {
     font-size: 10px; text-transform: uppercase; letter-spacing: .2em;
-    color: var(--muted); margin-bottom: 16px;
+    color: var(--muted); margin-bottom: 14px;
   }
   .pg4-sep {
     width: 32px; height: 2px; background: var(--brand-light);
     border-radius: 2px; margin: 0 auto 16px;
   }
 
-  /* Abas de categoria */
-  .oba-abas { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 4px; margin-bottom: 18px; width: 100%; }
+  /* Abas */
+  .oba-abas {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    padding: 0 20px 4px; margin-bottom: 18px; width: 100%;
+  }
   .oba-aba {
     flex-shrink: 0; background: var(--brand-light); color: var(--brand);
     border: 1.5px solid transparent; border-radius: 999px; padding: 7px 16px;
@@ -160,49 +191,43 @@
   .oba-aba.active { background: var(--brand); color: #fff; border-color: var(--brand); }
 
   /* Grid de sabores */
-  .oba-sabores-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; width: 100%; }
+  .oba-sabores-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 14px; width: 100%; padding: 0 20px;
+  }
   .oba-sabor-card {
     background: var(--card-bg); border: 1px solid var(--line);
     border-radius: 1.5rem; overflow: hidden;
     box-shadow: 0 2px 12px rgba(194,115,90,.08);
-    transition: box-shadow .2s, transform .2s;
-    cursor: pointer;
+    transition: box-shadow .2s, transform .2s; cursor: pointer;
   }
   .oba-sabor-card:active { transform: scale(.97); box-shadow: 0 4px 20px rgba(194,115,90,.2); }
-  /* Wrapper da foto — posição relativa para o ícone de lupa */
   .oba-sabor-img-wrap { position: relative; width: 100%; aspect-ratio: 1; overflow: hidden; background: var(--brand-light); }
   .oba-sabor-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .35s ease; }
   .oba-sabor-card:active .oba-sabor-img { transform: scale(1.06); }
-  /* Ícone de lupa */
   .oba-sabor-lupa {
     position: absolute; bottom: 8px; right: 8px;
     background: rgba(255,255,255,.88); backdrop-filter: blur(4px);
     border-radius: 50%; width: 28px; height: 28px;
     display: flex; align-items: center; justify-content: center;
     font-size: 13px; color: var(--brand);
-    box-shadow: 0 2px 8px rgba(0,0,0,.12);
-    pointer-events: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,.12); pointer-events: none;
   }
   .oba-sabor-img-placeholder { width: 100%; aspect-ratio: 1; background: var(--brand-light); display: flex; align-items: center; justify-content: center; }
   .oba-sabor-img-placeholder span { font-size: 28px; opacity: .3; }
   .oba-sabor-info { padding: 12px 14px 14px; text-align: center; }
   .oba-sabor-nome { font-size: 12px; font-weight: 700; color: var(--text); line-height: 1.35; }
 
-  /* ── BOTÃO CTA ── */
-  .oba-btn-cta {
-    background: var(--brand); color: #fff; border: none; border-radius: 999px;
-    padding: 15px 32px; font: inherit; font-size: 14px; font-weight: 700;
-    cursor: pointer; transition: background .15s, transform .1s;
-    margin-top: 36px; letter-spacing: .03em;
-    box-shadow: 0 6px 20px rgba(194,115,90,.3);
-  }
-  .oba-btn-cta:active { background: var(--brand-dark); transform: scale(.97); }
-  .oba-btn-cta.outline {
-    background: transparent; color: var(--brand);
-    border: 1.5px solid var(--brand); box-shadow: none;
+  /* Botão Voltar */
+  .oba-btn-voltar {
+    background: transparent; border: none; color: var(--muted);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px; font-style: italic; font-weight: 400; letter-spacing: .06em;
+    cursor: pointer; padding: 10px 0; margin-top: 8px;
+    display: block; text-align: center; width: 100%;
   }
 
-  /* ── BOTÕES FLUTUANTES ── */
+  /* Botões flutuantes */
   .oba-float-bar {
     position: fixed; bottom: 0; left: 0; right: 0;
     background: linear-gradient(transparent, var(--bg) 38%);
@@ -224,19 +249,10 @@
     font: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
     box-shadow: 0 4px 16px rgba(194,115,90,.3);
   }
-  .oba-float-btn-wpp:active   { opacity: .88; }
+  .oba-float-btn-wpp:active    { opacity: .88; }
   .oba-float-btn-cardapio:active { background: var(--brand-dark); }
 
-  /* ── BOTÃO VOLTAR ── */
-  .oba-btn-voltar {
-    background: transparent; border: none; color: var(--muted);
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 13px; font-style: italic; font-weight: 400; letter-spacing: .06em;
-    cursor: pointer; padding: 10px 0; margin-top: 8px;
-    display: block; text-align: center; width: 100%;
-  }
-
-  /* ── LOADING ── */
+  /* Loading */
   #loading {
     position: fixed; inset: 0; background: var(--bg);
     display: flex; align-items: center; justify-content: center; z-index: 999;
@@ -248,29 +264,23 @@
   #loading .dot:nth-child(2) { animation-delay: .15s; }
   #loading .dot:nth-child(3) { animation-delay: .3s; }
 
-  /* ── LIGHTBOX ── */
+  /* Lightbox */
   #cat-lightbox {
     position: fixed; inset: 0; z-index: 1000;
     background: rgba(30,12,6,.88);
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    padding: 24px;
-    opacity: 0; pointer-events: none;
+    padding: 24px; opacity: 0; pointer-events: none;
     transition: opacity .22s ease;
   }
   #cat-lightbox.open { opacity: 1; pointer-events: auto; }
   #cat-lightbox img {
     max-width: min(86vw, 400px); max-height: 58vh;
     object-fit: contain; border-radius: 1.25rem;
-    box-shadow: 0 24px 64px rgba(0,0,0,.55);
-    display: block;
+    box-shadow: 0 24px 64px rgba(0,0,0,.55); display: block;
   }
   #cat-lightbox .lb-nome {
     color: #fff; font-size: 16px; font-weight: 700;
-    text-align: center; margin-top: 18px; letter-spacing: .02em;
-  }
-  #cat-lightbox .lb-preco {
-    color: rgba(255,255,255,.6); font-size: 13px;
-    text-align: center; margin-top: 4px; display: none;
+    text-align: center; margin-top: 18px;
   }
   #cat-lightbox .lb-fechar {
     position: absolute; top: 18px; right: 20px;
@@ -292,42 +302,64 @@
   <button class="lb-fechar" onclick="catFecharLightbox()" aria-label="Fechar">×</button>
   <img id="cat-lb-img" src="" alt="">
   <p class="lb-nome" id="cat-lb-nome"></p>
-  <p class="lb-preco" id="cat-lb-preco"></p>
 </div>
 
-<!-- Página 1 — Abertura -->
+<!-- ══════════════════════════════════════════════════
+     PÁGINA 1 — ABERTURA (unifica ex-Pg1 e ex-Pg2)
+     Estrutura: topo → título → texto → CTA
+══════════════════════════════════════════════════ -->
 <div class="oba-page" id="pg-1">
-  <img id="cat-pg1-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-vertical.png"
-       alt="Oba Doceria" class="pg1-logo" onerror="this.style.display='none'">
-  <h1 class="pg1-titulo" id="cat-pg1-titulo">Catálogo<br>Oba Doceria</h1>
-  <p class="pg1-subtitulo" id="cat-pg1-subtitulo">Sabores artesanais feitos com amor</p>
-  <button class="oba-btn-cta" onclick="catNavegar(2)">Conhecer →</button>
+
+  <!-- Topo: logo + rótulo de seção -->
+  <div class="pg1-topo">
+    <img id="cat-pg1-logo"
+         src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-vertical.png"
+         alt="Oba Doceria" class="pg1-logo"
+         onerror="this.style.display='none'">
+    <div class="pg1-rotulo">
+      <span class="pg1-rotulo-texto" id="cat-pg1-rotulo">Catálogo</span>
+      <span class="pg1-rotulo-linha"></span>
+    </div>
+  </div>
+
+  <!-- Título grande -->
+  <h1 class="pg1-titulo" id="cat-pg1-titulo">Descubra<br>a Oba</h1>
+
+  <!-- Corpo de texto — dois parágrafos -->
+  <div class="pg1-corpo">
+    <p class="pg1-paragrafo" id="cat-pg1-p1">
+      Uma coleção de sabores artesanais, criados para despertar os sentidos e transformar pequenos momentos em lembranças especiais. Brigadeiros cremosos, combinações delicadas e receitas cuidadosamente preparadas para quem aprecia doces feitos de verdade.
+    </p>
+    <p class="pg1-paragrafo" id="cat-pg1-p2">
+      Explore nossos sabores, descubra seus favoritos e deixe-se levar pela experiência Oba. Cada doce tem seu jeito de encantar — e talvez o próximo seja exatamente o que você estava procurando.
+    </p>
+  </div>
+
+  <!-- CTA -->
+  <div class="pg1-cta-wrap">
+    <button class="pg1-cta" onclick="catNavegar(3)" id="cat-pg1-cta">
+      Conhecer nossos sabores →
+    </button>
+  </div>
+
 </div>
 
-<!-- Página 2 — Nossa Essência -->
-<div class="oba-page" id="pg-2">
-  <img id="cat-pg2-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-circular.png"
-       alt="Oba Doceria" class="pg2-logo" onerror="this.style.display='none'">
-  <div class="pg2-card">
-    <h2 class="pg2-titulo" id="cat-pg2-titulo">Nossa Essência</h2>
-    <div class="pg2-sep"></div>
-    <p class="pg2-texto" id="cat-pg2-texto">Na Oba Doceria, cada brigadeiro é uma obra de arte. Criamos receitas exclusivas com rigor técnico e os melhores insumos, resultando em doces menos açucarados e intensamente cremosos.</p>
-    <p class="pg2-citacao" id="cat-pg2-citacao">"Feito à mão, com amor e precisão."</p>
-  </div>
-  <button class="oba-btn-cta" onclick="catNavegar(3)">Ver os Sabores →</button>
+<!-- ══════════════════════════════════════════════════
+     PÁGINA 3 — MENU DE GRUPOS
+══════════════════════════════════════════════════ -->
+<div class="oba-page" id="pg-3">
+  <img id="cat-pg3-logo"
+       src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png"
+       alt="Oba Doceria" class="pg3-logo"
+       onerror="this.style.display='none'">
+  <p class="pg3-subtitulo">Escolha o tipo de doce</p>
+  <div id="cat-grupos" style="width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center;padding:0 20px"></div>
   <button class="oba-btn-voltar" onclick="catNavegar(1)">← voltar</button>
 </div>
 
-<!-- Página 3 — Menu de grupos -->
-<div class="oba-page" id="pg-3">
-  <img id="cat-pg3-logo" src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png"
-       alt="Oba Doceria" class="pg3-logo" onerror="this.style.display='none'">
-  <p class="pg3-subtitulo">Escolha o tipo de doce</p>
-  <div id="cat-grupos" style="width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center"></div>
-  <button class="oba-btn-voltar" onclick="catNavegar(2)">← voltar</button>
-</div>
-
-<!-- Página 4 — Sabores do grupo -->
+<!-- ══════════════════════════════════════════════════
+     PÁGINA 4 — SABORES DO GRUPO
+══════════════════════════════════════════════════ -->
 <div class="oba-page" id="pg-4">
   <div class="pg4-header">
     <h2 class="pg4-titulo" id="cat-pg4-titulo"></h2>
@@ -336,7 +368,7 @@
   </div>
   <div class="oba-abas" id="cat-abas"></div>
   <div class="oba-sabores-grid" id="cat-sabores"></div>
-  <button class="oba-btn-voltar" style="margin-bottom:80px" onclick="catNavegar(3)">← voltar</button>
+  <button class="oba-btn-voltar" style="margin-bottom:80px;padding:10px 20px" onclick="catNavegar(3)">← voltar</button>
 
   <!-- Botões flutuantes -->
   <div class="oba-float-bar">
@@ -353,12 +385,10 @@
 <script>
 /* ================================================================
    CATÁLOGO OBA DOCERIA — /catalogo
-   Lê dados do slot PUBLISHED via published-bootstrap.js
-   Paleta: Rosa Creme (#C2735A terracota)
+   Pg1+Pg2 unificadas · Paleta Rosa Creme · sem preço
 ================================================================ */
 
 const CAT_LOGO_VERTICAL   = 'https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-vertical.png';
-const CAT_LOGO_CIRCULAR   = 'https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-circular.png';
 const CAT_LOGO_HORIZONTAL = 'https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png';
 
 let _catDados       = null;
@@ -369,12 +399,13 @@ let _catPaginaAtual = 1;
 /* ── NAVEGAÇÃO ── */
 function catNavegar(num) {
   document.querySelectorAll('.oba-page').forEach(p => p.classList.remove('active'));
-  document.getElementById('pg-' + num)?.classList.add('active');
+  const pg = document.getElementById('pg-' + num);
+  if (pg) pg.classList.add('active');
   _catPaginaAtual = num;
   window.scrollTo({ top: 0 });
 }
 
-/* ── RESOLVER URL DE IMAGEM ── */
+/* ── URL DE IMAGEM ── */
 function catImageUrl(path) {
   if (!path) return '';
   if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) return path;
@@ -386,40 +417,27 @@ function catSetLogo(el, fromTema, fallback) {
   if (!el) return;
   const src = (fromTema && fromTema.trim()) ? catImageUrl(fromTema) : fallback;
   if (src) { el.src = src; el.style.display = ''; }
-  else { el.style.display = 'none'; }
+  else el.style.display = 'none';
 }
 
-/* ── MONTAR PG 1 ── */
+/* ── MONTAR PG 1 (unificada) ── */
 function catMontarPg1(dados) {
+  /* Logo */
   catSetLogo(
     document.getElementById('cat-pg1-logo'),
     dados.tema?.paginas?.boas_vindas?.logo,
     CAT_LOGO_VERTICAL
   );
-  const titulo = dados.tema?.paginas?.boas_vindas?.titulo;
-  if (titulo) document.getElementById('cat-pg1-titulo').textContent = titulo;
-  const sub = dados.tema?.paginas?.boas_vindas?.subtitulo;
-  if (sub) document.getElementById('cat-pg1-subtitulo').textContent = sub;
-}
-
-/* ── MONTAR PG 2 ── */
-function catMontarPg2(dados) {
-  catSetLogo(
-    document.getElementById('cat-pg2-logo'),
-    dados.tema?.paginas?.nossa_essencia?.logo,
-    CAT_LOGO_CIRCULAR
-  );
+  /* Título e texto — usa defaults do HTML, sobrescreve se o tema tiver valores */
+  const bv = dados.tema?.paginas?.boas_vindas || {};
   const ne = dados.tema?.paginas?.nossa_essencia || {};
-  if (ne.titulo) document.getElementById('cat-pg2-titulo').textContent = ne.titulo;
-  if (ne.texto)  document.getElementById('cat-pg2-texto').textContent  = ne.texto;
-  const citacaoEl = document.getElementById('cat-pg2-citacao');
-  if (citacaoEl) {
-    if (ne.citacao) {
-      citacaoEl.textContent = '\u201c' + ne.citacao.replace(/^[""\u201c\u201d]|[""\u201c\u201d]$/g, '') + '\u201d';
-      citacaoEl.style.display = '';
-    } else {
-      citacaoEl.style.display = 'none';
-    }
+  if (bv.titulo) {
+    const el = document.getElementById('cat-pg1-titulo');
+    if (el) el.textContent = bv.titulo;
+  }
+  if (ne.texto) {
+    const el = document.getElementById('cat-pg1-p1');
+    if (el) el.textContent = ne.texto;
   }
 }
 
@@ -445,7 +463,6 @@ function catMontarPg3(dados) {
     btn.onclick = () => catAbrirGrupo('artesanais', 'Doces Artesanais', 'Tradicionais, Clássicos e Especiais', dados);
     container.appendChild(btn);
   }
-
   if (temFinos) {
     const btn = document.createElement('button');
     btn.className = 'oba-cat-btn';
@@ -453,7 +470,6 @@ function catMontarPg3(dados) {
     btn.onclick = () => catAbrirGrupo('finos', 'Doces Finos', 'Linha exclusiva', dados);
     container.appendChild(btn);
   }
-
   if (!temArtesanais && !temFinos) {
     container.innerHTML = '<p style="color:var(--muted);font-size:13px;text-align:center;padding:32px 0">Nenhum grupo configurado ainda.</p>';
   }
@@ -471,7 +487,7 @@ function catAbrirGrupo(grupo, titulo, subtitulo, dados) {
   catNavegar(4);
 }
 
-/* ── MONTAR ABAS (agrupadas por nome base) ── */
+/* ── ABAS (agrupadas por nome base) ── */
 function catMontarAbas(cats) {
   const container = document.getElementById('cat-abas');
   container.innerHTML = '';
@@ -489,7 +505,6 @@ function catMontarAbas(cats) {
     if (!grupos.has(nomeBase)) grupos.set(nomeBase, []);
     grupos.get(nomeBase).push(cat);
   });
-
   grupos.forEach((catList, nomeBase) => {
     const ids = catList.map(c => c.id);
     const btn = document.createElement('button');
@@ -534,58 +549,46 @@ function catRenderizarSabores(dados, grupo, catId) {
     const card = document.createElement('div');
     card.className = 'oba-sabor-card';
 
-    /* Wrapper da foto + ícone de lupa */
     const imgWrap = document.createElement('div');
     imgWrap.className = 'oba-sabor-img-wrap';
-
     const imgUrl = catImageUrl(s.imagem);
     if (imgUrl) {
       const img = document.createElement('img');
       img.className = 'oba-sabor-img';
-      img.src = imgUrl;
-      img.alt = s.nome;
-      img.loading = 'lazy';
+      img.src = imgUrl; img.alt = s.nome; img.loading = 'lazy';
       img.onerror = () => { imgWrap.innerHTML = '<div class="oba-sabor-img-placeholder"><span>🍬</span></div>'; };
       imgWrap.appendChild(img);
     } else {
       imgWrap.innerHTML = '<div class="oba-sabor-img-placeholder"><span>🍬</span></div>';
     }
-
-    /* Ícone de lupa */
     const lupa = document.createElement('span');
-    lupa.className = 'oba-sabor-lupa';
-    lupa.textContent = '🔍';
+    lupa.className = 'oba-sabor-lupa'; lupa.textContent = '🔍';
     imgWrap.appendChild(lupa);
     card.appendChild(imgWrap);
 
-    /* Info */
     const info = document.createElement('div');
     info.className = 'oba-sabor-info';
     const nome = document.createElement('p');
-    nome.className = 'oba-sabor-nome';
-    nome.textContent = s.nome;
+    nome.className = 'oba-sabor-nome'; nome.textContent = s.nome;
     info.appendChild(nome);
     card.appendChild(info);
 
-    /* Clique abre lightbox — sem preço */
     card.onclick = () => catAbrirLightbox(imgUrl, s.nome);
-
     grid.appendChild(card);
   });
 }
 
 /* ── LIGHTBOX ── */
 function catAbrirLightbox(imgUrl, nome) {
-  const lb    = document.getElementById('cat-lightbox');
-  const img   = document.getElementById('cat-lb-img');
+  const lb = document.getElementById('cat-lightbox');
+  const img = document.getElementById('cat-lb-img');
   const nomeEl = document.getElementById('cat-lb-nome');
   if (!lb) return;
-  if (img)    { img.src = imgUrl || ''; img.style.display = imgUrl ? '' : 'none'; }
+  if (img) { img.src = imgUrl || ''; img.style.display = imgUrl ? '' : 'none'; }
   if (nomeEl) nomeEl.textContent = nome || '';
   lb.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
-
 function catFecharLightbox() {
   const lb = document.getElementById('cat-lightbox');
   if (lb) lb.classList.remove('open');
@@ -619,7 +622,6 @@ async function catIniciar() {
     };
 
     catMontarPg1(_catDados);
-    catMontarPg2(_catDados);
     catMontarPg3(_catDados);
     catConfigurarWpp(_catDados);
 
