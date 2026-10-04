@@ -4266,6 +4266,20 @@ hidratarTemaDoModeloMestre();
 // Pag 1 é a inicial — bloquear scroll imediatamente
 document.body.classList.add('oba-pagina-fixa');
 
+// Suporte a ?start=N — permite entrar diretamente em uma página específica
+// Usado pelo catálogo (/catalogo) que aponta para /cardapio?start=3
+(function(){
+  try {
+    const startParam = new URLSearchParams(window.location.search).get('start');
+    const startNum = startParam ? parseInt(startParam, 10) : NaN;
+    if (!isNaN(startNum) && startNum >= 1 && startNum <= 4) {
+      // Aguarda hidratarTemaDoModeloMestre terminar antes de navegar
+      // (ela é async — usamos setTimeout 0 para deixar a fila de microtasks resolver)
+      setTimeout(() => navegarPara(startNum), 0);
+    }
+  } catch(_) {}
+})();
+
 
 // ================================================================
 // ESTADO GLOBAL
