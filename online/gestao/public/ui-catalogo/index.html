@@ -169,7 +169,7 @@
   /* ═══════════════════════════════════════════════════
      PG 4 — SABORES
   ═══════════════════════════════════════════════════ */
-  #pg-4 { padding-top: 0; }
+  #pg-4 { padding-top: 32px; }
   .pg4-header { text-align: center; margin-bottom: 6px; width: 100%; padding: 0 20px; }
   .pg4-titulo {
     font-family: 'Cormorant Garamond', serif;
@@ -248,31 +248,30 @@
   }
   .oba-btn-voltar-dest:active { background: var(--brand-light); border-color: var(--brand); }
 
-  /* Botão Voltar Pg4 — no fluxo normal, topo da página */
-  .pg4-voltar-topo {
-    background: transparent;
-    border: 1.5px solid var(--line);
-    border-radius: 999px;
-    color: var(--brand);
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 13px; font-weight: 600; letter-spacing: .04em;
-    cursor: pointer; padding: 11px 24px;
-    display: inline-block; text-align: center;
-    margin: 20px 20px 8px;
-    transition: border-color .15s, background .15s;
-  }
-  .pg4-voltar-topo:active { background: var(--brand-light); border-color: var(--brand); }
+  /* Botão Voltar Pg4 — movido para a float-bar */
 
   /* Botões flutuantes — controlados por JS (só visíveis na Pg4) */
   .oba-float-bar {
     position: fixed; bottom: 0; left: 0; right: 0;
     background: linear-gradient(transparent, var(--bg) 38%);
-    padding: 18px 20px 26px;
-    display: none; gap: 10px; justify-content: center;
+    padding: 18px 16px 26px;
+    display: none; gap: 8px; justify-content: center; align-items: center;
     pointer-events: none;
   }
   .oba-float-bar.visivel { display: flex; }
   .oba-float-bar button { pointer-events: auto; }
+  /* Botão Voltar — menor, outline */
+  .oba-float-btn-voltar {
+    flex: 0 0 auto;
+    background: rgba(255,255,255,.92); color: var(--brand);
+    border: 1.5px solid var(--line); border-radius: 999px;
+    padding: 13px 18px;
+    font: inherit; font-size: 13px; font-weight: 600;
+    cursor: pointer; white-space: nowrap;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 2px 8px rgba(194,115,90,.1);
+  }
+  .oba-float-btn-voltar:active { background: var(--brand-light); border-color: var(--brand); }
   .oba-float-btn-wpp {
     flex: 1; max-width: 190px; background: var(--wpp); color: #fff;
     border: none; border-radius: 999px; padding: 13px 16px;
@@ -418,9 +417,6 @@
      PÁGINA 4 — SABORES DO GRUPO
 ══════════════════════════════════════════════════ -->
 <div class="oba-page" id="pg-4">
-  <!-- Botão Voltar no topo do fluxo — primeiro elemento visível -->
-  <button class="pg4-voltar-topo" onclick="catNavegar(3)">← Voltar</button>
-
   <div class="pg4-header">
     <h2 class="pg4-titulo" id="cat-pg4-titulo"></h2>
     <p class="pg4-subtitulo" id="cat-pg4-subtitulo"></p>
@@ -433,6 +429,7 @@
 
 <!-- Botões flutuantes — fora do #pg-4 para position:fixed funcionar corretamente -->
 <div class="oba-float-bar" id="cat-float-bar">
+  <button class="oba-float-btn-voltar" onclick="catNavegar(3)">← Voltar</button>
   <button class="oba-float-btn-wpp" id="cat-btn-wpp">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.117.549 4.107 1.512 5.84L0 24l6.335-1.481A11.942 11.942 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.003-1.37l-.36-.214-3.72.869.935-3.614-.235-.372A9.818 9.818 0 012.182 12C2.182 6.58 6.58 2.182 12 2.182c5.42 0 9.818 4.398 9.818 9.818 0 5.42-4.398 9.818-9.818 9.818z"/></svg>
     Pedir via WhatsApp
