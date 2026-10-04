@@ -1,24 +1,24 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<title>CatÃ¡logo Oba Doceria v2</title>
+<title>Catálogo Oba Doceria v2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  /* â”€â”€ PALETA VERDE SÃLVIA â”€â”€ */
+  /* ── PALETA VERDE SÁLVIA ── */
   :root {
-    --brand:       #4E7A5C;   /* verde sÃ¡lvia */
-    --brand-dark:  #3A6047;   /* verde sÃ¡lvia escuro â€” hover/active */
-    --brand-light: #E0EBE4;   /* verde palha â€” fundo aba inativa */
-    --text:        #1E2D22;   /* verde escuro quase preto â€” texto principal */
-    --muted:       #7A9A85;   /* verde mÃ©dio â€” textos secundÃ¡rios */
-    --bg:          #F2F5F0;   /* verde muito claro â€” fundo geral */
+    --brand:       #4E7A5C;   /* verde sálvia */
+    --brand-dark:  #3A6047;   /* verde sálvia escuro — hover/active */
+    --brand-light: #E0EBE4;   /* verde palha — fundo aba inativa */
+    --text:        #1E2D22;   /* verde escuro quase preto — texto principal */
+    --muted:       #7A9A85;   /* verde médio — textos secundários */
+    --bg:          #F2F5F0;   /* verde muito claro — fundo geral */
     --card-bg:     #fff;
-    --line:        #C8DCC8;   /* verde claro â€” bordas */
+    --line:        #C8DCC8;   /* verde claro — bordas */
     --wpp:         #25D366;
   }
 
@@ -29,11 +29,11 @@
     overflow: hidden; -webkit-tap-highlight-color: transparent;
   }
 
-  /* â”€â”€ ANIMAÃ‡Ã•ES â”€â”€ */
+  /* ── ANIMAÇÕES ── */
   @keyframes catFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes catPulse  { 0%,100%{opacity:.2;transform:scale(.8)} 50%{opacity:1;transform:scale(1)} }
 
-  /* â”€â”€ PÃGINAS (estrutura base) â”€â”€ */
+  /* ── PÁGINAS (estrutura base) ── */
   .oba-page {
     position: fixed; inset: 0;
     display: flex; flex-direction: column;
@@ -48,10 +48,10 @@
   #pg-4 { align-items: stretch; }
   #pg-4 > * { width: 100%; max-width: 100%; min-width: 0; }
 
-  /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     PG 1 â€” ABERTURA UNIFICADA (ex Pg1 + Pg2)
-     Layout: coluna, alinhado Ã  esquerda, scroll se necessÃ¡rio
-  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+  /* ═══════════════════════════════════════════════════
+     PG 1 — ABERTURA UNIFICADA (ex Pg1 + Pg2)
+     Layout: coluna, alinhado à esquerda, scroll se necessário
+  ═══════════════════════════════════════════════════ */
   #pg-1 {
     justify-content: flex-start;
     overflow-y: auto;
@@ -59,7 +59,7 @@
     background: var(--bg);
   }
 
-  /* Topo: logo + rÃ³tulo de seÃ§Ã£o */
+  /* Topo: logo + rótulo de seção */
   .pg1-topo {
     display: flex; flex-direction: column; align-items: flex-start;
     padding: 52px 28px 0;
@@ -68,7 +68,7 @@
     width: 100px; height: auto; object-fit: contain;
     margin-bottom: 36px;
   }
-  /* Fallback textual quando logo nÃ£o carrega */
+  /* Fallback textual quando logo não carrega */
   .pg1-logo-texto {
     font-family: 'Cormorant Garamond', serif;
     font-size: 22px; font-weight: 600; color: var(--text);
@@ -88,7 +88,7 @@
     width: 28px; height: 1px; background: var(--muted); opacity: .5;
   }
 
-  /* TÃ­tulo principal */
+  /* Título principal */
   .pg1-titulo {
     font-family: 'Cormorant Garamond', serif;
     font-size: 48px; font-weight: 600; line-height: 1.05;
@@ -126,9 +126,9 @@
   }
   .pg1-cta:active { background: var(--brand-dark); transform: scale(.98); }
 
-  /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     PG 3 â€” MENU DE GRUPOS
-  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+  /* ═══════════════════════════════════════════════════
+     PG 3 — MENU DE GRUPOS
+  ═══════════════════════════════════════════════════ */
   #pg-3 {
     padding-top: 52px;
     align-items: center;
@@ -166,9 +166,9 @@
   .oba-cat-btn .btn-ico { font-size: 22px; opacity: .35; }
   .oba-cat-btn.destaque .btn-ico { opacity: .8; }
 
-  /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     PG 4 â€” SABORES
-  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+  /* ═══════════════════════════════════════════════════
+     PG 4 — SABORES
+  ═══════════════════════════════════════════════════ */
   #pg-4 { padding-top: 32px; }
   .pg4-header { text-align: center; margin-bottom: 6px; width: 100%; padding: 0 20px; }
   .pg4-titulo {
@@ -226,7 +226,7 @@
   .oba-sabor-info { padding: 12px 14px 14px; text-align: center; }
   .oba-sabor-nome { font-size: 12px; font-weight: 700; color: var(--text); line-height: 1.35; }
 
-  /* BotÃ£o Voltar â€” padrÃ£o discreto */
+  /* Botão Voltar — padrão discreto */
   .oba-btn-voltar {
     background: transparent; border: none; color: var(--muted);
     font-family: 'Cormorant Garamond', serif;
@@ -234,7 +234,7 @@
     cursor: pointer; padding: 10px 0; margin-top: 8px;
     display: block; text-align: center; width: 100%;
   }
-  /* BotÃ£o Voltar â€” versÃ£o destacada (Pg3) */
+  /* Botão Voltar — versão destacada (Pg3) */
   .oba-btn-voltar-dest {
     background: transparent;
     border: 1.5px solid var(--line);
@@ -248,9 +248,9 @@
   }
   .oba-btn-voltar-dest:active { background: var(--brand-light); border-color: var(--brand); }
 
-  /* BotÃ£o Voltar Pg4 â€” movido para a float-bar */
+  /* Botão Voltar Pg4 — movido para a float-bar */
 
-  /* BotÃµes flutuantes â€” controlados por JS (sÃ³ visÃ­veis na Pg4) */
+  /* Botões flutuantes — controlados por JS (só visíveis na Pg4) */
   .oba-float-bar {
     position: fixed; bottom: 0; left: 0; right: 0;
     background: linear-gradient(transparent, var(--bg) 38%);
@@ -260,7 +260,7 @@
   }
   .oba-float-bar.visivel { display: flex; }
   .oba-float-bar button { pointer-events: auto; }
-  /* BotÃ£o Voltar â€” menor, outline */
+  /* Botão Voltar — menor, outline */
   .oba-float-btn-voltar {
     flex: 0 0 auto;
     background: rgba(255,255,255,.92); color: var(--brand);
@@ -302,7 +302,7 @@
   #loading .dot:nth-child(2) { animation-delay: .15s; }
   #loading .dot:nth-child(3) { animation-delay: .3s; }
 
-  /* Lightbox estilo cardÃ¡pio â€” overlay escuro + card branco */
+  /* Lightbox estilo cardápio — overlay escuro + card branco */
   #cat-lightbox {
     position: fixed; inset: 0; z-index: 1000;
     background: rgba(0,0,0,.80);
@@ -332,7 +332,7 @@
   .lb-nome {
     font-size: 16px; font-weight: 700; color: var(--text);
   }
-  /* BotÃ£o fechar no canto do card */
+  /* Botão fechar no canto do card */
   .lb-fechar {
     position: absolute; top: 12px; right: 12px;
     background: rgba(255,255,255,.9); backdrop-filter: blur(4px);
@@ -350,10 +350,10 @@
 <!-- Loading -->
 <div id="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
 
-<!-- Lightbox estilo cardÃ¡pio â€” overlay + card branco -->
+<!-- Lightbox estilo cardápio — overlay + card branco -->
 <div id="cat-lightbox" onclick="catFecharLightbox()">
   <div class="lb-card" onclick="event.stopPropagation()">
-    <button class="lb-fechar" onclick="catFecharLightbox()" aria-label="Fechar">Ã—</button>
+    <button class="lb-fechar" onclick="catFecharLightbox()" aria-label="Fechar">×</button>
     <img id="cat-lb-img" src="" alt="" class="lb-foto">
     <div class="lb-info">
       <p class="lb-nome" id="cat-lb-nome"></p>
@@ -361,13 +361,13 @@
   </div>
 </div>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     PÃGINA 1 â€” ABERTURA (unifica ex-Pg1 e ex-Pg2)
-     Estrutura: topo â†’ tÃ­tulo â†’ texto â†’ CTA
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- ══════════════════════════════════════════════════
+     PÁGINA 1 — ABERTURA (unifica ex-Pg1 e ex-Pg2)
+     Estrutura: topo → título → texto → CTA
+══════════════════════════════════════════════════ -->
 <div class="oba-page" id="pg-1">
 
-  <!-- Topo: logo + rÃ³tulo de seÃ§Ã£o -->
+  <!-- Topo: logo + rótulo de seção -->
   <div class="pg1-topo">
     <img id="cat-pg1-logo"
          src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-vertical.png"
@@ -375,36 +375,36 @@
          onerror="this.style.display='none';document.getElementById('cat-pg1-logo-txt').style.display='block'">
     <div class="pg1-logo-texto" id="cat-pg1-logo-txt">Oba<span>Doceria</span></div>
     <div class="pg1-rotulo">
-      <span class="pg1-rotulo-texto" id="cat-pg1-rotulo">CatÃ¡logo</span>
+      <span class="pg1-rotulo-texto" id="cat-pg1-rotulo">Catálogo</span>
       <span class="pg1-rotulo-linha"></span>
     </div>
   </div>
 
-  <!-- TÃ­tulo grande -->
+  <!-- Título grande -->
   <h1 class="pg1-titulo" id="cat-pg1-titulo">Descubra<br>a Oba</h1>
 
-  <!-- Corpo de texto â€” dois parÃ¡grafos -->
+  <!-- Corpo de texto — dois parágrafos -->
   <div class="pg1-corpo">
     <p class="pg1-paragrafo" id="cat-pg1-p1">
-      Uma coleÃ§Ã£o de sabores artesanais, criados para despertar os sentidos e transformar pequenos momentos em lembranÃ§as especiais. Brigadeiros cremosos, combinaÃ§Ãµes delicadas e receitas cuidadosamente preparadas para quem aprecia doces feitos de verdade.
+      Uma coleção de sabores artesanais, criados para despertar os sentidos e transformar pequenos momentos em lembranças especiais. Brigadeiros cremosos, combinações delicadas e receitas cuidadosamente preparadas para quem aprecia doces feitos de verdade.
     </p>
     <p class="pg1-paragrafo" id="cat-pg1-p2">
-      Explore nossos sabores, descubra seus favoritos e deixe-se levar pela experiÃªncia Oba. Cada doce tem seu jeito de encantar â€” e talvez o prÃ³ximo seja exatamente o que vocÃª estava procurando.
+      Explore nossos sabores, descubra seus favoritos e deixe-se levar pela experiência Oba. Cada doce tem seu jeito de encantar — e talvez o próximo seja exatamente o que você estava procurando.
     </p>
   </div>
 
   <!-- CTA -->
   <div class="pg1-cta-wrap">
     <button class="pg1-cta" onclick="catNavegar(3)" id="cat-pg1-cta">
-      Conhecer nossos sabores â†’
+      Conhecer nossos sabores →
     </button>
   </div>
 
 </div>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     PÃGINA 3 â€” MENU DE GRUPOS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- ══════════════════════════════════════════════════
+     PÁGINA 3 — MENU DE GRUPOS
+══════════════════════════════════════════════════ -->
 <div class="oba-page" id="pg-3">
   <img id="cat-pg3-logo"
        src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png"
@@ -412,12 +412,12 @@
        onerror="this.style.display='none'">
   <p class="pg3-subtitulo">Escolha o tipo de doce</p>
   <div id="cat-grupos" style="width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center;padding:0 20px"></div>
-  <button class="oba-btn-voltar-dest" onclick="catNavegar(1)">â† Voltar</button>
+  <button class="oba-btn-voltar-dest" onclick="catNavegar(1)">← Voltar</button>
 </div>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     PÃGINA 4 â€” SABORES DO GRUPO
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- ══════════════════════════════════════════════════
+     PÁGINA 4 — SABORES DO GRUPO
+══════════════════════════════════════════════════ -->
 <div class="oba-page" id="pg-4">
   <div class="pg4-header">
     <h2 class="pg4-titulo" id="cat-pg4-titulo"></h2>
@@ -429,9 +429,9 @@
   <div style="height:90px"></div>
 </div>
 
-<!-- BotÃµes flutuantes â€” fora do #pg-4 para position:fixed funcionar corretamente -->
+<!-- Botões flutuantes — fora do #pg-4 para position:fixed funcionar corretamente -->
 <div class="oba-float-bar" id="cat-float-bar">
-  <button class="oba-float-btn-voltar" onclick="catNavegar(3)">â† Voltar</button>
+  <button class="oba-float-btn-voltar" onclick="catNavegar(3)">← Voltar</button>
   <button class="oba-float-btn-wpp" id="cat-btn-wpp">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.117.549 4.107 1.512 5.84L0 24l6.335-1.481A11.942 11.942 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.003-1.37l-.36-.214-3.72.869.935-3.614-.235-.372A9.818 9.818 0 012.182 12C2.182 6.58 6.58 2.182 12 2.182c5.42 0 9.818 4.398 9.818 9.818 0 5.42-4.398 9.818-9.818 9.818z"/></svg>
     Pedir via WhatsApp
@@ -444,8 +444,8 @@
 
 <script>
 /* ================================================================
-   CATÃLOGO OBA DOCERIA â€” /catalogo
-   Pg1+Pg2 unificadas Â· Paleta Rosa Creme Â· sem preÃ§o
+   CATÁLOGO OBA DOCERIA — /catalogo
+   Pg1+Pg2 unificadas · Paleta Rosa Creme · sem preço
 ================================================================ */
 
 const CAT_LOGO_VERTICAL   = 'https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-vertical.png';
@@ -456,26 +456,26 @@ let _catGrupoAtivo  = null;
 let _catCatAtiva    = 'todos';
 let _catPaginaAtual = 1;
 
-/* â”€â”€ NAVEGAÃ‡ÃƒO â”€â”€ */
+/* ── NAVEGAÇÃO ── */
 function catNavegar(num) {
   document.querySelectorAll('.oba-page').forEach(p => p.classList.remove('active'));
   const pg = document.getElementById('pg-' + num);
   if (pg) pg.classList.add('active');
   _catPaginaAtual = num;
   window.scrollTo({ top: 0 });
-  /* Barra flutuante sÃ³ aparece na Pg4 */
+  /* Barra flutuante só aparece na Pg4 */
   const floatBar = document.getElementById('cat-float-bar');
   if (floatBar) floatBar.classList.toggle('visivel', num === 4);
 }
 
-/* â”€â”€ URL DE IMAGEM â”€â”€ */
+/* ── URL DE IMAGEM ── */
 function catImageUrl(path) {
   if (!path) return '';
   if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) return path;
   return '/' + path.replace(/\\/g, '/').replace(/^\/+/, '');
 }
 
-/* â”€â”€ LOGO COM FALLBACK â”€â”€ */
+/* ── LOGO COM FALLBACK ── */
 function catSetLogo(el, fromTema, fallback) {
   if (!el) return;
   const src = (fromTema && fromTema.trim()) ? catImageUrl(fromTema) : fallback;
@@ -483,19 +483,19 @@ function catSetLogo(el, fromTema, fallback) {
   else el.style.display = 'none';
 }
 
-/* â”€â”€ MONTAR PG 1 (unificada) â”€â”€ */
+/* ── MONTAR PG 1 (unificada) ── */
 function catMontarPg1(dados) {
-  /* Logo â€” usa tema se disponÃ­vel, senÃ£o fallback GitHub */
+  /* Logo — usa tema se disponível, senão fallback GitHub */
   catSetLogo(
     document.getElementById('cat-pg1-logo'),
     dados.tema?.paginas?.boas_vindas?.logo,
     CAT_LOGO_VERTICAL
   );
-  /* TÃ­tulo e textos do catÃ¡logo NÃƒO sÃ£o sobrescritos pelo tema do cardÃ¡pio.
-     O catÃ¡logo tem sua prÃ³pria identidade â€” os defaults do HTML sÃ£o canÃ´nicos. */
+  /* Título e textos do catálogo NÃO são sobrescritos pelo tema do cardápio.
+     O catálogo tem sua própria identidade — os defaults do HTML são canônicos. */
 }
 
-/* â”€â”€ MONTAR PG 3 â”€â”€ */
+/* ── MONTAR PG 3 ── */
 function catMontarPg3(dados) {
   catSetLogo(
     document.getElementById('cat-pg3-logo'),
@@ -513,14 +513,14 @@ function catMontarPg3(dados) {
   if (temArtesanais) {
     const btn = document.createElement('button');
     btn.className = 'oba-cat-btn destaque';
-    btn.innerHTML = '<div><span class="btn-sub">Artesanais</span><span class="btn-lbl">Doces Artesanais</span></div><span class="btn-ico">ðŸ«</span>';
-    btn.onclick = () => catAbrirGrupo('artesanais', 'Doces Artesanais', 'Tradicionais, ClÃ¡ssicos e Especiais', dados);
+    btn.innerHTML = '<div><span class="btn-sub">Artesanais</span><span class="btn-lbl">Doces Artesanais</span></div><span class="btn-ico">🍫</span>';
+    btn.onclick = () => catAbrirGrupo('artesanais', 'Doces Artesanais', 'Tradicionais, Clássicos e Especiais', dados);
     container.appendChild(btn);
   }
   if (temFinos) {
     const btn = document.createElement('button');
     btn.className = 'oba-cat-btn';
-    btn.innerHTML = '<div><span class="btn-sub">Exclusivos</span><span class="btn-lbl">Doces Finos</span></div><span class="btn-ico">âœ¨</span>';
+    btn.innerHTML = '<div><span class="btn-sub">Exclusivos</span><span class="btn-lbl">Doces Finos</span></div><span class="btn-ico">✨</span>';
     btn.onclick = () => catAbrirGrupo('finos', 'Doces Finos', 'Linha exclusiva', dados);
     container.appendChild(btn);
   }
@@ -529,7 +529,7 @@ function catMontarPg3(dados) {
   }
 }
 
-/* â”€â”€ ABRIR GRUPO â†’ PG 4 â”€â”€ */
+/* ── ABRIR GRUPO → PG 4 ── */
 function catAbrirGrupo(grupo, titulo, subtitulo, dados) {
   _catGrupoAtivo = grupo;
   _catCatAtiva = 'todos';
@@ -541,7 +541,7 @@ function catAbrirGrupo(grupo, titulo, subtitulo, dados) {
   catNavegar(4);
 }
 
-/* â”€â”€ ABAS (agrupadas por nome base) â”€â”€ */
+/* ── ABAS (agrupadas por nome base) ── */
 function catMontarAbas(cats) {
   const container = document.getElementById('cat-abas');
   container.innerHTML = '';
@@ -570,7 +570,7 @@ function catMontarAbas(cats) {
   });
 }
 
-/* â”€â”€ SELECIONAR ABA â”€â”€ */
+/* ── SELECIONAR ABA ── */
 function catSelecionarAba(catId, btnEl) {
   _catCatAtiva = catId;
   document.querySelectorAll('.oba-aba').forEach(b => b.classList.remove('active'));
@@ -578,7 +578,7 @@ function catSelecionarAba(catId, btnEl) {
   catRenderizarSabores(_catDados, _catGrupoAtivo, catId);
 }
 
-/* â”€â”€ RENDERIZAR SABORES â”€â”€ */
+/* ── RENDERIZAR SABORES ── */
 function catRenderizarSabores(dados, grupo, catId) {
   const cats    = (dados.categorias || []).filter(c => c.grupoCatalogo === grupo && c.ativo !== false);
   const catIds  = new Set(cats.map(c => String(c.id)));
@@ -610,13 +610,13 @@ function catRenderizarSabores(dados, grupo, catId) {
       const img = document.createElement('img');
       img.className = 'oba-sabor-img';
       img.src = imgUrl; img.alt = s.nome; img.loading = 'lazy';
-      img.onerror = () => { imgWrap.innerHTML = '<div class="oba-sabor-img-placeholder"><span>ðŸ¬</span></div>'; };
+      img.onerror = () => { imgWrap.innerHTML = '<div class="oba-sabor-img-placeholder"><span>🍬</span></div>'; };
       imgWrap.appendChild(img);
     } else {
-      imgWrap.innerHTML = '<div class="oba-sabor-img-placeholder"><span>ðŸ¬</span></div>';
+      imgWrap.innerHTML = '<div class="oba-sabor-img-placeholder"><span>🍬</span></div>';
     }
     const lupa = document.createElement('span');
-    lupa.className = 'oba-sabor-lupa'; lupa.textContent = 'ðŸ”';
+    lupa.className = 'oba-sabor-lupa'; lupa.textContent = '🔍';
     imgWrap.appendChild(lupa);
     card.appendChild(imgWrap);
 
@@ -632,7 +632,7 @@ function catRenderizarSabores(dados, grupo, catId) {
   });
 }
 
-/* â”€â”€ LIGHTBOX â”€â”€ */
+/* ── LIGHTBOX ── */
 function catAbrirLightbox(imgUrl, nome) {
   const lb = document.getElementById('cat-lightbox');
   const img = document.getElementById('cat-lb-img');
@@ -649,7 +649,7 @@ function catFecharLightbox() {
   document.body.style.overflow = '';
 }
 
-/* â”€â”€ WHATSAPP â”€â”€ */
+/* ── WHATSAPP ── */
 function catConfigurarWpp(dados) {
   const wpp = dados.loja?.store?.whatsapp || dados.loja?.whatsapp || '';
   const btn = document.getElementById('cat-btn-wpp');
@@ -658,7 +658,7 @@ function catConfigurarWpp(dados) {
   }
 }
 
-/* â”€â”€ INICIALIZAÃ‡ÃƒO â”€â”€ */
+/* ── INICIALIZAÇÃO ── */
 async function catIniciar() {
   try {
     const [catJson, flavJson, temaJson, lojaJson] = await Promise.all([
@@ -685,7 +685,7 @@ async function catIniciar() {
   } catch(err) {
     console.error('[catalogo] Erro ao carregar dados:', err);
     document.getElementById('loading').innerHTML =
-      '<p style="color:#C2735A;font-size:14px;text-align:center;padding:24px">Erro ao carregar o catÃ¡logo.<br>Tente novamente.</p>';
+      '<p style="color:#4E7A5C;font-size:14px;text-align:center;padding:24px">Erro ao carregar o catálogo.<br>Tente novamente.</p>';
   }
 }
 
