@@ -1121,6 +1121,7 @@ async function obaToggleStatus(tipo, id, ev) {
     renderTudo();
     addPendencia((ativo ? 'Ativado: ' : 'Inativado: ') + item.nome);
     msg((ativo ? '✅ Ativado: ' : '⏸ Inativado: ') + item.nome);
+    if(typeof atualizarStatus==='function')atualizarStatus();
   } catch (err) { msg(String(err.message || err), 'erro'); }
 }
 
@@ -1461,6 +1462,7 @@ async function salvarEditor(){
   renderTudo();
   addPendencia((novo?'Criado: ':'Alterado: ')+item.nome);
   msg('Salvo e validado. Backup: '+res.backup);
+  if(typeof atualizarStatus==='function')atualizarStatus();
 }
 
 async function arquivarAtual(){
@@ -1579,6 +1581,7 @@ $('formConfig').onsubmit=async e=>{
     cfg.store.whatsapp=$('cfgWhatsapp').value.trim();cfg.store.locale=$('cfgLocale').value.trim()||'pt-BR';cfg.store.currency=$('cfgCurrency').value.trim()||'BRL';cfg.store.exibirPrecos=$('cfgExibirPrecos')?.checked!==false;cfg.checkout.paymentMethods=$('cfgPayments').value.split(',').map(x=>x.trim()).filter(Boolean);
     const res=await obaSaveDraftWith('config',cfg);
     catalogo.config=cfg;addPendencia('Configurações da loja alteradas');msg('Loja salva. Backup: '+res.backup);
+    if(typeof atualizarStatus==='function')atualizarStatus();
   }catch(err){msg(String(err.message||err),'erro')}
 };
 
@@ -2374,6 +2377,7 @@ $('formConfig').onsubmit=async e=>{
       catalogo.tema=temaAtual;
       addPendencia('Edição Visual salva: '+nomeAba);
       msg(nomeAba+' salvo. Backup: '+res.backup);
+      if(typeof atualizarStatus==='function')atualizarStatus();
     }catch(err){msg(String(err.message||err),'erro')}
   }
 
@@ -2821,6 +2825,7 @@ $('formConfig').onsubmit=async e=>{
       catalogo.tema = temaAtual;
       addPendencia('Seção removida: ' + titulo);
       msg('Seção "' + titulo + '" removida e salva no Rascunho. Backup: ' + res.backup);
+      if(typeof atualizarStatus==='function')atualizarStatus();
     } catch(err) { msg(String(err.message||err), 'erro'); }
   };
 
@@ -2897,6 +2902,7 @@ $('formConfig').onsubmit=async e=>{
       const res = await obaSaveDraftWith('tema', temaAtual);
       addPendencia('Seção extra salva: ' + (titulo || 'Nova seção'));
       msg('Seção "' + (titulo || 'Nova seção') + '" salva. Backup: ' + res.backup);
+      if(typeof atualizarStatus==='function')atualizarStatus();
     } catch(err) { msg(String(err.message||err), 'erro'); }
   };
 
@@ -6029,16 +6035,11 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
 <script id="oba-publish-8e9f">
 (function(){
   async function obaPublishPreview(){
-    console.log('[PUB:1] iniciando — buscando preview...');
-
     const preview = await api('/api/preview');
-    console.log('[PUB:2] preview recebido — revision_id:', preview && preview.revision_id, '| slots:', JSON.stringify((preview && preview.slots) || {}));
 
     if (!preview || !preview.revision_id) {
       throw new Error('Preview ainda nao foi criado. Clique em "Visualizar Preview" primeiro.');
     }
-
-    console.log('[PUB:3] enviando POST /api/publish com expected_revision_id:', preview.revision_id);
 
     const result = await api(
       '/api/publish',
@@ -6052,8 +6053,6 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       }
     );
 
-    console.log('[PUB:4] resposta /api/publish — ok:', result && result.ok, '| slot:', result && result.slot, '| revision_id:', result && result.revision_id, '| reused:', result && result.reused);
-
     if (!result || !result.ok || !result.revision_id) {
       throw new Error('Publicacao nao confirmada pela API. Tente novamente.');
     }
@@ -6065,8 +6064,6 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     if (typeof msg === 'function') {
       msg(result.reused ? 'Cardapio ja estava atualizado.' : 'Publicacao concluida com seguranca. O cardapio foi atualizado.');
     }
-
-    console.log('[PUB:5] concluido com sucesso.');
   }
 
   const button = document.getElementById('publicarBtn');
@@ -6078,7 +6075,6 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
 
   button.onclick = async function(){
     const originalText = button.textContent;
-    console.log('[PUB:0] clique no botao Publicar — originalText:', originalText);
 
     button.disabled = true;
     button.textContent = 'Publicando...';
@@ -6088,14 +6084,13 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     }
     catch (error) {
       const message = String(error && error.message ? error.message : error);
-      console.error('[publicarBtn] Erro capturado no catch:', message, error);
+      console.error('[publicarBtn] Erro:', message, error);
       if (typeof msg === 'function') {
         msg(message, 'erro');
       }
       alert('Erro ao publicar: ' + message);
     }
     finally {
-      console.log('[PUB:finally] desbloqueando botao.');
       button.disabled = false;
       button.textContent = originalText || 'Publicar alteracoes';
     }
