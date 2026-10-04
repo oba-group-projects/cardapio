@@ -1,66 +1,65 @@
 # HANDOFF
 
-Atualizado: 2026-10-02
+Atualizado: 2026-10-03
 
 Branch: feature/gestao-online-segura
-HEAD: 9c011b3
-Tag de marco atual: v12C-pre-4 (9c011b3)
+HEAD: 5cc7dad
+Tag de marco atual: v12C-pre-4 (base) — sem nova tag (sessão de bugfix)
 
 ## Última entrega
-Fluxo DRAFT→PREVIEW→PUBLISHED separado + barra de contexto + validações de seção
+Correção do fluxo de publicação — badge de status atualiza após cada salvamento
 
 ## Commits recentes relevantes
 | Commit   | O que fez |
 |----------|-----------|
-| 9c011b3  | feat: restaurar botão Visualizar cardápio público |
-| 8ef441c  | feat: separar Visualizar Preview e Publicar após Preview |
-| 1a62c4f  | feat: bloquear salvamento de seção ativa sem label |
-| a31a180  | feat: aviso inline quando seção ativa sem label |
-| 76267a2  | feat: barra de contexto alterações não salvas + fix ID seção |
-| 4ffa5e7  | fix: substituir separador ⬢ por · (suporte universal) |
-| baca909  | feat: dropdown Catálogo na barra de navegação |
+| 5cc7dad  | fix: badge de status atualiza após cada salvamento + remove logs de diagnóstico |
+| 66970f1  | diag: logs PUB:0-5 no botão Publicar (temporário — já removido no 5cc7dad) |
+| 79d9a14  | fix: ctx.waitUntil + try/catch /api/ + gate pós-write seguro no Worker |
+| 6268b39  | fix: sync GitHub fire-and-forget no publish |
+| d5aba24  | fix: remover window.confirm() do fluxo de publicação |
 
-## O que está funcionando (9c011b3)
+## O que está funcionando (5cc7dad)
 
-### Fluxo de publicação
+### Fluxo de publicação — CORRIGIDO E APROVADO
+- Causa raiz identificada: badge de status ficava desatualizado após salvar, deixando o botão Publicar como `disabled` mesmo com conteúdo pendente
+- `atualizarStatus()` agora é chamado automaticamente após cada salvamento
+- Fluxo completo testado e aprovado: editar → salvar → badge atualiza → Preview → Publicar
+
+### Pontos de salvamento com atualização automática de badge
+- `salvarEditor()` — sabores, caixas, produtos, opcionais, combos, categorias
+- `obaToggleStatus()` — toggle ativo/inativo na tabela
+- Form loja (`onsubmit`) — configurações da loja
+- `obaSalvarPaginaDoTema()` — Pg1, Pg2, Pg3, Vitrine, Modal Personalizados, Modal Eventos, Tema Global
+- Remover seção extra
+- `obaFecharSalvarSecao()` — salvar seção extra
+
+### Worker melhorias desta sessão
+- Handler principal: `(request, env, ctx)` — ctx disponível
+- `ctx.waitUntil()` para sync GitHub (fire-and-forget seguro)
+- Gate pós-write `obaCatalogSlotsState` protegido com try/catch
+- Bloco `/api/` com try/catch global → retorna JSON 500 em vez de página de erro Cloudflare
+
+### Estado do fluxo de publicação
 - **"Visualizar Preview":** gera PREVIEW e abre /__preview em nova aba
-- **"Publicar após Preview":** desabilitado até Preview estar gerado; ao clicar confirma e publica DRAFT→PUBLISHED
-- **"Visualizar cardápio":** abre /cardapio público — o que o cliente vê
-- Badge de status: Rascunho aguardando Preview / Preview pronto para publicar / Sem alterações publicáveis
+- **"Publicar após Preview":** habilitado quando badge = "Preview pronto para publicar"
+- **Badge:** atualiza automaticamente após qualquer salvamento
+- **"Visualizar cardápio":** abre /cardapio público
 
-### Barra de contexto
-- Aparece ao editar qualquer campo das páginas fixas da Edição Visual
-- Mostra o nome da seção com alterações
-- Botão Salvar: submete o formulário ativo
-- Botão Descartar: restaura via obaPopularFormTema() + flag _ctxPronto
-
-### Validação de Seção Extra
-- Label vazio + seção ativa + botão marcado → bloqueia salvamento com mensagem clara
-- Aviso inline reaparece ao marcar checkbox "Adicionar botão automático" sem label
-- Seção pausada ou botão desmarcado: salva sem restrição
-
-### Outros
-- Separador · (U+00B7) em todo o cardápio público — suporte universal
-- Mensagem de seção salva mostra "Nova seção" em vez do ID técnico
-- Dropdown "Catálogo" na barra com Sabores, Categorias, Caixas, Produtos, Opcionais, Combos
-
-## Próxima implementação — Fase 12C
+## Próxima implementação — Fase 12C (pendente)
 Catálogo de Sabores — rota pública /catalogo
 
 ### Subfase 12C-1 (próxima)
 - Migration D1: coluna grupo_catalogo na tabela categories
-- Campo novo no editor de Categorias: "Grupo do Catálogo" (Doces Artesanais / Doces Finos / Não aparece)
-- Você categoriza cada categoria na Central
+- Campo novo no editor de Categorias: "Grupo do Catálogo"
 - Nada público ainda
 
-### Decisões técnicas aprovadas
-- Slot isolado no D1 para configs do Catálogo
-- Toggle global de preços
-- URL: /catalogo
-- Grupos: "Doces Artesanais" e "Doces Finos"
-- Cards: foto + nome obrigatório + preço opcional
+### Subfase 12C-2 (iniciada)
+- Rota `/catalogo` no Worker — implementada
+- HTML ui-catalogo/index.html — implementado
+- Pendente: conectar dados reais
 
 ## Ponto de retorno seguro
-Tag: v12C-pre-4 = commit 9c011b3
+Tag: v12C-pre-4 = commit 9c011b3 (anterior a esta sessão)
+HEAD atual: 5cc7dad (estável, aprovado)
 
 Leia AGENTS.md, CURRENT_STATE.md, DECISIONS.md antes de alterar código.

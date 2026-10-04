@@ -1,74 +1,70 @@
 ﻿# CURRENT STATE
 
-Atualizado: 2026-10-02
+Atualizado: 2026-10-03
 
 ## Git
 Branch: feature/gestao-online-segura
-Commit HEAD: 9c011b3
-Tag de marco anterior: v12C-pre-3 (baca909)
-Tag de marco atual: v12C-pre-4 (a criar)
+Commit HEAD: 5cc7dad
+Tag de marco anterior: v12C-pre-4 (9c011b3)
+Tag de marco atual: v12C-pre-4 (base — sem nova tag, sessão de bugfix)
 
 ## Estado funcional
 - Central privada autenticada e operacional (senha Oba2026!)
-- Fluxo DRAFT → PREVIEW → PUBLISHED separado e funcional
+- Fluxo DRAFT → PREVIEW → PUBLISHED separado, funcional e aprovado
+- Badge de status atualiza automaticamente após cada salvamento
 - Cardápio público funcional em /cardapio
 - Módulo de Propostas completo (12A + 12B)
+- Rota /catalogo implementada (12C-2 parcial — HTML sem dados reais)
 
-## Melhorias acumuladas — sessões recentes
+## Correções desta sessão (03/10)
+
+### Fluxo de publicação — bug resolvido
+- **Causa raiz:** badge de status não atualizava após salvar → botão Publicar permanecia `disabled` com conteúdo pendente
+- **Solução:** `atualizarStatus()` adicionado em todos os 6 pontos de salvamento do catálogo/tema
+- **Testado e aprovado** em produção
+
+### Worker — melhorias de robustez
+- Handler: `(request, env, ctx)` — ctx disponível para waitUntil
+- Sync GitHub: fire-and-forget via `ctx.waitUntil(Promise.all([...]))` — não bloqueia resposta
+- Gate pós-write: `obaCatalogSlotsState` protegido com try/catch
+- Bloco `/api/`: try/catch global → retorna JSON 500 em vez de página de erro Cloudflare
+
+## Melhorias acumuladas — sessões anteriores
 
 ### Separador visual no cardápio
-- Substituído ⬢ (U+2B22, hexágono — falha em alguns celulares) por · (U+00B7, ponto mediano — suporte universal)
-- 50 ocorrências corrigidas em ui-desenvolvimento/index.html
+- Substituído ⬢ por · (U+00B7) — suporte universal
 
 ### Barra de contexto "alterações não salvas"
-- Aparece automaticamente ao editar qualquer campo das páginas fixas (Pg1, Pg2, Pg3, Vitrine, Modais, Tema)
+- Aparece automaticamente ao editar campos das páginas fixas
 - Botão "Salvar" submete o formulário ativo
-- Botão "Descartar" restaura todos os campos via obaPopularFormTema()
-- Flag _ctxPronto evita disparos durante carga inicial
-
-### Correção de ID na mensagem de seção
-- `titulo || id` → `titulo || 'Nova seção'` — ID técnico nunca mais aparece para o usuário
+- Botão "Descartar" restaura todos os campos
 
 ### Validação de label ao salvar Seção Extra
-- Aviso inline abaixo do campo Label quando seção ativa + botão marcado + label vazio
-- Bloqueio de salvamento nesse mesmo cenário (Opção C aprovada)
-- Seção pausada ou botão desmarcado: salva normalmente sem restrição
+- Aviso inline + bloqueio quando seção ativa + botão marcado + label vazio
 
 ### Fluxo DRAFT → PREVIEW → PUBLISHED separado
-- "Visualizar Preview" → gera PREVIEW e abre /__preview (rascunho privado)
+- "Visualizar Preview" → gera PREVIEW e abre /__preview
 - "Publicar após Preview" → só habilitado quando badge = "Preview pronto para publicar"
-- "Visualizar cardápio" → abre /cardapio público (o que o cliente vê)
-- publicarBtn conectado ao obaPublishPreview() já existente em oba-publish-8e9f
+- "Visualizar cardápio" → abre /cardapio público
 
-## Fase 12C — Catálogo de Sabores (planejada, não iniciada)
+## Fase 12C — Catálogo de Sabores
 Estrutura aprovada:
-- Rota pública /catalogo no Worker (sem autenticação)
-- Pg 1: logo + título "Catálogo Oba Doceria"
-- Pg 2: texto da Nossa Essência (editável independentemente depois)
-- Pg 3: dois botões — "Doces Artesanais" e "Doces Finos"
-- Pg 4: sabores do grupo escolhido com abas de categoria + cards (foto + nome + preço opcional)
-- Botões flutuantes: WhatsApp + "Montar pedido online →"
+- Rota pública /catalogo no Worker (sem autenticação) — implementada
+- HTML ui-catalogo/index.html — implementado (estático)
+- Pendente: conectar dados reais (12C-3)
 
-Subfases aprovadas:
-- 12C-1: Migration D1 + campo grupo_catalogo nas categorias + categorização na Central
-- 12C-2: Rota /catalogo + HTML estático visual (sem dados ainda)
-- 12C-3: Conectar dados reais (sabores, fotos, preços)
-- 12C-4: Aba "Catálogo" na Central com configurações editáveis
-
-Decisões técnicas aprovadas:
-- Slot isolado no D1 para configs do Catálogo (Opção B)
-- Toggle global de preços na Central
-- URL: /catalogo
-- Grupos: "Doces Artesanais" e "Doces Finos" + opção "Não aparece no Catálogo"
+Subfases:
+- ✅ 12C-1: Campo grupoCatalogo no editor de Categorias
+- ✅ 12C-2: Rota /catalogo + HTML estático
+- ⬜ 12C-3: Conectar dados reais (sabores, fotos, preços)
+- ⬜ 12C-4: Aba "Catálogo" na Central com configurações
 
 ## Pontos de retorno seguros
-- Tag v12B-baseline = ded3c58
-- Tag v12C-pre = 2477185
-- Tag v12C-pre-2 = 6755162
-- Tag v12C-pre-3 = baca909
-- Tag v12C-pre-4 = 9c011b3 (a criar)
+- Tag v12C-pre-4 = 9c011b3 (estável anterior)
+- HEAD atual = 5cc7dad (estável, aprovado em produção)
 
 ## Links
 - Central: https://oba-cardapio-gestao.obadoceria.workers.dev/
 - Cardápio: https://oba-cardapio-gestao.obadoceria.workers.dev/cardapio
+- Catálogo: https://oba-cardapio-gestao.obadoceria.workers.dev/catalogo
 - GitHub: https://github.com/oba-group-projects/cardapio

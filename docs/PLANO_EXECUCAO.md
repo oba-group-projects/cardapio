@@ -300,3 +300,5 @@ URL própria, disparada para quem solicita orçamento de festa.
 | 02/10/2026 | Fluxo Preview/Publicar | Separado em 3 botões: Visualizar Preview / Publicar após Preview / Visualizar cardápio. |
 | 02/10/2026 | Planejamento 12C | Estrutura aprovada: /catalogo, 4 subfases, slot isolado D1, grupos Doces Artesanais/Finos. |
 | 02/10/2026 | Fechamento de sessão | Docs atualizados, tag v12C-pre-4, bundle de backup gerado. |
+| 03/10/2026 | fix: badge publicação | atualizarStatus() em 6 pontos de salvamento. Causa raiz: badge desatualizado deixava publicarBtn disabled. Testado e aprovado. |
+| 03/10/2026 | fix: Worker robustez | ctx.waitUntil para sync GitHub, try/catch /api/, gate pós-write protegido. HEAD: 5cc7dad |
