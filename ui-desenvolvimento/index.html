@@ -2355,9 +2355,6 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
     <div class="text-center space-y-5 w-full max-w-xs">
       <h1 id="oba-pag1-titulo" class="text-2xl font-light tracking-[0.2em] text-[#8B4513] uppercase">Bem-vindo</h1>
       <p id="oba-pag1-subtitulo" class="text-sm text-gray-500 font-light leading-relaxed px-2">Prepare-se para descobrir o verdadeiro sabor artesanal em cada detalhe.</p>
-      <button id="oba-pag1-btn-cta" onclick="navegarPara(2)" class="w-full py-4 mt-4 bg-[#8B4513] text-white rounded-[1.25rem] font-medium text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-[#8B4513]/20 active:scale-95 flex justify-center items-center gap-3">
-        <span id="oba-pag1-cta">Descobrir Nossa História</span> <i class="fa-solid fa-chevron-right text-[9px]"></i>
-      </button>
     </div>
 
     <!-- ── Essência na Pg1 — alimentada pelo JS via pag1-ne-* ── -->
@@ -2368,6 +2365,11 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
       <p id="pag1-ne-texto" class="text-[13px] text-gray-600 leading-relaxed font-light px-1"></p>
       <p id="pag1-ne-citacao" class="text-xs text-[#8B4513]/70 italic font-medium mt-3"></p>
     </div>
+
+    <!-- CTA — posicionado após a essência para ficar no fundo -->
+    <button id="oba-pag1-btn-cta" onclick="navegarPara(2)" class="w-full max-w-xs mt-8 py-4 bg-[#8B4513] text-white rounded-[1.25rem] font-medium text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-[#8B4513]/20 active:scale-95 flex justify-center items-center gap-3">
+      <span id="oba-pag1-cta">Descobrir Nossa História</span> <i class="fa-solid fa-chevron-right text-[9px]"></i>
+    </button>
 
   </section>
 
