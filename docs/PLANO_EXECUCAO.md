@@ -307,3 +307,7 @@ URL própria, disparada para quem solicita orçamento de festa.
 | 04/10/2026 | Cardápio B+ Parte 1 | Textos Pg1/Pg2 via theme.json. HEAD: 4ff4c3f |
 | 04/10/2026 | Cardápio B+ Parte 2 | CSS tipografia Pg1/Pg2 aprovado. HEAD: 7d8f120 |
 | 04/10/2026 | Fix ← quebrado + título centralizado | Byte 0x19 removido, text-align center. HEAD: c48eb9c |
+| 04/10/2026 | Unificar Pg1+Pg2 cardápio | Nossa Essência na abertura, navegação direta para Pg3. HEAD: 9b49c69 |
+| 04/10/2026 | Fix CTA pós-essência | CTA movido para após bloco de essência (hierarquia editorial). HEAD: 8f908e6 |
+| 05/10/2026 | Pg1 Interpretação B | Nossa Essência como título principal (Cormorant Garamond 2.6rem/300), layout à esquerda. HEAD: b644fd2 |
+| 05/10/2026 | Deploy Pg1 Interpretação B | wrangler deploy — Version ID: 4c385a3d. Cardápio ao vivo com nova Pg1. |
