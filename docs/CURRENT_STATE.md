@@ -1,41 +1,46 @@
 ﻿# CURRENT STATE
 
-Atualizado: 2026-10-04 (sessão 3)
+Atualizado: 2026-10-04 (sessão 4)
 
 ## Git
 Branch: feature/gestao-online-segura
-Commit HEAD: 7d8f120
+Commit HEAD: c48eb9c
 
 ## Estado funcional
 - Central privada autenticada e operacional (senha Oba2026!)
 - Fluxo DRAFT → PREVIEW → PUBLISHED funcional e aprovado
-- Badge atualiza automaticamente após cada salvamento
-- Cardápio público funcional em /cardapio — evolução B+ aprovada
+- Cardápio público funcional em /cardapio — evolução B+ completa e validada
 - Catálogo público funcional em /catalogo — paleta Verde Sálvia aprovada
 
-## Cardápio — evolução B+ concluída e aprovada
+## Cardápio — estado final aprovado e validado
 
 ### Pg1
-- Título: "Seu momento começa aqui." — 2.5rem/600, caixa mista
+- Título: "Seu momento começa aqui." — 2.5rem/600, centralizado, sem uppercase
 - Subtítulo: "Doces artesanais feitos à mão, com amor e precisão."
 - CTA: "Escolher minha experiência"
 
 ### Pg2
-- Texto condensado em parágrafo único
-- Citação em itálico destacada
-- Sem alteração na estrutura ou no JS
+- Título: "Nossa Essência"
+- Texto condensado, dois parágrafos em um
+- Citação em itálico
 
-### Como os textos chegam ao cardápio
-1. theme.json local (Static Asset) → fallback
-2. D1 PUBLISHED (slot) → prevalece sobre o HTML
+### Bugs corrigidos nesta sessão
+- Ícone ← quebrado (←🔲): byte de controle 0x19 removido de 4 locais
+- Título Pg1 centralizado
+
+### Como textos chegam ao cardápio
+1. theme.json local → Static Asset (fallback)
+2. D1 PUBLISHED → prevalece sobre o HTML
 3. Para atualizar: Central → Edição Visual → Salvar → Publicar
 
 ## Catálogo — estado aprovado
 - Paleta Verde Sálvia médio (#6B9E7A, #F4F8F4)
-- Layout editorial, Pg1 unificada, float-bar 3 botões, lightbox
+- Layout editorial Pg1 unificada
+- Float-bar 3 botões: Voltar / WhatsApp / Montar pedido
+- Lightbox card branco
 
 ## Pontos de retorno seguros
-- HEAD atual = 7d8f120 (aprovado)
+- HEAD atual = c48eb9c (aprovado, validado)
 - Tag = v12C-pre-4 = 9c011b3 (anterior)
 
 ## Links

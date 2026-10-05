@@ -306,3 +306,4 @@ URL própria, disparada para quem solicita orçamento de festa.
 | 04/10/2026 | Paleta Verde Sálvia | #6B9E7A aprovada. Fix encoding BOM. HEAD: 48dd22c |
 | 04/10/2026 | Cardápio B+ Parte 1 | Textos Pg1/Pg2 via theme.json. HEAD: 4ff4c3f |
 | 04/10/2026 | Cardápio B+ Parte 2 | CSS tipografia Pg1/Pg2 aprovado. HEAD: 7d8f120 |
+| 04/10/2026 | Fix ← quebrado + título centralizado | Byte 0x19 removido, text-align center. HEAD: c48eb9c |
