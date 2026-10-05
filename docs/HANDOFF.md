@@ -1,66 +1,75 @@
 # HANDOFF
 
-Atualizado: 2026-10-04 (sessão 2)
+Atualizado: 2026-10-04 (sessão 3)
 
 Branch: feature/gestao-online-segura
-HEAD: 48dd22c
+HEAD: 7d8f120
 
 ## Última entrega
-Catálogo — paleta Verde Sálvia médio #6B9E7A aprovada e deployada
+Cardápio B+ — Evolução visual Pg1 e Pg2 — aprovada e deployada
 
 ## Commits recentes relevantes
 | Commit   | O que fez |
 |----------|-----------|
-| 48dd22c  | feat: paleta Verde Sálvia médio #6B9E7A — aprovada |
-| 10fb167  | fix: paleta Verde Sálvia sem BOM — encoding limpo |
-| 2b4e0b3  | feat: paleta Verde Sálvia escuro #4E7A5C (substituída) |
-| 009caa2  | docs: handoff anterior |
-| 8da620d  | fix: botão Montar pedido ícone + duas linhas |
+| 7d8f120  | feat: Parte 2 — CSS tipografia Pg1 e Pg2 |
+| 4ff4c3f  | feat: Parte 1 — textos editoriais via theme.json |
+| fbc4afe  | docs: handoff anterior |
+| 48dd22c  | feat: catálogo paleta Verde Sálvia médio #6B9E7A |
 
-## Estado atual do Catálogo (/catalogo) — APROVADO
+## O que está funcionando (7d8f120)
 
-### Paleta Verde Sálvia médio
-- `--brand: #6B9E7A`
-- `--brand-dark: #5A8C6A`
-- `--brand-light: #DDF0E4`
-- `--text: #1E2E24`
-- `--muted: #85AE92`
-- `--bg: #F4F8F4`
-- `--line: #C8DCC8`
+### Cardápio (/cardapio) — Evolução B+ APROVADA
 
-### Layout e funcionalidades
-- Pg1: logo vertical, rótulo "CATÁLOGO —", título "Descubra a Oba" 48px/600, dois parágrafos, CTA → Pg3
-- Pg3: logo horizontal, "ESCOLHA O TIPO DE DOCE" 15px, botões Artesanais/Finos, Voltar pill
-- Pg4: título 32px, abas por nome base, grid 2 colunas, scroll ok
-- Float-bar: [← Voltar] [Pedir via WhatsApp] [Montar pedido ícone+2 linhas]
-- Lightbox: card branco + foto + nome + ×
+**Pg1:**
+- Título: "Seu momento começa aqui." — caixa mista, 2.5rem/600, sem uppercase
+- Subtítulo: "Doces artesanais feitos à mão, com amor e precisão." — 0.9rem/300
+- CTA: "ESCOLHER MINHA EXPERIÊNCIA →"
 
-### REGRA DE ENCODING — CRÍTICA
-Nunca usar `Set-Content` do PowerShell para salvar o index.html do catálogo.
-O PowerShell adiciona BOM (Byte Order Mark) que corrompe acentos no browser.
-Usar sempre as ferramentas de edição (str_replace, fs_write) que preservam UTF-8 sem BOM.
+**Pg2:**
+- Título: "NOSSA ESSÊNCIA" — mantido
+- Texto condensado: dois parágrafos em um, linha-height 1.9
+- Citação: "Feito à mão, com amor e precisão." — itálico/500
+
+**O que NÃO foi alterado:**
+- Zero JS funcional
+- Zero fluxo de compra
+- Zero paleta de cores
+- querySelector frágil intacto (hardening futuro)
+- glass-card intacto
+- bg-orange-200/60 intacto
+- Todos os IDs funcionais intactos
+
+### Como foi implementado
+- **Parte 1:** `theme.json` — textos via str_replace (sem PowerShell)
+- **Parte 2:** `ui-desenvolvimento/index.html` — CSS adicionado no `<style id="oba-tipografia-vars">` após linha 134
+- D1 PUBLISHED atualizado manualmente via Central (Edição Visual → Salvar → Publicar)
+
+### Catálogo (/catalogo) — APROVADO
+- Paleta Verde Sálvia médio #6B9E7A
+- Layout editorial Pg1 unificada
+- Float-bar 3 botões flutuantes
+
+## REGRA DE ENCODING — CRÍTICA
+Nunca usar Set-Content ou Out-File do PowerShell para salvar HTML/JSON.
+Sempre usar str_replace ou fs_write que preservam UTF-8 sem BOM.
 
 ## Pendente — próximas sessões
 
-### Refinamentos de texto no Catálogo
-- Encurtar ligeiramente o segundo parágrafo
-- "Escolha o tipo de doce" → "Encontre o seu favorito" (Pg3)
+### Parte 3 — Validação completa (sem código)
+- Percorrer fluxo completo: Pg1 → Pg2 → Pg3 → caixa → sabores → carrinho → WhatsApp
+- Confirmar que Edição Visual na Central ainda controla os campos
+- Confirmar que alterações da Central prevalecem sobre defaults
 
-### Evolução visual do Cardápio (/cardapio)
-Abordagem aprovada: B+ (evolução visual, não reconstrução)
-- Pg1: título default "Seu momento começa aqui." + subtítulo curto
-- Pg2: texto condensado conforme especificação + assinatura "Feito à mão, com amor e precisão."
-- SOMENTE CSS + alteração de textos default no HTML
-- NÃO alterar querySelector frágil (#pag-1 button[onclick="navegarPara(2)"])
-- NÃO alterar glass-card, bg-orange-200/60, IDs funcionais
-- NÃO alterar paleta do cardápio nesta fase
+### Refinamentos futuros do Catálogo
+- "Escolha o tipo de doce" → "Encontre o seu favorito" (Pg3)
+- Encurtar ligeiramente o segundo parágrafo da Pg1
 
 ### Hardening técnico (fase futura)
 - Substituir querySelector frágil por getElementById
 - Edição Visual do Catálogo na Central (12C-4)
 
 ## Pontos de retorno seguros
-- HEAD atual = 48dd22c (estável, aprovado)
+- HEAD atual = 7d8f120 (estável, aprovado)
 - Tag anterior = v12C-pre-4 = 9c011b3
 
 ## Links

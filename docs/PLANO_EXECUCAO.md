@@ -304,3 +304,5 @@ URL própria, disparada para quem solicita orçamento de festa.
 | 03/10/2026 | fix: Worker robustez | ctx.waitUntil para sync GitHub, try/catch /api/, gate pós-write protegido. HEAD: 5cc7dad |
 | 04/10/2026 | 12C-3 melhorias catálogo | abas agrupadas, lightbox, ?start=3, float-bar, redesign Rosa Creme, layout editorial Pg1+Pg2 unificadas. HEAD: 8da620d |
 | 04/10/2026 | Paleta Verde Sálvia | #6B9E7A aprovada. Fix encoding BOM. HEAD: 48dd22c |
+| 04/10/2026 | Cardápio B+ Parte 1 | Textos Pg1/Pg2 via theme.json. HEAD: 4ff4c3f |
+| 04/10/2026 | Cardápio B+ Parte 2 | CSS tipografia Pg1/Pg2 aprovado. HEAD: 7d8f120 |
