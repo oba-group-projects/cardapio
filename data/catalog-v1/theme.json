@@ -2,7 +2,7 @@
   "paginas": {
     "boas_vindas": {
       "ativo": true,
-      "botaoCTA": "",
+      "botaoCTA": "Ver o Cardápio",
       "corFundo": "",
       "corTitulo": "",
       "exibirCTA": true,
@@ -11,12 +11,12 @@
       "pesoCTA": "",
       "pesoSubtitulo": "",
       "pesoTitulo": "",
-      "subtitulo": "",
+      "subtitulo": "Doces artesanais feitos à mão, com amor e precisão.",
       "tamCTA": "",
       "tamSubtitulo": "",
       "tamTitulo": "",
       "tamanhoLogo": "medio",
-      "titulo": "Seja Bem-Vindo!"
+      "titulo": "Seu momento começa aqui."
     },
     "eventos_modal": {
       "ativo": true,
@@ -94,7 +94,7 @@
       "tamanhoLogo": "medio"
     },
     "nossa_essencia": {
-      "ativo": true,
+      "ativo": false,
       "citacao": "",
       "corFundo": "",
       "corTexto": "",
@@ -108,8 +108,8 @@
       "tamCitacao": "",
       "tamTexto": "",
       "tamTitulo": "",
-      "tamanhoLogo": "medio",
-      "texto": "Na Oba Doceria, cada brigadeiro é uma obra de arte. Criamos receitas exclusivas com rigor técnico e os melhores insumos, resultando em doces menos açucarados e intensamente cremosos.",
+      "tamanhoLogo": "pequeno",
+      "texto": "Cada receita é criada com ingredientes selecionados, técnica e cuidado para alcançar o equilíbrio entre sabor, textura e cremosidade. Acreditamos que um doce pode transformar um momento simples em uma lembrança especial — e é esse cuidado que colocamos em cada pedido.",
       "titulo": ""
     },
     "personalizados_modal": {
@@ -164,6 +164,6 @@
     "tamanhoSubtitulo": "11",
     "tamanhoTitulo": "26"
   },
-  "updatedAt": "2026-10-04",
+  "updatedAt": "2026-10-05",
   "variante": "classica"
 }
