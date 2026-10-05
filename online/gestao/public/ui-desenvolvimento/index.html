@@ -132,11 +132,16 @@
       font-weight: var(--oba-pag3-peso-sublabel, 600) !important;
     }
     /* Cor do texto principal da Pág 2 · controlada por JS via element.style */
-    /* ── B+ EVOLUÇÃO VISUAL — Pg1 Interpretação B (Nossa Essência como título principal) ── */
+    /* ── B+ EVOLUÇÃO VISUAL — Pg1 Interpretação B — refinamento v2 ── */
 
     /* Ocultar título/subtítulo originais — sem remover do DOM (JS continua funcionando) */
-    #oba-pag1-titulo  { display: none !important; }
+    #oba-pag1-titulo    { display: none !important; }
     #oba-pag1-subtitulo { display: none !important; }
+
+    /* Wrapper do título/subtítulo — ocultar container vazio */
+    #pag-1 > div.text-center {
+      display: none !important;
+    }
 
     /* Pg1 — alinhamento editorial à esquerda, scroll permitido, sem max-width restrito */
     #pag-1 {
@@ -146,7 +151,7 @@
       align-items: flex-start !important;
       justify-content: flex-start !important;
       padding-top: 10dvh !important;
-      padding-bottom: 48px !important;
+      padding-bottom: 56px !important;
       padding-left: 28px !important;
       padding-right: 28px !important;
       max-width: 100% !important;
@@ -154,86 +159,79 @@
       margin-right: 0 !important;
     }
 
-    /* Logo — alinhada à esquerda */
+    /* Logo — menor e mais aérea, alinhada à esquerda */
     #oba-pag1-logo {
       align-self: flex-start;
-      margin-bottom: 36px;
+      width: 96px !important;
+      margin-bottom: 28px !important;
     }
 
-    /* Bloco de essência — ocupa toda a largura, sem container restrito */
+    /* Bloco de essência — largura editorial contida, à esquerda */
     #pag1-essencia {
       width: 100%;
-      max-width: 100%;
+      max-width: 92%;
       text-align: left;
       margin-top: 0;
     }
 
-    /* Linha decorativa dentro do bloco — ocultar (substituída pelo ::after do rótulo) */
+    /* Linha decorativa dentro do bloco — ocultar */
     #pag1-essencia > div {
       display: none !important;
     }
 
-    /* Rótulo CARDÁPIO — com linha decorativa à direita */
+    /* Rótulo CARDÁPIO — com linha decorativa mais longa */
     #pag1-ne-rotulo {
       font-size: 10px;
       font-weight: 700;
-      letter-spacing: .25em;
+      letter-spacing: .28em;
       text-transform: uppercase;
       color: #8B4513;
       opacity: .6;
-      margin-bottom: 18px;
+      margin-bottom: 24px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
     #pag1-ne-rotulo::after {
       content: '';
       display: inline-block;
       height: 1px;
-      width: 28px;
+      width: 40px;
       background: #8B4513;
-      opacity: .45;
+      opacity: .4;
       flex-shrink: 0;
     }
 
-    /* Título principal — Nossa Essência — grande, serif, peso leve */
+    /* Título principal — Nossa Essência — dominante, serif leve */
     #pag1-ne-titulo {
       font-family: 'Cormorant Garamond', Georgia, serif !important;
-      font-size: 2.6rem !important;
+      font-size: 3rem !important;
       font-weight: 300 !important;
       letter-spacing: -0.01em !important;
       color: #3B2A1E !important;
       text-transform: none !important;
-      line-height: 1.1 !important;
-      margin-bottom: 22px !important;
+      line-height: 1.05 !important;
+      margin-bottom: 28px !important;
     }
 
-    /* Texto da essência — mais escuro, legível */
+    /* Texto da essência — compacto e legível */
     #pag1-ne-texto {
-      font-size: 14px !important;
-      line-height: 1.85 !important;
+      font-size: 13px !important;
+      line-height: 1.75 !important;
       font-weight: 300 !important;
       color: #4B5563 !important;
-      margin-bottom: 16px !important;
+      margin-bottom: 0 !important;
     }
 
-    /* Citação em itálico */
+    /* Citação — assinatura discreta, com respiro */
     #pag1-ne-citacao {
-      font-size: 13px !important;
+      font-size: 12px !important;
       font-style: italic !important;
       font-weight: 400 !important;
-      color: rgba(139,69,19,.75) !important;
-    }
-    #pag1-ne-citacao::after {
-      content: ' ♡';
-      font-style: normal;
-      font-size: 11px;
-      opacity: .6;
-    }
-
-    /* Wrapper do título/subtítulo — ocultar o container vazio */
-    #pag-1 > div.text-center {
-      display: none !important;
+      color: rgba(139,69,19,.7) !important;
+      margin-top: 20px !important;
+      margin-bottom: 0 !important;
+      display: block !important;
     }
     /* ── B+ EVOLUÇÃO VISUAL — Pg2 tipografia ── */
     #oba-pag2-titulo {
@@ -2404,11 +2402,11 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
       <div class="w-10 h-[2px] bg-orange-200/40 mx-auto rounded-full mb-4"></div>
       <h2 id="pag1-ne-titulo" class="text-sm font-semibold tracking-[0.15em] text-[#8B4513] uppercase mb-3">Nossa Essência</h2>
       <p id="pag1-ne-texto" class="text-[13px] text-gray-600 leading-relaxed font-light px-1"></p>
-      <p id="pag1-ne-citacao" class="text-xs text-[#8B4513]/70 italic font-medium mt-3"></p>
+      <p id="pag1-ne-citacao" class="text-xs text-[#8B4513]/70 italic font-medium mt-3">Feito à mão, com amor e precisão.</p>
     </div>
 
     <!-- CTA — posicionado após a essência para ficar no fundo -->
-    <button id="oba-pag1-btn-cta" onclick="navegarPara(2)" class="w-full max-w-xs mt-8 py-4 bg-[#8B4513] text-white rounded-[1.25rem] font-medium text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-[#8B4513]/20 active:scale-95 flex justify-center items-center gap-3">
+    <button id="oba-pag1-btn-cta" onclick="navegarPara(2)" class="w-full max-w-[280px] mt-12 py-3.5 bg-[#8B4513] text-white rounded-[1rem] font-medium text-[10px] uppercase tracking-[0.2em] shadow-md shadow-[#8B4513]/15 active:scale-95 flex justify-center items-center gap-3">
       <span id="oba-pag1-cta">Descobrir Nossa História</span> <i class="fa-solid fa-chevron-right text-[9px]"></i>
     </button>
 
