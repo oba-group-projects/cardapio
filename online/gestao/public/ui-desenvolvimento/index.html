@@ -133,7 +133,44 @@
     }
     /* Cor do texto principal da Pág 2 · controlada por JS via element.style */
 
-    /* ── REFINAMENTO VISUAL — Pg3 + Fluxo de montagem ── */
+    /* ── REFINAMENTO VISUAL — Pg3 hierarquia dos botões ── */
+
+    /* Subtítulo — mais presente */
+    #oba-pag3-subtitulo {
+      font-size: 13px !important;
+      color: rgba(139,69,19,0.85) !important;
+      letter-spacing: .25em !important;
+    }
+
+    /* Label principal — maior e médio */
+    #oba-menu-botoes button > div > span:last-child {
+      font-size: 15px !important;
+      font-weight: 500 !important;
+    }
+
+    /* Sublabel — um ponto maior, mais opaco, tracking reduzido */
+    #oba-menu-botoes button > div > span:first-child {
+      font-size: 10px !important;
+      opacity: .65 !important;
+      letter-spacing: .18em !important;
+    }
+
+    /* Ícones — todos maiores */
+    #oba-menu-botoes button i {
+      font-size: 1.5rem !important;
+    }
+
+    /* Ícones dos botões brancos — mais visíveis */
+    #oba-menu-botoes button:not(:first-child) i {
+      opacity: .35 !important;
+    }
+
+    /* Segundo botão — borda levemente mais presente */
+    #oba-menu-botoes button:nth-child(2) {
+      border-color: rgba(139,69,19,0.2) !important;
+    }
+
+
 
     /* Pg3 — subtítulo maior, header mais compacto */
     #oba-pag3-subtitulo {
