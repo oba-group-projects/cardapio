@@ -157,22 +157,22 @@
       margin-bottom: 16px !important;
     }
 
-    /* Categorias — linha única com scroll horizontal */
+    /* Categorias — grid 3 colunas, tudo visível */
     #abas-categorias {
       display: flex !important;
-      flex-wrap: nowrap !important;
-      overflow-x: auto !important;
+      flex-wrap: wrap !important;
+      overflow-x: visible !important;
       gap: 6px !important;
       padding-bottom: 4px !important;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
     }
-    #abas-categorias::-webkit-scrollbar { display: none; }
     #abas-categorias button {
-      flex-shrink: 0 !important;
+      flex: 0 0 calc(33.33% - 4px) !important;
       font-size: 11px !important;
-      padding: 5px 12px !important;
+      padding: 5px 8px !important;
       white-space: nowrap !important;
+      text-align: center !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
     }
 
     /* Resumo da caixa selecionada — alinhado à esquerda, sem quebra estranha */
