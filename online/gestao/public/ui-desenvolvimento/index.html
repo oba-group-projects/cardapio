@@ -7,7 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Cormorant+Garamond:wght@300;400;500&display=swap');
     .no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
     body{font-family:'Poppins',sans-serif;scroll-behavior:smooth;background-color:#FAF5F0;color:#3B2A1E;-webkit-tap-highlight-color:transparent}
     input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;appearance:none;margin:0}
@@ -132,67 +132,108 @@
       font-weight: var(--oba-pag3-peso-sublabel, 600) !important;
     }
     /* Cor do texto principal da Pág 2 · controlada por JS via element.style */
-    /* ── B+ EVOLUÇÃO VISUAL — Pg1 hierarquia editorial ── */
-    #oba-pag1-titulo {
-      font-size: 2.5rem !important;
-      font-weight: 600 !important;
-      letter-spacing: 0.05em !important;
-      text-transform: none !important;
-      line-height: 1.15 !important;
-      text-align: center !important;
-    }
-    #oba-pag1-subtitulo {
-      font-size: 0.9rem !important;
-      font-weight: 300 !important;
-      letter-spacing: 0 !important;
-      line-height: 1.6 !important;
-    }
-    /* Pg1 expandida — scroll permitido para acomodar conteúdo da Nossa Essência */
+    /* ── B+ EVOLUÇÃO VISUAL — Pg1 Interpretação B (Nossa Essência como título principal) ── */
+
+    /* Ocultar título/subtítulo originais — sem remover do DOM (JS continua funcionando) */
+    #oba-pag1-titulo  { display: none !important; }
+    #oba-pag1-subtitulo { display: none !important; }
+
+    /* Pg1 — alinhamento editorial à esquerda, scroll permitido, sem max-width restrito */
     #pag-1 {
       height: auto !important;
       min-height: 100dvh !important;
       overflow-y: auto !important;
+      align-items: flex-start !important;
       justify-content: flex-start !important;
       padding-top: 10dvh !important;
-      padding-bottom: 40px !important;
+      padding-bottom: 48px !important;
+      padding-left: 28px !important;
+      padding-right: 28px !important;
+      max-width: 100% !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
     }
-    /* Bloco de essência na Pg1 */
+
+    /* Logo — alinhada à esquerda */
+    #oba-pag1-logo {
+      align-self: flex-start;
+      margin-bottom: 36px;
+    }
+
+    /* Bloco de essência — ocupa toda a largura, sem container restrito */
     #pag1-essencia {
       width: 100%;
-      max-width: 320px;
-      text-align: center;
-      margin-top: 28px;
+      max-width: 100%;
+      text-align: left;
+      margin-top: 0;
     }
+
+    /* Linha decorativa dentro do bloco — ocultar (substituída pelo ::after do rótulo) */
+    #pag1-essencia > div {
+      display: none !important;
+    }
+
+    /* Rótulo CARDÁPIO — com linha decorativa à direita */
     #pag1-ne-rotulo {
-      font-size: 9px;
+      font-size: 10px;
       font-weight: 700;
-      letter-spacing: .22em;
+      letter-spacing: .25em;
       text-transform: uppercase;
       color: #8B4513;
-      opacity: .55;
-      margin-bottom: 14px;
-      display: block;
+      opacity: .6;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
+    #pag1-ne-rotulo::after {
+      content: '';
+      display: inline-block;
+      height: 1px;
+      width: 28px;
+      background: #8B4513;
+      opacity: .45;
+      flex-shrink: 0;
+    }
+
+    /* Título principal — Nossa Essência — grande, serif, peso leve */
     #pag1-ne-titulo {
-      font-size: 0.75rem !important;
-      font-weight: 700 !important;
-      letter-spacing: .15em !important;
-      color: #8B4513 !important;
-      text-transform: uppercase !important;
-      margin-bottom: 10px !important;
+      font-family: 'Cormorant Garamond', Georgia, serif !important;
+      font-size: 2.6rem !important;
+      font-weight: 300 !important;
+      letter-spacing: -0.01em !important;
+      color: #3B2A1E !important;
+      text-transform: none !important;
+      line-height: 1.1 !important;
+      margin-bottom: 22px !important;
     }
+
+    /* Texto da essência — mais escuro, legível */
     #pag1-ne-texto {
-      font-size: 13px !important;
+      font-size: 14px !important;
       line-height: 1.85 !important;
       font-weight: 300 !important;
-      color: #6B7280 !important;
-      margin-bottom: 12px !important;
+      color: #4B5563 !important;
+      margin-bottom: 16px !important;
     }
+
+    /* Citação em itálico */
     #pag1-ne-citacao {
-      font-size: 12px !important;
+      font-size: 13px !important;
       font-style: italic !important;
-      font-weight: 500 !important;
-      color: rgba(139,69,19,.65) !important;
+      font-weight: 400 !important;
+      color: rgba(139,69,19,.75) !important;
+    }
+    #pag1-ne-citacao::after {
+      content: ' ♡';
+      font-style: normal;
+      font-size: 11px;
+      opacity: .6;
+    }
+
+    /* Wrapper do título/subtítulo — ocultar o container vazio */
+    #pag-1 > div.text-center {
+      display: none !important;
     }
     /* ── B+ EVOLUÇÃO VISUAL — Pg2 tipografia ── */
     #oba-pag2-titulo {
