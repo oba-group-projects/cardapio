@@ -147,6 +147,53 @@
       letter-spacing: 0 !important;
       line-height: 1.6 !important;
     }
+    /* Pg1 expandida — scroll permitido para acomodar conteúdo da Nossa Essência */
+    #pag-1 {
+      height: auto !important;
+      min-height: 100dvh !important;
+      overflow-y: auto !important;
+      justify-content: flex-start !important;
+      padding-top: 10dvh !important;
+      padding-bottom: 40px !important;
+    }
+    /* Bloco de essência na Pg1 */
+    #pag1-essencia {
+      width: 100%;
+      max-width: 320px;
+      text-align: center;
+      margin-top: 28px;
+    }
+    #pag1-ne-rotulo {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: #8B4513;
+      opacity: .55;
+      margin-bottom: 14px;
+      display: block;
+    }
+    #pag1-ne-titulo {
+      font-size: 0.75rem !important;
+      font-weight: 700 !important;
+      letter-spacing: .15em !important;
+      color: #8B4513 !important;
+      text-transform: uppercase !important;
+      margin-bottom: 10px !important;
+    }
+    #pag1-ne-texto {
+      font-size: 13px !important;
+      line-height: 1.85 !important;
+      font-weight: 300 !important;
+      color: #6B7280 !important;
+      margin-bottom: 12px !important;
+    }
+    #pag1-ne-citacao {
+      font-size: 12px !important;
+      font-style: italic !important;
+      font-weight: 500 !important;
+      color: rgba(139,69,19,.65) !important;
+    }
     /* ── B+ EVOLUÇÃO VISUAL — Pg2 tipografia ── */
     #oba-pag2-titulo {
       font-size: 1rem !important;
@@ -2312,6 +2359,16 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
         <span id="oba-pag1-cta">Descobrir Nossa História</span> <i class="fa-solid fa-chevron-right text-[9px]"></i>
       </button>
     </div>
+
+    <!-- ── Essência na Pg1 — alimentada pelo JS via pag1-ne-* ── -->
+    <div id="pag1-essencia">
+      <span id="pag1-ne-rotulo">Cardápio</span>
+      <div class="w-10 h-[2px] bg-orange-200/40 mx-auto rounded-full mb-4"></div>
+      <h2 id="pag1-ne-titulo" class="text-sm font-semibold tracking-[0.15em] text-[#8B4513] uppercase mb-3">Nossa Essência</h2>
+      <p id="pag1-ne-texto" class="text-[13px] text-gray-600 leading-relaxed font-light px-1"></p>
+      <p id="pag1-ne-citacao" class="text-xs text-[#8B4513]/70 italic font-medium mt-3"></p>
+    </div>
+
   </section>
 
   <section id="pag-2" class="min-h-screen hidden flex-col items-center justify-center px-5 py-8 fade-page max-w-md mx-auto">
@@ -2354,7 +2411,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
         <i class="fa-solid fa-champagne-glasses text-xl opacity-20"></i>
       </button>
     </div>
-    <button onclick="navegarPara(2)" class="mt-6 mb-6 py-3 px-6 text-[10px] font-bold text-[#8B4513]/50 uppercase tracking-widest border border-transparent hover:border-[#8B4513]/20 rounded-full transition-all">← Voltar</button>
+    <button onclick="navegarPara(1)" class="mt-6 mb-6 py-3 px-6 text-[10px] font-bold text-[#8B4513]/50 uppercase tracking-widest border border-transparent hover:border-[#8B4513]/20 rounded-full transition-all">← Voltar</button>
   </section>
 
   <!-- FLUXO PRINCIPAL -->
@@ -3690,7 +3747,7 @@ async function hidratarTemaDoModeloMestre() {
     /* Visibilidade pag1 */
     const elSub1 = document.getElementById('oba-pag1-subtitulo');
     if (elSub1) elSub1.style.display = bv.exibirSubtitulo === false ? 'none' : '';
-    const elCTA1 = document.querySelector('#pag-1 button[onclick="navegarPara(2)"]');
+    const elCTA1 = document.getElementById('oba-pag1-btn-cta');
     if (elCTA1) elCTA1.style.display = bv.exibirCTA === false ? 'none' : '';
     /* ativo: se falso, oculta pag-1 e navega direto para pag-2 (ou pag-3 se ambas inativas) */
     if (bv.ativo === false) {
@@ -3707,6 +3764,11 @@ async function hidratarTemaDoModeloMestre() {
     _set('oba-pag2-titulo',        ne.titulo);
     _set('oba-pag2-texto',         ne.texto);
     _set('oba-pag2-citacao',       ne.citacao ? `"${ne.citacao.replace(/^"|"$/g, '')}"` : null);
+
+    /* Espelha nossa_essencia nos novos elementos da Pg1 unificada */
+    _set('pag1-ne-titulo',   ne.titulo);
+    _set('pag1-ne-texto',    ne.texto);
+    _set('pag1-ne-citacao',  ne.citacao ? `"${ne.citacao.replace(/^"|"$/g, '')}"` : null);
 
     /* Tamanho da logo pag2 */
     const elLogo2 = document.getElementById('oba-pag2-logo');
