@@ -1,30 +1,36 @@
 # HANDOFF
 
-Atualizado: 2026-10-04 (sessão 4)
+Atualizado: 2026-10-05 (sessão 5)
 
 Branch: feature/gestao-online-segura
-HEAD: c48eb9c
+HEAD: b644fd2
 
 ## Última entrega
-Cardápio B+ completo — Partes 1, 2 e 3 aprovadas. Fix ícone ← quebrado. Título Pg1 centralizado.
+Pg1 Interpretação B — "Nossa Essência" como título principal em Cormorant Garamond. Layout editorial à esquerda, alinhado ao modelo visual aprovado.
 
 ## Commits recentes relevantes
 | Commit   | O que fez |
 |----------|-----------|
+| b644fd2  | feat(cardapio): Pg1 Interpretação B — Nossa Essência como título principal |
+| 8f908e6  | fix(cardapio): mover CTA para após bloco de essência na Pg1 |
+| 9b49c69  | feat(cardapio): unificar Pg1+Pg2 — nossa essência na abertura |
 | c48eb9c  | fix: byte ctrl 0x19 removido dos botões ← + título Pg1 centralizado |
 | f17255f  | docs: handoff anterior |
-| 7d8f120  | feat: Parte 2 — CSS tipografia Pg1 e Pg2 |
-| 4ff4c3f  | feat: Parte 1 — textos editoriais via theme.json |
 
 ## Estado atual — TUDO APROVADO
 
-### Cardápio (/cardapio) — Evolução B+ COMPLETA
+### Cardápio (/cardapio) — Evolução B+ INTERPRETAÇÃO B
 
-**Pg1:**
-- Título: "Seu momento começa aqui." — 2.5rem/600, caixa mista, centralizado
-- Subtítulo: "Doces artesanais feitos à mão, com amor e precisão."
-- CTA: "Escolher minha experiência"
-- Ícone ← dos botões corrigido (byte 0x19 removido)
+**Pg1 — layout editorial à esquerda:**
+- `#oba-pag1-titulo` e `#oba-pag1-subtitulo`: ocultos via CSS, DOM intacto (JS preservado)
+- Título principal: "Nossa Essência" (`#pag1-ne-titulo`) — Cormorant Garamond 2.6rem/300, cor #3B2A1E
+- Rótulo: "CARDÁPIO" (`#pag1-ne-rotulo`) — com linha decorativa ::after, à esquerda
+- Texto (`#pag1-ne-texto`): 14px, #4B5563, font-weight 300
+- Citação (`#pag1-ne-citacao`): itálico, com ♡ via ::after
+- CTA: `#oba-pag1-btn-cta` com `navegarPara(2)` — intacto
+- Logo: alinhada à esquerda (`align-self: flex-start`)
+- `#pag-1`: `align-items: flex-start`, padding lateral 28px, `max-width: 100%`
+- Cormorant Garamond adicionada ao `@import` de fonts
 
 **Pg2:**
 - Título: "Nossa Essência"
@@ -63,8 +69,8 @@ Cardápio B+ completo — Partes 1, 2 e 3 aprovadas. Fix ícone ← quebrado. T�
 - Edição Visual do Catálogo na Central (12C-4)
 
 ## Pontos de retorno seguros
-- HEAD atual = c48eb9c (estável, validado)
-- Tag anterior = v12C-pre-4 = 9c011b3
+- HEAD atual = b644fd2 (estável, validado — Pg1 Interpretação B)
+- Anterior estável = 8f908e6
 
 ## Links
 - Central: https://oba-cardapio-gestao.obadoceria.workers.dev/
