@@ -132,6 +132,56 @@
       font-weight: var(--oba-pag3-peso-sublabel, 600) !important;
     }
     /* Cor do texto principal da Pág 2 · controlada por JS via element.style */
+
+    /* ── REFINAMENTO VISUAL — Pg3 + Fluxo de montagem ── */
+
+    /* Pg3 — subtítulo maior, header mais compacto */
+    #oba-pag3-subtitulo {
+      font-size: 13px !important;
+    }
+    #pag-3 header {
+      margin-bottom: 24px !important;
+    }
+
+    /* Pg3 — botões menos altos */
+    #oba-menu-botoes button {
+      padding: 16px 20px !important;
+    }
+
+    /* Fluxo principal — sobe o conteúdo */
+    #fluxo-principal {
+      padding-top: 16px !important;
+      padding-bottom: 32px !important;
+    }
+    #fluxo-principal > header {
+      margin-bottom: 16px !important;
+    }
+
+    /* Categorias — linha única com scroll horizontal */
+    #abas-categorias {
+      display: flex !important;
+      flex-wrap: nowrap !important;
+      overflow-x: auto !important;
+      gap: 6px !important;
+      padding-bottom: 4px !important;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    #abas-categorias::-webkit-scrollbar { display: none; }
+    #abas-categorias button {
+      flex-shrink: 0 !important;
+      font-size: 11px !important;
+      padding: 5px 12px !important;
+      white-space: nowrap !important;
+    }
+
+    /* Resumo da caixa selecionada — alinhado à esquerda, sem quebra estranha */
+    #resumo-caixa-selecionada {
+      text-align: left !important;
+      font-size: 11px !important;
+      line-height: 1.5 !important;
+    }
+
     /* ── B+ EVOLUÇÃO VISUAL — Pg1 Interpretação B — refinamento v2 ── */
 
     /* Ocultar título/subtítulo originais — sem remover do DOM (JS continua funcionando) */
