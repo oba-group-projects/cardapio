@@ -315,7 +315,8 @@ function obaLogout() {
           <p style="margin:0;font-size:12px;color:#555;line-height:1.6">O <strong>Título</strong>, <strong>Texto principal</strong> e <strong>Citação</strong> desta seção também aparecem na <strong>Pg1 do cardápio</strong> (abertura). Editar aqui atualiza os dois lugares ao mesmo tempo.</p>
         </div>
         <div class="field"><label>Título</label><input id="pg2-titulo" placeholder="Nossa Essência"></div>
-        <div class="field full"><label>Texto principal</label><textarea id="pg2-texto" rows="4" placeholder="Na OBA Doceria..."></textarea></div>
+        <div class="field full"><label>Texto principal <span class="hint">(primeiro parágrafo da abertura)</span></label><textarea id="pg2-texto" rows="4" placeholder="Na OBA Doceria..."></textarea></div>
+        <div class="field full"><label>Segundo parágrafo <span class="hint">(continuação — também aparece na abertura Pg1)</span></label><textarea id="pg2-texto2" rows="4" placeholder="Tudo é feito à mão..."></textarea></div>
         <div class="field full"><label>Citação em itálico</label><input id="pg2-citacao" placeholder="Feito à mão, com amor e precisão."></div>
 
         <div style="grid-column:1/-1"><p class="oba-secao-titulo">🖼️ Imagem</p></div>
@@ -2177,6 +2178,7 @@ $('formConfig').onsubmit=async e=>{
     const ne=pg.nossa_essencia||{};
     obaSetVal('pg2-titulo',ne.titulo);obaSetVal('pg2-logo',ne.logo);
     obaSetVal('pg2-texto',ne.texto);
+    obaSetVal('pg2-texto2',ne.texto2||'');
     obaSetVal('pg2-citacao',ne.citacao?ne.citacao.replace(/^"|"$/g,''):'');
     obaSetSelect('pg2-tamanhoLogo',ne.tamanhoLogo,'medio');
     obaSetCorPagina('pg2-corFundo',ne.corFundo);
@@ -2333,6 +2335,7 @@ $('formConfig').onsubmit=async e=>{
           tamanhoLogo:$('pg2-tamanhoLogo')?.value||'medio',
           titulo:$('pg2-titulo')?.value.trim()||'',
           texto:$('pg2-texto')?.value.trim()||'',
+          texto2:$('pg2-texto2')?.value.trim()||'',
           citacao:$('pg2-citacao')?.value.trim()||'',
           corFundo:$('pg2-corFundo-hex')?.value.trim()||'',
           corTitulo:$('pg2-corTitulo-hex')?.value.trim()||'',
