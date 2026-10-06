@@ -174,8 +174,12 @@ function obaLogout() {
         </div>
 
         <div style="grid-column:1/-1"><p class="oba-secao-titulo">✏️ Textos</p></div>
-        <div class="field"><label>Título</label><input id="pg1-titulo" placeholder="Bem-vindo"></div>
-        <div class="field"><label>Subtítulo</label><input id="pg1-subtitulo" placeholder="Prepare-se para descobrir..."></div>
+        <div style="grid-column:1/-1;padding:12px 14px;border-radius:10px;background:#fff8f0;border:1px solid #f5c89a;margin-bottom:4px">
+          <p style="margin:0 0 4px;font-size:12px;font-weight:700;color:#8B4513">ℹ️ Layout atual da Pg1</p>
+          <p style="margin:0;font-size:12px;color:#666;line-height:1.6">O <strong>Título</strong> e o <strong>Subtítulo</strong> abaixo estão ocultos no cardápio. O conteúdo visual da abertura é controlado pela <strong>Página 2 — Nossa Essência</strong> (título, texto e citação). O <strong>Texto do botão CTA</strong> e a <strong>Logo</strong> continuam ativos normalmente.</p>
+        </div>
+        <div class="field"><label>Título <span class="hint">(oculto no layout atual)</span></label><input id="pg1-titulo" placeholder="Bem-vindo"></div>
+        <div class="field"><label>Subtítulo <span class="hint">(oculto no layout atual)</span></label><input id="pg1-subtitulo" placeholder="Prepare-se para descobrir..."></div>
         <div class="field full"><label>Texto do botão CTA</label><input id="pg1-cta" placeholder="Descobrir Nossa História"></div>
 
         <div style="grid-column:1/-1"><p class="oba-secao-titulo">🖼️ Imagem</p></div>
@@ -306,6 +310,10 @@ function obaLogout() {
           <span class="hint" style="color:#a06000">Desativar oculta esta página para os clientes, mas preserva todo o conteúdo.</span>
         </div>
         <div style="grid-column:1/-1"><p class="oba-secao-titulo">✏️ Textos</p></div>
+        <div style="grid-column:1/-1;padding:12px 14px;border-radius:10px;background:#f0f8f0;border:1px solid #a8d5a2;margin-bottom:4px">
+          <p style="margin:0 0 4px;font-size:12px;font-weight:700;color:#2d6a2d">✅ Conteúdo da abertura do cardápio</p>
+          <p style="margin:0;font-size:12px;color:#555;line-height:1.6">O <strong>Título</strong>, <strong>Texto principal</strong> e <strong>Citação</strong> desta seção também aparecem na <strong>Pg1 do cardápio</strong> (abertura). Editar aqui atualiza os dois lugares ao mesmo tempo.</p>
+        </div>
         <div class="field"><label>Título</label><input id="pg2-titulo" placeholder="Nossa Essência"></div>
         <div class="field full"><label>Texto principal</label><textarea id="pg2-texto" rows="4" placeholder="Na OBA Doceria..."></textarea></div>
         <div class="field full"><label>Citação em itálico</label><input id="pg2-citacao" placeholder="Feito à mão, com amor e precisão."></div>
