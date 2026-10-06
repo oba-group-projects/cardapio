@@ -679,6 +679,47 @@ function obaLogout() {
       <p id="secoes-extras-vazio" class="hint" style="text-align:center;padding:16px 0;color:var(--muted)">Nenhuma seção extra criada ainda. Clique em "+ Nova seção" para começar.</p>
     </div>
 
+    <!-- ================================================================
+         12C-4 — EDIÇÃO VISUAL DO CATÁLOGO
+    ================================================================ -->
+    <div style="margin-top:32px;border-top:2px solid var(--line);padding-top:24px">
+      <p class="oba-secao-titulo" style="margin:0 0 4px">🗂️ Catálogo — Edição Visual</p>
+      <p class="hint" style="margin:0 0 16px">Textos da página de abertura do catálogo público <strong>(/catalogo)</strong>.</p>
+
+      <details class="oba-pg-details">
+        <summary class="oba-pg-summary">Catálogo — Página 1 (Abertura)</summary>
+        <form id="formCatalogoPg1" class="oba-pg-form grid">
+
+          <div style="grid-column:1/-1"><p class="oba-secao-titulo">✏️ Textos</p></div>
+
+          <div class="field">
+            <label>Rótulo <span class="hint">(ex: Catálogo)</span></label>
+            <input id="cat-ed-rotulo" placeholder="Catálogo">
+          </div>
+          <div class="field">
+            <label>Título principal <span class="hint">(use \n para quebra de linha)</span></label>
+            <input id="cat-ed-titulo" placeholder="Descubra\na Oba">
+          </div>
+          <div class="field full">
+            <label>Primeiro parágrafo</label>
+            <textarea id="cat-ed-p1" rows="3" placeholder="Uma coleção de sabores artesanais..."></textarea>
+          </div>
+          <div class="field full">
+            <label>Segundo parágrafo</label>
+            <textarea id="cat-ed-p2" rows="3" placeholder="Explore nossos sabores..."></textarea>
+          </div>
+          <div class="field full">
+            <label>Texto do botão CTA</label>
+            <input id="cat-ed-cta" placeholder="Conhecer nossos sabores →">
+          </div>
+
+          <div class="field full actions">
+            <button class="primary" type="submit">Salvar Catálogo</button>
+          </div>
+        </form>
+      </details>
+    </div>
+
   </div><!-- /vpanel-paginas -->
 
   <!-- ===== SUB-PAINEL: TEMA GLOBAL ===== -->
@@ -1064,7 +1105,8 @@ function obaNormalizeCatalog(raw){
     options:s.options||s.opcionais||[],
     combos:s.combos||[],
     config:s.config||s.loja||s.store||{},
-    tema:s.tema||s.theme||{}
+    tema:s.tema||s.theme||{},
+    tema_catalogo:s.tema_catalogo||{}
   };
 }
 
@@ -2224,6 +2266,8 @@ $('formConfig').onsubmit=async e=>{
     /* Variantes */
     obaRenderizarVariantes(t.variante||'classica');
     obaAtualizarPreviewCores();
+    /* 12C-4: Popular formulário do catálogo */
+    if (typeof obaPopularFormCatalogo === 'function') obaPopularFormCatalogo();
   };
 
   function obaSetVal(id,val){const el=$?$(id):document.getElementById(id);if(el&&val!=null)el.value=val}
@@ -2398,6 +2442,48 @@ $('formConfig').onsubmit=async e=>{
     const frm=$(fid);
     if(frm)frm.onsubmit=async e=>{e.preventDefault();await obaSalvarPaginaDoTema(nomes[fid]||fid)};
   });
+
+  /* ── 12C-4: Formulário de Edição Visual do Catálogo ── */
+
+  /* Popular campos do formulário a partir do catalogo.tema_catalogo */
+  window.obaPopularFormCatalogo = function() {
+    const tc = (catalogo && catalogo.tema_catalogo && catalogo.tema_catalogo.pg1) || {};
+    const sv = (id, val) => { const el = $(id); if (el && val != null) el.value = val; };
+    sv('cat-ed-rotulo', tc.rotulo  || '');
+    sv('cat-ed-titulo', tc.titulo  || '');
+    sv('cat-ed-p1',     tc.paragrafo1 || '');
+    sv('cat-ed-p2',     tc.paragrafo2 || '');
+    sv('cat-ed-cta',    tc.cta     || '');
+  };
+
+  /* Ler campos e montar objeto tema_catalogo */
+  function obaLerFormCatalogo() {
+    return {
+      schemaVersion: 1,
+      updatedAt: new Date().toISOString().slice(0, 10),
+      pg1: {
+        rotulo:     $('cat-ed-rotulo')?.value.trim() || '',
+        titulo:     $('cat-ed-titulo')?.value.trim() || '',
+        paragrafo1: $('cat-ed-p1')?.value.trim()     || '',
+        paragrafo2: $('cat-ed-p2')?.value.trim()     || '',
+        cta:        $('cat-ed-cta')?.value.trim()    || '',
+      }
+    };
+  }
+
+  /* Handler de submit */
+  const frmCat = $('formCatalogoPg1');
+  if (frmCat) frmCat.onsubmit = async e => {
+    e.preventDefault();
+    try {
+      const temaCat = obaLerFormCatalogo();
+      const res = await obaSaveDraftWith('tema_catalogo', temaCat);
+      catalogo.tema_catalogo = temaCat;
+      addPendencia('Edição Visual salva: Catálogo Pg1');
+      msg('Catálogo Pg1 salvo. Backup: ' + res.backup);
+      if (typeof atualizarStatus === 'function') atualizarStatus();
+    } catch(err) { msg(String(err.message || err), 'erro'); }
+  };
 
   /* Restaurar padrão do tema */
   const resetBtn=$('temaResetBtn');

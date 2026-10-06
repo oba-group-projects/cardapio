@@ -491,8 +491,18 @@ function catMontarPg1(dados) {
     dados.tema?.paginas?.boas_vindas?.logo,
     CAT_LOGO_VERTICAL
   );
-  /* Título e textos do catálogo NÃO são sobrescritos pelo tema do cardápio.
-     O catálogo tem sua própria identidade — os defaults do HTML são canônicos. */
+
+  /* Textos editáveis via theme-catalogo.json — fallback silencioso para o HTML */
+  function _catSet(id, valor) {
+    const el = document.getElementById(id);
+    if (el && typeof valor === 'string' && valor.trim()) el.textContent = valor;
+  }
+  const tc = dados.temaCatalogo?.pg1 || {};
+  _catSet('cat-pg1-rotulo', tc.rotulo);
+  _catSet('cat-pg1-titulo', tc.titulo);
+  _catSet('cat-pg1-p1',     tc.paragrafo1);
+  _catSet('cat-pg1-p2',     tc.paragrafo2);
+  _catSet('cat-pg1-cta',    tc.cta);
 }
 
 /* ── MONTAR PG 3 ── */
@@ -661,18 +671,20 @@ function catConfigurarWpp(dados) {
 /* ── INICIALIZAÇÃO ── */
 async function catIniciar() {
   try {
-    const [catJson, flavJson, temaJson, lojaJson] = await Promise.all([
+    const [catJson, flavJson, temaJson, lojaJson, temaCatJson] = await Promise.all([
       fetch('../data/catalog-v1/categories.json').then(r => r.json()),
       fetch('../data/catalog-v1/flavors.json').then(r => r.json()),
       fetch('../data/catalog-v1/theme.json').then(r => r.json()),
       fetch('../data/catalog-v1/config.json').then(r => r.json()),
+      fetch('../data/catalog-v1/theme-catalogo.json').then(r => r.json()).catch(() => ({})),
     ]);
 
     _catDados = {
-      categorias: Array.isArray(catJson) ? catJson : (catJson.categories || catJson.categorias || []),
-      sabores:    Array.isArray(flavJson) ? flavJson : (flavJson.flavors  || flavJson.sabores   || []),
-      tema:       temaJson,
-      loja:       lojaJson
+      categorias:   Array.isArray(catJson) ? catJson : (catJson.categories || catJson.categorias || []),
+      sabores:      Array.isArray(flavJson) ? flavJson : (flavJson.flavors  || flavJson.sabores   || []),
+      tema:         temaJson,
+      loja:         lojaJson,
+      temaCatalogo: temaCatJson,
     };
 
     catMontarPg1(_catDados);
