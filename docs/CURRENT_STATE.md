@@ -1,6 +1,54 @@
 ﻿# CURRENT STATE
 
-Atualizado: 2026-10-05 (sessão 5)
+Atualizado: 2026-10-05 (sessão 6)
+
+## Git
+Branch: feature/gestao-online-segura
+Commit HEAD: 6a2a2bb
+
+## Estado funcional
+- Central privada autenticada e operacional
+- Fluxo DRAFT → PREVIEW → PUBLISHED funcional
+- Cardápio público funcional em /cardapio — Pg1 Interpretação B + refinamentos visuais
+- Catálogo público funcional em /catalogo — Verde Sálvia + Edição Visual implementada
+
+## Cardápio — estado atual aprovado
+
+### Pg1 — Interpretação B
+- Título/subtítulo originais: ocultos via CSS (DOM intacto)
+- Título principal: "Nossa Essência" — Cormorant Garamond 3rem/500
+- 2 parágrafos de texto fixos no HTML
+- Citação: 14px, centralizada
+- CTA: py-3.5, max-w-280px, shadow-md
+
+### Pg3 — Menu Principal
+- Labels .oba-btn-label: 15px/500
+- Subtítulo: 13px/rgba(139,69,19,0.85)
+- Ícones brancos: opacity .35
+
+### Fluxo
+- Categorias: grid 3 colunas
+- Resumo caixa: text-left
+
+## Catálogo — estado atual aprovado
+- Paleta Verde Sálvia (#6B9E7A)
+- Layout editorial Pg1 unificada
+- Edição Visual (12C-4): theme-catalogo.json + hidratação + formulário na Central
+
+## Central — estado atual
+- Edição Visual cardápio: avisos Pg1/Pg2 sobre relação dos campos
+- Edição Visual catálogo: formulário "Catálogo Pg1" funcional
+- Pipeline completo funcional
+
+## Pontos de retorno seguros
+- HEAD atual = 6a2a2bb
+- Anterior = 9376512
+
+## Links
+- Central: https://oba-cardapio-gestao.obadoceria.workers.dev/
+- Cardápio: https://oba-cardapio-gestao.obadoceria.workers.dev/cardapio
+- Catálogo: https://oba-cardapio-gestao.obadoceria.workers.dev/catalogo
+- GitHub: https://github.com/oba-group-projects/cardapio
 
 ## Git
 Branch: feature/gestao-online-segura

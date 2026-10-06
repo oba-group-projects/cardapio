@@ -1,6 +1,82 @@
 # HANDOFF
 
-Atualizado: 2026-10-05 (sessão 5)
+Atualizado: 2026-10-05 (sessão 6)
+
+Branch: feature/gestao-online-segura
+HEAD: 6a2a2bb
+
+## Última entrega
+12C-4 completa — Edição Visual do Catálogo implementada. Refinamentos visuais do cardápio (Pg1, Pg3, fluxo). Avisos na Central sobre Pg1→Pg2.
+
+## Commits recentes relevantes
+| Commit   | O que fez |
+|----------|-----------|
+| 6a2a2bb  | feat(12C-4): Edição Visual Catálogo — theme-catalogo.json, hidratação, Central |
+| 0b89a9e  | feat(central): avisos informativos Pg1/Pg2 na Edição Visual |
+| 9376512  | fix(cardapio): Pg3 seletores corretos — oba-btn-label/oba-btn-sublabel |
+| 222b43a  | feat(cardapio): Pg3 refinamento visual — hierarquia botões |
+| fd39128  | fix(cardapio): categorias sabores — grid 3 colunas |
+| 481cfea  | feat(cardapio): refinamento Pg3 + fluxo montagem |
+| 8000eb9  | feat(cardapio): Pg1 refinamento v3 — rótulo, título semibold, 2 parágrafos |
+
+## Estado atual — TUDO APROVADO
+
+### Cardápio (/cardapio)
+
+**Pg1 — Interpretação B (Nossa Essência como título principal):**
+- Logo: 96px, align-self flex-start
+- Rótulo "CARDÁPIO": 12px, linha decorativa ::after
+- Título "Nossa Essência": Cormorant Garamond 3rem/500, #3B2A1E
+- Texto: 2 parágrafos fixos no HTML, 13px, #4B5563
+- Citação: "Feito à mão, com amor e precisão." 14px, centralizada
+- CTA: py-3.5, max-w-280px, shadow-md
+- `#oba-pag1-titulo` e `#oba-pag1-subtitulo`: ocultos (DOM intacto)
+
+**Pg3 — Menu Principal:**
+- Subtítulo: 13px, cor /85
+- Labels: 15px/500 (classe .oba-btn-label)
+- Sublabels: 10px/.65 (classe .oba-btn-sublabel)
+- Ícones: 1.5rem, brancos opacity .35
+- 2º botão: borda /20
+
+**Fluxo de montagem:**
+- Categorias: grid 3 colunas, flex-wrap, tudo visível
+- Resumo caixa: text-left
+
+### Catálogo (/catalogo) — APROVADO
+- Paleta Verde Sálvia (#6B9E7A, #F4F8F4)
+- Layout editorial, Pg1 unificada, float-bar, lightbox
+- **Edição Visual implementada (12C-4)**
+
+### Central de Gestão
+- Edição Visual: avisos informativos Pg1/Pg2 sobre relação dos campos
+- Edição Visual: formulário "Catálogo — Pg1 (Abertura)" funcional
+- Pipeline DRAFT → PREVIEW → PUBLISHED: funcional
+
+## REGRAS TÉCNICAS CRÍTICAS
+1. Nunca usar Set-Content/Out-File do PowerShell para HTML/JSON — adiciona BOM
+2. Sempre usar str_replace/fs_write para edições de texto
+3. theme.json = cardápio. theme-catalogo.json = catálogo. NUNCA misturar.
+4. querySelector('#pag-1 button[onclick="navegarPara(2)"]') — NÃO alterar o onclick
+5. .glass-card e .bg-orange-200/60 — NÃO remover essas classes
+6. obaSaveDraftWith('tema', ...) = cardápio. obaSaveDraftWith('tema_catalogo', ...) = catálogo.
+
+## Pendente — próximas sessões
+- Refinamentos visuais do catálogo: "Encontre o seu favorito" (Pg sabores) e segundo parágrafo Pg1 encurtado
+- Microinterações (sessão futura, uma por vez)
+- Hardening: substituir querySelector frágil por getElementById
+
+## Pontos de retorno seguros
+- HEAD atual = 6a2a2bb (estável, validado)
+- Anterior estável = 9376512
+
+## Links
+- Central: https://oba-cardapio-gestao.obadoceria.workers.dev/
+- Cardápio: https://oba-cardapio-gestao.obadoceria.workers.dev/cardapio
+- Catálogo: https://oba-cardapio-gestao.obadoceria.workers.dev/catalogo
+- GitHub: https://github.com/oba-group-projects/cardapio
+
+Leia AGENTS.md, CURRENT_STATE.md, DECISIONS.md antes de alterar código.
 
 Branch: feature/gestao-online-segura
 HEAD: b644fd2
