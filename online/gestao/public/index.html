@@ -112,6 +112,7 @@ function obaLogout() {
 <button class="tab" data-tab="catalogo-visual">🗂️ Ed. Visual Catálogo</button>
 <button class="tab" data-tab="midia">🖼️ Mídia</button>
 <button class="tab" data-tab="proposals">📋 Propostas</button>
+<button class="tab" data-tab="contracts">📄 Contratos</button>
 </div>
 
 <section id="panel-flavors" class="panel active"><div class="toolbar"><h2>Sabores</h2><button class="primary" data-new="flavors">+ Novo sabor</button><input id="buscaSabor" placeholder="Buscar sabor"><select id="filtroCategoria"><option value="">Todas as categorias</option></select></div><table><thead><tr><th data-sort="nome" data-tipo="flavors" onclick="obaSetSort('flavors','nome')">Nome</th><th data-sort="categoriaId" data-tipo="flavors" onclick="obaSetSort('flavors','categoriaId')">Categoria</th><th data-sort="preco" data-tipo="flavors" onclick="obaSetSort('flavors','preco')">Preço</th><th class="hide-mobile">Imagem</th><th>Status</th></tr></thead><tbody id="body-flavors"></tbody></table></section>
@@ -4305,6 +4306,9 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         const excluirBtn = p.status==='rascunho'
           ? '<button class="secondary" style="padding:4px 10px;font-size:11px;background:#fee2e2;color:#dc2626;border-color:#fca5a5" onclick="obaProposalExcluir(&quot;'+pid+'&quot;,&quot;'+cn+'&quot;)">\uD83D\uDDD1 Excluir</button>'
           : '';
+        const contratoBtn = (p.status==='aceita' && tmpl==='evento')
+          ? '<button class="secondary" style="padding:4px 10px;font-size:11px;background:#f0fdf4;color:#166534;border-color:#86efac" onclick="obaContractNovo(&quot;'+pid+'&quot;)">\uD83D\uDCC4 Contrato</button>'
+          : '';
         return '<tr>'
           +'<td>'+badge+'</td>'
           +'<td><strong>'+cn+'</strong>'+detalheNum+'</td>'
@@ -4318,6 +4322,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
           +'<button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaProposalCopiarLinkById(&quot;'+pid+'&quot;)">\uD83D\uDD17 Link</button>'
           +'<button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaProposalAbrirPDFById(&quot;'+pid+'&quot;)">\uD83D\uDCC4 PDF</button>'
           +'<button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaProposalDuplicar(&quot;'+pid+'&quot;,&quot;'+en+'&quot;)" title="Duplicar">\u29C5 Duplicar</button>'
+          +contratoBtn
           +excluirBtn
           +'</td></tr>';
       }).join('');
@@ -5607,6 +5612,410 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
 })();
 </script>
 <!-- FIM ABA PROPOSTAS -->
+
+<!-- =========================================================
+     FASE 13A — ABA CONTRATOS
+========================================================= -->
+<section id="panel-contracts" class="panel">
+  <div class="toolbar" style="margin-bottom:18px">
+    <h2 style="margin:0 auto 0 0">📄 Contratos</h2>
+  </div>
+
+  <!-- LISTAGEM -->
+  <div id="contracts-lista">
+    <table>
+      <thead>
+        <tr>
+          <th>Nº</th>
+          <th>Cliente</th>
+          <th>Evento / Data</th>
+          <th>Status</th>
+          <th>Criado em</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="contracts-tbody">
+        <tr><td colspan="6" style="text-align:center;color:#888">Carregando...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- EDITOR -->
+  <div id="contracts-editor" style="display:none">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+      <button class="secondary" onclick="obaContractVoltar()">← Voltar à lista</button>
+      <h3 id="contracts-editor-titulo" style="margin:0;font-size:15px">Contrato</h3>
+      <span id="contracts-status-badge" style="margin-left:auto;font-size:11px;padding:3px 10px;border-radius:20px;background:#eee;color:#555"></span>
+    </div>
+
+    <!-- Dados do evento (readonly) -->
+    <div class="card" style="margin-bottom:16px">
+      <h4 style="margin:0 0 12px;font-size:13px;color:var(--brand)">📅 Dados do evento (da proposta)</h4>
+      <div class="grid">
+        <div class="field"><label>Cliente</label><input id="ctr-cliente-ro" readonly style="background:#f9f3ec"></div>
+        <div class="field"><label>Data do evento</label><input id="ctr-data-evento-ro" readonly style="background:#f9f3ec"></div>
+        <div class="field"><label>Tipo de evento</label><input id="ctr-tipo-evento-ro" readonly style="background:#f9f3ec"></div>
+        <div class="field"><label>Convidados (est.)</label><input id="ctr-convidados-ro" readonly style="background:#f9f3ec"></div>
+      </div>
+    </div>
+
+    <!-- Cenário -->
+    <div class="card" style="margin-bottom:16px">
+      <h4 style="margin:0 0 12px;font-size:13px;color:var(--brand)">📦 Cenário contratado</h4>
+      <div class="grid">
+        <div class="field full">
+          <label>Selecione o cenário aceito pelo cliente</label>
+          <select id="ctr-scenario-id" style="font-size:13px">
+            <option value="">Carregando cenários...</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dados complementares -->
+    <div class="card" style="margin-bottom:16px">
+      <h4 style="margin:0 0 12px;font-size:13px;color:var(--brand)">👤 Dados complementares</h4>
+      <div class="grid">
+        <div class="field"><label>E-mail do cliente</label><input id="ctr-email" type="email" placeholder="cliente@email.com"></div>
+        <div class="field"><label>CPF ou CNPJ</label><input id="ctr-cpf-cnpj" placeholder="000.000.000-00"></div>
+        <div class="field full"><label>Local do evento (endereço)</label><input id="ctr-local" placeholder="Rua, número — Cidade/UF"></div>
+        <div class="field full"><label>Condições de pagamento</label><input id="ctr-cond-pagamento" placeholder="Ex: 50% no pedido, 50% na entrega"></div>
+      </div>
+    </div>
+
+    <!-- Cláusulas -->
+    <div class="card" style="margin-bottom:16px">
+      <h4 style="margin:0 0 4px;font-size:13px;color:var(--brand)">📝 Cláusulas</h4>
+      <p class="hint" style="margin-bottom:12px">Editáveis enquanto o contrato estiver em Rascunho. Após envio, ficam imutáveis.</p>
+      <div class="grid">
+        <div class="field full">
+          <label>Cancelamento</label>
+          <textarea id="ctr-clausula-cancelamento" rows="8" style="font-size:12px;line-height:1.7;resize:vertical"></textarea>
+        </div>
+        <div class="field full">
+          <label>Responsabilidades</label>
+          <textarea id="ctr-clausula-responsabilidades" rows="10" style="font-size:12px;line-height:1.7;resize:vertical"></textarea>
+        </div>
+        <div class="field full">
+          <label>Foro</label>
+          <textarea id="ctr-clausula-foro" rows="3" style="font-size:12px;line-height:1.7;resize:vertical"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ações -->
+    <div id="ctr-acoes-rascunho" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+      <button class="secondary" onclick="obaContractVoltar()">✕ Cancelar</button>
+      <button class="primary" style="background:#6b7280" onclick="obaContractSalvar()">💾 Salvar rascunho</button>
+      <button class="primary" style="background:#059669" onclick="obaContractEnviar()">📤 Gerar link para aceite</button>
+    </div>
+
+    <!-- Link gerado (aparece após envio) -->
+    <div id="ctr-link-box" style="display:none;padding:16px;background:#f0fdf4;border:1px solid #86efac;border-radius:12px;margin-bottom:16px">
+      <p style="font-size:13px;font-weight:700;color:#166534;margin-bottom:8px">✅ Contrato enviado para aceite</p>
+      <p class="hint" style="margin-bottom:10px">Compartilhe o link com o cliente pelo WhatsApp:</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <input id="ctr-link-input" readonly style="flex:1;min-width:200px;font-size:12px;background:#fff">
+        <button class="secondary" style="font-size:12px" onclick="obaContractCopiarLink()">📋 Copiar</button>
+        <button class="secondary" style="font-size:12px;background:#25d366;color:#fff;border:none" onclick="obaContractEnviarWpp()">📱 WhatsApp</button>
+      </div>
+    </div>
+
+    <!-- Registro de aceite (aparece se aceito) -->
+    <div id="ctr-aceite-box" style="display:none;padding:16px;background:#f0fdf4;border:1px solid #86efac;border-radius:12px;margin-bottom:16px">
+      <p style="font-size:13px;font-weight:700;color:#166534;margin-bottom:8px">✅ Contrato aceito eletronicamente</p>
+      <div id="ctr-aceite-detalhes" style="font-size:12px;color:#555"></div>
+    </div>
+  </div>
+</section>
+
+<script>
+// ================================================================
+// FASE 13A — MODULO DE CONTRATOS (Central)
+// ================================================================
+(function() {
+
+  let obaContractAtivo = null;
+  let obaContractPropostaAtiva = null;
+
+  function ctrStatusLabel(s) {
+    return { rascunho:'Rascunho', enviado:'Enviado', aceito:'Aceito', recusado:'Recusado' }[s] || s;
+  }
+  function ctrStatusColor(s) {
+    return { rascunho:'#888', enviado:'#2563eb', aceito:'#059669', recusado:'#dc2626' }[s] || '#888';
+  }
+  function csrf() {
+    const token = String(document.cookie||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('__Host-oba_csrf='));
+    return token ? decodeURIComponent(token.slice('__Host-oba_csrf='.length)) : '';
+  }
+  function $(id) { return document.getElementById(id); }
+  function sv(id, v) { const el = $(id); if (el) el.value = v || ''; }
+
+  // ── LISTAGEM ──────────────────────────────────────────────
+  async function carregarListaContratos() {
+    const tbody = $('contracts-tbody');
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#888">Carregando...</td></tr>';
+    try {
+      const r = await fetch('/api/contracts');
+      const data = await r.json();
+      if (!data.ok || !data.contracts.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#888">Nenhum contrato ainda. Acesse uma proposta <strong>Aceita</strong> e clique em "📄 Contrato".</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.contracts.map(c => {
+        const sc = ctrStatusColor(c.status);
+        const cid = c.contract_id;
+        const link = c.token_publico ? window.location.origin + '/contrato/' + c.token_publico : '';
+        return '<tr>'
+          + '<td><strong>' + (c.numero || '—') + '</strong></td>'
+          + '<td>' + (c.cliente || '—') + '</td>'
+          + '<td style="font-size:12px">' + (c.tipo_evento || '—') + (c.data_evento ? '<br><span style="color:#888">' + new Date(c.data_evento + 'T12:00:00').toLocaleDateString('pt-BR') + '</span>' : '') + '</td>'
+          + '<td><span style="font-size:11px;font-weight:700;padding:2px 10px;border-radius:10px;background:' + sc + '18;color:' + sc + '">' + ctrStatusLabel(c.status) + '</span></td>'
+          + '<td>' + new Date(c.criado_em).toLocaleDateString('pt-BR') + '</td>'
+          + '<td style="display:flex;gap:6px;flex-wrap:wrap">'
+          + '<button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaContractEditar(\'' + cid + '\')">✏️ Editar</button>'
+          + (link ? '<button class="secondary" style="padding:4px 10px;font-size:11px" onclick="navigator.clipboard.writeText(\'' + link + '\');this.textContent=\'✅ Copiado!\';setTimeout(()=>this.textContent=\'🔗 Link\',2000)">🔗 Link</button>' : '')
+          + '</td></tr>';
+      }).join('');
+    } catch(e) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#dc2626">Erro ao carregar contratos.</td></tr>';
+    }
+  }
+
+  // ── NOVO CONTRATO A PARTIR DE PROPOSTA ────────────────────
+  window.obaContractNovo = async function(proposalId) {
+    try {
+      // Carrega proposta para preencher o editor
+      const rp = await fetch('/api/proposals/' + proposalId);
+      const dp = await rp.json();
+      if (!dp.ok) { alert('Erro ao carregar proposta.'); return; }
+      const proposta = dp.proposal;
+
+      // Verifica contrato ativo
+      const rc = await fetch('/api/contracts');
+      const dc = await rc.json();
+      const ativo = (dc.contracts || []).find(c => c.proposal_id === proposalId && (c.status === 'enviado' || c.status === 'aceito'));
+      if (ativo) {
+        if (confirm('Já existe um contrato ' + ctrStatusLabel(ativo.status) + ' para esta proposta.\n\nAbrir o contrato existente?')) {
+          // Navega para aba contratos e abre o editor
+          document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === 'contracts'));
+          document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+          $('panel-contracts').classList.add('active');
+          obaContractEditar(ativo.contract_id);
+        }
+        return;
+      }
+
+      // Cria novo contrato com o primeiro cenário como padrão
+      const primeiroScenario = proposta.scenarios?.[0]?.scenario_id || '';
+      const r = await fetch('/api/contracts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf() },
+        body: JSON.stringify({ proposal_id: proposalId, scenario_id: primeiroScenario })
+      });
+      const d = await r.json();
+      if (!d.ok) { alert('Erro ao criar contrato: ' + (d.error || 'desconhecido')); return; }
+
+      // Navega para aba contratos e abre o editor
+      document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === 'contracts'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      $('panel-contracts').classList.add('active');
+      await obaContractEditar(d.contract.contract_id);
+    } catch(e) { alert('Erro de conexão.'); }
+  };
+
+  // ── ABRIR EDITOR ──────────────────────────────────────────
+  window.obaContractEditar = async function(contractId) {
+    try {
+      const r = await fetch('/api/contracts/' + contractId);
+      const d = await r.json();
+      if (!d.ok) { alert('Contrato não encontrado.'); return; }
+      obaContractAtivo = d.contract;
+
+      // Carrega proposta para dados readonly e cenários
+      const rp = await fetch('/api/proposals/' + d.contract.proposal_id);
+      const dp = await rp.json();
+      obaContractPropostaAtiva = dp.ok ? dp.proposal : null;
+
+      // Preenche campos readonly
+      sv('ctr-cliente-ro', dp.proposal?.cliente || '');
+      sv('ctr-data-evento-ro', dp.proposal?.data_evento ? new Date(dp.proposal.data_evento + 'T12:00:00').toLocaleDateString('pt-BR') : '');
+      sv('ctr-tipo-evento-ro', dp.proposal?.tipo_evento || '');
+      sv('ctr-convidados-ro', dp.proposal?.convidados || '');
+
+      // Popula select de cenários
+      const sel = $('ctr-scenario-id');
+      sel.innerHTML = '';
+      (dp.proposal?.scenarios || []).forEach((s, i) => {
+        const opt = document.createElement('option');
+        opt.value = s.scenario_id;
+        opt.textContent = s.nome || ('Cenário ' + (i + 1));
+        if (s.scenario_id === d.contract.scenario_id) opt.selected = true;
+        sel.appendChild(opt);
+      });
+
+      // Preenche campos editáveis
+      sv('ctr-email', d.contract.email_cliente || '');
+      sv('ctr-cpf-cnpj', d.contract.cpf_cnpj || '');
+      sv('ctr-local', d.contract.local_evento || '');
+      sv('ctr-cond-pagamento', d.contract.cond_pagamento || '');
+      sv('ctr-clausula-cancelamento', d.contract.clausula_cancelamento || '');
+      sv('ctr-clausula-responsabilidades', d.contract.clausula_responsabilidades || '');
+      sv('ctr-clausula-foro', d.contract.clausula_foro || '');
+
+      // Status badge
+      const sc = ctrStatusColor(d.contract.status);
+      $('contracts-status-badge').textContent = ctrStatusLabel(d.contract.status);
+      $('contracts-status-badge').style.background = sc + '18';
+      $('contracts-status-badge').style.color = sc;
+
+      $('contracts-editor-titulo').textContent = 'Contrato ' + (d.contract.numero || '');
+
+      // Mostra/oculta ações conforme status
+      const isRascunho = d.contract.status === 'rascunho';
+      const isEnviado  = d.contract.status === 'enviado';
+      const isAceito   = d.contract.status === 'aceito';
+
+      $('ctr-acoes-rascunho').style.display = isRascunho ? 'flex' : 'none';
+      // Campos editáveis só no rascunho
+      ['ctr-email','ctr-cpf-cnpj','ctr-local','ctr-cond-pagamento',
+       'ctr-clausula-cancelamento','ctr-clausula-responsabilidades','ctr-clausula-foro','ctr-scenario-id'].forEach(id => {
+        const el = $(id);
+        if (el) el.disabled = !isRascunho;
+      });
+
+      // Link box
+      if ((isEnviado || isAceito) && d.contract.token_publico) {
+        const link = window.location.origin + '/contrato/' + d.contract.token_publico;
+        $('ctr-link-input').value = link;
+        $('ctr-link-box').style.display = 'block';
+      } else {
+        $('ctr-link-box').style.display = 'none';
+      }
+
+      // Aceite box
+      if (isAceito && d.contract.aceite) {
+        const ac = d.contract.aceite;
+        $('ctr-aceite-detalhes').innerHTML =
+          '<table style="width:100%;font-size:12px"><tr><td style="padding:3px 0;color:#888;width:150px">Data/hora</td><td>' + (ac.data_hora ? new Date(ac.data_hora).toLocaleString('pt-BR') : '—') + '</td></tr>'
+          + '<tr><td style="padding:3px 0;color:#888">IP</td><td>' + (ac.ip || '—') + '</td></tr>'
+          + '<tr><td style="padding:3px 0;color:#888">WhatsApp conf.</td><td>' + (ac.whatsapp_confirmado || '—') + '</td></tr>'
+          + '<tr><td style="padding:3px 0;color:#888">Hash doc.</td><td style="font-size:10px;word-break:break-all">' + (ac.snapshot_hash || '—') + '</td></tr></table>';
+        $('ctr-aceite-box').style.display = 'block';
+      } else {
+        $('ctr-aceite-box').style.display = 'none';
+      }
+
+      mostrarEditor();
+    } catch(e) { alert('Erro ao carregar contrato.'); }
+  };
+
+  function mostrarEditor() {
+    $('contracts-lista').style.display = 'none';
+    $('contracts-editor').style.display = '';
+  }
+  function mostrarLista() {
+    $('contracts-lista').style.display = '';
+    $('contracts-editor').style.display = 'none';
+  }
+
+  window.obaContractVoltar = function() {
+    obaContractAtivo = null;
+    mostrarLista();
+    carregarListaContratos();
+  };
+
+  // ── SALVAR RASCUNHO ───────────────────────────────────────
+  window.obaContractSalvar = async function() {
+    if (!obaContractAtivo) return;
+    const body = {
+      scenario_id:               $('ctr-scenario-id')?.value || '',
+      email_cliente:             $('ctr-email')?.value.trim() || '',
+      cpf_cnpj:                  $('ctr-cpf-cnpj')?.value.trim() || '',
+      local_evento:              $('ctr-local')?.value.trim() || '',
+      cond_pagamento:            $('ctr-cond-pagamento')?.value.trim() || '',
+      clausula_cancelamento:     $('ctr-clausula-cancelamento')?.value || '',
+      clausula_responsabilidades:$('ctr-clausula-responsabilidades')?.value || '',
+      clausula_foro:             $('ctr-clausula-foro')?.value || '',
+    };
+    try {
+      const r = await fetch('/api/contracts/' + obaContractAtivo.contract_id, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf() },
+        body: JSON.stringify(body)
+      });
+      const d = await r.json();
+      if (d.ok) { obaContractAtivo = d.contract; alert('Rascunho salvo.'); }
+      else alert('Erro: ' + (d.error || 'desconhecido'));
+    } catch(e) { alert('Erro de conexão.'); }
+  };
+
+  // ── ENVIAR (GERAR SNAPSHOT + LINK) ────────────────────────
+  window.obaContractEnviar = async function() {
+    if (!obaContractAtivo) return;
+    if (!$('ctr-scenario-id')?.value) { alert('Selecione o cenário contratado antes de enviar.'); return; }
+
+    // Salva primeiro para garantir dados atualizados
+    await obaContractSalvar();
+
+    if (!confirm('Gerar link de aceite?\n\nApós confirmar, o contrato ficará imutável e o link poderá ser enviado ao cliente.')) return;
+
+    try {
+      const r = await fetch('/api/contracts/' + obaContractAtivo.contract_id + '/enviar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf() },
+        body: JSON.stringify({})
+      });
+      const d = await r.json();
+      if (d.ok) {
+        obaContractAtivo = d.contract;
+        const link = window.location.origin + d.link;
+        $('ctr-link-input').value = link;
+        $('ctr-link-box').style.display = 'block';
+        $('ctr-acoes-rascunho').style.display = 'none';
+        ['ctr-email','ctr-cpf-cnpj','ctr-local','ctr-cond-pagamento',
+         'ctr-clausula-cancelamento','ctr-clausula-responsabilidades','ctr-clausula-foro','ctr-scenario-id'].forEach(id => {
+          const el = $(id); if (el) el.disabled = true;
+        });
+        const sc = ctrStatusColor('enviado');
+        $('contracts-status-badge').textContent = 'Enviado';
+        $('contracts-status-badge').style.background = sc + '18';
+        $('contracts-status-badge').style.color = sc;
+        alert('Contrato enviado! Copie o link e envie ao cliente pelo WhatsApp.');
+      } else alert('Erro: ' + (d.error || 'desconhecido'));
+    } catch(e) { alert('Erro de conexão.'); }
+  };
+
+  // ── COPIAR LINK / WHATSAPP ────────────────────────────────
+  window.obaContractCopiarLink = function() {
+    const link = $('ctr-link-input')?.value || '';
+    if (!link) return;
+    navigator.clipboard.writeText(link).then(() => {
+      const btn = document.querySelector('[onclick="obaContractCopiarLink()"]');
+      if (btn) { const orig = btn.textContent; btn.textContent = '✅ Copiado!'; setTimeout(() => btn.textContent = orig, 2000); }
+    });
+  };
+
+  window.obaContractEnviarWpp = function() {
+    const link = $('ctr-link-input')?.value || '';
+    const wpp = obaContractPropostaAtiva?.whatsapp || '';
+    if (!wpp) { alert('Proposta sem WhatsApp cadastrado.'); return; }
+    const msg = encodeURIComponent('Olá! Segue o link do contrato da Oba Doceria para você revisar e aceitar:\n\n' + link);
+    window.open('https://wa.me/55' + wpp.replace(/\D/g,'') + '?text=' + msg, '_blank');
+  };
+
+  // ── INTEGRAÇÃO COM ABA ────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.tab[data-tab="contracts"]').forEach(btn => {
+      btn.addEventListener('click', () => setTimeout(carregarListaContratos, 50));
+    });
+  });
+
+  window.obaContractCarregarLista = carregarListaContratos;
+
+})();
+</script>
+<!-- FIM ABA CONTRATOS -->
 
 <!-- =========================================================
      FASE 7C.2B - UX OPERACIONAL SIMPLIFICADA

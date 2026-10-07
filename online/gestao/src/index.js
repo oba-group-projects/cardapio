@@ -3973,6 +3973,12 @@ export default {
       if (propostaResp) return propostaResp;
     }
 
+    // Rota pública: contrato para aceite do cliente
+    if (url.pathname.startsWith("/contrato/")) {
+      const contratoResp = await obaHandleContratoPublico(request, env, url);
+      if (contratoResp) return contratoResp;
+    }
+
     // Rota pública: imagens de propostas (sem autenticação, cache imutável)
     if (url.pathname.match(/^\/api\/proposals\/[^/]+\/media\/[^/]+\/dados$/) && request.method === "GET") {
       const mediaResp = await obaHandleProposalsApi(request, env, url);
@@ -4146,6 +4152,12 @@ export default {
           if (obaProposalsResponse) return obaProposalsResponse;
         }
 
+        // Fase 13A — Contratos
+        if (url.pathname.startsWith("/api/contracts")) {
+          const obaContractsResponse = await obaHandleContractsApi(request, env, url);
+          if (obaContractsResponse) return obaContractsResponse;
+        }
+
         return json(
           {
             ok: false,
@@ -4163,3 +4175,536 @@ export default {
     return env.ASSETS.fetch(request);
   },
 };
+
+// ============================================================
+// FASE 13A — MODULO DE CONTRATOS
+// ============================================================
+
+function obaContractId() {
+  return "ctr_" + crypto.randomUUID().replace(/-/g, "").slice(0, 12);
+}
+function obaAceiteId() {
+  return "ace_" + crypto.randomUUID().replace(/-/g, "").slice(0, 12);
+}
+
+/* Gera numero sequencial CTR-YYYY-NNNN */
+async function obaNextContractNumero(env) {
+  const year = new Date().getFullYear();
+  const prefix = "CTR-" + year + "-";
+  const row = await env.DB.prepare(
+    "SELECT COUNT(*) as n FROM contracts WHERE numero LIKE ?"
+  ).bind(prefix + "%").first();
+  const seq = String((row?.n || 0) + 1).padStart(4, "0");
+  return prefix + seq;
+}
+
+/* Textos padrao das clausulas */
+const CLAUSULA_CANCELAMENTO_PADRAO = `O cancelamento deste contrato deverá ser comunicado por escrito à CONTRATADA com antecedência mínima de 30 (trinta) dias da data do evento.
+
+Em caso de cancelamento pelo CONTRATANTE:
+• Mais de 30 dias de antecedência: devolução integral dos valores pagos, descontados custos com insumos já adquiridos exclusivamente para o pedido.
+• Entre 15 e 30 dias: retenção de 50% do valor total contratado.
+• Menos de 15 dias: retenção de 100% do valor total contratado, em razão dos insumos adquiridos e impossibilidade de reaproveitamento da data.
+
+Em caso de cancelamento pela CONTRATADA: devolução integral de todos os valores pagos, acrescida de indenização de 10% do valor total.`;
+
+const CLAUSULA_RESPONSABILIDADES_PADRAO = `A CONTRATADA responsabiliza-se por:
+• Entregar os produtos nas quantidades, sabores e condições acordados neste contrato;
+• Garantir a qualidade artesanal, a higiene e as boas práticas de manipulação de alimentos;
+• Cumprir o prazo de entrega na data, horário e local definidos;
+• Embalar os produtos adequadamente para transporte e apresentação.
+
+A CONTRATADA não se responsabiliza por:
+• Danos causados aos produtos após a entrega e recebimento formal pelo CONTRATANTE;
+• Alterações de sabor, textura ou aparência decorrentes de armazenamento inadequado após a entrega;
+• Atrasos ou impossibilidade de entrega por caso fortuito ou força maior, desde que comunicados imediatamente.
+
+O CONTRATANTE responsabiliza-se por:
+• Fornecer informações corretas e completas sobre o evento;
+• Comunicar alterações no número de convidados ou local com antecedência mínima de 15 dias;
+• Efetuar os pagamentos nos prazos e formas acordados;
+• Garantir condições adequadas de recebimento e armazenamento no local do evento.`;
+
+const CLAUSULA_FORO_PADRAO = `As partes elegem o foro da Comarca de Santo Cristo, Estado do Rio Grande do Sul, para dirimir quaisquer dúvidas ou litígios decorrentes deste contrato, renunciando a qualquer outro, por mais privilegiado que seja.`;
+
+/* Calcula total de um cenário */
+function obaContractCenarioTotal(scenario, catPM, saborPM) {
+  let sub = 0;
+  (scenario.items || []).forEach(it => {
+    if (it.tipo === "catalogo" && it.ref_id) {
+      const parts = (it.ref_id || "").split(":");
+      const cid = parts[0], sid = parts[1];
+      sub += Number(it.qtd || 0) * (sid === "__total__" ? (catPM[cid] || 0) : (Number(it.preco_unit || 0) || (saborPM[sid] || 0)));
+    } else {
+      sub += Number(it.qtd || 0) * Number(it.preco_unit || 0);
+    }
+  });
+  let desc = 0;
+  if (scenario.desconto_tipo === "reais") desc = Number(scenario.desconto_valor || 0);
+  else if (scenario.desconto_tipo === "percentual") desc = sub * (Number(scenario.desconto_valor || 0) / 100);
+  return { subtotal: sub, desconto: desc, total: Math.max(0, sub - desc) };
+}
+
+/* Formata data ISO para dd/mm/aaaa */
+function obaFmtData(d) {
+  if (!d) return "";
+  try { const [y, m, dy] = d.split("-"); return dy + "/" + m + "/" + y; } catch { return d; }
+}
+
+/* Gera HTML completo do contrato para snapshot */
+function obaGerarContratoHTML(contract, proposal, scenario, catPM, saborPM) {
+  const R = v => {
+    const n = Number(v || 0).toFixed(2), [i, dec] = n.split(".");
+    return "R$ " + i.replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "," + dec;
+  };
+  const tots = obaContractCenarioTotal(scenario, catPM, saborPM);
+
+  const itensRows = (scenario.items || [])
+    .filter(it => it.tipo !== "catalogo" || (it.ref_id && !it.ref_id.endsWith(":__total__")))
+    .filter(it => Number(it.qtd || 0) > 0)
+    .map(it => {
+      const preco = Number(it.preco_unit || 0);
+      const qtd = Number(it.qtd || 0);
+      return `<tr><td style="padding:6px 8px;border-bottom:1px solid #eee">${it.descricao || ""}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:center">${qtd}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right">${preco > 0 ? R(preco) : "—"}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right">${preco > 0 ? R(qtd * preco) : "—"}</td></tr>`;
+    }).join("");
+
+  const hoje = new Date().toLocaleDateString("pt-BR");
+
+  return `<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Contrato ${contract.numero} — Oba Doceria</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Georgia,serif;font-size:13px;color:#1a1a1a;background:#fff;padding:40px 48px;max-width:760px;margin:0 auto;line-height:1.7}
+h1{font-size:16px;text-align:center;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.sub{font-size:11px;text-align:center;color:#666;margin-bottom:32px}
+h2{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#8B4513;margin:28px 0 10px;border-bottom:1px solid #e0c8a8;padding-bottom:4px}
+table{width:100%;border-collapse:collapse;margin-top:8px}
+th{font-size:11px;text-align:left;padding:6px 8px;background:#f9f3ec;color:#3B2A1E;border-bottom:2px solid #e0c8a8}
+td{font-size:12px;vertical-align:top}
+.total-row td{font-weight:bold;border-top:2px solid #e0c8a8;padding:8px}
+.clausula{font-size:12px;line-height:1.8;margin-bottom:8px;white-space:pre-wrap}
+.aceite-box{margin-top:40px;padding:20px;border:1px solid #e0c8a8;border-radius:8px;background:#fffaf5}
+.aceite-label{font-size:11px;color:#666;margin-bottom:6px}
+.aceite-dado{font-size:13px;font-weight:bold;color:#3B2A1E}
+@media print{body{padding:20px}}
+</style>
+</head>
+<body>
+<h1>Contrato de Prestação de Serviços</h1>
+<p class="sub">Nº ${contract.numero} &nbsp;·&nbsp; Emitido em ${hoje}</p>
+
+<h2>1. Das Partes</h2>
+<table>
+<tr><td style="padding:4px 0;width:140px;color:#666;font-size:11px">CONTRATANTE</td><td style="padding:4px 0"><strong>${proposal.cliente || ""}</strong></td></tr>
+<tr><td style="padding:4px 0;color:#666;font-size:11px">CPF/CNPJ</td><td style="padding:4px 0">${contract.cpf_cnpj || "—"}</td></tr>
+<tr><td style="padding:4px 0;color:#666;font-size:11px">WhatsApp</td><td style="padding:4px 0">${proposal.whatsapp || "—"}</td></tr>
+<tr><td style="padding:4px 0;color:#666;font-size:11px">E-mail</td><td style="padding:4px 0">${contract.email_cliente || "—"}</td></tr>
+<tr><td style="padding:4px 8px 4px 0;color:#666;font-size:11px">CONTRATADA</td><td style="padding:4px 0"><strong>Oba Doceria</strong> — Fernanda Banderó Höffling — MEI</td></tr>
+</table>
+
+<h2>2. Do Objeto</h2>
+<table>
+<tr><td style="padding:4px 0;width:140px;color:#666;font-size:11px">Tipo de evento</td><td style="padding:4px 0">${proposal.tipo_evento || "—"}</td></tr>
+<tr><td style="padding:4px 0;color:#666;font-size:11px">Data do evento</td><td style="padding:4px 0"><strong>${obaFmtData(proposal.data_evento)}</strong></td></tr>
+<tr><td style="padding:4px 0;color:#666;font-size:11px">Local</td><td style="padding:4px 0">${contract.local_evento || "—"}</td></tr>
+<tr><td style="padding:4px 0;color:#666;font-size:11px">Convidados (est.)</td><td style="padding:4px 0">${proposal.convidados || "—"}</td></tr>
+</table>
+
+<h2>3. Dos Produtos</h2>
+<table>
+<thead><tr><th>Produto</th><th style="text-align:center">Qtd</th><th style="text-align:right">Preço unit.</th><th style="text-align:right">Total</th></tr></thead>
+<tbody>${itensRows || '<tr><td colspan="4" style="padding:8px;color:#888;font-size:11px">Itens conforme combinado</td></tr>'}</tbody>
+<tfoot>
+${tots.desconto > 0 ? `<tr class="total-row"><td colspan="3" style="padding:6px 8px;text-align:right;color:#666">Subtotal</td><td style="padding:6px 8px;text-align:right">${R(tots.subtotal)}</td></tr><tr><td colspan="3" style="padding:4px 8px;text-align:right;color:#c0392b">Desconto</td><td style="padding:4px 8px;text-align:right;color:#c0392b">- ${R(tots.desconto)}</td></tr>` : ""}
+<tr class="total-row"><td colspan="3" style="padding:8px;text-align:right">VALOR TOTAL</td><td style="padding:8px;text-align:right;font-size:15px">${R(tots.total)}</td></tr>
+</tfoot>
+</table>
+
+<h2>4. Das Condições Financeiras</h2>
+<p class="clausula">${(contract.cond_pagamento || "Condições a combinar conforme acordado entre as partes.").replace(/</g, "&lt;")}</p>
+<p style="font-size:11px;color:#888;margin-top:8px">O não pagamento do sinal no prazo acordado poderá resultar no cancelamento deste contrato, sem obrigação de devolução de valores já pagos a título de reserva de data.</p>
+
+<h2>5. Do Cancelamento</h2>
+<p class="clausula">${(contract.clausula_cancelamento || CLAUSULA_CANCELAMENTO_PADRAO).replace(/</g, "&lt;")}</p>
+
+<h2>6. Das Responsabilidades</h2>
+<p class="clausula">${(contract.clausula_responsabilidades || CLAUSULA_RESPONSABILIDADES_PADRAO).replace(/</g, "&lt;")}</p>
+
+<h2>7. Do Foro</h2>
+<p class="clausula">${(contract.clausula_foro || CLAUSULA_FORO_PADRAO).replace(/</g, "&lt;")}</p>
+
+<div class="aceite-box">
+<p class="aceite-label">ACEITE ELETRÔNICO</p>
+<p style="font-size:12px;color:#555;margin-bottom:12px">Este contrato foi disponibilizado digitalmente pela Oba Doceria. O aceite eletrônico registra que o CONTRATANTE leu e concordou com todos os termos acima.</p>
+<table>
+<tr><td style="padding:4px 0;width:160px;color:#666;font-size:11px">Contrato nº</td><td style="padding:4px 0;font-weight:bold">${contract.numero}</td></tr>
+<tr><td style="padding:4px 0;color:#666;font-size:11px">Status</td><td style="padding:4px 0">${contract.status === "aceito" ? "✅ Aceito eletronicamente" : "Aguardando aceite"}</td></tr>
+</table>
+</div>
+
+</body></html>`;
+}
+
+/* Calcula SHA-256 de uma string */
+async function obaHashContent(content) {
+  const data = new TextEncoder().encode(content);
+  const buf = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+/* Carrega contrato completo com dados de proposta e cenário */
+async function obaLoadContract(env, contractId) {
+  const contract = await env.DB.prepare("SELECT * FROM contracts WHERE contract_id = ?").bind(contractId).first();
+  if (!contract) return null;
+  const aceite = await env.DB.prepare("SELECT * FROM contract_aceites WHERE contract_id = ? LIMIT 1").bind(contractId).first();
+  return { ...contract, aceite: aceite || null };
+}
+
+/* Carrega catálogo PUBLISHED para preços */
+async function obaGetCatalogPrecos(env) {
+  const catPM = {}, saborPM = {};
+  try {
+    const pub = await obaLoadCatalogSlot(env, "PUBLISHED");
+    if (pub && pub.payload) {
+      (pub.payload.categorias || pub.payload.categories || []).forEach(c => { catPM[String(c.id)] = Number(c.precoReferencia || 0); });
+      (pub.payload.sabores || pub.payload.flavors || []).forEach(f => { saborPM[String(f.id)] = Number(f.preco || 0); });
+    }
+  } catch (e) {}
+  return { catPM, saborPM };
+}
+
+// ── HANDLER API AUTENTICADA ──────────────────────────────────
+
+async function obaHandleContractsApi(request, env, url) {
+  if (!url.pathname.startsWith("/api/contracts")) return null;
+  const now = new Date().toISOString();
+
+  // GET /api/contracts — listar
+  if (url.pathname === "/api/contracts" && request.method === "GET") {
+    const rows = await env.DB.prepare(
+      "SELECT c.contract_id, c.proposal_id, c.numero, c.status, c.email_cliente, c.cpf_cnpj, c.local_evento, c.token_publico, c.criado_em, c.atualizado_em, p.cliente, p.tipo_evento, p.data_evento, p.whatsapp FROM contracts c LEFT JOIN proposals p ON c.proposal_id = p.proposal_id ORDER BY c.criado_em DESC"
+    ).all();
+    return json({ ok: true, contracts: rows.results || [] });
+  }
+
+  // POST /api/contracts — criar novo
+  if (url.pathname === "/api/contracts" && request.method === "POST") {
+    let body;
+    try { body = await request.json(); } catch { return json({ ok: false, error: "json_invalido" }, 400); }
+
+    const { proposal_id, scenario_id } = body;
+    if (!proposal_id || !scenario_id) return json({ ok: false, error: "proposal_id e scenario_id obrigatorios" }, 400);
+
+    // Verifica se proposta existe e é evento aceito
+    const proposta = await env.DB.prepare("SELECT * FROM proposals WHERE proposal_id = ? AND template = 'evento' AND status = 'aceita'").bind(proposal_id).first();
+    if (!proposta) return json({ ok: false, error: "proposta_nao_encontrada_ou_nao_aceita" }, 404);
+
+    // Verifica contrato ativo existente
+    const ativo = await env.DB.prepare("SELECT contract_id FROM contracts WHERE proposal_id = ? AND status IN ('enviado','aceito')").bind(proposal_id).first();
+    if (ativo) return json({ ok: false, error: "contrato_ativo_existente", contract_id: ativo.contract_id }, 409);
+
+    const contractId = obaContractId();
+    const numero = await obaNextContractNumero(env);
+
+    await env.DB.prepare(`
+      INSERT INTO contracts (contract_id, proposal_id, scenario_id, numero, status,
+        email_cliente, cpf_cnpj, local_evento, cond_pagamento,
+        clausula_cancelamento, clausula_responsabilidades, clausula_foro,
+        criado_em, atualizado_em)
+      VALUES (?, ?, ?, ?, 'rascunho', ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      contractId, proposal_id, scenario_id, numero,
+      body.email_cliente || null, body.cpf_cnpj || null,
+      body.local_evento || null, body.cond_pagamento || null,
+      CLAUSULA_CANCELAMENTO_PADRAO, CLAUSULA_RESPONSABILIDADES_PADRAO, CLAUSULA_FORO_PADRAO,
+      now, now
+    ).run();
+
+    const saved = await obaLoadContract(env, contractId);
+    return json({ ok: true, contract: saved }, 201);
+  }
+
+  // GET /api/contracts/:id
+  const matchGet = url.pathname.match(/^\/api\/contracts\/([^/]+)$/);
+  if (matchGet && request.method === "GET") {
+    const contract = await obaLoadContract(env, matchGet[1]);
+    if (!contract) return json({ ok: false, error: "nao_encontrado" }, 404);
+    return json({ ok: true, contract });
+  }
+
+  // PUT /api/contracts/:id — atualizar rascunho
+  const matchPut = url.pathname.match(/^\/api\/contracts\/([^/]+)$/);
+  if (matchPut && request.method === "PUT") {
+    let body;
+    try { body = await request.json(); } catch { return json({ ok: false, error: "json_invalido" }, 400); }
+
+    const existing = await env.DB.prepare("SELECT status FROM contracts WHERE contract_id = ?").bind(matchPut[1]).first();
+    if (!existing) return json({ ok: false, error: "nao_encontrado" }, 404);
+    if (existing.status !== "rascunho") return json({ ok: false, error: "contrato_imutavel" }, 403);
+
+    await env.DB.prepare(`
+      UPDATE contracts SET
+        email_cliente = ?, cpf_cnpj = ?, local_evento = ?, cond_pagamento = ?,
+        clausula_cancelamento = ?, clausula_responsabilidades = ?, clausula_foro = ?,
+        scenario_id = ?,
+        atualizado_em = ?
+      WHERE contract_id = ?
+    `).bind(
+      body.email_cliente || null, body.cpf_cnpj || null,
+      body.local_evento || null, body.cond_pagamento || null,
+      body.clausula_cancelamento || CLAUSULA_CANCELAMENTO_PADRAO,
+      body.clausula_responsabilidades || CLAUSULA_RESPONSABILIDADES_PADRAO,
+      body.clausula_foro || CLAUSULA_FORO_PADRAO,
+      body.scenario_id || null,
+      now, matchPut[1]
+    ).run();
+
+    const saved = await obaLoadContract(env, matchPut[1]);
+    return json({ ok: true, contract: saved });
+  }
+
+  // POST /api/contracts/:id/enviar — congela snapshot e gera token
+  const matchEnviar = url.pathname.match(/^\/api\/contracts\/([^/]+)\/enviar$/);
+  if (matchEnviar && request.method === "POST") {
+    const contract = await env.DB.prepare("SELECT * FROM contracts WHERE contract_id = ?").bind(matchEnviar[1]).first();
+    if (!contract) return json({ ok: false, error: "nao_encontrado" }, 404);
+    if (contract.status !== "rascunho") return json({ ok: false, error: "contrato_ja_enviado" }, 409);
+
+    const proposal = await env.DB.prepare("SELECT * FROM proposals WHERE proposal_id = ?").bind(contract.proposal_id).first();
+    const scenario = await env.DB.prepare("SELECT * FROM proposal_scenarios WHERE scenario_id = ?").bind(contract.scenario_id).first();
+    if (!scenario) return json({ ok: false, error: "cenario_nao_encontrado" }, 404);
+    const items = await env.DB.prepare("SELECT * FROM proposal_items WHERE scenario_id = ? ORDER BY ordem").bind(contract.scenario_id).all();
+    const scenarioComItems = { ...scenario, items: items.results || [] };
+
+    const { catPM, saborPM } = await obaGetCatalogPrecos(env);
+    const snapshotHtml = obaGerarContratoHTML(contract, proposal, scenarioComItems, catPM, saborPM);
+    const snapshotHash = await obaHashContent(snapshotHtml);
+    const tokenPublico = randomToken(32);
+
+    await env.DB.prepare(`
+      UPDATE contracts SET status = 'enviado', snapshot_html = ?, snapshot_hash = ?, token_publico = ?, atualizado_em = ?
+      WHERE contract_id = ?
+    `).bind(snapshotHtml, snapshotHash, tokenPublico, now, matchEnviar[1]).run();
+
+    const saved = await obaLoadContract(env, matchEnviar[1]);
+    return json({ ok: true, contract: saved, link: "/contrato/" + tokenPublico });
+  }
+
+  // GET /api/contracts/:id/aceite — consulta registro de aceite
+  const matchAceite = url.pathname.match(/^\/api\/contracts\/([^/]+)\/aceite$/);
+  if (matchAceite && request.method === "GET") {
+    const aceite = await env.DB.prepare("SELECT * FROM contract_aceites WHERE contract_id = ?").bind(matchAceite[1]).first();
+    if (!aceite) return json({ ok: false, error: "sem_aceite" }, 404);
+    return json({ ok: true, aceite });
+  }
+
+  return null;
+}
+
+// ── HANDLER PÁGINA PÚBLICA /contrato/:token ──────────────────
+
+async function obaHandleContratoPublico(request, env, url) {
+  const match = url.pathname.match(/^\/contrato\/([^/]+)$/);
+  if (!match) return null;
+  const token = match[1];
+  const now = new Date().toISOString();
+
+  // POST /contrato/:token/aceitar — registra aceite
+  if (request.method === "POST") {
+    let body;
+    try { body = await request.json(); } catch { return json({ ok: false, error: "json_invalido" }, 400); }
+
+    const contract = await env.DB.prepare("SELECT * FROM contracts WHERE token_publico = ?").bind(token).first();
+    if (!contract) return json({ ok: false, error: "nao_encontrado" }, 404);
+    if (contract.status !== "enviado") return json({ ok: false, error: "contrato_nao_disponivel_para_aceite" }, 409);
+
+    // Valida WhatsApp
+    const wppInformado = (body.whatsapp || "").replace(/\D/g, "");
+    const proposal = await env.DB.prepare("SELECT whatsapp FROM proposals WHERE proposal_id = ?").bind(contract.proposal_id).first();
+    const wppEsperado = (proposal?.whatsapp || "").replace(/\D/g, "");
+    if (!wppInformado || wppInformado !== wppEsperado) {
+      return json({ ok: false, error: "whatsapp_invalido" }, 403);
+    }
+
+    // Fase 2 do POST: aceite de verdade (requer campo aceito:true)
+    if (body.aceito === true) {
+      const jaAceitou = await env.DB.prepare("SELECT aceite_id FROM contract_aceites WHERE contract_id = ?").bind(contract.contract_id).first();
+      if (jaAceitou) return json({ ok: false, error: "ja_aceito" }, 409);
+
+      const aceiteId = obaAceiteId();
+      const ip = request.headers.get("CF-Connecting-IP") || request.headers.get("X-Forwarded-For") || "desconhecido";
+      const ua = request.headers.get("User-Agent") || "";
+      await env.DB.prepare(`
+        INSERT INTO contract_aceites (aceite_id, contract_id, data_hora, ip, user_agent, whatsapp_confirmado, snapshot_hash, criado_em)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(aceiteId, contract.contract_id, now, ip, ua, wppInformado, contract.snapshot_hash, now).run();
+
+      await env.DB.prepare("UPDATE contracts SET status = 'aceito', atualizado_em = ? WHERE contract_id = ?").bind(now, contract.contract_id).run();
+      return json({ ok: true, aceito: true, data_hora: now });
+    }
+
+    // Fase 1: só validação de WhatsApp (sem aceito:true — apenas confirma acesso)
+    return json({ ok: true, acesso: true });
+  }
+
+  // GET /contrato/:token — página pública
+  const contract = await env.DB.prepare("SELECT * FROM contracts WHERE token_publico = ?").bind(token).first();
+
+  const html404 = `<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Contrato não encontrado</title><style>*{box-sizing:border-box}body{font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#FAF7F4;color:#3B2A1E;text-align:center;padding:32px}.logo{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#C8922A;margin-bottom:20px}h2{font-size:18px;font-weight:500;margin-bottom:10px}p{color:#aaa;font-size:13px}</style><body><div><div class="logo">Oba Doceria</div><h2>Contrato não encontrado</h2><p>O link pode ter expirado ou sido cancelado.<br>Entre em contato com a Oba Doceria.</p></div></body></html>`;
+
+  if (!contract || (contract.status !== "enviado" && contract.status !== "aceito")) {
+    return new Response(html404, { status: 404, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } });
+  }
+
+  const dataAceite = contract.status === "aceito"
+    ? await env.DB.prepare("SELECT data_hora FROM contract_aceites WHERE contract_id = ? LIMIT 1").bind(contract.contract_id).first()
+    : null;
+
+  const pageHtml = `<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Contrato ${contract.numero} — Oba Doceria</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#FAF7F4;color:#3B2A1E;min-height:100vh}
+.topo{background:#fff;border-bottom:1px solid #EDD9C0;padding:16px 20px;display:flex;align-items:center;gap:12px}
+.logo-txt{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#C8922A;font-weight:700}
+.num{font-size:12px;color:#888;margin-left:auto}
+#etapa-wpp{display:flex;align-items:center;justify-content:center;min-height:80vh;padding:32px 20px}
+.card-wpp{background:#fff;border-radius:20px;padding:32px 28px;max-width:400px;width:100%;border:1px solid #EDD9C0;text-align:center}
+.card-wpp h2{font-size:16px;margin-bottom:8px;color:#3B2A1E}
+.card-wpp p{font-size:13px;color:#888;margin-bottom:24px;line-height:1.6}
+.card-wpp input{width:100%;padding:13px;border:1.5px solid #EDD9C0;border-radius:12px;font:inherit;font-size:15px;text-align:center;letter-spacing:2px;margin-bottom:16px;outline:none}
+.card-wpp input:focus{border-color:#C8922A}
+.btn-prim{width:100%;padding:14px;background:#8B4513;color:#fff;border:none;border-radius:12px;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
+.btn-prim:active{opacity:.85}
+.erro{color:#dc2626;font-size:12px;margin-top:8px;display:none}
+#etapa-contrato{display:none;padding:0 0 80px}
+.contrato-wrap{max-width:760px;margin:0 auto;padding:32px 20px}
+#aceite-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #EDD9C0;padding:16px 20px;display:none;align-items:center;gap:12px;flex-wrap:wrap;z-index:100}
+.aceite-check-label{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:#3B2A1E;cursor:pointer;flex:1;min-width:200px}
+.aceite-check-label input{width:18px;height:18px;margin-top:1px;accent-color:#8B4513;flex-shrink:0}
+.btn-aceitar{padding:13px 28px;background:#8B4513;color:#fff;border:none;border-radius:12px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+.btn-aceitar:disabled{opacity:.4;cursor:not-allowed}
+#etapa-confirmado{display:none;align-items:center;justify-content:center;min-height:80vh;padding:32px 20px}
+.card-ok{background:#fff;border-radius:20px;padding:40px 28px;max-width:400px;width:100%;border:1px solid #EDD9C0;text-align:center}
+.card-ok .ico{font-size:48px;margin-bottom:16px}
+.card-ok h2{font-size:18px;margin-bottom:8px;color:#059669}
+.card-ok p{font-size:13px;color:#888;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="topo">
+  <span class="logo-txt">Oba Doceria</span>
+  <span class="num">Contrato ${contract.numero}</span>
+</div>
+
+${contract.status === "aceito" ? `
+<div id="etapa-contrato" style="display:block">
+  <div class="contrato-wrap">
+    <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:14px 16px;margin-bottom:24px;font-size:13px;color:#166534">
+      ✅ Contrato aceito eletronicamente em ${dataAceite ? new Date(dataAceite.data_hora).toLocaleString("pt-BR") : "—"}
+    </div>
+    <iframe srcdoc="${contract.snapshot_html.replace(/"/g, "&quot;")}" style="width:100%;min-height:900px;border:none;border-radius:12px;background:#fff" title="Contrato"></iframe>
+  </div>
+</div>` : `
+<div id="etapa-wpp">
+  <div class="card-wpp">
+    <h2>Confirme seu WhatsApp</h2>
+    <p>Para visualizar o contrato, confirme o número de WhatsApp cadastrado.</p>
+    <input id="wpp-input" type="tel" placeholder="Ex: 55999998888" inputmode="numeric" autocomplete="tel">
+    <p class="erro" id="wpp-erro">Número não confere. Tente novamente.</p>
+    <button class="btn-prim" onclick="confirmarWpp()">Confirmar</button>
+  </div>
+</div>
+
+<div id="etapa-contrato">
+  <div class="contrato-wrap">
+    <iframe id="contrato-frame" srcdoc="${contract.snapshot_html.replace(/"/g, "&quot;")}" style="width:100%;min-height:900px;border:none;border-radius:12px;background:#fff" title="Contrato"></iframe>
+  </div>
+</div>
+
+<div id="aceite-bar">
+  <label class="aceite-check-label">
+    <input type="checkbox" id="chk-aceite" onchange="document.getElementById('btn-aceitar').disabled=!this.checked">
+    Declaro que li e concordo com todos os termos deste contrato.
+  </label>
+  <button class="btn-aceitar" id="btn-aceitar" disabled onclick="aceitarContrato()">Aceitar contrato</button>
+</div>
+
+<div id="etapa-confirmado">
+  <div class="card-ok">
+    <div class="ico">✅</div>
+    <h2>Contrato aceito!</h2>
+    <p id="txt-confirmado"></p>
+  </div>
+</div>
+
+<script>
+const TOKEN = ${JSON.stringify(token)};
+let wppValidado = '';
+
+async function confirmarWpp() {
+  const wpp = document.getElementById('wpp-input').value.replace(/\\D/g,'');
+  const erro = document.getElementById('wpp-erro');
+  erro.style.display = 'none';
+  try {
+    const r = await fetch('/contrato/' + TOKEN, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ whatsapp: wpp })
+    });
+    const d = await r.json();
+    if (d.ok) {
+      wppValidado = wpp;
+      document.getElementById('etapa-wpp').style.display = 'none';
+      document.getElementById('etapa-contrato').style.display = 'block';
+      document.getElementById('aceite-bar').style.display = 'flex';
+    } else {
+      erro.style.display = 'block';
+    }
+  } catch(e) { erro.style.display = 'block'; }
+}
+
+async function aceitarContrato() {
+  const btn = document.getElementById('btn-aceitar');
+  btn.disabled = true;
+  btn.textContent = 'Registrando...';
+  try {
+    const r = await fetch('/contrato/' + TOKEN, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ whatsapp: wppValidado, aceito: true })
+    });
+    const d = await r.json();
+    if (d.ok) {
+      document.getElementById('etapa-contrato').style.display = 'none';
+      document.getElementById('aceite-bar').style.display = 'none';
+      const conf = document.getElementById('etapa-confirmado');
+      conf.style.display = 'flex';
+      const dt = d.data_hora ? new Date(d.data_hora).toLocaleString('pt-BR') : '';
+      document.getElementById('txt-confirmado').textContent = 'Aceite registrado em ' + dt + '. Guarde este comprovante.';
+    } else {
+      btn.disabled = false;
+      btn.textContent = 'Aceitar contrato';
+      alert('Erro ao registrar aceite. Tente novamente.');
+    }
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = 'Aceitar contrato';
+    alert('Erro de conexão.');
+  }
+}
+</script>`}
+
+</body></html>`;
+
+  return new Response(pageHtml, { status: 200, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store, no-cache" } });
+}
+
