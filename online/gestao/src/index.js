@@ -4388,7 +4388,7 @@ async function obaHandleContractsApi(request, env, url) {
   // GET /api/contracts — listar
   if (url.pathname === "/api/contracts" && request.method === "GET") {
     const rows = await env.DB.prepare(
-      "SELECT c.contract_id, c.proposal_id, c.numero, c.status, c.email_cliente, c.cpf_cnpj, c.local_evento, c.token_publico, c.criado_em, c.atualizado_em, p.cliente, p.tipo_evento, p.data_evento, p.whatsapp FROM contracts c LEFT JOIN proposals p ON c.proposal_id = p.proposal_id ORDER BY c.criado_em DESC"
+      "SELECT c.contract_id, c.proposal_id, c.numero, c.status, c.nome_completo, c.email_cliente, c.cpf_cnpj, c.local_evento, c.token_publico, c.criado_em, c.atualizado_em, p.cliente, p.tipo_evento, p.data_evento, p.whatsapp FROM contracts c LEFT JOIN proposals p ON c.proposal_id = p.proposal_id ORDER BY c.criado_em DESC"
     ).all();
     return json({ ok: true, contracts: rows.results || [] });
   }
@@ -4405,7 +4405,7 @@ async function obaHandleContractsApi(request, env, url) {
     const proposta = await env.DB.prepare("SELECT * FROM proposals WHERE proposal_id = ? AND template = 'evento' AND status = 'aceita'").bind(proposal_id).first();
     if (!proposta) return json({ ok: false, error: "proposta_nao_encontrada_ou_nao_aceita" }, 404);
 
-    // Verifica contrato ativo existente
+    // Verifica contrato ativo existente (cancelado não bloqueia)
     const ativo = await env.DB.prepare("SELECT contract_id FROM contracts WHERE proposal_id = ? AND status IN ('enviado','aceito')").bind(proposal_id).first();
     if (ativo) return json({ ok: false, error: "contrato_ativo_existente", contract_id: ativo.contract_id }, 409);
 
@@ -4481,6 +4481,16 @@ async function obaHandleContractsApi(request, env, url) {
     if (!contract) return json({ ok: false, error: "nao_encontrado" }, 404);
     if (contract.status !== "rascunho") return json({ ok: false, error: "contrato_ja_enviado" }, 409);
 
+    // Validação de campos obrigatórios
+    const camposFaltando = [];
+    if (!contract.nome_completo?.trim()) camposFaltando.push("Nome completo do cliente");
+    if (!contract.cpf_cnpj?.trim())      camposFaltando.push("CPF ou CNPJ");
+    if (!contract.cond_pagamento?.trim()) camposFaltando.push("Condições de pagamento");
+    if (!contract.scenario_id?.trim())   camposFaltando.push("Cenário contratado");
+    if (camposFaltando.length > 0) {
+      return json({ ok: false, error: "campos_obrigatorios", campos: camposFaltando }, 422);
+    }
+
     const proposal = await env.DB.prepare("SELECT * FROM proposals WHERE proposal_id = ?").bind(contract.proposal_id).first();
     const scenario = await env.DB.prepare("SELECT * FROM proposal_scenarios WHERE scenario_id = ?").bind(contract.scenario_id).first();
     if (!scenario) return json({ ok: false, error: "cenario_nao_encontrado" }, 404);
@@ -4509,6 +4519,28 @@ async function obaHandleContractsApi(request, env, url) {
     return json({ ok: true, aceite });
   }
 
+  // DELETE /api/contracts/:id — excluir rascunho
+  const matchDel = url.pathname.match(/^\/api\/contracts\/([^/]+)$/);
+  if (matchDel && request.method === "DELETE") {
+    const existing = await env.DB.prepare("SELECT status FROM contracts WHERE contract_id = ?").bind(matchDel[1]).first();
+    if (!existing) return json({ ok: false, error: "nao_encontrado" }, 404);
+    if (existing.status !== "rascunho") return json({ ok: false, error: "apenas_rascunhos_podem_ser_excluidos" }, 403);
+    await env.DB.prepare("DELETE FROM contract_aceites WHERE contract_id = ?").bind(matchDel[1]).run();
+    await env.DB.prepare("DELETE FROM contracts WHERE contract_id = ?").bind(matchDel[1]).run();
+    return json({ ok: true, deleted: matchDel[1] });
+  }
+
+  // POST /api/contracts/:id/cancelar — cancela contrato enviado (libera proposta para novo contrato)
+  const matchCancel = url.pathname.match(/^\/api\/contracts\/([^/]+)\/cancelar$/);
+  if (matchCancel && request.method === "POST") {
+    const existing = await env.DB.prepare("SELECT status FROM contracts WHERE contract_id = ?").bind(matchCancel[1]).first();
+    if (!existing) return json({ ok: false, error: "nao_encontrado" }, 404);
+    if (existing.status === "aceito") return json({ ok: false, error: "contrato_aceito_nao_pode_ser_cancelado" }, 403);
+    if (existing.status === "cancelado") return json({ ok: false, error: "ja_cancelado" }, 409);
+    await env.DB.prepare("UPDATE contracts SET status = 'cancelado', atualizado_em = ? WHERE contract_id = ?").bind(now, matchCancel[1]).run();
+    return json({ ok: true, status: "cancelado" });
+  }
+
   return null;
 }
 
@@ -4529,11 +4561,13 @@ async function obaHandleContratoPublico(request, env, url) {
     if (!contract) return json({ ok: false, error: "nao_encontrado" }, 404);
     if (contract.status !== "enviado") return json({ ok: false, error: "contrato_nao_disponivel_para_aceite" }, 409);
 
-    // Valida WhatsApp
+    // Valida WhatsApp — tolerante a formato (com/sem DDI 55, com/sem pontuação)
     const wppInformado = (body.whatsapp || "").replace(/\D/g, "");
     const proposal = await env.DB.prepare("SELECT whatsapp FROM proposals WHERE proposal_id = ?").bind(contract.proposal_id).first();
-    const wppEsperado = (proposal?.whatsapp || "").replace(/\D/g, "");
-    if (!wppInformado || wppInformado !== wppEsperado) {
+    const wppEsperadoRaw = (proposal?.whatsapp || "").replace(/\D/g, "");
+    // Normaliza: remove prefixo 55 se presente para comparar só DDD+número
+    const normWpp = w => w.startsWith("55") && w.length > 11 ? w.slice(2) : w;
+    if (!wppInformado || normWpp(wppInformado) !== normWpp(wppEsperadoRaw)) {
       return json({ ok: false, error: "whatsapp_invalido" }, 403);
     }
 

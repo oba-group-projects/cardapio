@@ -5742,10 +5742,10 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
   let obaContractPropostaAtiva = null;
 
   function ctrStatusLabel(s) {
-    return { rascunho:'Rascunho', enviado:'Enviado', aceito:'Aceito', recusado:'Recusado' }[s] || s;
+    return { rascunho:'Rascunho', enviado:'Enviado', aceito:'Aceito', recusado:'Recusado', cancelado:'Cancelado' }[s] || s;
   }
   function ctrStatusColor(s) {
-    return { rascunho:'#888', enviado:'#2563eb', aceito:'#059669', recusado:'#dc2626' }[s] || '#888';
+    return { rascunho:'#888', enviado:'#2563eb', aceito:'#059669', recusado:'#dc2626', cancelado:'#9B7A60' }[s] || '#888';
   }
   function csrf() {
     const token = String(document.cookie||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('__Host-oba_csrf='));
@@ -5769,15 +5769,18 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         const sc = ctrStatusColor(c.status);
         const cid = c.contract_id;
         const link = c.token_publico ? window.location.origin + '/contrato/' + c.token_publico : '';
+        const nomeCliente = c.nome_completo || c.cliente || '—';
         return '<tr>'
           + '<td><strong>' + (c.numero || '—') + '</strong></td>'
-          + '<td>' + (c.cliente || '—') + '</td>'
+          + '<td>' + nomeCliente + '</td>'
           + '<td style="font-size:12px">' + (c.tipo_evento || '—') + (c.data_evento ? '<br><span style="color:#888">' + new Date(c.data_evento + 'T12:00:00').toLocaleDateString('pt-BR') + '</span>' : '') + '</td>'
           + '<td><span style="font-size:11px;font-weight:700;padding:2px 10px;border-radius:10px;background:' + sc + '18;color:' + sc + '">' + ctrStatusLabel(c.status) + '</span></td>'
           + '<td>' + new Date(c.criado_em).toLocaleDateString('pt-BR') + '</td>'
           + '<td style="display:flex;gap:6px;flex-wrap:wrap">'
           + '<button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaContractEditar(\'' + cid + '\')">✏️ Editar</button>'
-          + (link ? '<button class="secondary" style="padding:4px 10px;font-size:11px" onclick="navigator.clipboard.writeText(\'' + link + '\');this.textContent=\'✅ Copiado!\';setTimeout(()=>this.textContent=\'🔗 Link\',2000)">🔗 Link</button>' : '')
+          + (link && (c.status === 'enviado' || c.status === 'aceito') ? '<button class="secondary" style="padding:4px 10px;font-size:11px" onclick="navigator.clipboard.writeText(\'' + link + '\');this.textContent=\'✅ Copiado!\';setTimeout(()=>this.textContent=\'🔗 Link\',2000)">🔗 Link</button>' : '')
+          + (c.status === 'rascunho' ? '<button class="secondary" style="padding:4px 10px;font-size:11px;background:#fee2e2;color:#dc2626;border-color:#fca5a5" onclick="obaContractExcluir(\'' + cid + '\',\'' + (c.numero||'') + '\')">🗑 Excluir</button>' : '')
+          + (c.status === 'enviado' ? '<button class="secondary" style="padding:4px 10px;font-size:11px;background:#fff7ed;color:#92400e;border-color:#fcd34d" onclick="obaContractCancelar(\'' + cid + '\',\'' + (c.numero||'') + '\')">✕ Cancelar</button>' : '')
           + '</td></tr>';
       }).join('');
     } catch(e) {
@@ -5958,10 +5961,49 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     } catch(e) { alert('Erro de conexão.'); }
   };
 
+  // ── EXCLUIR RASCUNHO ─────────────────────────────────────
+  window.obaContractExcluir = async function(contractId, numero) {
+    if (!confirm('Excluir o contrato ' + numero + '?\n\nEsta ação não pode ser desfeita.')) return;
+    try {
+      const r = await fetch('/api/contracts/' + contractId, {
+        method: 'DELETE',
+        headers: { 'X-CSRF-Token': csrf() }
+      });
+      const d = await r.json();
+      if (d.ok) { carregarListaContratos(); }
+      else alert('Erro: ' + (d.error || 'desconhecido'));
+    } catch(e) { alert('Erro de conexão.'); }
+  };
+
+  // ── CANCELAR ENVIADO ─────────────────────────────────────
+  window.obaContractCancelar = async function(contractId, numero) {
+    if (!confirm('Cancelar o contrato ' + numero + '?\n\nO contrato ficará marcado como Cancelado e a proposta poderá receber um novo contrato.')) return;
+    try {
+      const r = await fetch('/api/contracts/' + contractId + '/cancelar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf() },
+        body: JSON.stringify({})
+      });
+      const d = await r.json();
+      if (d.ok) { carregarListaContratos(); alert('Contrato cancelado. A proposta pode receber um novo contrato.'); }
+      else alert('Erro: ' + (d.error || 'desconhecido'));
+    } catch(e) { alert('Erro de conexão.'); }
+  };
+
   // ── ENVIAR (GERAR SNAPSHOT + LINK) ────────────────────────
   window.obaContractEnviar = async function() {
     if (!obaContractAtivo) return;
-    if (!$('ctr-scenario-id')?.value) { alert('Selecione o cenário contratado antes de enviar.'); return; }
+
+    // Validação visual dos campos obrigatórios
+    const camposFaltando = [];
+    if (!$('ctr-nome-completo')?.value.trim()) camposFaltando.push('Nome completo do cliente');
+    if (!$('ctr-cpf-cnpj')?.value.trim())      camposFaltando.push('CPF ou CNPJ');
+    if (!$('ctr-cond-pagamento')?.value.trim()) camposFaltando.push('Condições de pagamento');
+    if (!$('ctr-scenario-id')?.value)           camposFaltando.push('Cenário contratado');
+    if (camposFaltando.length > 0) {
+      alert('Preencha os campos obrigatórios antes de gerar o link:\n\n• ' + camposFaltando.join('\n• '));
+      return;
+    }
 
     // Salva primeiro para garantir dados atualizados
     await obaContractSalvar();
