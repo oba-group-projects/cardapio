@@ -1,33 +1,61 @@
 # HANDOFF
 
-Atualizado: 2026-10-07 (sessão 8)
+Atualizado: 2026-10-07 (sessão 9)
 
 Branch: feature/gestao-online-segura
-HEAD: 5d5a611
+HEAD: 62b459a
 
 ## Última entrega
-Ed. Visual Catálogo Pg3/4 profissionalizada — paridade com o nível do cardápio. Estado ativo/inativo por grupo, cor do subtítulo, cor de fundo da Pg4, tipografia granular (tam+peso para título e subtítulo de cada grupo).
+MVP Contratos (Fase 13A) — módulo completo de contratos para propostas de Evento aceitas. Aceite eletrônico próprio com snapshot imutável, token público, confirmação de WhatsApp e registro de aceite.
 
 ## Commits recentes relevantes
 | Commit   | O que fez |
 |----------|-----------|
+| 62b459a  | feat(contratos): MVP 13A — tabelas, API, página pública aceite, Central UI |
+| ea58430  | docs: handoff sessão 8 — Ed. Visual Catálogo Pg3/4 profissional |
 | 5d5a611  | feat(catalogo): Ed. Visual Pg3/4 profissional — ativo, corSubtitulo, corFundo, tipografia por grupo |
-| 4789a82  | docs: handoff sessão 7 — Ed. Visual Catálogo Etapa A completa |
-| d1367b7  | feat(catalogo): Ed. Visual completa — cores, logo, tipografia, tema global |
 
 ## Estado atual — TUDO APROVADO
 
 ### Cardápio (/cardapio) — intacto
+Pg1 Interpretação B, Pg3 Menu Principal, fluxo — sem alterações.
 
-**Pg1 — Interpretação B:** Nossa Essência, Cormorant Garamond 2.4rem/500, 2 parágrafos via D1.
-**Pg3 — Menu Principal:** labels 15px/500, sublabels 13px, ícones 1.5rem/.35.
-**Fluxo:** grid 3 colunas, padding 16px.
+### Catálogo (/catalogo) — intacto
+Ed. Visual Pg3/4 profissional (sessão 8) ativa.
 
-### Catálogo (/catalogo) — APROVADO
-- Paleta Verde Sálvia (#6B9E7A, #F4F8F4)
-- Ed. Visual completa implementada
+### Central de Gestão — sessão 9
+- **📄 Contratos (nova aba):** listagem, editor, botão na proposta aceita
+- **✏️ Ed. Visual Cardápio** + **🗂️ Ed. Visual Catálogo** — intactos
 
-### Central de Gestão
+### Módulo de Contratos (Fase 13A)
+- D1: tabelas `contracts` e `contract_aceites` (migration 0016) — aplicada em produção
+- Worker: `obaHandleContractsApi` + `obaHandleContratoPublico`
+- Rota pública `GET/POST /contrato/:token` — confirmação WhatsApp + snapshot + aceite
+- Snapshot imutável: HTML completo + SHA-256 gerado ao enviar
+- Aceite registra: IP, data/hora, user-agent, WhatsApp confirmado, hash
+- Um contrato ativo por proposta (bloqueia novo se enviado/aceito)
+
+### Cláusulas padrão (editáveis no rascunho)
+- Cancelamento / Responsabilidades / Foro Santo Cristo/RS
+- **Aguardam revisão jurídica antes de uso em contratos de alto valor**
+
+## REGRAS TÉCNICAS CRÍTICAS
+1. Nunca usar Set-Content/Out-File do PowerShell — adiciona BOM
+2. theme.json = cardápio. theme-catalogo.json = catálogo. NUNCA misturar.
+3. `obaSaveDraftWith('tema', ...)` = cardápio. `obaSaveDraftWith('tema_catalogo', ...)` = catálogo.
+4. Contrato imutável após status `enviado` — Worker retorna 403 `contrato_imutavel` em PUT
+5. Rota `/contrato/:token` fica ANTES de `validateSession` — é pública por design
+6. Nunca expor dados pessoais da titular em logs ou respostas de API
+
+## Pendente — próximas sessões
+- Validar MVP Contratos ao vivo: proposta aceita → Contrato → preencher → Enviar → link → aceitar
+- Revisão jurídica das cláusulas antes de uso em produção real
+- Refinamento catálogo: "Encontre o seu favorito" (texto Pg3)
+- Decidir redesign do layout do catálogo antes de expandir Ed. Visual
+
+## Pontos de retorno seguros
+- HEAD atual = 62b459a (estável, deploy validado)
+- Anterior = ea58430
 - **✏️ Ed. Visual Cardápio** — Páginas (Pg1/Pg2/Pg3) + Tema Global
 - **🗂️ Ed. Visual Catálogo** — sub-abas Páginas / Tema Global
   - Pg1: textos + logo + cores + tipografia
