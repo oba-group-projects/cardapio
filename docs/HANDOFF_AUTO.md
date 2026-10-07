@@ -1,14 +1,14 @@
 ﻿# HANDOFF AUTOMATICO
 
-Atualizado: 2026-09-03 18:30:02
+Atualizado: 2026-10-07 16:05:12
 
 ## Git
 
 Branch: feature/gestao-online-segura
 
-HEAD: 7d1d50e
+HEAD: 5d5a611
 
-Última tag: gestao-online-draft-20260831-203523
+Última tag: v12C-pre-4
 
 ## Workspace
 
@@ -16,11 +16,11 @@ Limpo.
 
 ## Últimos commits
 
-- 7d1d50e feat(gestao-online): consolidacao da central de gestao online, pipeline de midia e homologacao geral
-- d519493 feat(online): implementa publicacao segura do preview
-- 0fccbf8 feat(online): integra draft e preview privado
-- 218f08e fix(online): inclui cliente homologado no preview privado
-- bdca20d chore(online): consolida runner seguro de preview
+- 5d5a611 feat(catalogo): Ed. Visual Pg3/4 profissional ÔÇö ativo, corSubtitulo, corFundo, tipografia por grupo
+- 4789a82 docs: handoff sessao 7 ÔÇö Ed. Visual Catalogo Etapa A completa
+- d1367b7 feat(catalogo): Ed. Visual completa ÔÇö cores, logo, tipografia, tema global
+- 1aee67f feat(12C-4): Ed. Visual Catalogo completa ÔÇö Pg2 e Pg3/4 editaveis
+- 0cd18cc feat(central): Ed. Visual Cardapio e Ed. Visual Catalogo como abas separadas
 
 ## Antes de continuar
 
