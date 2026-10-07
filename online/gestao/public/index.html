@@ -933,15 +933,24 @@ function obaLogout() {
 <section id="panel-catalogo-visual" class="panel">
   <div class="toolbar" style="margin-bottom:18px">
     <h2 style="margin:0 auto 0 0">Ed. Visual — Catálogo</h2>
-    <span class="badge">Textos da página de abertura do catálogo público (/catalogo)</span>
+    <span class="badge">Textos, cores e tipografia do catálogo público (/catalogo)</span>
   </div>
 
+  <!-- SUB-ABAS internas -->
+  <div class="tabs" id="cat-visual-subtabs" style="margin-bottom:16px">
+    <button class="vtab vtab-active" id="cat-vsubtab-paginas" onclick="obaCatVisualSubtab('paginas')">📄 Páginas</button>
+    <button class="vtab"             id="cat-vsubtab-tema"    onclick="obaCatVisualSubtab('tema')">🎨 Tema Global</button>
+  </div>
+
+  <!-- ===== SUB-PAINEL: PÁGINAS ===== -->
+  <div id="cat-vpanel-paginas">
+
+  <!-- Pg1 — Abertura -->
   <details class="oba-pg-details" open>
     <summary class="oba-pg-summary">Catálogo — Página 1 (Abertura)</summary>
     <form id="formCatalogoPg1" class="oba-pg-form grid">
 
       <div style="grid-column:1/-1"><p class="oba-secao-titulo">✏️ Textos</p></div>
-
       <div class="field">
         <label>Rótulo <span class="hint">(ex: Catálogo)</span></label>
         <input id="cat-ed-rotulo" placeholder="Catálogo">
@@ -963,9 +972,108 @@ function obaLogout() {
         <input id="cat-ed-cta" placeholder="Conhecer nossos sabores →">
       </div>
 
-      <div class="field full actions">
-        <button class="primary" type="submit">Salvar Catálogo</button>
+      <div style="grid-column:1/-1"><p class="oba-secao-titulo">🖼️ Imagem</p></div>
+      <div class="field full">
+        <label>Logo <span class="hint">(caminho ou URL)</span></label>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input id="cat-ed-pg1-logo" placeholder="Images/Logo_Oba/logo-vertical.png" style="flex:1;min-width:200px">
+          <button type="button" class="secondary" style="padding:7px 10px;font-size:12px;white-space:nowrap" onclick="obaAbrirGaleria('cat-ed-pg1-logo','cat-ed-pg1-logo-preview')">📁 Galeria</button>
+          <img id="cat-ed-pg1-logo-preview" src="" alt="preview" onerror="this.style.display='none'" style="width:80px;height:60px;object-fit:contain;border:1px solid var(--line);border-radius:8px;display:none">
+        </div>
       </div>
+      <div class="field full">
+        <label>Tamanho da logo</label>
+        <select id="cat-ed-pg1-tamanhoLogo">
+          <option value="pequeno">Pequena</option>
+          <option value="medio" selected>Média (atual)</option>
+          <option value="grande">Grande</option>
+        </select>
+      </div>
+
+      <div style="grid-column:1/-1"><p class="oba-secao-titulo">🎨 Cores desta página <span class="hint">(vazio = usa o tema global)</span></p></div>
+      <div class="field">
+        <label>Cor de fundo</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="color" id="cat-ed-pg1-corFundo" value="#F4F8F4" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
+          <input type="text" id="cat-ed-pg1-corFundo-hex" maxlength="7" placeholder="Tema global" style="width:110px">
+          <button type="button" class="secondary" style="padding:6px 10px;font-size:11px" onclick="obaCatClearCor('cat-ed-pg1-corFundo')">✕</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Cor do título</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="color" id="cat-ed-pg1-corTitulo" value="#1E2E24" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
+          <input type="text" id="cat-ed-pg1-corTitulo-hex" maxlength="7" placeholder="Tema global" style="width:110px">
+          <button type="button" class="secondary" style="padding:6px 10px;font-size:11px" onclick="obaCatClearCor('cat-ed-pg1-corTitulo')">✕</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Cor do texto</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="color" id="cat-ed-pg1-corTexto" value="#85AE92" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
+          <input type="text" id="cat-ed-pg1-corTexto-hex" maxlength="7" placeholder="Tema global" style="width:110px">
+          <button type="button" class="secondary" style="padding:6px 10px;font-size:11px" onclick="obaCatClearCor('cat-ed-pg1-corTexto')">✕</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Cor do botão CTA</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="color" id="cat-ed-pg1-corCTA" value="#1E2E24" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
+          <input type="text" id="cat-ed-pg1-corCTA-hex" maxlength="7" placeholder="Tema global" style="width:110px">
+          <button type="button" class="secondary" style="padding:6px 10px;font-size:11px" onclick="obaCatClearCor('cat-ed-pg1-corCTA')">✕</button>
+        </div>
+      </div>
+
+      <div style="grid-column:1/-1"><p class="oba-secao-titulo">🔤 Tipografia <span class="hint">(vazio = tema global)</span></p></div>
+      <div class="field">
+        <label>Tamanho do título</label>
+        <select id="cat-ed-pg1-tamTitulo">
+          <option value="">Tema global</option>
+          <option value="32">32px</option><option value="40">40px</option>
+          <option value="48">48px (atual)</option><option value="56">56px</option><option value="64">64px</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Peso do título</label>
+        <select id="cat-ed-pg1-pesoTitulo">
+          <option value="">Tema global</option>
+          <option value="300">300 — Fino</option><option value="400">400 — Normal</option>
+          <option value="600">600 — Semibold</option><option value="700">700 — Negrito</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Tamanho do texto</label>
+        <select id="cat-ed-pg1-tamTexto">
+          <option value="">Tema global</option>
+          <option value="12">12px</option><option value="13">13px</option>
+          <option value="14">14px (atual)</option><option value="15">15px</option><option value="16">16px</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Peso do texto</label>
+        <select id="cat-ed-pg1-pesoTexto">
+          <option value="">Tema global</option>
+          <option value="300">300 — Fino</option><option value="400">400 — Normal</option><option value="500">500 — Médio</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Tamanho do CTA</label>
+        <select id="cat-ed-pg1-tamCTA">
+          <option value="">Tema global</option>
+          <option value="12">12px</option><option value="13">13px</option>
+          <option value="14">14px (atual)</option><option value="15">15px</option><option value="16">16px</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Peso do CTA</label>
+        <select id="cat-ed-pg1-pesoCTA">
+          <option value="">Tema global</option>
+          <option value="400">400</option><option value="500">500</option>
+          <option value="600">600 (atual)</option><option value="700">700</option>
+        </select>
+      </div>
+
+      <div class="field full actions"><button class="primary" type="submit">Salvar Página 1</button></div>
     </form>
   </details>
 
@@ -975,35 +1083,69 @@ function obaLogout() {
     <form id="formCatalogoPg2" class="oba-pg-form grid">
 
       <div style="grid-column:1/-1"><p class="oba-secao-titulo">✏️ Textos</p></div>
-
       <div class="field full">
-        <label>Subtítulo <span class="hint">(ex: Escolha o tipo de doce)</span></label>
+        <label>Subtítulo</label>
         <input id="cat-ed-pg2-subtitulo" placeholder="Escolha o tipo de doce">
       </div>
+      <div style="grid-column:1/-1"><p class="oba-secao-titulo">🍫 Botão Artesanais</p></div>
+      <div class="field"><label>Sublabel</label><input id="cat-ed-art-sublabel" placeholder="Artesanais"></div>
+      <div class="field"><label>Label principal</label><input id="cat-ed-art-label" placeholder="Doces Artesanais"></div>
+      <div style="grid-column:1/-1"><p class="oba-secao-titulo">✨ Botão Finos</p></div>
+      <div class="field"><label>Sublabel</label><input id="cat-ed-fin-sublabel" placeholder="Exclusivos"></div>
+      <div class="field"><label>Label principal</label><input id="cat-ed-fin-label" placeholder="Doces Finos"></div>
 
-      <div style="grid-column:1/-1"><p class="oba-secao-titulo">🍫 Botão — Doces Artesanais</p></div>
-      <div class="field">
-        <label>Sublabel <span class="hint">(linha pequena acima)</span></label>
-        <input id="cat-ed-art-sublabel" placeholder="Artesanais">
+      <div style="grid-column:1/-1"><p class="oba-secao-titulo">🖼️ Logo</p></div>
+      <div class="field full">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input id="cat-ed-pg2-logo" placeholder="Images/Logo_Oba/logo-horizontal.png" style="flex:1;min-width:200px">
+          <button type="button" class="secondary" style="padding:7px 10px;font-size:12px;white-space:nowrap" onclick="obaAbrirGaleria('cat-ed-pg2-logo','cat-ed-pg2-logo-preview')">📁 Galeria</button>
+          <img id="cat-ed-pg2-logo-preview" src="" alt="preview" onerror="this.style.display='none'" style="width:80px;height:60px;object-fit:contain;border:1px solid var(--line);border-radius:8px;display:none">
+        </div>
       </div>
-      <div class="field">
-        <label>Label principal</label>
-        <input id="cat-ed-art-label" placeholder="Doces Artesanais">
-      </div>
-
-      <div style="grid-column:1/-1"><p class="oba-secao-titulo">✨ Botão — Doces Finos</p></div>
-      <div class="field">
-        <label>Sublabel <span class="hint">(linha pequena acima)</span></label>
-        <input id="cat-ed-fin-sublabel" placeholder="Exclusivos">
-      </div>
-      <div class="field">
-        <label>Label principal</label>
-        <input id="cat-ed-fin-label" placeholder="Doces Finos">
+      <div class="field full">
+        <label>Tamanho da logo</label>
+        <select id="cat-ed-pg2-tamanhoLogo">
+          <option value="pequeno">Pequena</option><option value="medio" selected>Média (atual)</option><option value="grande">Grande</option>
+        </select>
       </div>
 
-      <div class="field full actions">
-        <button class="primary" type="submit">Salvar Página 2</button>
+      <div style="grid-column:1/-1"><p class="oba-secao-titulo">🎨 Cores</p></div>
+      <div class="field">
+        <label>Cor de fundo</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="color" id="cat-ed-pg2-corFundo" value="#F4F8F4" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
+          <input type="text" id="cat-ed-pg2-corFundo-hex" maxlength="7" placeholder="Tema global" style="width:110px">
+          <button type="button" class="secondary" style="padding:6px 10px;font-size:11px" onclick="obaCatClearCor('cat-ed-pg2-corFundo')">✕</button>
+        </div>
       </div>
+      <div class="field">
+        <label>Cor do subtítulo</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="color" id="cat-ed-pg2-corSubtitulo" value="#85AE92" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
+          <input type="text" id="cat-ed-pg2-corSubtitulo-hex" maxlength="7" placeholder="Tema global" style="width:110px">
+          <button type="button" class="secondary" style="padding:6px 10px;font-size:11px" onclick="obaCatClearCor('cat-ed-pg2-corSubtitulo')">✕</button>
+        </div>
+      </div>
+
+      <div style="grid-column:1/-1"><p class="oba-secao-titulo">🔤 Tipografia do subtítulo</p></div>
+      <div class="field">
+        <label>Tamanho</label>
+        <select id="cat-ed-pg2-tamSubtitulo">
+          <option value="">Tema global</option>
+          <option value="12">12px</option><option value="13">13px</option>
+          <option value="15">15px (atual)</option><option value="17">17px</option><option value="19">19px</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Peso</label>
+        <select id="cat-ed-pg2-pesoSubtitulo">
+          <option value="">Tema global</option>
+          <option value="400">400</option><option value="600">600</option>
+          <option value="700">700 (atual)</option><option value="800">800</option>
+        </select>
+      </div>
+
+      <div class="field full actions"><button class="primary" type="submit">Salvar Página 2</button></div>
     </form>
   </details>
 
@@ -1013,30 +1155,122 @@ function obaLogout() {
     <form id="formCatalogoPg34" class="oba-pg-form grid">
 
       <div style="grid-column:1/-1"><p class="oba-secao-titulo">🍫 Grupo Doces Artesanais</p></div>
+      <div class="field"><label>Título</label><input id="cat-ed-art-titulo" placeholder="Doces Artesanais"></div>
+      <div class="field"><label>Subtítulo</label><input id="cat-ed-art-subtitulo" placeholder="Tradicionais, Clássicos e Especiais"></div>
       <div class="field">
-        <label>Título</label>
-        <input id="cat-ed-art-titulo" placeholder="Doces Artesanais">
-      </div>
-      <div class="field">
-        <label>Subtítulo</label>
-        <input id="cat-ed-art-subtitulo" placeholder="Tradicionais, Clássicos e Especiais">
+        <label>Cor do título</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="color" id="cat-ed-art-corTitulo" value="#6B9E7A" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
+          <input type="text" id="cat-ed-art-corTitulo-hex" maxlength="7" placeholder="Padrão" style="width:110px">
+          <button type="button" class="secondary" style="padding:6px 10px;font-size:11px" onclick="obaCatClearCor('cat-ed-art-corTitulo')">✕</button>
+        </div>
       </div>
 
       <div style="grid-column:1/-1"><p class="oba-secao-titulo">✨ Grupo Doces Finos</p></div>
+      <div class="field"><label>Título</label><input id="cat-ed-fin-titulo" placeholder="Doces Finos"></div>
+      <div class="field"><label>Subtítulo</label><input id="cat-ed-fin-subtitulo" placeholder="Linha exclusiva"></div>
       <div class="field">
-        <label>Título</label>
-        <input id="cat-ed-fin-titulo" placeholder="Doces Finos">
-      </div>
-      <div class="field">
-        <label>Subtítulo</label>
-        <input id="cat-ed-fin-subtitulo" placeholder="Linha exclusiva">
+        <label>Cor do título</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="color" id="cat-ed-fin-corTitulo" value="#6B9E7A" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
+          <input type="text" id="cat-ed-fin-corTitulo-hex" maxlength="7" placeholder="Padrão" style="width:110px">
+          <button type="button" class="secondary" style="padding:6px 10px;font-size:11px" onclick="obaCatClearCor('cat-ed-fin-corTitulo')">✕</button>
+        </div>
       </div>
 
-      <div class="field full actions">
-        <button class="primary" type="submit">Salvar Páginas 3 e 4</button>
-      </div>
+      <div class="field full actions"><button class="primary" type="submit">Salvar Páginas 3 e 4</button></div>
     </form>
   </details>
+
+  </div><!-- /cat-vpanel-paginas -->
+
+  <!-- ===== SUB-PAINEL: TEMA GLOBAL ===== -->
+  <div id="cat-vpanel-tema" style="display:none">
+    <form id="formCatalogoTema" class="oba-pg-form grid">
+
+      <div style="grid-column:1/-1"><p class="oba-secao-titulo">🎨 Paleta de cores</p></div>
+      <div class="field">
+        <label>Cor primária <span class="hint">(Verde Sálvia padrão: #6B9E7A)</span></label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="color" id="cat-ed-tema-corPrimaria" value="#6B9E7A" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
+          <input type="text" id="cat-ed-tema-corPrimaria-hex" maxlength="7" placeholder="#6B9E7A" style="width:110px">
+          <button type="button" class="secondary" style="padding:6px 10px;font-size:11px" onclick="obaCatClearCor('cat-ed-tema-corPrimaria')">✕</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Cor de fundo <span class="hint">(padrão: #F4F8F4)</span></label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="color" id="cat-ed-tema-corFundo" value="#F4F8F4" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
+          <input type="text" id="cat-ed-tema-corFundo-hex" maxlength="7" placeholder="#F4F8F4" style="width:110px">
+          <button type="button" class="secondary" style="padding:6px 10px;font-size:11px" onclick="obaCatClearCor('cat-ed-tema-corFundo')">✕</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Cor do texto principal <span class="hint">(padrão: #1E2E24)</span></label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="color" id="cat-ed-tema-corTexto" value="#1E2E24" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
+          <input type="text" id="cat-ed-tema-corTexto-hex" maxlength="7" placeholder="#1E2E24" style="width:110px">
+          <button type="button" class="secondary" style="padding:6px 10px;font-size:11px" onclick="obaCatClearCor('cat-ed-tema-corTexto')">✕</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Cor de texto secundário <span class="hint">(padrão: #85AE92)</span></label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="color" id="cat-ed-tema-corMuted" value="#85AE92" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
+          <input type="text" id="cat-ed-tema-corMuted-hex" maxlength="7" placeholder="#85AE92" style="width:110px">
+          <button type="button" class="secondary" style="padding:6px 10px;font-size:11px" onclick="obaCatClearCor('cat-ed-tema-corMuted')">✕</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Cor dos cards</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="color" id="cat-ed-tema-corCard" value="#ffffff" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
+          <input type="text" id="cat-ed-tema-corCard-hex" maxlength="7" placeholder="#ffffff" style="width:110px">
+          <button type="button" class="secondary" style="padding:6px 10px;font-size:11px" onclick="obaCatClearCor('cat-ed-tema-corCard')">✕</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Cor das bordas</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="color" id="cat-ed-tema-corLinha" value="#C8DCC8" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
+          <input type="text" id="cat-ed-tema-corLinha-hex" maxlength="7" placeholder="#C8DCC8" style="width:110px">
+          <button type="button" class="secondary" style="padding:6px 10px;font-size:11px" onclick="obaCatClearCor('cat-ed-tema-corLinha')">✕</button>
+        </div>
+      </div>
+
+      <div style="grid-column:1/-1"><p class="oba-secao-titulo">🔤 Tipografia global</p></div>
+      <div class="field full">
+        <label>Fonte <span class="hint">(nome Google Fonts — ex: Poppins, Montserrat)</span></label>
+        <input id="cat-ed-tema-fonte" placeholder="Plus Jakarta Sans">
+      </div>
+      <div class="field">
+        <label>Tamanho dos títulos</label>
+        <select id="cat-ed-tema-tamanhoTitulo">
+          <option value="">Padrão</option>
+          <option value="28">28px</option><option value="32">32px</option><option value="40">40px</option>
+          <option value="48">48px (atual)</option><option value="56">56px</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Tamanho do corpo</label>
+        <select id="cat-ed-tema-tamanhoCorpo">
+          <option value="">Padrão</option>
+          <option value="12">12px</option><option value="13">13px</option>
+          <option value="14">14px (atual)</option><option value="15">15px</option><option value="16">16px</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Arredondamento dos cards</label>
+        <select id="cat-ed-tema-arredondamento">
+          <option value="">Padrão</option>
+          <option value="8">8px — quadrado</option><option value="12">12px</option>
+          <option value="16">16px</option><option value="24">24px (atual)</option><option value="32">32px — arredondado</option>
+        </select>
+      </div>
+
+      <div class="field full actions"><button class="primary" type="submit">Salvar Tema Global</button></div>
+    </form>
+  </div><!-- /cat-vpanel-tema -->
 
 </section>
 <!-- /PAINEL EDIÇÃO VISUAL CATÁLOGO -->
@@ -2534,59 +2768,109 @@ $('formConfig').onsubmit=async e=>{
     const gru = tc.grupos || {};
     const art = gru.artesanais || {};
     const fin = gru.finos      || {};
-    const sv = (id, val) => { const el = $(id); if (el && val != null) el.value = val; };
-    /* Pg1 */
-    sv('cat-ed-rotulo', pg1.rotulo     || '');
-    sv('cat-ed-titulo', pg1.titulo     || '');
-    sv('cat-ed-p1',     pg1.paragrafo1 || '');
-    sv('cat-ed-p2',     pg1.paragrafo2 || '');
-    sv('cat-ed-cta',    pg1.cta        || '');
-    /* Pg2 */
-    sv('cat-ed-pg2-subtitulo', pg2.subtitulo           || '');
-    sv('cat-ed-art-sublabel',  pg2.artesanais_sublabel || '');
-    sv('cat-ed-art-label',     pg2.artesanais_label    || '');
-    sv('cat-ed-fin-sublabel',  pg2.finos_sublabel      || '');
-    sv('cat-ed-fin-label',     pg2.finos_label         || '');
+    const tm  = tc.tema   || {};
+    const sv  = (id, val) => { const el = $(id); if (el && val != null) el.value = val; };
+    const sc  = (baseId, hex) => {
+      const picker = $(baseId); const hx = $(baseId + '-hex');
+      const valido = hex && /^#[0-9a-fA-F]{6}$/.test(hex);
+      if (picker) picker.value = valido ? hex : '#000000';
+      if (hx)    hx.value    = valido ? hex : '';
+    };
+    /* Pg1 — textos */
+    sv('cat-ed-rotulo', pg1.rotulo || ''); sv('cat-ed-titulo', pg1.titulo || '');
+    sv('cat-ed-p1', pg1.paragrafo1 || ''); sv('cat-ed-p2', pg1.paragrafo2 || '');
+    sv('cat-ed-cta', pg1.cta || '');
+    /* Pg1 — logo */
+    sv('cat-ed-pg1-logo', pg1.logo || '');
+    const sel1 = $('cat-ed-pg1-tamanhoLogo'); if (sel1) sel1.value = pg1.tamanhoLogo || 'medio';
+    /* Pg1 — cores */
+    sc('cat-ed-pg1-corFundo',  pg1.corFundo  || '');
+    sc('cat-ed-pg1-corTitulo', pg1.corTitulo || '');
+    sc('cat-ed-pg1-corTexto',  pg1.corTexto  || '');
+    sc('cat-ed-pg1-corCTA',    pg1.corCTA    || '');
+    /* Pg1 — tipografia */
+    const stSel = (id, val) => { const el = $(id); if (el) el.value = val || ''; };
+    stSel('cat-ed-pg1-tamTitulo',  pg1.tamTitulo);  stSel('cat-ed-pg1-pesoTitulo', pg1.pesoTitulo);
+    stSel('cat-ed-pg1-tamTexto',   pg1.tamTexto);   stSel('cat-ed-pg1-pesoTexto',  pg1.pesoTexto);
+    stSel('cat-ed-pg1-tamCTA',     pg1.tamCTA);     stSel('cat-ed-pg1-pesoCTA',    pg1.pesoCTA);
+    /* Pg2 — textos */
+    sv('cat-ed-pg2-subtitulo', pg2.subtitulo || '');
+    sv('cat-ed-art-sublabel', pg2.artesanais_sublabel || ''); sv('cat-ed-art-label', pg2.artesanais_label || '');
+    sv('cat-ed-fin-sublabel', pg2.finos_sublabel || '');      sv('cat-ed-fin-label', pg2.finos_label || '');
+    /* Pg2 — logo */
+    sv('cat-ed-pg2-logo', pg2.logo || '');
+    const sel2 = $('cat-ed-pg2-tamanhoLogo'); if (sel2) sel2.value = pg2.tamanhoLogo || 'medio';
+    /* Pg2 — cores */
+    sc('cat-ed-pg2-corFundo',     pg2.corFundo     || '');
+    sc('cat-ed-pg2-corSubtitulo', pg2.corSubtitulo || '');
+    /* Pg2 — tipografia */
+    stSel('cat-ed-pg2-tamSubtitulo',  pg2.tamSubtitulo);
+    stSel('cat-ed-pg2-pesoSubtitulo', pg2.pesoSubtitulo);
     /* Pg3/4 */
-    sv('cat-ed-art-titulo',    art.titulo    || '');
-    sv('cat-ed-art-subtitulo', art.subtitulo || '');
-    sv('cat-ed-fin-titulo',    fin.titulo    || '');
-    sv('cat-ed-fin-subtitulo', fin.subtitulo || '');
+    sv('cat-ed-art-titulo', art.titulo || ''); sv('cat-ed-art-subtitulo', art.subtitulo || '');
+    sv('cat-ed-fin-titulo', fin.titulo || ''); sv('cat-ed-fin-subtitulo', fin.subtitulo || '');
+    sc('cat-ed-art-corTitulo', art.corTitulo || '');
+    sc('cat-ed-fin-corTitulo', fin.corTitulo || '');
+    /* Tema Global */
+    sc('cat-ed-tema-corPrimaria', tm.corPrimaria || ''); sc('cat-ed-tema-corFundo',  tm.corFundo  || '');
+    sc('cat-ed-tema-corTexto',    tm.corTexto    || ''); sc('cat-ed-tema-corMuted', tm.corMuted || '');
+    sc('cat-ed-tema-corCard',     tm.corCard     || ''); sc('cat-ed-tema-corLinha', tm.corLinha || '');
+    sv('cat-ed-tema-fonte', tm.fonte || '');
+    stSel('cat-ed-tema-tamanhoTitulo', tm.tamanhoTitulo);
+    stSel('cat-ed-tema-tamanhoCorpo',  tm.tamanhoCorpo);
+    stSel('cat-ed-tema-arredondamento', tm.arredondamento);
   };
 
   /* Ler todos os campos e montar objeto tema_catalogo completo */
   function obaLerFormCatalogo() {
+    const hx = id => $(id + '-hex')?.value.trim() || '';
     return {
-      schemaVersion: 2,
+      schemaVersion: 3,
       updatedAt: new Date().toISOString().slice(0, 10),
       pg1: {
-        rotulo:     $('cat-ed-rotulo')?.value.trim() || '',
-        titulo:     $('cat-ed-titulo')?.value.trim() || '',
-        paragrafo1: $('cat-ed-p1')?.value.trim()     || '',
-        paragrafo2: $('cat-ed-p2')?.value.trim()     || '',
-        cta:        $('cat-ed-cta')?.value.trim()    || '',
+        rotulo: $('cat-ed-rotulo')?.value.trim() || '', titulo: $('cat-ed-titulo')?.value.trim() || '',
+        paragrafo1: $('cat-ed-p1')?.value.trim() || '', paragrafo2: $('cat-ed-p2')?.value.trim() || '',
+        cta: $('cat-ed-cta')?.value.trim() || '',
+        logo: $('cat-ed-pg1-logo')?.value.trim() || '', tamanhoLogo: $('cat-ed-pg1-tamanhoLogo')?.value || 'medio',
+        corFundo: hx('cat-ed-pg1-corFundo'), corTitulo: hx('cat-ed-pg1-corTitulo'),
+        corTexto: hx('cat-ed-pg1-corTexto'), corCTA: hx('cat-ed-pg1-corCTA'),
+        tamTitulo: $('cat-ed-pg1-tamTitulo')?.value || '', pesoTitulo: $('cat-ed-pg1-pesoTitulo')?.value || '',
+        tamTexto:  $('cat-ed-pg1-tamTexto')?.value  || '', pesoTexto:  $('cat-ed-pg1-pesoTexto')?.value  || '',
+        tamCTA:    $('cat-ed-pg1-tamCTA')?.value    || '', pesoCTA:    $('cat-ed-pg1-pesoCTA')?.value    || '',
       },
       pg2: {
-        subtitulo:           $('cat-ed-pg2-subtitulo')?.value.trim() || '',
-        artesanais_sublabel: $('cat-ed-art-sublabel')?.value.trim()  || '',
-        artesanais_label:    $('cat-ed-art-label')?.value.trim()     || '',
-        finos_sublabel:      $('cat-ed-fin-sublabel')?.value.trim()  || '',
-        finos_label:         $('cat-ed-fin-label')?.value.trim()     || '',
+        subtitulo: $('cat-ed-pg2-subtitulo')?.value.trim() || '',
+        artesanais_sublabel: $('cat-ed-art-sublabel')?.value.trim() || '',
+        artesanais_label:    $('cat-ed-art-label')?.value.trim()    || '',
+        finos_sublabel:      $('cat-ed-fin-sublabel')?.value.trim() || '',
+        finos_label:         $('cat-ed-fin-label')?.value.trim()    || '',
+        logo: $('cat-ed-pg2-logo')?.value.trim() || '', tamanhoLogo: $('cat-ed-pg2-tamanhoLogo')?.value || 'medio',
+        corFundo:     hx('cat-ed-pg2-corFundo'), corSubtitulo: hx('cat-ed-pg2-corSubtitulo'),
+        tamSubtitulo: $('cat-ed-pg2-tamSubtitulo')?.value || '', pesoSubtitulo: $('cat-ed-pg2-pesoSubtitulo')?.value || '',
       },
       grupos: {
         artesanais: {
-          titulo:    $('cat-ed-art-titulo')?.value.trim()    || '',
-          subtitulo: $('cat-ed-art-subtitulo')?.value.trim() || '',
+          titulo: $('cat-ed-art-titulo')?.value.trim() || '', subtitulo: $('cat-ed-art-subtitulo')?.value.trim() || '',
+          corTitulo: hx('cat-ed-art-corTitulo'),
         },
         finos: {
-          titulo:    $('cat-ed-fin-titulo')?.value.trim()    || '',
-          subtitulo: $('cat-ed-fin-subtitulo')?.value.trim() || '',
+          titulo: $('cat-ed-fin-titulo')?.value.trim() || '', subtitulo: $('cat-ed-fin-subtitulo')?.value.trim() || '',
+          corTitulo: hx('cat-ed-fin-corTitulo'),
         }
+      },
+      tema: {
+        corPrimaria: hx('cat-ed-tema-corPrimaria'), corFundo:  hx('cat-ed-tema-corFundo'),
+        corTexto:    hx('cat-ed-tema-corTexto'),    corMuted:  hx('cat-ed-tema-corMuted'),
+        corCard:     hx('cat-ed-tema-corCard'),     corLinha:  hx('cat-ed-tema-corLinha'),
+        fonte:        $('cat-ed-tema-fonte')?.value.trim() || '',
+        tamanhoTitulo: $('cat-ed-tema-tamanhoTitulo')?.value || '',
+        tamanhoCorpo:  $('cat-ed-tema-tamanhoCorpo')?.value  || '',
+        arredondamento: $('cat-ed-tema-arredondamento')?.value || '',
       }
     };
   }
 
-  /* Helper de save compartilhado pelos 3 forms */
+  /* Helper de save compartilhado pelos 4 forms */
   async function _salvarCatalogo(nomeAba) {
     try {
       const temaCat = obaLerFormCatalogo();
@@ -2598,13 +2882,15 @@ $('formConfig').onsubmit=async e=>{
     } catch(err) { msg(String(err.message || err), 'erro'); }
   }
 
-  /* Handlers de submit — os 3 forms salvam o objeto completo */
+  /* Handlers de submit — os 4 forms salvam o objeto completo */
   const frmCat = $('formCatalogoPg1');
   if (frmCat) frmCat.onsubmit = async e => { e.preventDefault(); await _salvarCatalogo('Catálogo Pg1'); };
   const frmCat2 = $('formCatalogoPg2');
   if (frmCat2) frmCat2.onsubmit = async e => { e.preventDefault(); await _salvarCatalogo('Catálogo Pg2'); };
   const frmCat34 = $('formCatalogoPg34');
   if (frmCat34) frmCat34.onsubmit = async e => { e.preventDefault(); await _salvarCatalogo('Catálogo Pg3/4'); };
+  const frmCatTema = $('formCatalogoTema');
+  if (frmCatTema) frmCatTema.onsubmit = async e => { e.preventDefault(); await _salvarCatalogo('Catálogo Tema Global'); };
 
   /* Restaurar padrão do tema */
   const resetBtn=$('temaResetBtn');
@@ -3565,6 +3851,36 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       btn.addEventListener('click', () => {
         if (typeof obaPopularFormCatalogo === 'function') obaPopularFormCatalogo();
       });
+    });
+
+    /* Sub-abas do catálogo — Páginas / Tema Global */
+    window.obaCatVisualSubtab = function(id) {
+      const pp = document.getElementById('cat-vpanel-paginas');
+      const pt = document.getElementById('cat-vpanel-tema');
+      if (pp) pp.style.display = id === 'paginas' ? '' : 'none';
+      if (pt) pt.style.display = id === 'tema' ? '' : 'none';
+      ['paginas','tema'].forEach(t => {
+        const b = document.getElementById('cat-vsubtab-' + t);
+        if (b) b.classList.toggle('vtab-active', t === id);
+      });
+    };
+
+    /* Helper limpar cor (color picker + hex) */
+    window.obaCatClearCor = function(baseId) {
+      const picker = document.getElementById(baseId);
+      const hex    = document.getElementById(baseId + '-hex');
+      if (hex) hex.value = '';
+    };
+
+    /* Sincronizar picker <-> hex nos campos do catálogo */
+    document.querySelectorAll('#panel-catalogo-visual input[type=color]').forEach(picker => {
+      const hexId = picker.id + '-hex';
+      const hex = document.getElementById(hexId);
+      if (!hex) return;
+      picker.oninput = () => { hex.value = picker.value; };
+      hex.oninput = () => {
+        if (/^#[0-9a-fA-F]{6}$/.test(hex.value)) picker.value = hex.value;
+      };
     });
   });
 

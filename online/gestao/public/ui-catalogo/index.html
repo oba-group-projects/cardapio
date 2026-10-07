@@ -454,6 +454,12 @@ const CAT_LOGO_HORIZONTAL = 'https://raw.githubusercontent.com/obadoceria-gif/ca
 let _catDados       = null;
 let _catGrupoAtivo  = null;
 let _catCatAtiva    = 'todos';
+
+/* Helper global — sobrescreve textContent se valor não vazio */
+function _catSet(id, valor) {
+  const el = document.getElementById(id);
+  if (el && typeof valor === 'string' && valor.trim()) el.textContent = valor;
+}
 let _catPaginaAtual = 1;
 
 /* ── NAVEGAÇÃO ── */
@@ -483,38 +489,121 @@ function catSetLogo(el, fromTema, fallback) {
   else el.style.display = 'none';
 }
 
+/* ── TEMA GLOBAL — aplica CSS vars e fonte ── */
+function catHidratarTema(dados) {
+  const t = dados.temaCatalogo?.tema || {};
+  const root = document.documentElement.style;
+  /* Cores */
+  if (t.corPrimaria)   root.setProperty('--brand',       t.corPrimaria);
+  if (t.corFundo)      root.setProperty('--bg',          t.corFundo);
+  if (t.corTexto)      root.setProperty('--text',        t.corTexto);
+  if (t.corMuted)      root.setProperty('--muted',       t.corMuted);
+  if (t.corCard)       root.setProperty('--card-bg',     t.corCard);
+  if (t.corLinha)      root.setProperty('--line',        t.corLinha);
+  /* Arredondamento dos cards */
+  if (t.arredondamento) {
+    document.querySelectorAll('.oba-sabor-card').forEach(el => {
+      el.style.borderRadius = t.arredondamento + 'px';
+    });
+  }
+  /* Fonte */
+  if (t.fonte && t.fonte.trim()) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(t.fonte)}:wght@300;400;500;600;700&display=swap`;
+    document.head.appendChild(link);
+    document.body.style.fontFamily = `'${t.fonte}', system-ui, sans-serif`;
+  }
+  /* Tipografia global */
+  if (t.tamanhoTitulo) {
+    document.querySelectorAll('.pg1-titulo, .pg4-titulo').forEach(el => {
+      el.style.fontSize = t.tamanhoTitulo + 'px';
+    });
+  }
+  if (t.tamanhoCorpo) {
+    document.querySelectorAll('.pg1-paragrafo, .oba-sabor-nome').forEach(el => {
+      el.style.fontSize = t.tamanhoCorpo + 'px';
+    });
+  }
+}
+
 /* ── MONTAR PG 1 (unificada) ── */
 function catMontarPg1(dados) {
-  /* Logo — usa tema se disponível, senão fallback GitHub */
+  /* Logo — usa temaCatalogo.pg1.logo se disponível, senão theme.json, senão fallback */
+  const pg1 = dados.temaCatalogo?.pg1 || {};
   catSetLogo(
     document.getElementById('cat-pg1-logo'),
-    dados.tema?.paginas?.boas_vindas?.logo,
+    pg1.logo || dados.tema?.paginas?.boas_vindas?.logo,
     CAT_LOGO_VERTICAL
   );
 
-  /* Textos editáveis via theme-catalogo.json — fallback silencioso para o HTML */
-  function _catSet(id, valor) {
-    const el = document.getElementById(id);
-    if (el && typeof valor === 'string' && valor.trim()) el.textContent = valor;
+  /* Tamanho da logo */
+  const logoTamMap = { pequeno: '72px', medio: '100px', grande: '140px' };
+  const elLogo1 = document.getElementById('cat-pg1-logo');
+  if (elLogo1 && pg1.tamanhoLogo) elLogo1.style.width = logoTamMap[pg1.tamanhoLogo] || '100px';
+
+  /* Cores específicas da Pg1 */
+  const elPg1 = document.getElementById('pg-1');
+  if (elPg1 && pg1.corFundo) elPg1.style.background = pg1.corFundo;
+  const elTit1 = document.getElementById('cat-pg1-titulo');
+  if (elTit1 && pg1.corTitulo) elTit1.style.color = pg1.corTitulo;
+  if (pg1.corTexto) {
+    document.querySelectorAll('#pg-1 .pg1-paragrafo').forEach(el => { el.style.color = pg1.corTexto; });
   }
-  const tc = dados.temaCatalogo?.pg1 || {};
-  _catSet('cat-pg1-rotulo', tc.rotulo);
-  _catSet('cat-pg1-titulo', tc.titulo);
-  _catSet('cat-pg1-p1',     tc.paragrafo1);
-  _catSet('cat-pg1-p2',     tc.paragrafo2);
-  _catSet('cat-pg1-cta',    tc.cta);
+  const elCTA1 = document.getElementById('cat-pg1-cta');
+  if (elCTA1 && pg1.corCTA) elCTA1.style.background = pg1.corCTA;
+
+  /* Tipografia Pg1 */
+  if (elTit1) {
+    if (pg1.tamTitulo) elTit1.style.fontSize = pg1.tamTitulo + 'px';
+    if (pg1.pesoTitulo) elTit1.style.fontWeight = pg1.pesoTitulo;
+  }
+  if (pg1.tamTexto || pg1.pesoTexto) {
+    document.querySelectorAll('#pg-1 .pg1-paragrafo').forEach(el => {
+      if (pg1.tamTexto) el.style.fontSize = pg1.tamTexto + 'px';
+      if (pg1.pesoTexto) el.style.fontWeight = pg1.pesoTexto;
+    });
+  }
+  if (elCTA1) {
+    if (pg1.tamCTA) elCTA1.style.fontSize = pg1.tamCTA + 'px';
+    if (pg1.pesoCTA) elCTA1.style.fontWeight = pg1.pesoCTA;
+  }
+
+  /* Textos editáveis via theme-catalogo.json — fallback silencioso para o HTML */
+  _catSet('cat-pg1-rotulo', pg1.rotulo);
+  _catSet('cat-pg1-titulo', pg1.titulo);
+  _catSet('cat-pg1-p1',     pg1.paragrafo1);
+  _catSet('cat-pg1-p2',     pg1.paragrafo2);
+  _catSet('cat-pg1-cta',    pg1.cta);
 }
 
 /* ── MONTAR PG 3 ── */
 function catMontarPg3(dados) {
+  const pg2 = dados.temaCatalogo?.pg2 || {};
+
+  /* Logo Pg2 */
   catSetLogo(
     document.getElementById('cat-pg3-logo'),
-    dados.tema?.paginas?.menu_principal?.logo,
+    pg2.logo || dados.tema?.paginas?.menu_principal?.logo,
     CAT_LOGO_HORIZONTAL
   );
+  const logoTamMap = { pequeno: '72px', medio: '100px', grande: '140px' };
+  const elLogo3 = document.getElementById('cat-pg3-logo');
+  if (elLogo3 && pg2.tamanhoLogo) elLogo3.style.width = logoTamMap[pg2.tamanhoLogo] || '100px';
+
+  /* Cores Pg2 */
+  const elPg3 = document.getElementById('pg-3');
+  if (elPg3 && pg2.corFundo) elPg3.style.background = pg2.corFundo;
+  const elSub3 = document.getElementById('cat-pg3-subtitulo');
+  if (elSub3 && pg2.corSubtitulo) elSub3.style.color = pg2.corSubtitulo;
+
+  /* Tipografia Pg2 subtítulo */
+  if (elSub3) {
+    if (pg2.tamSubtitulo) elSub3.style.fontSize = pg2.tamSubtitulo + 'px';
+    if (pg2.pesoSubtitulo) elSub3.style.fontWeight = pg2.pesoSubtitulo;
+  }
 
   /* Hidratar subtítulo da Pg2 a partir do temaCatalogo */
-  const pg2 = dados.temaCatalogo?.pg2 || {};
   _catSet('cat-pg3-subtitulo', pg2.subtitulo);
 
   const cats = dados.categorias || [];
@@ -555,7 +644,12 @@ function catAbrirGrupo(grupo, dados) {
   const subtitulo = cfg.subtitulo || (grupo === 'artesanais' ? 'Tradicionais, Clássicos e Especiais' : 'Linha exclusiva');
   _catGrupoAtivo = grupo;
   _catCatAtiva = 'todos';
-  document.getElementById('cat-pg4-titulo').textContent = titulo;
+  const elTit4 = document.getElementById('cat-pg4-titulo');
+  if (elTit4) {
+    elTit4.textContent = titulo;
+    if (cfg.corTitulo) elTit4.style.color = cfg.corTitulo;
+    else elTit4.style.color = '';
+  }
   document.getElementById('cat-pg4-subtitulo').textContent = subtitulo;
   const cats = (dados.categorias || []).filter(c => c.grupoCatalogo === grupo && c.ativo !== false);
   catMontarAbas(cats);
@@ -700,6 +794,7 @@ async function catIniciar() {
     };
 
     catMontarPg1(_catDados);
+    catHidratarTema(_catDados);
     catMontarPg3(_catDados);
     catConfigurarWpp(_catDados);
 

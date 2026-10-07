@@ -1,28 +1,60 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "updatedAt": "2026-10-07",
   "pg1": {
-    "rotulo": "Catálogo",
-    "titulo": "Descubra\na Oba",
+    "rotulo":     "Catálogo",
+    "titulo":     "Descubra\na Oba",
     "paragrafo1": "Uma coleção de sabores artesanais, criados para despertar os sentidos e transformar pequenos momentos em lembranças especiais. Brigadeiros cremosos, combinações delicadas e receitas cuidadosamente preparadas para quem aprecia doces feitos de verdade.",
     "paragrafo2": "Explore nossos sabores, descubra seus favoritos e deixe-se levar pela experiência Oba. Cada doce tem seu jeito de encantar — e talvez o próximo seja exatamente o que você estava procurando.",
-    "cta": "Conhecer nossos sabores →"
+    "cta":        "Conhecer nossos sabores →",
+    "logo":       "",
+    "tamanhoLogo": "medio",
+    "corFundo":   "",
+    "corTitulo":  "",
+    "corTexto":   "",
+    "corCTA":     "",
+    "tamTitulo":  "",
+    "pesoTitulo": "",
+    "tamTexto":   "",
+    "pesoTexto":  "",
+    "tamCTA":     "",
+    "pesoCTA":    ""
   },
   "pg2": {
-    "subtitulo": "Escolha o tipo de doce",
+    "subtitulo":           "Escolha o tipo de doce",
     "artesanais_sublabel": "Artesanais",
-    "artesanais_label": "Doces Artesanais",
-    "finos_sublabel": "Exclusivos",
-    "finos_label": "Doces Finos"
+    "artesanais_label":    "Doces Artesanais",
+    "finos_sublabel":      "Exclusivos",
+    "finos_label":         "Doces Finos",
+    "logo":                "",
+    "tamanhoLogo":         "medio",
+    "corFundo":            "",
+    "corSubtitulo":        "",
+    "tamSubtitulo":        "",
+    "pesoSubtitulo":       ""
   },
   "grupos": {
     "artesanais": {
-      "titulo": "Doces Artesanais",
-      "subtitulo": "Tradicionais, Clássicos e Especiais"
+      "titulo":    "Doces Artesanais",
+      "subtitulo": "Tradicionais, Clássicos e Especiais",
+      "corTitulo": ""
     },
     "finos": {
-      "titulo": "Doces Finos",
-      "subtitulo": "Linha exclusiva"
+      "titulo":    "Doces Finos",
+      "subtitulo": "Linha exclusiva",
+      "corTitulo": ""
     }
+  },
+  "tema": {
+    "corPrimaria":   "",
+    "corFundo":      "",
+    "corTexto":      "",
+    "corMuted":      "",
+    "corCard":       "",
+    "corLinha":      "",
+    "fonte":         "",
+    "tamanhoTitulo": "",
+    "tamanhoCorpo":  "",
+    "arredondamento": ""
   }
 }
