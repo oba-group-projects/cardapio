@@ -410,7 +410,7 @@
        src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png"
        alt="Oba Doceria" class="pg3-logo"
        onerror="this.style.display='none'">
-  <p class="pg3-subtitulo">Escolha o tipo de doce</p>
+  <p class="pg3-subtitulo" id="cat-pg3-subtitulo">Escolha o tipo de doce</p>
   <div id="cat-grupos" style="width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center;padding:0 20px"></div>
   <button class="oba-btn-voltar-dest" onclick="catNavegar(1)">← Voltar</button>
 </div>
@@ -513,6 +513,10 @@ function catMontarPg3(dados) {
     CAT_LOGO_HORIZONTAL
   );
 
+  /* Hidratar subtítulo da Pg2 a partir do temaCatalogo */
+  const pg2 = dados.temaCatalogo?.pg2 || {};
+  _catSet('cat-pg3-subtitulo', pg2.subtitulo);
+
   const cats = dados.categorias || [];
   const temArtesanais = cats.some(c => c.grupoCatalogo === 'artesanais' && c.ativo !== false);
   const temFinos      = cats.some(c => c.grupoCatalogo === 'finos'      && c.ativo !== false);
@@ -523,15 +527,19 @@ function catMontarPg3(dados) {
   if (temArtesanais) {
     const btn = document.createElement('button');
     btn.className = 'oba-cat-btn destaque';
-    btn.innerHTML = '<div><span class="btn-sub">Artesanais</span><span class="btn-lbl">Doces Artesanais</span></div><span class="btn-ico">🍫</span>';
-    btn.onclick = () => catAbrirGrupo('artesanais', 'Doces Artesanais', 'Tradicionais, Clássicos e Especiais', dados);
+    const subA = pg2.artesanais_sublabel || 'Artesanais';
+    const lblA = pg2.artesanais_label    || 'Doces Artesanais';
+    btn.innerHTML = `<div><span class="btn-sub">${subA}</span><span class="btn-lbl">${lblA}</span></div><span class="btn-ico">🍫</span>`;
+    btn.onclick = () => catAbrirGrupo('artesanais', dados);
     container.appendChild(btn);
   }
   if (temFinos) {
     const btn = document.createElement('button');
     btn.className = 'oba-cat-btn';
-    btn.innerHTML = '<div><span class="btn-sub">Exclusivos</span><span class="btn-lbl">Doces Finos</span></div><span class="btn-ico">✨</span>';
-    btn.onclick = () => catAbrirGrupo('finos', 'Doces Finos', 'Linha exclusiva', dados);
+    const subF = pg2.finos_sublabel || 'Exclusivos';
+    const lblF = pg2.finos_label    || 'Doces Finos';
+    btn.innerHTML = `<div><span class="btn-sub">${subF}</span><span class="btn-lbl">${lblF}</span></div><span class="btn-ico">✨</span>`;
+    btn.onclick = () => catAbrirGrupo('finos', dados);
     container.appendChild(btn);
   }
   if (!temArtesanais && !temFinos) {
@@ -540,7 +548,11 @@ function catMontarPg3(dados) {
 }
 
 /* ── ABRIR GRUPO → PG 4 ── */
-function catAbrirGrupo(grupo, titulo, subtitulo, dados) {
+function catAbrirGrupo(grupo, dados) {
+  const grupos = dados.temaCatalogo?.grupos || {};
+  const cfg = grupos[grupo] || {};
+  const titulo    = cfg.titulo    || (grupo === 'artesanais' ? 'Doces Artesanais' : 'Doces Finos');
+  const subtitulo = cfg.subtitulo || (grupo === 'artesanais' ? 'Tradicionais, Clássicos e Especiais' : 'Linha exclusiva');
   _catGrupoAtivo = grupo;
   _catCatAtiva = 'todos';
   document.getElementById('cat-pg4-titulo').textContent = titulo;

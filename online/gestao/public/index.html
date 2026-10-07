@@ -969,6 +969,75 @@ function obaLogout() {
     </form>
   </details>
 
+  <!-- Pg2 — Seleção de Grupo -->
+  <details class="oba-pg-details">
+    <summary class="oba-pg-summary">Catálogo — Página 2 (Seleção de Grupo)</summary>
+    <form id="formCatalogoPg2" class="oba-pg-form grid">
+
+      <div style="grid-column:1/-1"><p class="oba-secao-titulo">✏️ Textos</p></div>
+
+      <div class="field full">
+        <label>Subtítulo <span class="hint">(ex: Escolha o tipo de doce)</span></label>
+        <input id="cat-ed-pg2-subtitulo" placeholder="Escolha o tipo de doce">
+      </div>
+
+      <div style="grid-column:1/-1"><p class="oba-secao-titulo">🍫 Botão — Doces Artesanais</p></div>
+      <div class="field">
+        <label>Sublabel <span class="hint">(linha pequena acima)</span></label>
+        <input id="cat-ed-art-sublabel" placeholder="Artesanais">
+      </div>
+      <div class="field">
+        <label>Label principal</label>
+        <input id="cat-ed-art-label" placeholder="Doces Artesanais">
+      </div>
+
+      <div style="grid-column:1/-1"><p class="oba-secao-titulo">✨ Botão — Doces Finos</p></div>
+      <div class="field">
+        <label>Sublabel <span class="hint">(linha pequena acima)</span></label>
+        <input id="cat-ed-fin-sublabel" placeholder="Exclusivos">
+      </div>
+      <div class="field">
+        <label>Label principal</label>
+        <input id="cat-ed-fin-label" placeholder="Doces Finos">
+      </div>
+
+      <div class="field full actions">
+        <button class="primary" type="submit">Salvar Página 2</button>
+      </div>
+    </form>
+  </details>
+
+  <!-- Pg3/4 — Grids de Sabores -->
+  <details class="oba-pg-details">
+    <summary class="oba-pg-summary">Catálogo — Páginas 3 e 4 (Grids de Sabores)</summary>
+    <form id="formCatalogoPg34" class="oba-pg-form grid">
+
+      <div style="grid-column:1/-1"><p class="oba-secao-titulo">🍫 Grupo Doces Artesanais</p></div>
+      <div class="field">
+        <label>Título</label>
+        <input id="cat-ed-art-titulo" placeholder="Doces Artesanais">
+      </div>
+      <div class="field">
+        <label>Subtítulo</label>
+        <input id="cat-ed-art-subtitulo" placeholder="Tradicionais, Clássicos e Especiais">
+      </div>
+
+      <div style="grid-column:1/-1"><p class="oba-secao-titulo">✨ Grupo Doces Finos</p></div>
+      <div class="field">
+        <label>Título</label>
+        <input id="cat-ed-fin-titulo" placeholder="Doces Finos">
+      </div>
+      <div class="field">
+        <label>Subtítulo</label>
+        <input id="cat-ed-fin-subtitulo" placeholder="Linha exclusiva">
+      </div>
+
+      <div class="field full actions">
+        <button class="primary" type="submit">Salvar Páginas 3 e 4</button>
+      </div>
+    </form>
+  </details>
+
 </section>
 <!-- /PAINEL EDIÇÃO VISUAL CATÁLOGO -->
 
@@ -2459,19 +2528,36 @@ $('formConfig').onsubmit=async e=>{
 
   /* Popular campos do formulário a partir do catalogo.tema_catalogo */
   window.obaPopularFormCatalogo = function() {
-    const tc = (catalogo && catalogo.tema_catalogo && catalogo.tema_catalogo.pg1) || {};
+    const tc  = (catalogo && catalogo.tema_catalogo) || {};
+    const pg1 = tc.pg1    || {};
+    const pg2 = tc.pg2    || {};
+    const gru = tc.grupos || {};
+    const art = gru.artesanais || {};
+    const fin = gru.finos      || {};
     const sv = (id, val) => { const el = $(id); if (el && val != null) el.value = val; };
-    sv('cat-ed-rotulo', tc.rotulo  || '');
-    sv('cat-ed-titulo', tc.titulo  || '');
-    sv('cat-ed-p1',     tc.paragrafo1 || '');
-    sv('cat-ed-p2',     tc.paragrafo2 || '');
-    sv('cat-ed-cta',    tc.cta     || '');
+    /* Pg1 */
+    sv('cat-ed-rotulo', pg1.rotulo     || '');
+    sv('cat-ed-titulo', pg1.titulo     || '');
+    sv('cat-ed-p1',     pg1.paragrafo1 || '');
+    sv('cat-ed-p2',     pg1.paragrafo2 || '');
+    sv('cat-ed-cta',    pg1.cta        || '');
+    /* Pg2 */
+    sv('cat-ed-pg2-subtitulo', pg2.subtitulo           || '');
+    sv('cat-ed-art-sublabel',  pg2.artesanais_sublabel || '');
+    sv('cat-ed-art-label',     pg2.artesanais_label    || '');
+    sv('cat-ed-fin-sublabel',  pg2.finos_sublabel      || '');
+    sv('cat-ed-fin-label',     pg2.finos_label         || '');
+    /* Pg3/4 */
+    sv('cat-ed-art-titulo',    art.titulo    || '');
+    sv('cat-ed-art-subtitulo', art.subtitulo || '');
+    sv('cat-ed-fin-titulo',    fin.titulo    || '');
+    sv('cat-ed-fin-subtitulo', fin.subtitulo || '');
   };
 
-  /* Ler campos e montar objeto tema_catalogo */
+  /* Ler todos os campos e montar objeto tema_catalogo completo */
   function obaLerFormCatalogo() {
     return {
-      schemaVersion: 1,
+      schemaVersion: 2,
       updatedAt: new Date().toISOString().slice(0, 10),
       pg1: {
         rotulo:     $('cat-ed-rotulo')?.value.trim() || '',
@@ -2479,23 +2565,46 @@ $('formConfig').onsubmit=async e=>{
         paragrafo1: $('cat-ed-p1')?.value.trim()     || '',
         paragrafo2: $('cat-ed-p2')?.value.trim()     || '',
         cta:        $('cat-ed-cta')?.value.trim()    || '',
+      },
+      pg2: {
+        subtitulo:           $('cat-ed-pg2-subtitulo')?.value.trim() || '',
+        artesanais_sublabel: $('cat-ed-art-sublabel')?.value.trim()  || '',
+        artesanais_label:    $('cat-ed-art-label')?.value.trim()     || '',
+        finos_sublabel:      $('cat-ed-fin-sublabel')?.value.trim()  || '',
+        finos_label:         $('cat-ed-fin-label')?.value.trim()     || '',
+      },
+      grupos: {
+        artesanais: {
+          titulo:    $('cat-ed-art-titulo')?.value.trim()    || '',
+          subtitulo: $('cat-ed-art-subtitulo')?.value.trim() || '',
+        },
+        finos: {
+          titulo:    $('cat-ed-fin-titulo')?.value.trim()    || '',
+          subtitulo: $('cat-ed-fin-subtitulo')?.value.trim() || '',
+        }
       }
     };
   }
 
-  /* Handler de submit */
-  const frmCat = $('formCatalogoPg1');
-  if (frmCat) frmCat.onsubmit = async e => {
-    e.preventDefault();
+  /* Helper de save compartilhado pelos 3 forms */
+  async function _salvarCatalogo(nomeAba) {
     try {
       const temaCat = obaLerFormCatalogo();
       const res = await obaSaveDraftWith('tema_catalogo', temaCat);
       catalogo.tema_catalogo = temaCat;
-      addPendencia('Edição Visual salva: Catálogo Pg1');
-      msg('Catálogo Pg1 salvo. Backup: ' + res.backup);
+      addPendencia('Edição Visual salva: ' + nomeAba);
+      msg(nomeAba + ' salvo. Backup: ' + res.backup);
       if (typeof atualizarStatus === 'function') atualizarStatus();
     } catch(err) { msg(String(err.message || err), 'erro'); }
-  };
+  }
+
+  /* Handlers de submit — os 3 forms salvam o objeto completo */
+  const frmCat = $('formCatalogoPg1');
+  if (frmCat) frmCat.onsubmit = async e => { e.preventDefault(); await _salvarCatalogo('Catálogo Pg1'); };
+  const frmCat2 = $('formCatalogoPg2');
+  if (frmCat2) frmCat2.onsubmit = async e => { e.preventDefault(); await _salvarCatalogo('Catálogo Pg2'); };
+  const frmCat34 = $('formCatalogoPg34');
+  if (frmCat34) frmCat34.onsubmit = async e => { e.preventDefault(); await _salvarCatalogo('Catálogo Pg3/4'); };
 
   /* Restaurar padrão do tema */
   const resetBtn=$('temaResetBtn');
