@@ -4599,11 +4599,23 @@ async function obaHandleContratoPublico(request, env, url) {
   }
 
   // GET /contrato/:token — página pública
+  // Verifica status antes de carregar tudo
+  const contractStatus = await env.DB.prepare("SELECT status FROM contracts WHERE token_publico = ?").bind(token).first();
+
+  if (!contractStatus) {
+    const html404 = `<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Contrato não encontrado</title><style>*{box-sizing:border-box}body{font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#FAF7F4;color:#3B2A1E;text-align:center;padding:32px}.logo{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#C8922A;margin-bottom:20px}h2{font-size:18px;font-weight:500;margin-bottom:10px}p{color:#aaa;font-size:13px}</style><body><div><div class="logo">Oba Doceria</div><h2>Contrato não encontrado</h2><p>O link pode ter expirado ou foi cancelado.<br>Entre em contato com a Oba Doceria.</p></div></body></html>`;
+    return new Response(html404, { status: 404, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } });
+  }
+
+  if (contractStatus.status === "cancelado") {
+    const htmlCancelado = `<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Contrato cancelado</title><style>*{box-sizing:border-box}body{font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#FAF7F4;color:#3B2A1E;text-align:center;padding:32px}.logo{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#C8922A;margin-bottom:20px}h2{font-size:18px;font-weight:500;margin-bottom:10px}p{color:#888;font-size:13px;line-height:1.7}</style><body><div><div class="logo">Oba Doceria</div><h2>Este contrato foi cancelado</h2><p>O contrato referenciado por este link foi cancelado.<br>Entre em contato com a Oba Doceria para mais informações.</p></div></body></html>`;
+    return new Response(htmlCancelado, { status: 410, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } });
+  }
+
   const contract = await env.DB.prepare("SELECT * FROM contracts WHERE token_publico = ?").bind(token).first();
 
-  const html404 = `<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Contrato não encontrado</title><style>*{box-sizing:border-box}body{font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#FAF7F4;color:#3B2A1E;text-align:center;padding:32px}.logo{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#C8922A;margin-bottom:20px}h2{font-size:18px;font-weight:500;margin-bottom:10px}p{color:#aaa;font-size:13px}</style><body><div><div class="logo">Oba Doceria</div><h2>Contrato não encontrado</h2><p>O link pode ter expirado ou sido cancelado.<br>Entre em contato com a Oba Doceria.</p></div></body></html>`;
-
   if (!contract || (contract.status !== "enviado" && contract.status !== "aceito")) {
+    const html404 = `<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Contrato não encontrado</title><style>*{box-sizing:border-box}body{font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#FAF7F4;color:#3B2A1E;text-align:center;padding:32px}.logo{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#C8922A;margin-bottom:20px}h2{font-size:18px;font-weight:500;margin-bottom:10px}p{color:#aaa;font-size:13px}</style><body><div><div class="logo">Oba Doceria</div><h2>Contrato não encontrado</h2><p>O link pode ter expirado.<br>Entre em contato com a Oba Doceria.</p></div></body></html>`;
     return new Response(html404, { status: 404, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } });
   }
 

@@ -5657,6 +5657,14 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         <div class="field"><label>Tipo de evento</label><input id="ctr-tipo-evento-ro" readonly style="background:#f9f3ec"></div>
         <div class="field"><label>Convidados (est.)</label><input id="ctr-convidados-ro" readonly style="background:#f9f3ec"></div>
       </div>
+      <!-- Aviso: data no passado -->
+      <div id="ctr-aviso-data" style="display:none;margin-top:10px;padding:10px 12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;font-size:12px;color:#92400e">
+        ⚠️ A data deste evento já passou. Verifique se este contrato ainda é necessário.
+      </div>
+      <!-- Aviso: cenário sem produtos detalhados -->
+      <div id="ctr-aviso-scenario" style="display:none;margin-top:10px;padding:10px 12px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;font-size:12px;color:#92400e">
+        ⚠️ O cenário selecionado não tem produtos detalhados por sabor. O contrato exibirá apenas o valor total ("Itens conforme combinado").
+      </div>
     </div>
 
     <!-- Cenário -->
@@ -5674,15 +5682,37 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
 
     <!-- Dados complementares -->
     <div class="card" style="margin-bottom:16px">
-      <h4 style="margin:0 0 12px;font-size:13px;color:var(--brand)">👤 Dados complementares</h4>
+      <h4 style="margin:0 0 4px;font-size:13px;color:var(--brand)">👤 Dados complementares</h4>
+      <p class="hint" style="margin-bottom:12px">Campos marcados com <span style="color:#dc2626">*</span> são obrigatórios para gerar o link.</p>
       <div class="grid">
-        <div class="field"><label>Nome completo do cliente</label><input id="ctr-nome-completo" placeholder="Nome completo conforme documento"></div>
-        <div class="field"><label>CPF ou CNPJ</label><input id="ctr-cpf-cnpj" placeholder="000.000.000-00"></div>
+        <div class="field">
+          <label>Nome completo do cliente <span style="color:#dc2626">*</span></label>
+          <input id="ctr-nome-completo" placeholder="Nome completo conforme documento">
+          <p class="hint" style="margin-top:4px">⚠️ O campo "Cliente" acima é o nome da proposta (pode ser informal). Preencha aqui o nome legal completo.</p>
+        </div>
+        <div class="field">
+          <label>CPF ou CNPJ <span style="color:#dc2626">*</span></label>
+          <input id="ctr-cpf-cnpj" placeholder="000.000.000-00 ou 00.000.000/0000-00" maxlength="18"
+            oninput="obaContractMascaraCpfCnpj(this)">
+          <p id="ctr-cpf-cnpj-erro" class="hint" style="color:#dc2626;display:none;margin-top:4px">CPF deve ter 11 dígitos ou CNPJ deve ter 14 dígitos.</p>
+        </div>
         <div class="field"><label>E-mail <span class="hint">(opcional)</span></label><input id="ctr-email" type="email" placeholder="cliente@email.com"></div>
         <div class="field"><label>Horário de entrega <span class="hint">(opcional)</span></label><input id="ctr-horario-entrega" placeholder="Ex: 14h do dia 15/03/2027"></div>
         <div class="field full"><label>Local do evento <span class="hint">(opcional — endereço de entrega)</span></label><input id="ctr-local" placeholder="Rua, número — Cidade/UF"></div>
         <div class="field full"><label>Responsável pelo recebimento <span class="hint">(opcional)</span></label><input id="ctr-responsavel" placeholder="Ex: João Silva — (55) 99999-0000"></div>
-        <div class="field full"><label>Condições de pagamento</label><input id="ctr-cond-pagamento" placeholder="Ex: 50% no pedido, 50% na entrega"></div>
+        <div class="field full">
+          <label>Condições de pagamento <span style="color:#dc2626">*</span></label>
+          <select id="ctr-cond-pagamento-sel" onchange="obaContractCondPagamento(this.value)" style="margin-bottom:8px">
+            <option value="">Selecione uma opção...</option>
+            <option value="50% no pedido, 50% na entrega">50% no pedido, 50% na entrega</option>
+            <option value="30% no pedido, 70% na entrega">30% no pedido, 70% na entrega</option>
+            <option value="100% no pedido">100% no pedido (pagamento integral)</option>
+            <option value="Parcelado em 2x">Parcelado em 2x (combinar datas)</option>
+            <option value="Parcelado em 3x">Parcelado em 3x (combinar datas)</option>
+            <option value="outro">Outro — especificar abaixo</option>
+          </select>
+          <input id="ctr-cond-pagamento" placeholder="Descreva as condições de pagamento" style="display:none">
+        </div>
       </div>
     </div>
 
@@ -5850,6 +5880,22 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       sv('ctr-tipo-evento-ro', dp.proposal?.tipo_evento || '');
       sv('ctr-convidados-ro', dp.proposal?.convidados || '');
 
+      // Aviso: data do evento no passado
+      const avisoDataEl = $('ctr-aviso-data');
+      if (avisoDataEl && dp.proposal?.data_evento) {
+        const dataEvento = new Date(dp.proposal.data_evento + 'T12:00:00');
+        avisoDataEl.style.display = dataEvento < new Date() ? 'block' : 'none';
+      }
+
+      // Aviso: cenário sem produtos detalhados
+      const scenarioSelecionado = (dp.proposal?.scenarios || []).find(s => s.scenario_id === d.contract.scenario_id)
+        || dp.proposal?.scenarios?.[0];
+      const temItensDetalhados = (scenarioSelecionado?.items || []).some(it =>
+        it.tipo === 'catalogo' && it.ref_id && !it.ref_id.endsWith(':__total__') && Number(it.qtd) > 0
+      );
+      const avisoScenarioEl = $('ctr-aviso-scenario');
+      if (avisoScenarioEl) avisoScenarioEl.style.display = temItensDetalhados ? 'none' : 'block';
+
       // Popula select de cenários
       const sel = $('ctr-scenario-id');
       sel.innerHTML = '';
@@ -5869,6 +5915,24 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       sv('ctr-horario-entrega', d.contract.horario_entrega || '');
       sv('ctr-responsavel', d.contract.responsavel_recebimento || '');
       sv('ctr-cond-pagamento', d.contract.cond_pagamento || '');
+      // Popular select de condições de pagamento
+      if (d.contract.cond_pagamento) {
+        const sel = $('ctr-cond-pagamento-sel');
+        const opcoesFixas = ['50% no pedido, 50% na entrega','30% no pedido, 70% na entrega','100% no pedido (pagamento integral)','Parcelado em 2x (combinar datas)','Parcelado em 3x (combinar datas)'];
+        // Normaliza: remove descrição em parênteses para comparar
+        const valNorm = (d.contract.cond_pagamento || '').split('(')[0].trim();
+        const opcaoExata = ['50% no pedido, 50% na entrega','30% no pedido, 70% na entrega','100% no pedido','Parcelado em 2x','Parcelado em 3x'];
+        const idx = opcaoExata.findIndex(o => d.contract.cond_pagamento?.startsWith(o.split('(')[0].trim()));
+        if (sel) {
+          if (idx >= 0) {
+            sel.value = opcoesFixas[idx] || d.contract.cond_pagamento;
+            $('ctr-cond-pagamento').style.display = 'none';
+          } else if (d.contract.cond_pagamento) {
+            sel.value = 'outro';
+            $('ctr-cond-pagamento').style.display = '';
+          }
+        }
+      }
       sv('ctr-clausula-cancelamento', d.contract.clausula_cancelamento || '');
       sv('ctr-clausula-responsabilidades', d.contract.clausula_responsabilidades || '');
       sv('ctr-clausula-foro', d.contract.clausula_foro || '');
@@ -5945,7 +6009,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       local_evento:              $('ctr-local')?.value.trim() || '',
       horario_entrega:           $('ctr-horario-entrega')?.value.trim() || '',
       responsavel_recebimento:   $('ctr-responsavel')?.value.trim() || '',
-      cond_pagamento:            $('ctr-cond-pagamento')?.value.trim() || '',
+      cond_pagamento:            obaContractLerCondPagamento(),
       clausula_cancelamento:     $('ctr-clausula-cancelamento')?.value || '',
       clausula_responsabilidades:$('ctr-clausula-responsabilidades')?.value || '',
       clausula_foro:             $('ctr-clausula-foro')?.value || '',
@@ -5999,7 +6063,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     const camposFaltando = [];
     if (!$('ctr-nome-completo')?.value.trim()) camposFaltando.push('Nome completo do cliente');
     if (!$('ctr-cpf-cnpj')?.value.trim())      camposFaltando.push('CPF ou CNPJ');
-    if (!$('ctr-cond-pagamento')?.value.trim()) camposFaltando.push('Condições de pagamento');
+    if (!obaContractLerCondPagamento()) camposFaltando.push('Condições de pagamento');
     if (!$('ctr-scenario-id')?.value)           camposFaltando.push('Cenário contratado');
     if (camposFaltando.length > 0) {
       alert('Preencha os campos obrigatórios antes de gerar o link:\n\n• ' + camposFaltando.join('\n• '));
@@ -6065,9 +6129,56 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       const dp = await rp.json();
       const wpp = (dp.proposal?.whatsapp || '').replace(/\D/g, '');
       if (!wpp) { alert('Proposta sem WhatsApp cadastrado.'); return; }
-      const msg = encodeURIComponent('Olá! Segue o link do contrato da Oba Doceria para você revisar e aceitar:\n\n' + link);
+      const nome = dp.proposal?.cliente || 'cliente';
+      const tipo = dp.proposal?.tipo_evento || 'evento';
+      const data = dp.proposal?.data_evento ? new Date(dp.proposal.data_evento + 'T12:00:00').toLocaleDateString('pt-BR') : '';
+      const numero = d.contract.numero || '';
+      const msg = encodeURIComponent(
+        'Olá, ' + nome + '! 😊\n\n' +
+        'Segue o contrato ' + numero + ' referente ao seu ' + tipo + (data ? ' em ' + data : '') + '.\n\n' +
+        'Acesse o link abaixo para revisar e aceitar:\n' + link + '\n\n' +
+        'Qualquer dúvida, é só me chamar! 🍫\nOba Doceria'
+      );
       window.open('https://wa.me/55' + wpp + '?text=' + msg, '_blank');
     } catch(e) { alert('Erro de conexão.'); }
+  };
+
+  // ── FUNÇÕES AUXILIARES ────────────────────────────────────
+
+  /* Máscara CPF/CNPJ */
+  window.obaContractMascaraCpfCnpj = function(input) {
+    let v = input.value.replace(/\D/g, '');
+    if (v.length <= 11) {
+      v = v.replace(/(\d{3})(\d)/, '$1.$2');
+      v = v.replace(/(\d{3})(\d)/, '$1.$2');
+      v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    } else {
+      v = v.replace(/^(\d{2})(\d)/, '$1.$2');
+      v = v.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+      v = v.replace(/\.(\d{3})(\d)/, '.$1/$2');
+      v = v.replace(/(\d{4})(\d)/, '$1-$2');
+    }
+    input.value = v;
+    const digits = v.replace(/\D/g,'');
+    const erroEl = document.getElementById('ctr-cpf-cnpj-erro');
+    if (erroEl) erroEl.style.display = (digits.length > 0 && digits.length !== 11 && digits.length !== 14) ? 'block' : 'none';
+  };
+
+  /* Lê condições de pagamento (select + campo livre) */
+  window.obaContractLerCondPagamento = function() {
+    const sel = document.getElementById('ctr-cond-pagamento-sel');
+    if (!sel) return document.getElementById('ctr-cond-pagamento')?.value.trim() || '';
+    if (sel.value === 'outro') return document.getElementById('ctr-cond-pagamento')?.value.trim() || '';
+    return sel.value || '';
+  };
+
+  /* Mostra/oculta campo livre de condições */
+  window.obaContractCondPagamento = function(val) {
+    const input = document.getElementById('ctr-cond-pagamento');
+    if (input) {
+      input.style.display = val === 'outro' ? '' : 'none';
+      if (val !== 'outro') input.value = '';
+    }
   };
 
   // ── INTEGRAÇÃO COM ABA ────────────────────────────────────
