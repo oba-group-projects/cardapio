@@ -4187,15 +4187,21 @@ function obaAceiteId() {
   return "ace_" + crypto.randomUUID().replace(/-/g, "").slice(0, 12);
 }
 
-/* Gera numero sequencial CTR-YYYY-NNNN */
+/* Gera numero sequencial CTR-YYYY-NNNN — ignora cancelados e excluídos */
 async function obaNextContractNumero(env) {
   const year = new Date().getFullYear();
   const prefix = "CTR-" + year + "-";
-  const row = await env.DB.prepare(
-    "SELECT COUNT(*) as n FROM contracts WHERE numero LIKE ?"
+  /* Busca o maior número sequencial existente para o ano, independente de status */
+  const rows = await env.DB.prepare(
+    "SELECT numero FROM contracts WHERE numero LIKE ? ORDER BY numero DESC LIMIT 1"
   ).bind(prefix + "%").first();
-  const seq = String((row?.n || 0) + 1).padStart(4, "0");
-  return prefix + seq;
+  let next = 1;
+  if (rows?.numero) {
+    const parts = rows.numero.split("-");
+    const last = parseInt(parts[parts.length - 1], 10);
+    if (!isNaN(last)) next = last + 1;
+  }
+  return prefix + String(next).padStart(4, "0");
 }
 
 /* Textos padrao das clausulas */
