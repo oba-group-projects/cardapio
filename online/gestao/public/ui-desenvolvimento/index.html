@@ -219,6 +219,23 @@
       line-height: 1.5 !important;
     }
 
+    /* Fluxo de montagem — reduzir espaço entre cards e padding interno */
+    #fluxo-principal .lg\:col-span-8 {
+      gap: 12px !important;
+      row-gap: 12px !important;
+    }
+    /* space-y-6 cria margin-top nos filhos — sobrescrever */
+    #fluxo-principal .lg\:col-span-8 > * + * {
+      margin-top: 12px !important;
+    }
+    #secao-passo1,
+    #secao-passo2 > div:first-child {
+      padding: 16px !important;
+    }
+    #secao-passo1 .flex.justify-between {
+      margin-bottom: 14px !important;
+    }
+
     /* ── B+ EVOLUÇÃO VISUAL — Pg1 Interpretação B — refinamento v2 ── */
 
     /* Ocultar título/subtítulo originais — sem remover do DOM (JS continua funcionando) */
