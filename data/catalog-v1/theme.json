@@ -109,7 +109,8 @@
       "tamTexto": "",
       "tamTitulo": "",
       "tamanhoLogo": "pequeno",
-      "texto": "Cada receita é criada com ingredientes selecionados, técnica e cuidado para alcançar o equilíbrio entre sabor, textura e cremosidade. Acreditamos que um doce pode transformar um momento simples em uma lembrança especial — e é esse cuidado que colocamos em cada pedido.",
+      "texto": "Na Oba Doceria, acreditamos que um doce artesanal começa muito antes da primeira mordida. Cada receita é criada, testada e produzida com cuidado, utilizando ingredientes selecionados e técnicas que valorizam o verdadeiro sabor de cada elemento. Buscamos o equilíbrio perfeito entre textura, cremosidade e doçura — para que cada brigadeiro seja uma experiência, e não apenas um doce.",
+      "texto2": "Tudo é feito à mão, em pequenos detalhes, com tempo, precisão e carinho. Porque sabemos que, quando alguém escolhe a Oba, não está apenas escolhendo doces: está escolhendo algo para celebrar, presentear, compartilhar ou simplesmente tornar um momento mais especial. E é esse cuidado que colocamos em cada pedido, do primeiro preparo até chegar às suas mãos.",
       "titulo": ""
     },
     "personalizados_modal": {
@@ -164,6 +165,6 @@
     "tamanhoSubtitulo": "11",
     "tamanhoTitulo": "26"
   },
-  "updatedAt": "2026-10-05",
+  "updatedAt": "2026-10-07",
   "variante": "classica"
 }
