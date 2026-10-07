@@ -108,7 +108,8 @@ function obaLogout() {
   </div>
 </div>
 <button class="tab" data-tab="config">Loja</button>
-<button class="tab" data-tab="visual">✏️ Edição Visual</button>
+<button class="tab" data-tab="visual">✏️ Ed. Visual Cardápio</button>
+<button class="tab" data-tab="catalogo-visual">🗂️ Ed. Visual Catálogo</button>
 <button class="tab" data-tab="midia">🖼️ Mídia</button>
 <button class="tab" data-tab="proposals">📋 Propostas</button>
 </div>
@@ -145,19 +146,18 @@ function obaLogout() {
 </section>
 
 <!-- ================================================================
-     FASE 9B — PAINEL DE EDIÇÃO VISUAL
+     FASE 9B — PAINEL DE EDIÇÃO VISUAL CARDÁPIO
 ================================================================ -->
 <section id="panel-visual" class="panel">
   <div class="toolbar" style="margin-bottom:18px">
-    <h2 style="margin:0 auto 0 0">Edição Visual</h2>
-    <span class="badge">Textos, imagens e cores das páginas do cardápio e do catálogo</span>
+    <h2 style="margin:0 auto 0 0">Ed. Visual — Cardápio</h2>
+    <span class="badge">Textos, imagens e cores das páginas do cardápio</span>
   </div>
 
   <!-- SUB-ABAS internas -->
   <div class="tabs" id="visual-subtabs" style="margin-bottom:16px">
-    <button class="vtab vtab-active" id="vsubtab-paginas"  onclick="obaVisualSubtab('paginas')">📄 Cardápio</button>
+    <button class="vtab vtab-active" id="vsubtab-paginas"  onclick="obaVisualSubtab('paginas')">📄 Páginas</button>
     <button class="vtab"             id="vsubtab-tema"     onclick="obaVisualSubtab('tema')">🎨 Tema Global</button>
-    <button class="vtab"             id="vsubtab-catalogo" onclick="obaVisualSubtab('catalogo')">🗂️ Catálogo</button>
   </div>
 
   <!-- ===== SUB-PAINEL: PÁGINAS ===== -->
@@ -682,53 +682,10 @@ function obaLogout() {
     </div>
 
     <!-- ================================================================
-         12C-4 — formulário movido para vpanel-catalogo
+         12C-4 — formulário movido para panel-catalogo-visual
     ================================================================ -->
 
   </div><!-- /vpanel-paginas -->
-
-  <!-- ===== SUB-PAINEL: CATÁLOGO ===== -->
-  <div id="vpanel-catalogo" style="display:none">
-
-    <div class="toolbar" style="margin-bottom:16px">
-      <h3 style="margin:0;font-size:15px;font-weight:700;color:var(--text)">🗂️ Edição Visual — Catálogo</h3>
-      <span class="badge">Textos da página de abertura do catálogo público (/catalogo)</span>
-    </div>
-
-    <details class="oba-pg-details" open>
-      <summary class="oba-pg-summary">Catálogo — Página 1 (Abertura)</summary>
-      <form id="formCatalogoPg1" class="oba-pg-form grid">
-
-        <div style="grid-column:1/-1"><p class="oba-secao-titulo">✏️ Textos</p></div>
-
-        <div class="field">
-          <label>Rótulo <span class="hint">(ex: Catálogo)</span></label>
-          <input id="cat-ed-rotulo" placeholder="Catálogo">
-        </div>
-        <div class="field">
-          <label>Título principal <span class="hint">(use \n para quebra de linha)</span></label>
-          <input id="cat-ed-titulo" placeholder="Descubra\na Oba">
-        </div>
-        <div class="field full">
-          <label>Primeiro parágrafo</label>
-          <textarea id="cat-ed-p1" rows="3" placeholder="Uma coleção de sabores artesanais..."></textarea>
-        </div>
-        <div class="field full">
-          <label>Segundo parágrafo</label>
-          <textarea id="cat-ed-p2" rows="3" placeholder="Explore nossos sabores..."></textarea>
-        </div>
-        <div class="field full">
-          <label>Texto do botão CTA</label>
-          <input id="cat-ed-cta" placeholder="Conhecer nossos sabores →">
-        </div>
-
-        <div class="field full actions">
-          <button class="primary" type="submit">Salvar Catálogo</button>
-        </div>
-      </form>
-    </details>
-
-  </div><!-- /vpanel-catalogo -->
 
   <!-- ===== SUB-PAINEL: TEMA GLOBAL ===== -->
   <div id="vpanel-tema" style="display:none">
@@ -969,6 +926,51 @@ function obaLogout() {
 
 </section>
 <!-- /FASE 9B -->
+
+<!-- ================================================================
+     PAINEL EDIÇÃO VISUAL CATÁLOGO
+================================================================ -->
+<section id="panel-catalogo-visual" class="panel">
+  <div class="toolbar" style="margin-bottom:18px">
+    <h2 style="margin:0 auto 0 0">Ed. Visual — Catálogo</h2>
+    <span class="badge">Textos da página de abertura do catálogo público (/catalogo)</span>
+  </div>
+
+  <details class="oba-pg-details" open>
+    <summary class="oba-pg-summary">Catálogo — Página 1 (Abertura)</summary>
+    <form id="formCatalogoPg1" class="oba-pg-form grid">
+
+      <div style="grid-column:1/-1"><p class="oba-secao-titulo">✏️ Textos</p></div>
+
+      <div class="field">
+        <label>Rótulo <span class="hint">(ex: Catálogo)</span></label>
+        <input id="cat-ed-rotulo" placeholder="Catálogo">
+      </div>
+      <div class="field">
+        <label>Título principal <span class="hint">(use \n para quebra de linha)</span></label>
+        <input id="cat-ed-titulo" placeholder="Descubra\na Oba">
+      </div>
+      <div class="field full">
+        <label>Primeiro parágrafo</label>
+        <textarea id="cat-ed-p1" rows="3" placeholder="Uma coleção de sabores artesanais..."></textarea>
+      </div>
+      <div class="field full">
+        <label>Segundo parágrafo</label>
+        <textarea id="cat-ed-p2" rows="3" placeholder="Explore nossos sabores..."></textarea>
+      </div>
+      <div class="field full">
+        <label>Texto do botão CTA</label>
+        <input id="cat-ed-cta" placeholder="Conhecer nossos sabores →">
+      </div>
+
+      <div class="field full actions">
+        <button class="primary" type="submit">Salvar Catálogo</button>
+      </div>
+    </form>
+  </details>
+
+</section>
+<!-- /PAINEL EDIÇÃO VISUAL CATÁLOGO -->
 
 <!-- ================================================================
      ABA MÍDIA — Upload direto D1 + listagem + exclusão
@@ -2426,12 +2428,9 @@ $('formConfig').onsubmit=async e=>{
   window.obaVisualSubtab=function(id){
     $('vpanel-paginas').style.display=id==='paginas'?'':'none';
     $('vpanel-tema').style.display=id==='tema'?'':'none';
-    $('vpanel-catalogo').style.display=id==='catalogo'?'':'none';
-    ['paginas','tema','catalogo'].forEach(t=>{
+    ['paginas','tema'].forEach(t=>{
       const b=$('vsubtab-'+t);if(b)b.classList.toggle('vtab-active',t===id)
     });
-    /* Popular campos do catálogo ao ativar a sub-aba */
-    if(id==='catalogo'&&typeof obaPopularFormCatalogo==='function')obaPopularFormCatalogo();
   };
 
   /* Handlers de submit por página */
@@ -3451,6 +3450,12 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     initDropzone();
     document.querySelectorAll('.tab[data-tab="midia"]').forEach(btn => {
       btn.addEventListener('click', () => setTimeout(obaCarregarMidias, 50));
+    });
+    /* Popular campos do catálogo ao ativar a aba Ed. Visual Catálogo */
+    document.querySelectorAll('.tab[data-tab="catalogo-visual"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (typeof obaPopularFormCatalogo === 'function') obaPopularFormCatalogo();
+      });
     });
   });
 
