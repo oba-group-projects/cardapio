@@ -1,77 +1,59 @@
 # HANDOFF
 
-Atualizado: 2026-10-07 (sessão 7)
+Atualizado: 2026-10-07 (sessão 8)
 
 Branch: feature/gestao-online-segura
-HEAD: d1367b7
+HEAD: 5d5a611
 
 ## Última entrega
-Etapa A completa — Ed. Visual Catálogo com cores, logo, tipografia e tema global. Refinamentos visuais cardápio (Pg1, Pg3, fluxo). Central reorganizada com abas separadas.
+Ed. Visual Catálogo Pg3/4 profissionalizada — paridade com o nível do cardápio. Estado ativo/inativo por grupo, cor do subtítulo, cor de fundo da Pg4, tipografia granular (tam+peso para título e subtítulo de cada grupo).
 
 ## Commits recentes relevantes
 | Commit   | O que fez |
 |----------|-----------|
+| 5d5a611  | feat(catalogo): Ed. Visual Pg3/4 profissional — ativo, corSubtitulo, corFundo, tipografia por grupo |
+| 4789a82  | docs: handoff sessão 7 — Ed. Visual Catálogo Etapa A completa |
 | d1367b7  | feat(catalogo): Ed. Visual completa — cores, logo, tipografia, tema global |
-| 1aee67f  | feat(12C-4): Ed. Visual Catálogo — Pg2 e Pg3/4 editáveis |
-| 0cd18cc  | feat(central): Ed. Visual Cardápio e Ed. Visual Catálogo como abas separadas |
-| 6dedb28  | feat(cardapio): texto Nossa Essência controlado pela Central |
-| 4c1dfc0  | feat(cardapio): Pg1 título menor + botão centralizado + fluxo compacto |
 
 ## Estado atual — TUDO APROVADO
 
-### Cardápio (/cardapio)
+### Cardápio (/cardapio) — intacto
 
-**Pg1 — Interpretação B (Nossa Essência como título principal):**
-- Logo: 96px, align-self flex-start
-- Rótulo "CARDÁPIO": 12px, linha decorativa ::after
-- Título "Nossa Essência": Cormorant Garamond 2.4rem/500
-- Texto: 2 parágrafos via D1 (pag1-ne-texto + pag1-ne-texto-2), 13px/1.65
-- Citação: 14px, centralizada
-- CTA: py-3.5, max-w-280px, shadow-md, align-self center, mt-24px
-- `#oba-pag1-titulo` e `#oba-pag1-subtitulo`: ocultos (DOM intacto)
-
-**Pg3 — Menu Principal:**
-- Labels .oba-btn-label: 15px/500
-- Subtítulo: 13px, cor rgba(139,69,19,0.85)
-- Ícones: 1.5rem, opacity .35
-
-**Fluxo de montagem:**
-- Categorias: grid 3 colunas
-- secao-passo1/passo2: padding 16px, mt 12px entre cards
+**Pg1 — Interpretação B:** Nossa Essência, Cormorant Garamond 2.4rem/500, 2 parágrafos via D1.
+**Pg3 — Menu Principal:** labels 15px/500, sublabels 13px, ícones 1.5rem/.35.
+**Fluxo:** grid 3 colunas, padding 16px.
 
 ### Catálogo (/catalogo) — APROVADO
 - Paleta Verde Sálvia (#6B9E7A, #F4F8F4)
-- Ed. Visual completa implementada (Etapa A)
-- catHidratarTema() aplica CSS vars + fonte + tipografia global
-- catMontarPg1/Pg3 expandidas com cores/logo/tipografia
+- Ed. Visual completa implementada
 
 ### Central de Gestão
 - **✏️ Ed. Visual Cardápio** — Páginas (Pg1/Pg2/Pg3) + Tema Global
 - **🗂️ Ed. Visual Catálogo** — sub-abas Páginas / Tema Global
   - Pg1: textos + logo + cores + tipografia
   - Pg2: textos + logo + cores + tipografia
-  - Pg3/4: textos + corTitulo por grupo
+  - **Pg3/4 (sessão 8):** estado ativo/inativo por grupo, cor título, cor subtítulo, cor fundo, tipografia granular (4 selects por grupo)
   - Tema Global: 6 cores + fonte + tipografia + arredondamento
-- theme-catalogo.json v3 (schemaVersion 3)
+- theme-catalogo.json campos novos adicionados retrocompativelmente (sem bump de versão)
 
 ## REGRAS TÉCNICAS CRÍTICAS
 1. Nunca usar Set-Content/Out-File do PowerShell — adiciona BOM
 2. Sempre usar str_replace/fs_write para edições de texto
 3. theme.json = cardápio. theme-catalogo.json = catálogo. NUNCA misturar.
-4. pag1-ne-texto e pag1-ne-texto-2: textos vêm do D1 (nossa_essencia.texto e texto2)
+4. pag1-ne-texto e pag1-ne-texto-2: textos vêm do D1
 5. catAbrirGrupo assinatura: (grupo, dados) — não (grupo, titulo, subtitulo, dados)
-6. _catSet: função global no catálogo, não local em catMontarPg1
+6. _catSet: função global no catálogo, não local
 7. obaSaveDraftWith('tema', ...) = cardápio. obaSaveDraftWith('tema_catalogo', ...) = catálogo.
+8. Novos campos em grupos: corSubtitulo, corFundo, tamTitulo, pesoTitulo, tamSubtitulo, pesoSubtitulo, ativo
 
 ## Pendente — próximas sessões
-- Validar Ed. Visual Catálogo ao vivo (abrir Central → Ed. Visual Catálogo → testar Pg1/Pg2/Pg3/Tema Global)
+- Validar Ed. Visual Catálogo Pg3/4 ao vivo (abrir Central → Ed. Visual Catálogo → Pg3/4 → testar novos campos)
 - Refinamentos do catálogo: "Encontre o seu favorito" (Pg de sabores)
-- Etapa B futura: hidratarTemaCatalogo() para temas salvos via D1 (hoje só static asset)
-- Microinterações (sessão futura)
+- Etapa B futura: hidratarTemaCatalogo() para temas salvos via D1
 
 ## Pontos de retorno seguros
-- HEAD atual = d1367b7 (estável, validado)
-- Anterior = 1aee67f
+- HEAD atual = 5d5a611 (estável, deploy validado)
+- Anterior = 4789a82
 
 ## Links
 - Central: https://oba-cardapio-gestao.obadoceria.workers.dev/

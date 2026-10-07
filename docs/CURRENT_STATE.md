@@ -1,10 +1,10 @@
 ﻿# CURRENT STATE
 
-Atualizado: 2026-10-07 (sessão 7)
+Atualizado: 2026-10-07 (sessão 8)
 
 ## Git
 Branch: feature/gestao-online-segura
-Commit HEAD: d1367b7
+Commit HEAD: 5d5a611
 
 ## Estado funcional
 - Central privada autenticada e operacional
@@ -26,16 +26,22 @@ Commit HEAD: d1367b7
 - Paleta Verde Sálvia (#6B9E7A, #F4F8F4)
 - Ed. Visual Etapa A: catHidratarTema(), catMontarPg1/Pg3 com cores+logo+tipografia
 - catAbrirGrupo: lê temaCatalogo.grupos com fallback
-- theme-catalogo.json v3 (schemaVersion 3)
+- **Ed. Visual Pg3/4 profissional (sessão 8):**
+  - Estado ativo/inativo por grupo (artesanais/finos)
+  - Cor do subtítulo por grupo
+  - Cor de fundo da Pg4 por grupo
+  - Tipografia granular por grupo (tam+peso título + tam+peso subtítulo)
+- theme-catalogo.json schemaVersion 3 (campos novos adicionados retrocompativelmente)
 
 ## Central — estado atual
 - ✏️ Ed. Visual Cardápio: Páginas (Pg1/Pg2/Pg3) + Tema Global (intacto)
 - 🗂️ Ed. Visual Catálogo: sub-abas Páginas/Tema Global completas
+  - Pg3/4 profissional: ativo/inativo, corSubtitulo, corFundo, tipografia (sessão 8)
 - obaSaveDraftWith('tema_catalogo', ...) salva no D1 e sincroniza GitHub
 
 ## Pontos de retorno seguros
-- HEAD atual = d1367b7
-- Anterior = 1aee67f
+- HEAD atual = 5d5a611
+- Anterior = 4789a82
 
 ## Links
 - Central: https://oba-cardapio-gestao.obadoceria.workers.dev/
