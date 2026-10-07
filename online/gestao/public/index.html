@@ -5676,9 +5676,12 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     <div class="card" style="margin-bottom:16px">
       <h4 style="margin:0 0 12px;font-size:13px;color:var(--brand)">👤 Dados complementares</h4>
       <div class="grid">
-        <div class="field"><label>E-mail do cliente</label><input id="ctr-email" type="email" placeholder="cliente@email.com"></div>
+        <div class="field"><label>Nome completo do cliente</label><input id="ctr-nome-completo" placeholder="Nome completo conforme documento"></div>
         <div class="field"><label>CPF ou CNPJ</label><input id="ctr-cpf-cnpj" placeholder="000.000.000-00"></div>
-        <div class="field full"><label>Local do evento (endereço)</label><input id="ctr-local" placeholder="Rua, número — Cidade/UF"></div>
+        <div class="field"><label>E-mail <span class="hint">(opcional)</span></label><input id="ctr-email" type="email" placeholder="cliente@email.com"></div>
+        <div class="field"><label>Horário de entrega <span class="hint">(opcional)</span></label><input id="ctr-horario-entrega" placeholder="Ex: 14h do dia 15/03/2027"></div>
+        <div class="field full"><label>Local do evento <span class="hint">(opcional — endereço de entrega)</span></label><input id="ctr-local" placeholder="Rua, número — Cidade/UF"></div>
+        <div class="field full"><label>Responsável pelo recebimento <span class="hint">(opcional)</span></label><input id="ctr-responsavel" placeholder="Ex: João Silva — (55) 99999-0000"></div>
         <div class="field full"><label>Condições de pagamento</label><input id="ctr-cond-pagamento" placeholder="Ex: 50% no pedido, 50% na entrega"></div>
       </div>
     </div>
@@ -5855,9 +5858,12 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       });
 
       // Preenche campos editáveis
+      sv('ctr-nome-completo', d.contract.nome_completo || '');
       sv('ctr-email', d.contract.email_cliente || '');
       sv('ctr-cpf-cnpj', d.contract.cpf_cnpj || '');
       sv('ctr-local', d.contract.local_evento || '');
+      sv('ctr-horario-entrega', d.contract.horario_entrega || '');
+      sv('ctr-responsavel', d.contract.responsavel_recebimento || '');
       sv('ctr-cond-pagamento', d.contract.cond_pagamento || '');
       sv('ctr-clausula-cancelamento', d.contract.clausula_cancelamento || '');
       sv('ctr-clausula-responsabilidades', d.contract.clausula_responsabilidades || '');
@@ -5878,13 +5884,12 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
 
       $('ctr-acoes-rascunho').style.display = isRascunho ? 'flex' : 'none';
       // Campos editáveis só no rascunho
-      ['ctr-email','ctr-cpf-cnpj','ctr-local','ctr-cond-pagamento',
+      ['ctr-nome-completo','ctr-email','ctr-cpf-cnpj','ctr-local','ctr-cond-pagamento',
+       'ctr-horario-entrega','ctr-responsavel',
        'ctr-clausula-cancelamento','ctr-clausula-responsabilidades','ctr-clausula-foro','ctr-scenario-id'].forEach(id => {
         const el = $(id);
         if (el) el.disabled = !isRascunho;
-      });
-
-      // Link box
+      });      // Link box
       if ((isEnviado || isAceito) && d.contract.token_publico) {
         const link = window.location.origin + '/contrato/' + d.contract.token_publico;
         $('ctr-link-input').value = link;
@@ -5930,9 +5935,12 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     if (!obaContractAtivo) return;
     const body = {
       scenario_id:               $('ctr-scenario-id')?.value || '',
+      nome_completo:             $('ctr-nome-completo')?.value.trim() || '',
       email_cliente:             $('ctr-email')?.value.trim() || '',
       cpf_cnpj:                  $('ctr-cpf-cnpj')?.value.trim() || '',
       local_evento:              $('ctr-local')?.value.trim() || '',
+      horario_entrega:           $('ctr-horario-entrega')?.value.trim() || '',
+      responsavel_recebimento:   $('ctr-responsavel')?.value.trim() || '',
       cond_pagamento:            $('ctr-cond-pagamento')?.value.trim() || '',
       clausula_cancelamento:     $('ctr-clausula-cancelamento')?.value || '',
       clausula_responsabilidades:$('ctr-clausula-responsabilidades')?.value || '',
@@ -5973,7 +5981,8 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         $('ctr-link-input').value = link;
         $('ctr-link-box').style.display = 'block';
         $('ctr-acoes-rascunho').style.display = 'none';
-        ['ctr-email','ctr-cpf-cnpj','ctr-local','ctr-cond-pagamento',
+        ['ctr-nome-completo','ctr-email','ctr-cpf-cnpj','ctr-local','ctr-cond-pagamento',
+         'ctr-horario-entrega','ctr-responsavel',
          'ctr-clausula-cancelamento','ctr-clausula-responsabilidades','ctr-clausula-foro','ctr-scenario-id'].forEach(id => {
           const el = $(id); if (el) el.disabled = true;
         });

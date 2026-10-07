@@ -4299,10 +4299,10 @@ td{font-size:12px;vertical-align:top}
 
 <h2>1. Das Partes</h2>
 <table>
-<tr><td style="padding:4px 0;width:140px;color:#666;font-size:11px">CONTRATANTE</td><td style="padding:4px 0"><strong>${proposal.cliente || ""}</strong></td></tr>
+<tr><td style="padding:4px 0;width:140px;color:#666;font-size:11px">CONTRATANTE</td><td style="padding:4px 0"><strong>${contract.nome_completo || proposal.cliente || ""}</strong></td></tr>
 <tr><td style="padding:4px 0;color:#666;font-size:11px">CPF/CNPJ</td><td style="padding:4px 0">${contract.cpf_cnpj || "—"}</td></tr>
 <tr><td style="padding:4px 0;color:#666;font-size:11px">WhatsApp</td><td style="padding:4px 0">${proposal.whatsapp || "—"}</td></tr>
-<tr><td style="padding:4px 0;color:#666;font-size:11px">E-mail</td><td style="padding:4px 0">${contract.email_cliente || "—"}</td></tr>
+${contract.email_cliente ? `<tr><td style="padding:4px 0;color:#666;font-size:11px">E-mail</td><td style="padding:4px 0">${contract.email_cliente}</td></tr>` : ""}
 <tr><td style="padding:4px 8px 4px 0;color:#666;font-size:11px">CONTRATADA</td><td style="padding:4px 0"><strong>Oba Doceria</strong> — Fernanda Banderó Höffling — MEI</td></tr>
 </table>
 
@@ -4312,6 +4312,8 @@ td{font-size:12px;vertical-align:top}
 <tr><td style="padding:4px 0;color:#666;font-size:11px">Data do evento</td><td style="padding:4px 0"><strong>${obaFmtData(proposal.data_evento)}</strong></td></tr>
 <tr><td style="padding:4px 0;color:#666;font-size:11px">Local</td><td style="padding:4px 0">${contract.local_evento || "—"}</td></tr>
 <tr><td style="padding:4px 0;color:#666;font-size:11px">Convidados (est.)</td><td style="padding:4px 0">${proposal.convidados || "—"}</td></tr>
+${contract.horario_entrega ? `<tr><td style="padding:4px 0;color:#666;font-size:11px">Horário de entrega</td><td style="padding:4px 0">${contract.horario_entrega}</td></tr>` : ""}
+${contract.responsavel_recebimento ? `<tr><td style="padding:4px 0;color:#666;font-size:11px">Responsável recebimento</td><td style="padding:4px 0">${contract.responsavel_recebimento}</td></tr>` : ""}
 </table>
 
 <h2>3. Dos Produtos</h2>
@@ -4412,14 +4414,16 @@ async function obaHandleContractsApi(request, env, url) {
 
     await env.DB.prepare(`
       INSERT INTO contracts (contract_id, proposal_id, scenario_id, numero, status,
-        email_cliente, cpf_cnpj, local_evento, cond_pagamento,
+        nome_completo, email_cliente, cpf_cnpj, local_evento, cond_pagamento,
+        horario_entrega, responsavel_recebimento,
         clausula_cancelamento, clausula_responsabilidades, clausula_foro,
         criado_em, atualizado_em)
-      VALUES (?, ?, ?, ?, 'rascunho', ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, 'rascunho', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       contractId, proposal_id, scenario_id, numero,
-      body.email_cliente || null, body.cpf_cnpj || null,
+      body.nome_completo || null, body.email_cliente || null, body.cpf_cnpj || null,
       body.local_evento || null, body.cond_pagamento || null,
+      body.horario_entrega || null, body.responsavel_recebimento || null,
       CLAUSULA_CANCELAMENTO_PADRAO, CLAUSULA_RESPONSABILIDADES_PADRAO, CLAUSULA_FORO_PADRAO,
       now, now
     ).run();
@@ -4448,14 +4452,17 @@ async function obaHandleContractsApi(request, env, url) {
 
     await env.DB.prepare(`
       UPDATE contracts SET
-        email_cliente = ?, cpf_cnpj = ?, local_evento = ?, cond_pagamento = ?,
+        nome_completo = ?, email_cliente = ?, cpf_cnpj = ?,
+        local_evento = ?, cond_pagamento = ?,
+        horario_entrega = ?, responsavel_recebimento = ?,
         clausula_cancelamento = ?, clausula_responsabilidades = ?, clausula_foro = ?,
         scenario_id = ?,
         atualizado_em = ?
       WHERE contract_id = ?
     `).bind(
-      body.email_cliente || null, body.cpf_cnpj || null,
+      body.nome_completo || null, body.email_cliente || null, body.cpf_cnpj || null,
       body.local_evento || null, body.cond_pagamento || null,
+      body.horario_entrega || null, body.responsavel_recebimento || null,
       body.clausula_cancelamento || CLAUSULA_CANCELAMENTO_PADRAO,
       body.clausula_responsabilidades || CLAUSULA_RESPONSABILIDADES_PADRAO,
       body.clausula_foro || CLAUSULA_FORO_PADRAO,
