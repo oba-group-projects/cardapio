@@ -35,14 +35,28 @@
   },
   "grupos": {
     "artesanais": {
-      "titulo":    "Doces Artesanais",
-      "subtitulo": "Tradicionais, Clássicos e Especiais",
-      "corTitulo": ""
+      "titulo":        "Doces Artesanais",
+      "subtitulo":     "Tradicionais, Clássicos e Especiais",
+      "corTitulo":     "",
+      "corSubtitulo":  "",
+      "corFundo":      "",
+      "tamTitulo":     "",
+      "pesoTitulo":    "",
+      "tamSubtitulo":  "",
+      "pesoSubtitulo": "",
+      "ativo":         true
     },
     "finos": {
-      "titulo":    "Doces Finos",
-      "subtitulo": "Linha exclusiva",
-      "corTitulo": ""
+      "titulo":        "Doces Finos",
+      "subtitulo":     "Linha exclusiva",
+      "corTitulo":     "",
+      "corSubtitulo":  "",
+      "corFundo":      "",
+      "tamTitulo":     "",
+      "pesoTitulo":    "",
+      "tamSubtitulo":  "",
+      "pesoSubtitulo": "",
+      "ativo":         true
     }
   },
   "tema": {

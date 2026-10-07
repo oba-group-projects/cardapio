@@ -610,10 +610,15 @@ function catMontarPg3(dados) {
   const temArtesanais = cats.some(c => c.grupoCatalogo === 'artesanais' && c.ativo !== false);
   const temFinos      = cats.some(c => c.grupoCatalogo === 'finos'      && c.ativo !== false);
 
+  /* Respeita flag ativo do grupo no tema */
+  const gruposCfg = dados.temaCatalogo?.grupos || {};
+  const artAtivo = temArtesanais && gruposCfg.artesanais?.ativo !== false;
+  const finAtivo = temFinos      && gruposCfg.finos?.ativo      !== false;
+
   const container = document.getElementById('cat-grupos');
   container.innerHTML = '';
 
-  if (temArtesanais) {
+  if (artAtivo) {
     const btn = document.createElement('button');
     btn.className = 'oba-cat-btn destaque';
     const subA = pg2.artesanais_sublabel || 'Artesanais';
@@ -622,7 +627,7 @@ function catMontarPg3(dados) {
     btn.onclick = () => catAbrirGrupo('artesanais', dados);
     container.appendChild(btn);
   }
-  if (temFinos) {
+  if (finAtivo) {
     const btn = document.createElement('button');
     btn.className = 'oba-cat-btn';
     const subF = pg2.finos_sublabel || 'Exclusivos';
@@ -631,7 +636,7 @@ function catMontarPg3(dados) {
     btn.onclick = () => catAbrirGrupo('finos', dados);
     container.appendChild(btn);
   }
-  if (!temArtesanais && !temFinos) {
+  if (!artAtivo && !finAtivo) {
     container.innerHTML = '<p style="color:var(--muted);font-size:13px;text-align:center;padding:32px 0">Nenhum grupo configurado ainda.</p>';
   }
 }
@@ -644,13 +649,28 @@ function catAbrirGrupo(grupo, dados) {
   const subtitulo = cfg.subtitulo || (grupo === 'artesanais' ? 'Tradicionais, Clássicos e Especiais' : 'Linha exclusiva');
   _catGrupoAtivo = grupo;
   _catCatAtiva = 'todos';
+
+  /* Cor de fundo específica do grupo na Pg4 */
+  const elPg4 = document.getElementById('pg-4');
+  if (elPg4) elPg4.style.background = cfg.corFundo || '';
+
   const elTit4 = document.getElementById('cat-pg4-titulo');
   if (elTit4) {
     elTit4.textContent = titulo;
-    if (cfg.corTitulo) elTit4.style.color = cfg.corTitulo;
-    else elTit4.style.color = '';
+    elTit4.style.color = cfg.corTitulo || '';
+    if (cfg.tamTitulo)  elTit4.style.fontSize   = cfg.tamTitulo + 'px';
+    else                elTit4.style.fontSize   = '';
+    if (cfg.pesoTitulo) elTit4.style.fontWeight = cfg.pesoTitulo;
+    else                elTit4.style.fontWeight = '';
   }
-  document.getElementById('cat-pg4-subtitulo').textContent = subtitulo;
+
+  const elSub4 = document.getElementById('cat-pg4-subtitulo');
+  if (elSub4) {
+    elSub4.textContent    = subtitulo;
+    elSub4.style.color      = cfg.corSubtitulo || '';
+    elSub4.style.fontSize   = cfg.tamSubtitulo  ? cfg.tamSubtitulo  + 'px' : '';
+    elSub4.style.fontWeight = cfg.pesoSubtitulo || '';
+  }
   const cats = (dados.categorias || []).filter(c => c.grupoCatalogo === grupo && c.ativo !== false);
   catMontarAbas(cats);
   catRenderizarSabores(dados, grupo, 'todos');
