@@ -219,21 +219,22 @@
       line-height: 1.5 !important;
     }
 
-    /* Fluxo de montagem — reduzir espaço entre cards e padding interno */
-    #fluxo-principal .lg\:col-span-8 {
-      gap: 12px !important;
-      row-gap: 12px !important;
-    }
-    /* space-y-6 cria margin-top nos filhos — sobrescrever */
-    #fluxo-principal .lg\:col-span-8 > * + * {
-      margin-top: 12px !important;
-    }
-    #secao-passo1,
-    #secao-passo2 > div:first-child {
+    /* Fluxo de montagem — reduzir espaço entre cards (IDs estáveis) */
+    #secao-passo1 {
+      margin-top: 0 !important;
       padding: 16px !important;
     }
+    #secao-passo2 {
+      margin-top: 12px !important;
+    }
+    #secao-passo2 > div:first-child {
+      padding: 14px 16px !important;
+    }
     #secao-passo1 .flex.justify-between {
-      margin-bottom: 14px !important;
+      margin-bottom: 12px !important;
+    }
+    #secao-kits {
+      margin-top: 0 !important;
     }
 
     /* ── B+ EVOLUÇÃO VISUAL — Pg1 Interpretação B — refinamento v2 ── */
@@ -306,25 +307,40 @@
       flex-shrink: 0;
     }
 
-    /* Título principal — Nossa Essência — dominante, serif semibold */
+    /* Título principal — Nossa Essência — com dois parágrafos, tamanho equilibrado */
     #pag1-ne-titulo {
       font-family: 'Cormorant Garamond', Georgia, serif !important;
-      font-size: 3rem !important;
+      font-size: 2.4rem !important;
       font-weight: 500 !important;
       letter-spacing: -0.01em !important;
       color: #3B2A1E !important;
       text-transform: none !important;
       line-height: 1.05 !important;
-      margin-bottom: 28px !important;
+      margin-bottom: 20px !important;
     }
 
-    /* Texto da essência — compacto e legível */
+    /* Texto da essência — line-height mais compacto */
     #pag1-ne-texto {
       font-size: 13px !important;
-      line-height: 1.75 !important;
+      line-height: 1.65 !important;
       font-weight: 300 !important;
       color: #4B5563 !important;
       margin-bottom: 0 !important;
+    }
+
+    /* Segundo parágrafo — espaço menor entre os dois */
+    #pag1-ne-texto-2 {
+      font-size: 13px !important;
+      line-height: 1.65 !important;
+      font-weight: 300 !important;
+      color: #4B5563 !important;
+      margin-top: 8px !important;
+    }
+
+    /* CTA — centralizado e mais próximo do texto */
+    #oba-pag1-btn-cta {
+      align-self: center !important;
+      margin-top: 24px !important;
     }
 
     /* Citação — assinatura discreta, maior e centralizada */
