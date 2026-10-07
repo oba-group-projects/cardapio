@@ -1,6 +1,47 @@
 ﻿# CURRENT STATE
 
-Atualizado: 2026-10-05 (sessão 6)
+Atualizado: 2026-10-07 (sessão 7)
+
+## Git
+Branch: feature/gestao-online-segura
+Commit HEAD: d1367b7
+
+## Estado funcional
+- Central privada autenticada e operacional
+- Fluxo DRAFT → PREVIEW → PUBLISHED funcional
+- Cardápio público funcional em /cardapio — Pg1 Interpretação B + refinamentos
+- Catálogo público funcional em /catalogo — Verde Sálvia + Ed. Visual Etapa A
+
+## Cardápio — estado atual
+### Pg1
+- Título/subtítulo originais: ocultos. Título "Nossa Essência": Cormorant Garamond 2.4rem/500
+- 2 parágrafos: pag1-ne-texto (D1 nossa_essencia.texto) + pag1-ne-texto-2 (D1 nossa_essencia.texto2)
+- Citação: 14px, centralizada. CTA: py-3.5, max-w-280px, centralizado
+### Pg3
+- Labels .oba-btn-label: 15px/500, subtítulo 13px, ícones 1.5rem/.35
+### Fluxo
+- Categorias: grid 3 colunas, secao-passo1/2: padding 16px, mt 12px
+
+## Catálogo — estado atual
+- Paleta Verde Sálvia (#6B9E7A, #F4F8F4)
+- Ed. Visual Etapa A: catHidratarTema(), catMontarPg1/Pg3 com cores+logo+tipografia
+- catAbrirGrupo: lê temaCatalogo.grupos com fallback
+- theme-catalogo.json v3 (schemaVersion 3)
+
+## Central — estado atual
+- ✏️ Ed. Visual Cardápio: Páginas (Pg1/Pg2/Pg3) + Tema Global (intacto)
+- 🗂️ Ed. Visual Catálogo: sub-abas Páginas/Tema Global completas
+- obaSaveDraftWith('tema_catalogo', ...) salva no D1 e sincroniza GitHub
+
+## Pontos de retorno seguros
+- HEAD atual = d1367b7
+- Anterior = 1aee67f
+
+## Links
+- Central: https://oba-cardapio-gestao.obadoceria.workers.dev/
+- Cardápio: https://oba-cardapio-gestao.obadoceria.workers.dev/cardapio
+- Catálogo: https://oba-cardapio-gestao.obadoceria.workers.dev/catalogo
+- GitHub: https://github.com/oba-group-projects/cardapio
 
 ## Git
 Branch: feature/gestao-online-segura

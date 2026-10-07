@@ -1,6 +1,85 @@
 # HANDOFF
 
-Atualizado: 2026-10-05 (sessão 6)
+Atualizado: 2026-10-07 (sessão 7)
+
+Branch: feature/gestao-online-segura
+HEAD: d1367b7
+
+## Última entrega
+Etapa A completa — Ed. Visual Catálogo com cores, logo, tipografia e tema global. Refinamentos visuais cardápio (Pg1, Pg3, fluxo). Central reorganizada com abas separadas.
+
+## Commits recentes relevantes
+| Commit   | O que fez |
+|----------|-----------|
+| d1367b7  | feat(catalogo): Ed. Visual completa — cores, logo, tipografia, tema global |
+| 1aee67f  | feat(12C-4): Ed. Visual Catálogo — Pg2 e Pg3/4 editáveis |
+| 0cd18cc  | feat(central): Ed. Visual Cardápio e Ed. Visual Catálogo como abas separadas |
+| 6dedb28  | feat(cardapio): texto Nossa Essência controlado pela Central |
+| 4c1dfc0  | feat(cardapio): Pg1 título menor + botão centralizado + fluxo compacto |
+
+## Estado atual — TUDO APROVADO
+
+### Cardápio (/cardapio)
+
+**Pg1 — Interpretação B (Nossa Essência como título principal):**
+- Logo: 96px, align-self flex-start
+- Rótulo "CARDÁPIO": 12px, linha decorativa ::after
+- Título "Nossa Essência": Cormorant Garamond 2.4rem/500
+- Texto: 2 parágrafos via D1 (pag1-ne-texto + pag1-ne-texto-2), 13px/1.65
+- Citação: 14px, centralizada
+- CTA: py-3.5, max-w-280px, shadow-md, align-self center, mt-24px
+- `#oba-pag1-titulo` e `#oba-pag1-subtitulo`: ocultos (DOM intacto)
+
+**Pg3 — Menu Principal:**
+- Labels .oba-btn-label: 15px/500
+- Subtítulo: 13px, cor rgba(139,69,19,0.85)
+- Ícones: 1.5rem, opacity .35
+
+**Fluxo de montagem:**
+- Categorias: grid 3 colunas
+- secao-passo1/passo2: padding 16px, mt 12px entre cards
+
+### Catálogo (/catalogo) — APROVADO
+- Paleta Verde Sálvia (#6B9E7A, #F4F8F4)
+- Ed. Visual completa implementada (Etapa A)
+- catHidratarTema() aplica CSS vars + fonte + tipografia global
+- catMontarPg1/Pg3 expandidas com cores/logo/tipografia
+
+### Central de Gestão
+- **✏️ Ed. Visual Cardápio** — Páginas (Pg1/Pg2/Pg3) + Tema Global
+- **🗂️ Ed. Visual Catálogo** — sub-abas Páginas / Tema Global
+  - Pg1: textos + logo + cores + tipografia
+  - Pg2: textos + logo + cores + tipografia
+  - Pg3/4: textos + corTitulo por grupo
+  - Tema Global: 6 cores + fonte + tipografia + arredondamento
+- theme-catalogo.json v3 (schemaVersion 3)
+
+## REGRAS TÉCNICAS CRÍTICAS
+1. Nunca usar Set-Content/Out-File do PowerShell — adiciona BOM
+2. Sempre usar str_replace/fs_write para edições de texto
+3. theme.json = cardápio. theme-catalogo.json = catálogo. NUNCA misturar.
+4. pag1-ne-texto e pag1-ne-texto-2: textos vêm do D1 (nossa_essencia.texto e texto2)
+5. catAbrirGrupo assinatura: (grupo, dados) — não (grupo, titulo, subtitulo, dados)
+6. _catSet: função global no catálogo, não local em catMontarPg1
+7. obaSaveDraftWith('tema', ...) = cardápio. obaSaveDraftWith('tema_catalogo', ...) = catálogo.
+
+## Pendente — próximas sessões
+- Validar Ed. Visual Catálogo ao vivo (abrir Central → Ed. Visual Catálogo → testar Pg1/Pg2/Pg3/Tema Global)
+- Refinamentos do catálogo: "Encontre o seu favorito" (Pg de sabores)
+- Etapa B futura: hidratarTemaCatalogo() para temas salvos via D1 (hoje só static asset)
+- Microinterações (sessão futura)
+
+## Pontos de retorno seguros
+- HEAD atual = d1367b7 (estável, validado)
+- Anterior = 1aee67f
+
+## Links
+- Central: https://oba-cardapio-gestao.obadoceria.workers.dev/
+- Cardápio: https://oba-cardapio-gestao.obadoceria.workers.dev/cardapio
+- Catálogo: https://oba-cardapio-gestao.obadoceria.workers.dev/catalogo
+- GitHub: https://github.com/oba-group-projects/cardapio
+
+Leia AGENTS.md, CURRENT_STATE.md, DECISIONS.md antes de alterar código.
 
 Branch: feature/gestao-online-segura
 HEAD: 6a2a2bb
