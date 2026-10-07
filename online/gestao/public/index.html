@@ -5779,6 +5779,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
           + '<td style="display:flex;gap:6px;flex-wrap:wrap">'
           + '<button class="secondary" style="padding:4px 10px;font-size:11px" onclick="obaContractEditar(\'' + cid + '\')">✏️ Editar</button>'
           + (link && (c.status === 'enviado' || c.status === 'aceito') ? '<button class="secondary" style="padding:4px 10px;font-size:11px" onclick="navigator.clipboard.writeText(\'' + link + '\');this.textContent=\'✅ Copiado!\';setTimeout(()=>this.textContent=\'🔗 Link\',2000)">🔗 Link</button>' : '')
+          + (c.status === 'enviado' && link ? '<button class="secondary" style="padding:4px 10px;font-size:11px;background:#25d366;color:#fff;border:none" onclick="obaContractEnviarWppById(\'' + c.contract_id + '\',\'' + link + '\')">📱 WhatsApp</button>' : '')
           + (c.status === 'rascunho' ? '<button class="secondary" style="padding:4px 10px;font-size:11px;background:#fee2e2;color:#dc2626;border-color:#fca5a5" onclick="obaContractExcluir(\'' + cid + '\',\'' + (c.numero||'') + '\')">🗑 Excluir</button>' : '')
           + (c.status === 'enviado' ? '<button class="secondary" style="padding:4px 10px;font-size:11px;background:#fff7ed;color:#92400e;border-color:#fcd34d" onclick="obaContractCancelar(\'' + cid + '\',\'' + (c.numero||'') + '\')">✕ Cancelar</button>' : '')
           + '</td></tr>';
@@ -6053,6 +6054,20 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     if (!wpp) { alert('Proposta sem WhatsApp cadastrado.'); return; }
     const msg = encodeURIComponent('Olá! Segue o link do contrato da Oba Doceria para você revisar e aceitar:\n\n' + link);
     window.open('https://wa.me/55' + wpp.replace(/\D/g,'') + '?text=' + msg, '_blank');
+  };
+
+  window.obaContractEnviarWppById = async function(contractId, link) {
+    try {
+      const r = await fetch('/api/contracts/' + contractId);
+      const d = await r.json();
+      if (!d.ok) { alert('Erro ao carregar contrato.'); return; }
+      const rp = await fetch('/api/proposals/' + d.contract.proposal_id);
+      const dp = await rp.json();
+      const wpp = (dp.proposal?.whatsapp || '').replace(/\D/g, '');
+      if (!wpp) { alert('Proposta sem WhatsApp cadastrado.'); return; }
+      const msg = encodeURIComponent('Olá! Segue o link do contrato da Oba Doceria para você revisar e aceitar:\n\n' + link);
+      window.open('https://wa.me/55' + wpp + '?text=' + msg, '_blank');
+    } catch(e) { alert('Erro de conexão.'); }
   };
 
   // ── INTEGRAÇÃO COM ABA ────────────────────────────────────
