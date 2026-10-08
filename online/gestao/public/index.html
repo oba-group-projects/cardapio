@@ -2609,8 +2609,10 @@ $('formConfig').onsubmit=async e=>{
 
     /* Boas-vindas */
     const bv=pg.boas_vindas||{};
-    obaSetVal('pg1-titulo',bv.titulo);obaSetVal('pg1-subtitulo',bv.subtitulo);
-    obaSetVal('pg1-cta',bv.botaoCTA);obaSetVal('pg1-logo',bv.logo);
+    obaSetVal('pg1-titulo',   bv.titulo    || 'Seu momento começa aqui.');
+    obaSetVal('pg1-subtitulo',bv.subtitulo || 'Doces artesanais feitos à mão, com amor e precisão.');
+    obaSetVal('pg1-cta',      bv.botaoCTA  || 'Descobrir Nossa História');
+    obaSetVal('pg1-logo',bv.logo);
     obaSetSelect('pg1-tamanhoLogo',bv.tamanhoLogo,'medio');
     obaSetCorPagina('pg1-corFundo',bv.corFundo);
     obaSetCorPagina('pg1-corTitulo',bv.corTitulo);
@@ -2621,10 +2623,11 @@ $('formConfig').onsubmit=async e=>{
 
     /* Nossa Essência */
     const ne=pg.nossa_essencia||{};
-    obaSetVal('pg2-titulo',ne.titulo);obaSetVal('pg2-logo',ne.logo);
-    obaSetVal('pg2-texto',ne.texto);
-    obaSetVal('pg2-texto2',ne.texto2||'');
-    obaSetVal('pg2-citacao',ne.citacao?ne.citacao.replace(/^"|"$/g,''):'');
+    obaSetVal('pg2-titulo',ne.titulo || 'Nossa Essência');
+    obaSetVal('pg2-logo',ne.logo);
+    obaSetVal('pg2-texto', ne.texto || 'Na Oba Doceria, acreditamos que um doce artesanal começa muito antes da primeira mordida.');
+    obaSetVal('pg2-texto2',ne.texto2 || 'Tudo é feito à mão, em pequenos detalhes, com tempo, precisão e carinho.');
+    obaSetVal('pg2-citacao',ne.citacao ? ne.citacao.replace(/^"|"$/g,'') : 'Feito à mão, com amor e precisão.');
     obaSetSelect('pg2-tamanhoLogo',ne.tamanhoLogo,'medio');
     obaSetCorPagina('pg2-corFundo',ne.corFundo);
     obaSetCorPagina('pg2-corTitulo',ne.corTitulo);
@@ -2636,7 +2639,8 @@ $('formConfig').onsubmit=async e=>{
 
     /* Menu Principal */
     const mp=pg.menu_principal||{};const op=mp.opcoes||{};
-    obaSetVal('pg3-subtitulo',mp.subtitulo);obaSetVal('pg3-logo',mp.logo);
+    obaSetVal('pg3-subtitulo',mp.subtitulo || 'Escolha sua Experiência');
+    obaSetVal('pg3-logo',mp.logo);
     obaSetSelect('pg3-tamanhoLogo',mp.tamanhoLogo,'medio');
     obaSetCorPagina('pg3-corFundo',mp.corFundo);
     obaSetCorPagina('pg3-corSubtitulo',mp.corSubtitulo);
@@ -2647,13 +2651,15 @@ $('formConfig').onsubmit=async e=>{
 
     /* Vitrine */
     const vp=pg.vitrine_presentes||{};
-    obaSetVal('vit-titulo',vp.titulo);obaSetVal('vit-subtitulo',vp.subtitulo);
+    obaSetVal('vit-titulo',   vp.titulo    || 'Vitrine de Presentes');
+    obaSetVal('vit-subtitulo',vp.subtitulo || 'Nossas opções exclusivas já vêm montadas com carinho.');
     obaSetCheck('vit-ativo',vp.ativo!==false);
 
     /* Modal Personalizados */
     const pm=pg.personalizados_modal||{};
-    obaSetVal('pers-m-titulo',pm.titulo);obaSetVal('pers-m-info-titulo',pm.info_titulo);
-    obaSetVal('pers-m-pacotes-titulo',pm.pacotes_titulo);
+    obaSetVal('pers-m-titulo',        pm.titulo         || 'Doces Personalizados');
+    obaSetVal('pers-m-info-titulo',   pm.info_titulo    || 'Informações');
+    obaSetVal('pers-m-pacotes-titulo',pm.pacotes_titulo || 'Pacotes Especiais');
     obaSetCheck('pers-ativo',pm.ativo!==false);
     /* R11B: lista dinâmica de info_items */
     const infoItemsParaRenderizar = (Array.isArray(pm.info_items) && pm.info_items.some(Boolean))
@@ -2667,13 +2673,13 @@ $('formConfig').onsubmit=async e=>{
     obaRenderizarPacotes(pacotesParaRenderizar);
     /* Modal Eventos */
     const em=pg.eventos_modal||{};
-    obaSetVal('eventos-m-titulo',em.titulo);
+    obaSetVal('eventos-m-titulo',           em.titulo          || 'Orçamentos de Eventos');
     obaSetCheck('eventos-ativo',em.ativo!==false);
-    obaSetVal('eventos-m-label-nome',em.label_nome||'');
-    obaSetVal('eventos-m-label-tipo',em.label_tipo||'');
-    obaSetVal('eventos-m-label-data',em.label_data||'');
-    obaSetVal('eventos-m-label-convidados',em.label_convidados||'');
-    obaSetVal('eventos-m-label-botao',em.label_botao||'');
+    obaSetVal('eventos-m-label-nome',       em.label_nome      || 'Seu Nome Completo');
+    obaSetVal('eventos-m-label-tipo',       em.label_tipo      || 'Tipo (Casamento, Formatura...)');
+    obaSetVal('eventos-m-label-data',       em.label_data      || 'Data');
+    obaSetVal('eventos-m-label-convidados', em.label_convidados|| 'Nº Convidados');
+    obaSetVal('eventos-m-label-botao',      em.label_botao     || 'Solicitar Proposta');
 
     /* R10C: Seções extras */
     obaRenderizarSecoesExtras(Array.isArray(t.paginas_customizadas) ? t.paginas_customizadas : []);
@@ -2910,9 +2916,11 @@ $('formConfig').onsubmit=async e=>{
       if (hx)    hx.value    = valido ? hex : '';
     };
     /* Pg1 — textos */
-    sv('cat-ed-rotulo', pg1.rotulo || ''); sv('cat-ed-titulo', pg1.titulo || '');
-    sv('cat-ed-p1', pg1.paragrafo1 || ''); sv('cat-ed-p2', pg1.paragrafo2 || '');
-    sv('cat-ed-cta', pg1.cta || '');
+    sv('cat-ed-rotulo',    pg1.rotulo    || 'Catálogo');
+    sv('cat-ed-titulo',    pg1.titulo    || 'Descubra\na Oba');
+    sv('cat-ed-p1',        pg1.paragrafo1|| 'Uma coleção de sabores artesanais, criados para despertar os sentidos e transformar pequenos momentos em lembranças especiais. Brigadeiros cremosos, combinações delicadas e receitas cuidadosamente preparadas para quem aprecia doces feitos de verdade.');
+    sv('cat-ed-p2',        pg1.paragrafo2|| 'Explore nossos sabores, descubra seus favoritos e deixe-se levar pela experiência Oba.');
+    sv('cat-ed-cta',       pg1.cta       || 'Conhecer nossos sabores →');
     /* Pg1 — logo */
     sv('cat-ed-pg1-logo', pg1.logo || '');
     const sel1 = $('cat-ed-pg1-tamanhoLogo'); if (sel1) sel1.value = pg1.tamanhoLogo || 'medio';
@@ -2927,9 +2935,11 @@ $('formConfig').onsubmit=async e=>{
     stSel('cat-ed-pg1-tamTexto',   pg1.tamTexto);   stSel('cat-ed-pg1-pesoTexto',  pg1.pesoTexto);
     stSel('cat-ed-pg1-tamCTA',     pg1.tamCTA);     stSel('cat-ed-pg1-pesoCTA',    pg1.pesoCTA);
     /* Pg2 — textos */
-    sv('cat-ed-pg2-subtitulo', pg2.subtitulo || '');
-    sv('cat-ed-art-sublabel', pg2.artesanais_sublabel || ''); sv('cat-ed-art-label', pg2.artesanais_label || '');
-    sv('cat-ed-fin-sublabel', pg2.finos_sublabel || '');      sv('cat-ed-fin-label', pg2.finos_label || '');
+    sv('cat-ed-pg2-subtitulo',  pg2.subtitulo            || 'Escolha o tipo de doce');
+    sv('cat-ed-art-sublabel',   pg2.artesanais_sublabel  || 'Artesanais');
+    sv('cat-ed-art-label',      pg2.artesanais_label     || 'Doces Artesanais');
+    sv('cat-ed-fin-sublabel',   pg2.finos_sublabel       || 'Exclusivos');
+    sv('cat-ed-fin-label',      pg2.finos_label          || 'Doces Finos');
     /* Pg2 — logo */
     sv('cat-ed-pg2-logo', pg2.logo || '');
     const sel2 = $('cat-ed-pg2-tamanhoLogo'); if (sel2) sel2.value = pg2.tamanhoLogo || 'medio';
@@ -2940,8 +2950,10 @@ $('formConfig').onsubmit=async e=>{
     stSel('cat-ed-pg2-tamSubtitulo',  pg2.tamSubtitulo);
     stSel('cat-ed-pg2-pesoSubtitulo', pg2.pesoSubtitulo);
     /* Pg3/4 */
-    sv('cat-ed-art-titulo', art.titulo || ''); sv('cat-ed-art-subtitulo', art.subtitulo || '');
-    sv('cat-ed-fin-titulo', fin.titulo || ''); sv('cat-ed-fin-subtitulo', fin.subtitulo || '');
+    sv('cat-ed-art-titulo',    art.titulo    || 'Doces Artesanais');
+    sv('cat-ed-art-subtitulo', art.subtitulo || 'Tradicionais, Clássicos e Especiais');
+    sv('cat-ed-fin-titulo',    fin.titulo    || 'Doces Finos');
+    sv('cat-ed-fin-subtitulo', fin.subtitulo || 'Linha exclusiva');
     sc('cat-ed-art-corTitulo',    art.corTitulo    || '');
     sc('cat-ed-art-corSubtitulo', art.corSubtitulo || '');
     sc('cat-ed-art-corFundo',     art.corFundo     || '');
