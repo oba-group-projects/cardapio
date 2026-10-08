@@ -1,61 +1,70 @@
 # HANDOFF
 
-Atualizado: 2026-10-07 (sessão 9)
+Atualizado: 2026-10-08 (sessão 10)
 
 Branch: feature/gestao-online-segura
-HEAD: 62b459a
+HEAD: 15c6d4c
 
 ## Última entrega
-MVP Contratos (Fase 13A) — módulo completo de contratos para propostas de Evento aceitas. Aceite eletrônico próprio com snapshot imutável, token público, confirmação de WhatsApp e registro de aceite.
+MVP Contratos completo e funcional — fluxo Proposta aceita → Contrato → Rascunho → Link → Aceite eletrônico testado e validado end-to-end.
 
 ## Commits recentes relevantes
 | Commit   | O que fez |
 |----------|-----------|
-| 62b459a  | feat(contratos): MVP 13A — tabelas, API, página pública aceite, Central UI |
-| ea58430  | docs: handoff sessão 8 — Ed. Visual Catálogo Pg3/4 profissional |
-| 5d5a611  | feat(catalogo): Ed. Visual Pg3/4 profissional — ativo, corSubtitulo, corFundo, tipografia por grupo |
+| 15c6d4c  | feat(contratos): excluir contratos cancelados |
+| f4850db  | fix(contratos): cpf_cnpj buscado do contrato — corrige crash 1101 |
+| 4a5688e  | fix(contratos): wpp normalização robusta, dupla verificação wpp/cpf |
+| c0a9dd4  | feat(contratos): cenário aceito registrado na proposta |
+| 31f1cdf  | fix(contratos): valor_total calculado no Worker com preços reais |
 
 ## Estado atual — TUDO APROVADO
 
-### Cardápio (/cardapio) — intacto
-Pg1 Interpretação B, Pg3 Menu Principal, fluxo — sem alterações.
+### Cardápio e Catálogo — intactos
+Sem alterações nesta sessão.
 
-### Catálogo (/catalogo) — intacto
-Ed. Visual Pg3/4 profissional (sessão 8) ativa.
+### Módulo de Contratos — estado sessão 10
 
-### Central de Gestão — sessão 9
-- **📄 Contratos (nova aba):** listagem, editor, botão na proposta aceita
-- **✏️ Ed. Visual Cardápio** + **🗂️ Ed. Visual Catálogo** — intactos
+**Fluxo completo funcional e testado:**
+1. Proposta Evento aceita → pergunta qual cenário foi aceito (se múltiplos)
+2. Botão "📄 Contrato" aparece na proposta
+3. Editor: nome completo (pré-preenchido), CPF/CNPJ com máscara, condições de pagamento (select + livre), campos opcionais
+4. Resumo financeiro calculado no Worker com preços reais do catálogo (`valor_total` gravado no D1)
+5. Cenário definido automaticamente via `scenario_aceito_id` na proposta
+6. "📄 Gerar contrato" → modal de confirmação com nome, CPF mascarado, valor total
+7. "📨 Confirmar envio" → snapshot imutável (HTML + SHA-256) + token público
+8. "📱 WhatsApp" envia mensagem com contexto (nome, nº contrato, tipo/data evento)
+9. Página pública `/contrato/:token` — dupla verificação: WhatsApp OU CPF/CNPJ
+10. Aceite registra IP, data/hora, hash, método de verificação
+11. Cancelar (enviado) → libera proposta para novo contrato
+12. Excluir (rascunho ou cancelado)
+13. Avisos: data passada, cenário sem produtos, campos obrigatórios
 
-### Módulo de Contratos (Fase 13A)
-- D1: tabelas `contracts` e `contract_aceites` (migration 0016) — aplicada em produção
-- Worker: `obaHandleContractsApi` + `obaHandleContratoPublico`
-- Rota pública `GET/POST /contrato/:token` — confirmação WhatsApp + snapshot + aceite
-- Snapshot imutável: HTML completo + SHA-256 gerado ao enviar
-- Aceite registra: IP, data/hora, user-agent, WhatsApp confirmado, hash
-- Um contrato ativo por proposta (bloqueia novo se enviado/aceito)
+**Migrations aplicadas em produção:**
+- 0016: tabelas contracts + contract_aceites
+- 0017: campos nome_completo, horario_entrega, responsavel_recebimento
+- 0018: status cancelado no CHECK constraint (recriação da tabela)
+- 0019: scenario_aceito_id na tabela proposals
+- ALTER manual: valor_total REAL em contracts
 
-### Cláusulas padrão (editáveis no rascunho)
-- Cancelamento / Responsabilidades / Foro Santo Cristo/RS
-- **Aguardam revisão jurídica antes de uso em contratos de alto valor**
+**Pendente para próximas sessões:**
+- Revisão jurídica das cláusulas (cancelamento, foro) antes de uso em produção real
+- Aditivos (fase 2)
+- Templates de cláusulas editáveis na Central (configurações)
+- Corporativo e Sazonal (fase 2)
+- Integração Autentique (fase 2 — sandbox primeiro)
 
 ## REGRAS TÉCNICAS CRÍTICAS
 1. Nunca usar Set-Content/Out-File do PowerShell — adiciona BOM
 2. theme.json = cardápio. theme-catalogo.json = catálogo. NUNCA misturar.
-3. `obaSaveDraftWith('tema', ...)` = cardápio. `obaSaveDraftWith('tema_catalogo', ...)` = catálogo.
-4. Contrato imutável após status `enviado` — Worker retorna 403 `contrato_imutavel` em PUT
+3. `cpf_cnpj` está em `contracts`, NÃO em `proposals`
+4. `valor_total` calculado pelo Worker via `obaCalcularValorContrato()` — não recalcular no frontend
 5. Rota `/contrato/:token` fica ANTES de `validateSession` — é pública por design
-6. Nunca expor dados pessoais da titular em logs ou respostas de API
-
-## Pendente — próximas sessões
-- Validar MVP Contratos ao vivo: proposta aceita → Contrato → preencher → Enviar → link → aceitar
-- Revisão jurídica das cláusulas antes de uso em produção real
-- Refinamento catálogo: "Encontre o seu favorito" (texto Pg3)
-- Decidir redesign do layout do catálogo antes de expandir Ed. Visual
+6. Status permitidos em contracts: rascunho, enviado, aceito, recusado, cancelado
+7. `scenario_aceito_id` em proposals — gravado no PATCH de status quando = aceita
 
 ## Pontos de retorno seguros
-- HEAD atual = 62b459a (estável, deploy validado)
-- Anterior = ea58430
+- HEAD atual = 15c6d4c (estável, deploy validado)
+- Anterior = f4850db
 - **✏️ Ed. Visual Cardápio** — Páginas (Pg1/Pg2/Pg3) + Tema Global
 - **🗂️ Ed. Visual Catálogo** — sub-abas Páginas / Tema Global
   - Pg1: textos + logo + cores + tipografia
