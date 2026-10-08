@@ -5748,7 +5748,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         <div class="field full"><label>Responsável pelo recebimento <span class="hint">(opcional)</span></label><input id="ctr-responsavel" placeholder="Ex: João Silva — (55) 99999-0000"></div>
         <div class="field full">
           <label>Condições de pagamento <span style="color:#dc2626">*</span></label>
-          <select id="ctr-cond-pagamento-sel" onchange="obaContractCondPagamento(this.value)" style="margin-bottom:8px">
+          <select id="ctr-cond-pagamento-sel" onchange="obaContractCondPagamento(this.value)" style="width:100%;margin-bottom:8px;font-size:13px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:#fff;font:inherit;cursor:pointer">
             <option value="">Selecione uma opção...</option>
             <option value="50% no pedido, 50% na entrega">50% no pedido, 50% na entrega</option>
             <option value="30% no pedido, 70% na entrega">30% no pedido, 70% na entrega</option>
@@ -6001,21 +6001,21 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       sv('ctr-responsavel', d.contract.responsavel_recebimento || '');
       sv('ctr-cond-pagamento', d.contract.cond_pagamento || '');
       // Popular select de condições de pagamento
-      if (d.contract.cond_pagamento) {
-        const sel = $('ctr-cond-pagamento-sel');
-        const opcoesFixas = ['50% no pedido, 50% na entrega','30% no pedido, 70% na entrega','100% no pedido (pagamento integral)','Parcelado em 2x (combinar datas)','Parcelado em 3x (combinar datas)'];
-        // Normaliza: remove descrição em parênteses para comparar
-        const valNorm = (d.contract.cond_pagamento || '').split('(')[0].trim();
-        const opcaoExata = ['50% no pedido, 50% na entrega','30% no pedido, 70% na entrega','100% no pedido','Parcelado em 2x','Parcelado em 3x'];
-        const idx = opcaoExata.findIndex(o => d.contract.cond_pagamento?.startsWith(o.split('(')[0].trim()));
-        if (sel) {
-          if (idx >= 0) {
-            sel.value = opcoesFixas[idx] || d.contract.cond_pagamento;
-            $('ctr-cond-pagamento').style.display = 'none';
-          } else if (d.contract.cond_pagamento) {
-            sel.value = 'outro';
-            $('ctr-cond-pagamento').style.display = '';
-          }
+      const selCond = $('ctr-cond-pagamento-sel');
+      const inputCond = $('ctr-cond-pagamento');
+      if (selCond) {
+        const condAtual = d.contract.cond_pagamento || '';
+        const opcoesValores = ['50% no pedido, 50% na entrega','30% no pedido, 70% na entrega','100% no pedido','Parcelado em 2x','Parcelado em 3x'];
+        const opcaoMatch = opcoesValores.find(o => condAtual.startsWith(o));
+        if (!condAtual) {
+          selCond.value = '';
+          if (inputCond) inputCond.style.display = 'none';
+        } else if (opcaoMatch) {
+          selCond.value = opcaoMatch;
+          if (inputCond) inputCond.style.display = 'none';
+        } else {
+          selCond.value = 'outro';
+          if (inputCond) { inputCond.style.display = ''; inputCond.value = condAtual; }
         }
       }
       sv('ctr-clausula-cancelamento', d.contract.clausula_cancelamento || '');
