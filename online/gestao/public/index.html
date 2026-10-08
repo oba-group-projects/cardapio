@@ -1086,6 +1086,12 @@ function obaLogout() {
     <summary class="oba-pg-summary">Catálogo — Página 2 (Seleção de Grupo)</summary>
     <form id="formCatalogoPg2" class="oba-pg-form grid">
 
+      <div style="grid-column:1/-1"><p class="oba-secao-titulo">⚙️ Estado da página</p></div>
+      <div class="field full" style="display:flex;gap:20px;flex-wrap:wrap;align-items:center">
+        <label class="oba-toggle-label"><input type="checkbox" id="cat-ed-pg2-ativo" checked> Página 2 ativa no catálogo</label>
+        <span class="hint" style="color:#a06000">Desativar oculta a seleção de grupos para os clientes. Se houver apenas um grupo ativo, o catálogo vai direto para ele.</span>
+      </div>
+
       <div style="grid-column:1/-1"><p class="oba-secao-titulo">✏️ Textos</p></div>
       <div class="field full">
         <label>Subtítulo</label>
@@ -2953,6 +2959,7 @@ $('formConfig').onsubmit=async e=>{
     stSel('cat-ed-pg1-tamCTA',     pg1.tamCTA);     stSel('cat-ed-pg1-pesoCTA',    pg1.pesoCTA);
     /* Pg2 — textos */
     sv('cat-ed-pg2-subtitulo',  pg2.subtitulo            || 'Escolha o tipo de doce');
+    const pg2AtivoEl = $('cat-ed-pg2-ativo'); if (pg2AtivoEl) pg2AtivoEl.checked = pg2.ativo !== false;
     sv('cat-ed-art-sublabel',   pg2.artesanais_sublabel  || 'Artesanais');
     sv('cat-ed-art-label',      pg2.artesanais_label     || 'Doces Artesanais');
     sv('cat-ed-fin-sublabel',   pg2.finos_sublabel       || 'Exclusivos');
@@ -3016,6 +3023,7 @@ $('formConfig').onsubmit=async e=>{
       },
       pg2: {
         subtitulo: $('cat-ed-pg2-subtitulo')?.value.trim() || '',
+        ativo: $('cat-ed-pg2-ativo')?.checked !== false,
         artesanais_sublabel: $('cat-ed-art-sublabel')?.value.trim() || '',
         artesanais_label:    $('cat-ed-art-label')?.value.trim()    || '',
         finos_sublabel:      $('cat-ed-fin-sublabel')?.value.trim() || '',
@@ -3066,6 +3074,16 @@ $('formConfig').onsubmit=async e=>{
   async function _salvarCatalogo(nomeAba) {
     try {
       const temaCat = obaLerFormCatalogo();
+
+      /* Validação: pg2 inativa + todos os grupos inativos = configuração inválida */
+      const pg2Ativo = temaCat.pg2?.ativo !== false;
+      const artAtivo = temaCat.grupos?.artesanais?.ativo !== false;
+      const finAtivo = temaCat.grupos?.finos?.ativo !== false;
+      if (!pg2Ativo && !artAtivo && !finAtivo) {
+        msg('Configuração inválida: não é possível desativar a Página 2 e todos os grupos ao mesmo tempo. O catálogo ficaria inacessível.', 'erro');
+        return;
+      }
+
       const res = await obaSaveDraftWith('tema_catalogo', temaCat);
       catalogo.tema_catalogo = temaCat;
       addPendencia('Edição Visual salva: ' + nomeAba);

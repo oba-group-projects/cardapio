@@ -31,7 +31,8 @@
     "corFundo":            "",
     "corSubtitulo":        "",
     "tamSubtitulo":        "",
-    "pesoSubtitulo":       ""
+    "pesoSubtitulo":       "",
+    "ativo":               true
   },
   "grupos": {
     "artesanais": {

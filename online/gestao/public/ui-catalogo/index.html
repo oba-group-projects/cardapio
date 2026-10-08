@@ -464,6 +464,30 @@ let _catPaginaAtual = 1;
 
 /* ── NAVEGAÇÃO ── */
 function catNavegar(num) {
+  /* Se tentando ir para Pg3 (seleção de grupos) e pg2 está inativa,
+     verifica se há exatamente um grupo ativo — se sim, abre direto */
+  if (num === 3 && _catDados) {
+    const pg2Ativo = _catDados.temaCatalogo?.pg2?.ativo !== false;
+    if (!pg2Ativo) {
+      const gruposCfg = _catDados.temaCatalogo?.grupos || {};
+      const cats = _catDados.categorias || [];
+      const artAtivo = gruposCfg.artesanais?.ativo !== false && cats.some(c => c.grupoCatalogo === 'artesanais' && c.ativo !== false);
+      const finAtivo = gruposCfg.finos?.ativo !== false && cats.some(c => c.grupoCatalogo === 'finos' && c.ativo !== false);
+      const ativos = [artAtivo && 'artesanais', finAtivo && 'finos'].filter(Boolean);
+      if (ativos.length === 1) {
+        /* Um único grupo — vai direto para ele */
+        catAbrirGrupo(ativos[0], _catDados);
+        return;
+      } else if (ativos.length === 0) {
+        /* Nenhum grupo ativo — mostra aviso e fica em Pg1 */
+        const el = document.getElementById('loading');
+        if (el) { el.innerHTML = '<p style="color:var(--muted);font-size:13px;text-align:center;padding:24px">Catálogo temporariamente indisponível.</p>'; el.style.display = 'block'; }
+        return;
+      }
+      /* Se dois grupos ativos mas pg2 inativa — situação inconsistente, mostra pg3 mesmo assim */
+    }
+  }
+
   document.querySelectorAll('.oba-page').forEach(p => p.classList.remove('active'));
   const pg = document.getElementById('pg-' + num);
   if (pg) pg.classList.add('active');
