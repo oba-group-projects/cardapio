@@ -5871,6 +5871,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
           + (link && (c.status === 'enviado' || c.status === 'aceito') ? '<button class="secondary" style="padding:4px 10px;font-size:11px" onclick="navigator.clipboard.writeText(\'' + link + '\');this.textContent=\'✅ Copiado!\';setTimeout(()=>this.textContent=\'🔗 Link\',2000)">🔗 Link</button>' : '')
           + (c.status === 'enviado' && link ? '<button class="secondary" style="padding:4px 10px;font-size:11px;background:#25d366;color:#fff;border:none" onclick="obaContractEnviarWppById(\'' + c.contract_id + '\',\'' + link + '\')">📱 WhatsApp</button>' : '')
           + (c.status === 'rascunho' ? '<button class="secondary" style="padding:4px 10px;font-size:11px;background:#fee2e2;color:#dc2626;border-color:#fca5a5" onclick="obaContractExcluir(\'' + cid + '\',\'' + (c.numero||'') + '\')">🗑 Excluir</button>' : '')
+          + (c.status === 'cancelado' ? '<button class="secondary" style="padding:4px 10px;font-size:11px;background:#fee2e2;color:#dc2626;border-color:#fca5a5" onclick="obaContractExcluir(\'' + cid + '\',\'' + (c.numero||'') + '\')">🗑 Excluir</button>' : '')
           + (c.status === 'enviado' ? '<button class="secondary" style="padding:4px 10px;font-size:11px;background:#fff7ed;color:#92400e;border-color:#fcd34d" onclick="obaContractCancelar(\'' + cid + '\',\'' + (c.numero||'') + '\')">✕ Cancelar</button>' : '')
           + '</td></tr>';
       }).join('');

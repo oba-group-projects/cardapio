@@ -4547,12 +4547,14 @@ async function obaHandleContractsApi(request, env, url) {
     return json({ ok: true, aceite });
   }
 
-  // DELETE /api/contracts/:id — excluir rascunho
+  // DELETE /api/contracts/:id — excluir rascunho ou cancelado
   const matchDel = url.pathname.match(/^\/api\/contracts\/([^/]+)$/);
   if (matchDel && request.method === "DELETE") {
     const existing = await env.DB.prepare("SELECT status FROM contracts WHERE contract_id = ?").bind(matchDel[1]).first();
     if (!existing) return json({ ok: false, error: "nao_encontrado" }, 404);
-    if (existing.status !== "rascunho") return json({ ok: false, error: "apenas_rascunhos_podem_ser_excluidos" }, 403);
+    if (existing.status !== "rascunho" && existing.status !== "cancelado") {
+      return json({ ok: false, error: "apenas_rascunhos_ou_cancelados_podem_ser_excluidos" }, 403);
+    }
     await env.DB.prepare("DELETE FROM contract_aceites WHERE contract_id = ?").bind(matchDel[1]).run();
     await env.DB.prepare("DELETE FROM contracts WHERE contract_id = ?").bind(matchDel[1]).run();
     return json({ ok: true, deleted: matchDel[1] });
