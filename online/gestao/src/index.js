@@ -4591,12 +4591,12 @@ async function obaHandleContratoPublico(request, env, url) {
 
     // Valida WhatsApp — tolerante a formato (com/sem DDI 55, com/sem pontuação)
     const wppInformado = (body.whatsapp || "").replace(/\D/g, "").trim();
-    const proposal = await env.DB.prepare("SELECT whatsapp, cpf_cnpj FROM proposals WHERE proposal_id = ?").bind(contract.proposal_id).first();
+    const proposal = await env.DB.prepare("SELECT whatsapp FROM proposals WHERE proposal_id = ?").bind(contract.proposal_id).first();
     const wppEsperadoRaw = (proposal?.whatsapp || "").replace(/\D/g, "").trim();
     // Normaliza: remove prefixo 55 se número tiver 12+ dígitos (55 + 10 dígitos)
     const normWpp = w => (w.startsWith("55") && w.length >= 12) ? w.slice(2) : w;
 
-    // Verificação por CPF (alternativa ao WhatsApp)
+    // Verificação por CPF — compara com cpf_cnpj do CONTRATO (não da proposta)
     const cpfInformado = (body.cpf || "").replace(/\D/g, "").trim();
     const cpfEsperado = (contract.cpf_cnpj || "").replace(/\D/g, "").trim();
 
