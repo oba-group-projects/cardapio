@@ -1,26 +1,26 @@
 ﻿# HANDOFF AUTOMATICO
 
-Atualizado: 2026-10-07 16:05:12
+Atualizado: 2026-10-08 20:32:26
 
 ## Git
 
 Branch: feature/gestao-online-segura
 
-HEAD: 5d5a611
+HEAD: a18caa9
 
 Última tag: v12C-pre-4
 
 ## Workspace
 
-Limpo.
+ M docs/HANDOFF_AUTO.md
 
 ## Últimos commits
 
-- 5d5a611 feat(catalogo): Ed. Visual Pg3/4 profissional ÔÇö ativo, corSubtitulo, corFundo, tipografia por grupo
-- 4789a82 docs: handoff sessao 7 ÔÇö Ed. Visual Catalogo Etapa A completa
-- d1367b7 feat(catalogo): Ed. Visual completa ÔÇö cores, logo, tipografia, tema global
-- 1aee67f feat(12C-4): Ed. Visual Catalogo completa ÔÇö Pg2 e Pg3/4 editaveis
-- 0cd18cc feat(central): Ed. Visual Cardapio e Ed. Visual Catalogo como abas separadas
+- a18caa9 feat(catalogo): Camada 1 ÔÇö Pg2 e grupos ativo/inativo com validacao e navegacao segura
+- 237034e feat(central): botao publicar com nome dinamico catalogo/cardapio/ambos + mensagem contextual
+- 9717df0 chore(sync): publicacao via Central [draft_d6fb0c]
+- ffd3d2a chore(sync): publicacao via Central [draft_d6fb0c]
+- bd4a5bc chore(sync): publicacao via Central [draft_d6fb0c]
 
 ## Antes de continuar
 
