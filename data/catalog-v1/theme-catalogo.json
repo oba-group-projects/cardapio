@@ -1,0 +1,74 @@
+{
+  "grupos": {
+    "artesanais": {
+      "ativo": true,
+      "corFundo": "",
+      "corSubtitulo": "",
+      "corTitulo": "",
+      "pesoSubtitulo": "",
+      "pesoTitulo": "",
+      "subtitulo": "Tradicionais, Clássicos e Especiais",
+      "tamSubtitulo": "",
+      "tamTitulo": "",
+      "titulo": "Doces Artesanais"
+    },
+    "finos": {
+      "ativo": true,
+      "corFundo": "",
+      "corSubtitulo": "",
+      "corTitulo": "",
+      "pesoSubtitulo": "",
+      "pesoTitulo": "",
+      "subtitulo": "Linha exclusiva",
+      "tamSubtitulo": "",
+      "tamTitulo": "",
+      "titulo": "Doces Finos"
+    }
+  },
+  "pg1": {
+    "corCTA": "",
+    "corFundo": "",
+    "corTexto": "",
+    "corTitulo": "",
+    "cta": "Conhecer nossos sabores →",
+    "logo": "",
+    "paragrafo1": "Uma coleção de sabores artesanais, criados para despertar os sentidos e transformar pequenos momentos em lembranças especiais. Brigadeiros cremosos, combinações delicadas e receitas cuidadosamente preparadas para quem aprecia doces feitos de verdade.",
+    "paragrafo2": "Explore nossos sabores, descubra seus favoritos e deixe-se levar pela experiência Oba.",
+    "pesoCTA": "",
+    "pesoTexto": "",
+    "pesoTitulo": "",
+    "rotulo": "Catálogo",
+    "tamCTA": "",
+    "tamTexto": "",
+    "tamTitulo": "",
+    "tamanhoLogo": "medio",
+    "titulo": "Descubra a Oba"
+  },
+  "pg2": {
+    "artesanais_label": "Doces Artesanais",
+    "artesanais_sublabel": "Artesanais",
+    "corFundo": "",
+    "corSubtitulo": "",
+    "finos_label": "Doces Finos",
+    "finos_sublabel": "Exclusivos",
+    "logo": "",
+    "pesoSubtitulo": "",
+    "subtitulo": "Encontre seu favorito",
+    "tamSubtitulo": "",
+    "tamanhoLogo": "medio"
+  },
+  "schemaVersion": 3,
+  "tema": {
+    "arredondamento": "",
+    "corCard": "",
+    "corFundo": "",
+    "corLinha": "",
+    "corMuted": "",
+    "corPrimaria": "",
+    "corTexto": "",
+    "fonte": "",
+    "tamanhoCorpo": "",
+    "tamanhoTitulo": ""
+  },
+  "updatedAt": "2026-10-08"
+}
