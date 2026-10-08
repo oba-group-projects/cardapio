@@ -4590,13 +4590,21 @@ async function obaHandleContratoPublico(request, env, url) {
     if (contract.status !== "enviado") return json({ ok: false, error: "contrato_nao_disponivel_para_aceite" }, 409);
 
     // Valida WhatsApp — tolerante a formato (com/sem DDI 55, com/sem pontuação)
-    const wppInformado = (body.whatsapp || "").replace(/\D/g, "");
-    const proposal = await env.DB.prepare("SELECT whatsapp FROM proposals WHERE proposal_id = ?").bind(contract.proposal_id).first();
-    const wppEsperadoRaw = (proposal?.whatsapp || "").replace(/\D/g, "");
-    // Normaliza: remove prefixo 55 se presente para comparar só DDD+número
-    const normWpp = w => w.startsWith("55") && w.length > 11 ? w.slice(2) : w;
-    if (!wppInformado || normWpp(wppInformado) !== normWpp(wppEsperadoRaw)) {
-      return json({ ok: false, error: "whatsapp_invalido" }, 403);
+    const wppInformado = (body.whatsapp || "").replace(/\D/g, "").trim();
+    const proposal = await env.DB.prepare("SELECT whatsapp, cpf_cnpj FROM proposals WHERE proposal_id = ?").bind(contract.proposal_id).first();
+    const wppEsperadoRaw = (proposal?.whatsapp || "").replace(/\D/g, "").trim();
+    // Normaliza: remove prefixo 55 se número tiver 12+ dígitos (55 + 10 dígitos)
+    const normWpp = w => (w.startsWith("55") && w.length >= 12) ? w.slice(2) : w;
+
+    // Verificação por CPF (alternativa ao WhatsApp)
+    const cpfInformado = (body.cpf || "").replace(/\D/g, "").trim();
+    const cpfEsperado = (contract.cpf_cnpj || "").replace(/\D/g, "").trim();
+
+    const wppOk = wppInformado && normWpp(wppInformado) === normWpp(wppEsperadoRaw);
+    const cpfOk = cpfInformado && cpfEsperado && cpfInformado === cpfEsperado;
+
+    if (!wppOk && !cpfOk) {
+      return json({ ok: false, error: "verificacao_invalida" }, 403);
     }
 
     // Fase 2 do POST: aceite de verdade (requer campo aceito:true)
@@ -4610,7 +4618,7 @@ async function obaHandleContratoPublico(request, env, url) {
       await env.DB.prepare(`
         INSERT INTO contract_aceites (aceite_id, contract_id, data_hora, ip, user_agent, whatsapp_confirmado, snapshot_hash, criado_em)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `).bind(aceiteId, contract.contract_id, now, ip, ua, wppInformado, contract.snapshot_hash, now).run();
+      `).bind(aceiteId, contract.contract_id, now, ip, ua, wppOk ? wppInformado : ("CPF:" + cpfInformado), contract.snapshot_hash, now).run();
 
       await env.DB.prepare("UPDATE contracts SET status = 'aceito', atualizado_em = ? WHERE contract_id = ?").bind(now, contract.contract_id).run();
       return json({ ok: true, aceito: true, data_hora: now });
@@ -4697,11 +4705,22 @@ ${contract.status === "aceito" ? `
 </div>` : `
 <div id="etapa-wpp">
   <div class="card-wpp">
-    <h2>Confirme seu WhatsApp</h2>
-    <p>Para visualizar o contrato, confirme o número de WhatsApp cadastrado.</p>
-    <input id="wpp-input" type="tel" placeholder="Ex: 55999998888" inputmode="numeric" autocomplete="tel">
-    <p class="erro" id="wpp-erro">Número não confere. Tente novamente.</p>
-    <button class="btn-prim" onclick="confirmarWpp()">Confirmar</button>
+    <h2>Confirme sua identidade</h2>
+    <p>Para visualizar o contrato, confirme pelo WhatsApp <strong>ou</strong> pelo CPF/CNPJ cadastrado.</p>
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <button id="tab-wpp" onclick="obaVerifTab('wpp')" style="flex:1;padding:9px;border:1.5px solid #8B4513;border-radius:10px;background:#8B4513;color:#fff;font:inherit;font-size:12px;font-weight:600;cursor:pointer">📱 WhatsApp</button>
+      <button id="tab-cpf" onclick="obaVerifTab('cpf')" style="flex:1;padding:9px;border:1.5px solid #EDD9C0;border-radius:10px;background:#FFFDF8;color:#8B4513;font:inherit;font-size:12px;font-weight:600;cursor:pointer">🪪 CPF/CNPJ</button>
+    </div>
+    <div id="verif-wpp-block">
+      <p style="font-size:12px;color:#888;margin-bottom:8px">Digite o número de WhatsApp cadastrado na proposta:</p>
+      <input id="wpp-input" type="tel" placeholder="Ex: 51999609505" inputmode="numeric" autocomplete="tel">
+    </div>
+    <div id="verif-cpf-block" style="display:none">
+      <p style="font-size:12px;color:#888;margin-bottom:8px">Digite o CPF ou CNPJ cadastrado no contrato:</p>
+      <input id="cpf-input" type="text" placeholder="Ex: 000.000.000-00" inputmode="numeric" maxlength="18">
+    </div>
+    <p class="erro" id="wpp-erro">Dados não conferem. Tente novamente ou use a outra opção.</p>
+    <button class="btn-prim" style="margin-top:12px" onclick="confirmarIdentidade()">Confirmar</button>
   </div>
 </div>
 
@@ -4731,19 +4750,35 @@ ${contract.status === "aceito" ? `
 const TOKEN = ${JSON.stringify(token)};
 let wppValidado = '';
 
-async function confirmarWpp() {
-  const wpp = document.getElementById('wpp-input').value.replace(/\\D/g,'');
+function obaVerifTab(tab) {
+  const isWpp = tab === 'wpp';
+  document.getElementById('verif-wpp-block').style.display = isWpp ? '' : 'none';
+  document.getElementById('verif-cpf-block').style.display = isWpp ? 'none' : '';
+  const btnWpp = document.getElementById('tab-wpp');
+  const btnCpf = document.getElementById('tab-cpf');
+  btnWpp.style.background = isWpp ? '#8B4513' : '#FFFDF8';
+  btnWpp.style.color = isWpp ? '#fff' : '#8B4513';
+  btnWpp.style.borderColor = isWpp ? '#8B4513' : '#EDD9C0';
+  btnCpf.style.background = isWpp ? '#FFFDF8' : '#8B4513';
+  btnCpf.style.color = isWpp ? '#8B4513' : '#fff';
+  btnCpf.style.borderColor = isWpp ? '#EDD9C0' : '#8B4513';
+}
+
+async function confirmarIdentidade() {
   const erro = document.getElementById('wpp-erro');
   erro.style.display = 'none';
+  const usandoCpf = document.getElementById('verif-cpf-block').style.display !== 'none';
+  const wpp = usandoCpf ? '' : (document.getElementById('wpp-input').value.replace(/\\D/g,''));
+  const cpf = usandoCpf ? (document.getElementById('cpf-input').value.replace(/\\D/g,'')) : '';
   try {
     const r = await fetch('/contrato/' + TOKEN, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ whatsapp: wpp })
+      body: JSON.stringify({ whatsapp: wpp, cpf: cpf })
     });
     const d = await r.json();
     if (d.ok) {
-      wppValidado = wpp;
+      wppValidado = wpp || ('cpf:' + cpf);
       document.getElementById('etapa-wpp').style.display = 'none';
       document.getElementById('etapa-contrato').style.display = 'block';
       document.getElementById('aceite-bar').style.display = 'flex';
@@ -4757,11 +4792,15 @@ async function aceitarContrato() {
   const btn = document.getElementById('btn-aceitar');
   btn.disabled = true;
   btn.textContent = 'Registrando...';
+  const isCpf = wppValidado.startsWith('cpf:');
+  const body = isCpf
+    ? { cpf: wppValidado.slice(4), aceito: true }
+    : { whatsapp: wppValidado, aceito: true };
   try {
     const r = await fetch('/contrato/' + TOKEN, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ whatsapp: wppValidado, aceito: true })
+      body: JSON.stringify(body)
     });
     const d = await r.json();
     if (d.ok) {
