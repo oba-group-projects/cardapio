@@ -1678,22 +1678,29 @@ async function atualizarStatus(){
     const temCardapio = pendencias.some(p => !p.toLowerCase().includes('catálogo') && !p.toLowerCase().includes('catalogo'));
     const contexto = (temCatalogo && temCardapio) ? ' (cardápio + catálogo)' : temCatalogo ? ' (catálogo)' : temCardapio ? ' (cardápio)' : '';
 
+    /* Nome dinâmico do botão publicar */
+    const nomeBtnPublicar = (temCatalogo && temCardapio)
+      ? 'Publicar cardápio + catálogo'
+      : temCatalogo
+        ? 'Publicar catálogo'
+        : 'Publicar cardápio';
+
     if(!draft.revision_id){
       b.textContent='Rascunho vazio';
       b.className='badge off';
-      if(pub)pub.disabled=true;
+      if(pub){ pub.disabled=true; pub.textContent='Publicar após Preview'; }
     }else if(slots.PREVIEW!==draft.revision_id){
       b.textContent='Rascunho aguardando Preview' + contexto;
       b.className='badge off';
-      if(pub)pub.disabled=true;
+      if(pub){ pub.disabled=true; pub.textContent=nomeBtnPublicar; }
     }else if(slots.PUBLISHED!==draft.revision_id){
       b.textContent='Preview pronto para publicar' + contexto;
       b.className='badge off';
-      if(pub)pub.disabled=false;
+      if(pub){ pub.disabled=false; pub.textContent=nomeBtnPublicar; }
     }else{
       b.textContent='Sem alterações publicáveis';
       b.className='badge ok';
-      if(pub)pub.disabled=true;
+      if(pub){ pub.disabled=true; pub.textContent='Publicar após Preview'; }
     }
     window.__obaStatusPublicacao={draft,preview,slots};
   }catch{}
@@ -7617,7 +7624,10 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     }
 
     if (typeof msg === 'function') {
-      msg(result.reused ? 'Cardapio ja estava atualizado.' : 'Publicacao concluida com seguranca. O cardapio foi atualizado.');
+      const temCatalogo = typeof pendencias !== 'undefined' && pendencias.some(p => p.toLowerCase().includes('catálogo') || p.toLowerCase().includes('catalogo'));
+      const temCardapio = typeof pendencias !== 'undefined' && pendencias.some(p => !p.toLowerCase().includes('catálogo') && !p.toLowerCase().includes('catalogo'));
+      const quem = (temCatalogo && temCardapio) ? 'Cardápio e catálogo publicados' : temCatalogo ? 'Catálogo publicado' : 'Cardápio publicado';
+      msg(result.reused ? 'Já estava atualizado.' : quem + ' com segurança.');
     }
   }
 
