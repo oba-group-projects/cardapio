@@ -2523,12 +2523,20 @@ async function obaHandleProposalsApi(request, env, url) {
     if (!allowed.includes(body.status)) {
       return json({ ok: false, error: "status_invalido" }, 400);
     }
-    const result = await env.DB.prepare(
-      "UPDATE proposals SET status = ?, atualizado_em = ? WHERE proposal_id = ?"
-    ).bind(body.status, now, matchStatus[1]).run();
 
+    // Se status = aceita e foi informado o cenário aceito, grava junto
+    let queryStatus, bindsStatus;
+    if (body.status === "aceita" && body.scenario_aceito_id) {
+      queryStatus = "UPDATE proposals SET status = ?, scenario_aceito_id = ?, atualizado_em = ? WHERE proposal_id = ?";
+      bindsStatus = [body.status, body.scenario_aceito_id, now, matchStatus[1]];
+    } else {
+      queryStatus = "UPDATE proposals SET status = ?, atualizado_em = ? WHERE proposal_id = ?";
+      bindsStatus = [body.status, now, matchStatus[1]];
+    }
+
+    const result = await env.DB.prepare(queryStatus).bind(...bindsStatus).run();
     if (result.meta.changes === 0) return json({ ok: false, error: "nao_encontrada" }, 404);
-    return json({ ok: true, proposal_id: matchStatus[1], status: body.status });
+    return json({ ok: true, proposal_id: matchStatus[1], status: body.status, scenario_aceito_id: body.scenario_aceito_id || null });
   }
 
   // DELETE /api/proposals/:id — excluir proposta (apenas rascunhos)

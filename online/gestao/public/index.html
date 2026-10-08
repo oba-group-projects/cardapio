@@ -5167,6 +5167,53 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
 
   // ---------- ALTERAR STATUS ----------
   window.obaProposalAlterarStatus = async function(proposalId, novoStatus, selectEl) {
+    // Se mudando para "aceita" e proposta tem múltiplos cenários, pergunta qual foi aceito
+    if (novoStatus === 'aceita') {
+      try {
+        const rp = await fetch('/api/proposals/' + proposalId);
+        const dp = await rp.json();
+        const scenarios = dp.proposal?.scenarios || [];
+        let scenarioAceitoId = scenarios[0]?.scenario_id || null;
+
+        if (scenarios.length > 1) {
+          // Monta mini-modal inline via prompt com lista
+          const opcoes = scenarios.map((s, i) => (i + 1) + '. ' + (s.nome || 'Cenário ' + (i + 1))).join('\n');
+          const escolha = prompt('Qual cenário foi aceito pelo cliente?\n\n' + opcoes + '\n\nDigite o número:');
+          const idx = parseInt(escolha, 10) - 1;
+          if (idx >= 0 && idx < scenarios.length) {
+            scenarioAceitoId = scenarios[idx].scenario_id;
+          } else if (escolha !== null) {
+            alert('Opção inválida. Aceitando sem registrar o cenário.');
+            scenarioAceitoId = null;
+          } else {
+            // Cancelou o prompt — restaura select
+            if (selectEl) selectEl.value = dp.proposal?.status || 'enviada';
+            return;
+          }
+        }
+
+        const r = await fetch('/api/proposals/' + proposalId + '/status', {
+          method: 'PATCH',
+          headers: {'Content-Type':'application/json','X-CSRF-Token':csrf()},
+          body: JSON.stringify({ status: novoStatus, scenario_aceito_id: scenarioAceitoId }),
+        });
+        const data = await r.json();
+        if (data.ok) {
+          if (selectEl) {
+            selectEl.style.borderColor = statusColor(novoStatus);
+            selectEl.style.background = statusColor(novoStatus) + '18';
+            selectEl.style.color = statusColor(novoStatus);
+          }
+          carregarLista();
+        } else {
+          alert('Erro ao atualizar status: ' + (data.error || 'desconhecido'));
+          carregarLista();
+        }
+      } catch(e) { alert('Erro de conexão.'); carregarLista(); }
+      return;
+    }
+
+    // Status diferentes de "aceita" — comportamento original
     try {
       const r = await fetch('/api/proposals/' + proposalId + '/status', {
         method: 'PATCH',
@@ -5175,17 +5222,15 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       });
       const data = await r.json();
       if (data.ok) {
-        // Atualiza a cor do select sem recarregar a lista inteira
         if (selectEl) {
           selectEl.style.borderColor = statusColor(novoStatus);
           selectEl.style.background = statusColor(novoStatus)+'18';
           selectEl.style.color = statusColor(novoStatus);
         }
-        // Se mudou de rascunho, recarrega para mostrar/ocultar botão Excluir
         carregarLista();
       } else {
         alert('Erro ao atualizar status: ' + (data.error||'desconhecido'));
-        carregarLista(); // restaura valor anterior
+        carregarLista();
       }
     } catch(e) { alert('Erro de conexão.'); carregarLista(); }
   };
@@ -5672,7 +5717,8 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       <h4 style="margin:0 0 12px;font-size:13px;color:var(--brand)">📦 Cenário contratado</h4>
       <div class="grid">
         <div class="field full">
-          <label>Selecione o cenário aceito pelo cliente</label>
+          <label>Cenário aceito pelo cliente</label>
+          <p id="ctr-aviso-scenario-sel" style="display:none;font-size:12px;margin-bottom:8px;padding:8px 10px;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;color:#166534"></p>
           <select id="ctr-scenario-id" style="font-size:13px">
             <option value="">Carregando cenários...</option>
           </select>
@@ -5857,8 +5903,10 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         return;
       }
 
-      // Cria novo contrato com o primeiro cenário como padrão
-      const primeiroScenario = proposta.scenarios?.[0]?.scenario_id || '';
+      // Cria novo contrato — usa cenário aceito da proposta como padrão
+      const primeiroScenario = proposta.scenario_aceito_id
+        || proposta.scenarios?.[0]?.scenario_id
+        || '';
       const r = await fetch('/api/contracts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf() },
@@ -5920,6 +5968,28 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         if (s.scenario_id === d.contract.scenario_id) opt.selected = true;
         sel.appendChild(opt);
       });
+
+      // Se só tem 1 cenário ou cenário já estava definido — oculta o select e mostra apenas o nome
+      const scenarioAtual = (dp.proposal?.scenarios || []).find(s => s.scenario_id === d.contract.scenario_id)
+        || dp.proposal?.scenarios?.[0];
+      const scenarioDefinido = dp.proposal?.scenario_aceito_id || dp.proposal?.scenarios?.length === 1;
+      const avisoScenarioSel = $('ctr-aviso-scenario-sel');
+      if (scenarioDefinido && scenarioAtual) {
+        // Força a seleção correta e mostra info em vez do select
+        sel.value = scenarioAtual.scenario_id;
+        if (avisoScenarioSel) {
+          avisoScenarioSel.textContent = '✅ Cenário definido na proposta: ' + (scenarioAtual.nome || 'Cenário 1');
+          avisoScenarioSel.style.display = 'block';
+        }
+        sel.style.display = 'none';
+      } else {
+        if (avisoScenarioSel) {
+          avisoScenarioSel.innerHTML = '⚠️ Esta proposta tem ' + (dp.proposal?.scenarios?.length || 0) + ' cenários. Selecione qual foi aceito pelo cliente.';
+          avisoScenarioSel.style.display = 'block';
+          avisoScenarioSel.style.color = '#92400e';
+        }
+        sel.style.display = '';
+      }
 
       // Preenche campos editáveis
       sv('ctr-nome-completo', d.contract.nome_completo || dp.proposal?.cliente || '');
