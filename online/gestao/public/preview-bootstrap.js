@@ -15,7 +15,8 @@
     'options.json':'opcionais',
     'combos.json':'combos',
     'config.json':'loja',
-    'theme.json':'tema'
+    'theme.json':'tema',
+    'theme-catalogo.json':'tema_catalogo'
   };
   window.fetch=async function(input,init){
     const raw=typeof input==='string'?input:(input&&input.url?input.url:String(input));

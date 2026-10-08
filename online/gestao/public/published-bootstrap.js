@@ -14,26 +14,28 @@
       // que é o fallback correto quando basePath não resolve imagens locais
       if (loja.assets) { loja.assets.basePath = ''; loja.assets.imageRoot = ''; }
       return {
-        sabores:    d.sabores    || d.flavors    || [],
-        categorias: d.categorias || d.categories || [],
-        caixas:     d.caixas     || d.boxes      || [],
-        produtos:   d.produtos   || d.products   || [],
-        opcionais:  d.opcionais  || d.options    || [],
-        combos:     d.combos     || [],
-        loja:       loja,
-        tema:       d.tema       || d.theme      || {}
+        sabores:       d.sabores       || d.flavors    || [],
+        categorias:    d.categorias    || d.categories || [],
+        caixas:        d.caixas        || d.boxes      || [],
+        produtos:      d.produtos      || d.products   || [],
+        opcionais:     d.opcionais     || d.options    || [],
+        combos:        d.combos        || [],
+        loja:          loja,
+        tema:          d.tema          || d.theme      || {},
+        tema_catalogo: d.tema_catalogo || {}
       };
     });
 
   var map = {
-    'flavors.json':    'sabores',
-    'categories.json': 'categorias',
-    'boxes.json':      'caixas',
-    'products.json':   'produtos',
-    'options.json':    'opcionais',
-    'combos.json':     'combos',
-    'config.json':     'loja',
-    'theme.json':      'tema'
+    'flavors.json':         'sabores',
+    'categories.json':      'categorias',
+    'boxes.json':           'caixas',
+    'products.json':        'produtos',
+    'options.json':         'opcionais',
+    'combos.json':          'combos',
+    'config.json':          'loja',
+    'theme.json':           'tema',
+    'theme-catalogo.json':  'tema_catalogo'
   };
 
   window.fetch = function(input, init) {
