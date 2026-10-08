@@ -82,6 +82,9 @@ function obaLogout() {
 <button class="secondary" id="previewBtn">Visualizar Preview</button>
 <button class="primary" id="publicarBtn" disabled>Publicar após Preview</button>
 <button class="secondary" onclick="window.open('/cardapio','_blank','noopener,noreferrer')">Visualizar cardápio</button>
+<span style="display:inline-block;width:1px;height:20px;background:var(--line);margin:0 4px;vertical-align:middle"></span>
+<button class="secondary" id="previewCatBtn">Visualizar Preview Catálogo</button>
+<button class="secondary" onclick="window.open('/catalogo','_blank','noopener,noreferrer')">Visualizar catálogo</button>
 <button class="secondary" id="historicoBtn">Histórico de versões</button>
 <span id="statusBadge" class="badge">Verificando...</span>
 </div>
@@ -1668,20 +1671,26 @@ async function atualizarStatus(){
     const b=$('statusBadge');
     const pub=$('publicarBtn');
     const slots=preview.slots||{};
+
+    /* Detecta contexto das pendências: cardápio, catálogo ou ambos */
+    const temCatalogo = pendencias.some(p => p.toLowerCase().includes('catálogo') || p.toLowerCase().includes('catalogo'));
+    const temCardapio = pendencias.some(p => !p.toLowerCase().includes('catálogo') && !p.toLowerCase().includes('catalogo'));
+    const contexto = (temCatalogo && temCardapio) ? ' (cardápio + catálogo)' : temCatalogo ? ' (catálogo)' : temCardapio ? ' (cardápio)' : '';
+
     if(!draft.revision_id){
       b.textContent='Rascunho vazio';
       b.className='badge off';
       if(pub)pub.disabled=true;
     }else if(slots.PREVIEW!==draft.revision_id){
-      b.textContent='Rascunho aguardando Preview';
+      b.textContent='Rascunho aguardando Preview' + contexto;
       b.className='badge off';
       if(pub)pub.disabled=true;
     }else if(slots.PUBLISHED!==draft.revision_id){
-      b.textContent='Preview pronto para publicar';
+      b.textContent='Preview pronto para publicar' + contexto;
       b.className='badge off';
       if(pub)pub.disabled=false;
     }else{
-      b.textContent='Sem alteracoes publicaveis';
+      b.textContent='Sem alterações publicáveis';
       b.className='badge ok';
       if(pub)pub.disabled=true;
     }
@@ -3619,6 +3628,22 @@ $('previewBtn').onclick=async()=>{
   }catch(err){msg(String(err.message||err),'erro')}
   finally{b.disabled=false;b.textContent='Visualizar Preview'}
 };
+
+/* Preview do catálogo — usa o mesmo slot PREVIEW, abre /__preview_catalogo */
+const previewCatBtn = $('previewCatBtn');
+if (previewCatBtn) {
+  previewCatBtn.onclick = async () => {
+    previewCatBtn.disabled = true;
+    previewCatBtn.textContent = 'Preparando preview...';
+    try {
+      await obaPreparePreview();
+      await atualizarStatus();
+      window.open('/__preview_catalogo?cb=' + Date.now(), '_blank', 'noopener,noreferrer');
+      msg('Preview do catálogo atualizado. O catálogo publicado continua intacto.');
+    } catch(err) { msg(String(err.message || err), 'erro'); }
+    finally { previewCatBtn.disabled = false; previewCatBtn.textContent = 'Visualizar Preview Catálogo'; }
+  };
+}
 
 /* publicarBtn — conectado ao handler obaPublishPreview em oba-publish-8e9f */
 

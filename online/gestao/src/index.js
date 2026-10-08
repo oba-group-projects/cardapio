@@ -2314,6 +2314,41 @@ async function obaPrivatePreviewPage(request, env) {
 
 /* OBA_PREVIEW_API_END */
 
+/* ── PREVIEW PRIVADO DO CATÁLOGO ── */
+async function obaPrivatePreviewPageCatalogo(request, env) {
+  const preview = await obaLoadCatalogSlot(env, "PREVIEW");
+  if (!preview.revision_id || !preview.payload) {
+    return new Response(
+      "<!doctype html><html lang='pt-BR'><meta charset='utf-8'><title>Preview indisponível</title><body><h1>Preview ainda não foi criado.</h1><p>Volte à Central e clique em Visualizar Preview.</p></body></html>",
+      { status: 409, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex, nofollow" } }
+    );
+  }
+
+  const assetUrl = new URL(request.url);
+  assetUrl.pathname = "/ui-catalogo/index.html";
+  assetUrl.search = "";
+  assetUrl.hash = "";
+  const asset = await env.ASSETS.fetch(new Request(assetUrl.toString(), { method: "GET", headers: request.headers }));
+  if (!asset.ok) return new Response("Preview do catálogo indisponível", { status: 502 });
+
+  const source = await asset.text();
+  const inject = "<base href='/'><script src='/preview-bootstrap.js'></script>";
+  const html = source.includes("<head>") ? source.replace("<head>", "<head>" + inject) : inject + source;
+
+  return new Response(html, {
+    status: 200,
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+      "Cache-Control": "no-store, no-cache, must-revalidate",
+      "Pragma": "no-cache",
+      "X-Robots-Tag": "noindex, nofollow, noarchive",
+      "X-Content-Type-Options": "nosniff",
+      "Referrer-Policy": "no-referrer",
+      "X-Frame-Options": "DENY"
+    }
+  });
+}
+
 // ============================================================
 // FASE 12A — PROPOSTAS DE ORCAMENTO
 // ============================================================
@@ -4089,6 +4124,10 @@ export default {
 
     if (url.pathname === "/__preview") {
       return obaPrivatePreviewPage(request, env);
+    }
+
+    if (url.pathname === "/__preview_catalogo") {
+      return obaPrivatePreviewPageCatalogo(request, env);
     }
 
     if (url.pathname.startsWith("/api/")) {
