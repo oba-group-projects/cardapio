@@ -6111,7 +6111,11 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         body: JSON.stringify(body)
       });
       const d = await r.json();
-      if (d.ok) { obaContractAtivo = d.contract; alert('Rascunho salvo.'); }
+      if (d.ok) {
+        obaContractAtivo = d.contract;
+        obaContractAtualizarResumo();
+        alert('Rascunho salvo.');
+      }
       else alert('Erro: ' + (d.error || 'desconhecido'));
     } catch(e) { alert('Erro de conexão.'); }
   };
@@ -6139,20 +6143,25 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     const scenarioId = $('ctr-scenario-id')?.value;
     const resumoBox = $('ctr-resumo-financeiro');
     const resumoConteudo = $('ctr-resumo-conteudo');
-    if (!resumoBox || !resumoConteudo || !obaContractPropostaAtiva || !scenarioId) {
-      if (resumoBox) resumoBox.style.display = 'none';
+    if (!resumoBox || !resumoConteudo) return;
+
+    // Usa valor_total gravado pelo Worker (correto, inclui preços de catálogo)
+    const valorTotal = obaContractAtivo?.valor_total;
+    const scenarioAtual = (obaContractPropostaAtiva?.scenarios || []).find(s => s.scenario_id === (scenarioId || obaContractAtivo?.scenario_id));
+    const nomeScenario = scenarioAtual?.nome || 'Cenário';
+
+    if (valorTotal == null || isNaN(Number(valorTotal))) {
+      resumoBox.style.display = 'none';
       return;
     }
-    const r = obaContractCalcularResumo(obaContractPropostaAtiva, scenarioId);
-    if (!r) { resumoBox.style.display = 'none'; return; }
+
     resumoBox.style.display = '';
     resumoConteudo.innerHTML =
       '<table style="width:100%;border-collapse:collapse">' +
-      '<tr><td style="padding:4px 0;color:#555;width:160px">Cenário</td><td style="padding:4px 0"><strong>' + (r.nome || '—') + '</strong></td></tr>' +
-      (r.subtotal !== r.total ? '<tr><td style="padding:4px 0;color:#555">Subtotal</td><td style="padding:4px 0">' + obaFmtMoeda(r.subtotal) + '</td></tr>' : '') +
-      (r.desconto > 0 ? '<tr><td style="padding:4px 0;color:#dc2626">Desconto</td><td style="padding:4px 0;color:#dc2626">- ' + obaFmtMoeda(r.desconto) + '</td></tr>' : '') +
-      '<tr><td style="padding:6px 0 0;font-weight:700;font-size:14px">Valor total</td><td style="padding:6px 0 0;font-weight:700;font-size:14px;color:#059669">' + obaFmtMoeda(r.total) + '</td></tr>' +
-      '</table>';
+      '<tr><td style="padding:4px 0;color:#555;width:160px">Cenário</td><td style="padding:4px 0"><strong>' + nomeScenario + '</strong></td></tr>' +
+      '<tr><td style="padding:6px 0 0;font-weight:700;font-size:14px">Valor total</td><td style="padding:6px 0 0;font-weight:700;font-size:14px;color:#059669">' + obaFmtMoeda(valorTotal) + '</td></tr>' +
+      '</table>' +
+      '<p class="hint" style="margin-top:6px">Valor calculado a partir dos itens e preços do catálogo.</p>';
   }
 
   // ── GERAR DOCUMENTO (snapshot + documento-box) ────────────
@@ -6178,17 +6187,16 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     const nome = $('ctr-nome-completo')?.value.trim() || '—';
     const cpf = ($('ctr-cpf-cnpj')?.value.trim() || '').replace(/\d(?=\d{2})/g, '*'); // mascara parcial
     const cond = obaContractLerCondPagamento() || '—';
-    const scenarioId = $('ctr-scenario-id')?.value;
-    const r = obaContractCalcularResumo(obaContractPropostaAtiva, scenarioId);
     const dataEvento = $('ctr-data-evento-ro')?.value || '—';
     const tipoEvento = $('ctr-tipo-evento-ro')?.value || '—';
+    const valorContrato = obaContractAtivo?.valor_total;
 
     const resumoHtml =
       '<strong>' + nome + '</strong><br>' +
       'CPF/CNPJ: ' + cpf + '<br>' +
       'Evento: ' + tipoEvento + ' — ' + dataEvento + '<br>' +
       'Condições: ' + cond + '<br>' +
-      (r ? '<strong style="color:#059669;font-size:14px">Total: ' + obaFmtMoeda(r.total) + '</strong>' : '');
+      (valorContrato != null ? '<strong style="color:#059669;font-size:14px">Total: ' + obaFmtMoeda(valorContrato) + '</strong>' : '');
 
     $('ctr-modal-resumo').innerHTML = resumoHtml;
     $('ctr-modal-confirmar').style.display = 'flex';

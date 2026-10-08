@@ -4393,6 +4393,17 @@ async function obaGetCatalogPrecos(env) {
   return { catPM, saborPM };
 }
 
+/* Calcula valor_total de um contrato a partir do cenário e do catálogo publicado */
+async function obaCalcularValorContrato(env, scenarioId) {
+  if (!scenarioId) return null;
+  const scenario = await env.DB.prepare("SELECT * FROM proposal_scenarios WHERE scenario_id = ?").bind(scenarioId).first();
+  if (!scenario) return null;
+  const items = await env.DB.prepare("SELECT * FROM proposal_items WHERE scenario_id = ? ORDER BY ordem").bind(scenarioId).all();
+  const { catPM, saborPM } = await obaGetCatalogPrecos(env);
+  const tots = obaContractCenarioTotal({ ...scenario, items: items.results || [] }, catPM, saborPM);
+  return tots.total;
+}
+
 // ── HANDLER API AUTENTICADA ──────────────────────────────────
 
 async function obaHandleContractsApi(request, env, url) {
@@ -4431,14 +4442,16 @@ async function obaHandleContractsApi(request, env, url) {
         nome_completo, email_cliente, cpf_cnpj, local_evento, cond_pagamento,
         horario_entrega, responsavel_recebimento,
         clausula_cancelamento, clausula_responsabilidades, clausula_foro,
+        valor_total,
         criado_em, atualizado_em)
-      VALUES (?, ?, ?, ?, 'rascunho', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, 'rascunho', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       contractId, proposal_id, scenario_id, numero,
       body.nome_completo || null, body.email_cliente || null, body.cpf_cnpj || null,
       body.local_evento || null, body.cond_pagamento || null,
       body.horario_entrega || null, body.responsavel_recebimento || null,
       CLAUSULA_CANCELAMENTO_PADRAO, CLAUSULA_RESPONSABILIDADES_PADRAO, CLAUSULA_FORO_PADRAO,
+      await obaCalcularValorContrato(env, scenario_id),
       now, now
     ).run();
 
@@ -4470,7 +4483,7 @@ async function obaHandleContractsApi(request, env, url) {
         local_evento = ?, cond_pagamento = ?,
         horario_entrega = ?, responsavel_recebimento = ?,
         clausula_cancelamento = ?, clausula_responsabilidades = ?, clausula_foro = ?,
-        scenario_id = ?,
+        scenario_id = ?, valor_total = ?,
         atualizado_em = ?
       WHERE contract_id = ?
     `).bind(
@@ -4481,6 +4494,7 @@ async function obaHandleContractsApi(request, env, url) {
       body.clausula_responsabilidades || CLAUSULA_RESPONSABILIDADES_PADRAO,
       body.clausula_foro || CLAUSULA_FORO_PADRAO,
       body.scenario_id || null,
+      await obaCalcularValorContrato(env, body.scenario_id),
       now, matchPut[1]
     ).run();
 
