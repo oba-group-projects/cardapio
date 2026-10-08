@@ -5736,11 +5736,25 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       </div>
     </div>
 
+    <!-- Resumo financeiro -->
+    <div id="ctr-resumo-financeiro" class="card" style="margin-bottom:16px;display:none">
+      <h4 style="margin:0 0 12px;font-size:13px;color:var(--brand)">💰 Resumo da contratação</h4>
+      <div id="ctr-resumo-conteudo" style="font-size:13px"></div>
+    </div>
+
     <!-- Ações -->
     <div id="ctr-acoes-rascunho" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
       <button class="secondary" onclick="obaContractVoltar()">✕ Cancelar</button>
       <button class="primary" style="background:#6b7280" onclick="obaContractSalvar()">💾 Salvar rascunho</button>
-      <button class="primary" style="background:#059669" onclick="obaContractEnviar()">📤 Gerar link para aceite</button>
+      <button class="primary" style="background:#2563eb" onclick="obaContractGerarDocumento()">📄 Gerar contrato</button>
+    </div>
+
+    <!-- Documento gerado — aguardando envio -->
+    <div id="ctr-documento-box" style="display:none;padding:16px;background:#eff6ff;border:1px solid #93c5fd;border-radius:12px;margin-bottom:16px">
+      <p style="font-size:13px;font-weight:700;color:#1e40af;margin-bottom:8px">📄 Contrato gerado — aguardando envio</p>
+      <p class="hint" style="margin-bottom:12px">O documento está pronto. Revise o resumo abaixo e envie ao cliente quando confirmar.</p>
+      <div id="ctr-documento-resumo" style="font-size:12px;color:#1e3a8a;margin-bottom:12px;padding:10px 12px;background:#dbeafe;border-radius:8px"></div>
+      <button class="primary" style="background:#059669" onclick="obaContractConfirmarEnvio()">📨 Enviar para aceite</button>
     </div>
 
     <!-- Link gerado (aparece após envio) -->
@@ -5908,7 +5922,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       });
 
       // Preenche campos editáveis
-      sv('ctr-nome-completo', d.contract.nome_completo || '');
+      sv('ctr-nome-completo', d.contract.nome_completo || dp.proposal?.cliente || '');
       sv('ctr-email', d.contract.email_cliente || '');
       sv('ctr-cpf-cnpj', d.contract.cpf_cnpj || '');
       sv('ctr-local', d.contract.local_evento || '');
@@ -5937,7 +5951,13 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       sv('ctr-clausula-responsabilidades', d.contract.clausula_responsabilidades || '');
       sv('ctr-clausula-foro', d.contract.clausula_foro || '');
 
-      // Status badge
+      // Atualiza resumo financeiro
+      obaContractAtualizarResumo();
+
+      // Select de cenário atualiza o resumo ao mudar
+      if ($('ctr-scenario-id')) {
+        $('ctr-scenario-id').onchange = obaContractAtualizarResumo;
+      }
       const sc = ctrStatusColor(d.contract.status);
       $('contracts-status-badge').textContent = ctrStatusLabel(d.contract.status);
       $('contracts-status-badge').style.background = sc + '18';
@@ -6026,7 +6046,128 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     } catch(e) { alert('Erro de conexão.'); }
   };
 
-  // ── EXCLUIR RASCUNHO ─────────────────────────────────────
+  // ── CALCULAR RESUMO FINANCEIRO ───────────────────────────
+  function obaContractCalcularResumo(proposta, scenarioId) {
+    const scenario = (proposta?.scenarios || []).find(s => s.scenario_id === scenarioId);
+    if (!scenario) return null;
+    let sub = 0;
+    (scenario.items || []).forEach(it => {
+      sub += Number(it.qtd || 0) * Number(it.preco_unit || 0);
+    });
+    let desc = 0;
+    if (scenario.desconto_tipo === 'reais') desc = Number(scenario.desconto_valor || 0);
+    else if (scenario.desconto_tipo === 'percentual') desc = sub * (Number(scenario.desconto_valor || 0) / 100);
+    const total = Math.max(0, sub - desc);
+    return { subtotal: sub, desconto: desc, total, nome: scenario.nome };
+  }
+
+  function obaFmtMoeda(v) {
+    return 'R$ ' + Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function obaContractAtualizarResumo() {
+    const scenarioId = $('ctr-scenario-id')?.value;
+    const resumoBox = $('ctr-resumo-financeiro');
+    const resumoConteudo = $('ctr-resumo-conteudo');
+    if (!resumoBox || !resumoConteudo || !obaContractPropostaAtiva || !scenarioId) {
+      if (resumoBox) resumoBox.style.display = 'none';
+      return;
+    }
+    const r = obaContractCalcularResumo(obaContractPropostaAtiva, scenarioId);
+    if (!r) { resumoBox.style.display = 'none'; return; }
+    resumoBox.style.display = '';
+    resumoConteudo.innerHTML =
+      '<table style="width:100%;border-collapse:collapse">' +
+      '<tr><td style="padding:4px 0;color:#555;width:160px">Cenário</td><td style="padding:4px 0"><strong>' + (r.nome || '—') + '</strong></td></tr>' +
+      (r.subtotal !== r.total ? '<tr><td style="padding:4px 0;color:#555">Subtotal</td><td style="padding:4px 0">' + obaFmtMoeda(r.subtotal) + '</td></tr>' : '') +
+      (r.desconto > 0 ? '<tr><td style="padding:4px 0;color:#dc2626">Desconto</td><td style="padding:4px 0;color:#dc2626">- ' + obaFmtMoeda(r.desconto) + '</td></tr>' : '') +
+      '<tr><td style="padding:6px 0 0;font-weight:700;font-size:14px">Valor total</td><td style="padding:6px 0 0;font-weight:700;font-size:14px;color:#059669">' + obaFmtMoeda(r.total) + '</td></tr>' +
+      '</table>';
+  }
+
+  // ── GERAR DOCUMENTO (snapshot + documento-box) ────────────
+  window.obaContractGerarDocumento = async function() {
+    if (!obaContractAtivo) return;
+
+    // Validação
+    const camposFaltando = [];
+    if (!$('ctr-nome-completo')?.value.trim()) camposFaltando.push('Nome completo do cliente');
+    if (!$('ctr-cpf-cnpj')?.value.trim())      camposFaltando.push('CPF ou CNPJ');
+    if (!obaContractLerCondPagamento())         camposFaltando.push('Condições de pagamento');
+    if (!$('ctr-scenario-id')?.value)           camposFaltando.push('Cenário contratado');
+    if (camposFaltando.length > 0) {
+      alert('Preencha os campos obrigatórios antes de gerar o contrato:\n\n• ' + camposFaltando.join('\n• '));
+      return;
+    }
+
+    // Salva rascunho primeiro
+    await obaContractSalvar();
+    if (!obaContractAtivo) return;
+
+    // Monta resumo do modal de confirmação
+    const nome = $('ctr-nome-completo')?.value.trim() || '—';
+    const cpf = ($('ctr-cpf-cnpj')?.value.trim() || '').replace(/\d(?=\d{2})/g, '*'); // mascara parcial
+    const cond = obaContractLerCondPagamento() || '—';
+    const scenarioId = $('ctr-scenario-id')?.value;
+    const r = obaContractCalcularResumo(obaContractPropostaAtiva, scenarioId);
+    const dataEvento = $('ctr-data-evento-ro')?.value || '—';
+    const tipoEvento = $('ctr-tipo-evento-ro')?.value || '—';
+
+    const resumoHtml =
+      '<strong>' + nome + '</strong><br>' +
+      'CPF/CNPJ: ' + cpf + '<br>' +
+      'Evento: ' + tipoEvento + ' — ' + dataEvento + '<br>' +
+      'Condições: ' + cond + '<br>' +
+      (r ? '<strong style="color:#059669;font-size:14px">Total: ' + obaFmtMoeda(r.total) + '</strong>' : '');
+
+    $('ctr-modal-resumo').innerHTML = resumoHtml;
+    $('ctr-modal-confirmar').style.display = 'flex';
+  };
+
+  // ── CONFIRMAR ENVIO (após modal) ─────────────────────────
+  window.obaContractConfirmarEnvio = async function() {
+    document.getElementById('ctr-modal-confirmar').style.display = 'none';
+    if (!obaContractAtivo) return;
+
+    // Validação já foi feita ao gerar — mas verifica status
+    const camposFaltando = [];
+    if (!$('ctr-nome-completo')?.value.trim()) camposFaltando.push('Nome completo do cliente');
+    if (!$('ctr-cpf-cnpj')?.value.trim())      camposFaltando.push('CPF ou CNPJ');
+    if (!obaContractLerCondPagamento())         camposFaltando.push('Condições de pagamento');
+    if (!$('ctr-scenario-id')?.value)           camposFaltando.push('Cenário contratado');
+    if (camposFaltando.length > 0) { alert('Campos obrigatórios ausentes.'); return; }
+
+    try {
+      const r = await fetch('/api/contracts/' + obaContractAtivo.contract_id + '/enviar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf() },
+        body: JSON.stringify({})
+      });
+      const d = await r.json();
+      if (d.ok) {
+        obaContractAtivo = d.contract;
+        const link = window.location.origin + d.link;
+        $('ctr-link-input').value = link;
+        $('ctr-link-box').style.display = 'block';
+        $('ctr-acoes-rascunho').style.display = 'none';
+        $('ctr-documento-box').style.display = 'none';
+        $('ctr-resumo-financeiro').style.display = 'none';
+        ['ctr-nome-completo','ctr-email','ctr-cpf-cnpj','ctr-local','ctr-cond-pagamento',
+         'ctr-cond-pagamento-sel','ctr-horario-entrega','ctr-responsavel',
+         'ctr-clausula-cancelamento','ctr-clausula-responsabilidades','ctr-clausula-foro','ctr-scenario-id'].forEach(id => {
+          const el = $(id); if (el) el.disabled = true;
+        });
+        const sc = ctrStatusColor('enviado');
+        $('contracts-status-badge').textContent = 'Enviado';
+        $('contracts-status-badge').style.background = sc + '18';
+        $('contracts-status-badge').style.color = sc;
+        alert('Contrato enviado! Copie o link e envie ao cliente pelo WhatsApp.');
+      } else {
+        if (d.campos) alert('Campos obrigatórios faltando:\n• ' + d.campos.join('\n• '));
+        else alert('Erro: ' + (d.error || 'desconhecido'));
+      }
+    } catch(e) { alert('Erro de conexão.'); }
+  };
   window.obaContractExcluir = async function(contractId, numero) {
     if (!confirm('Excluir o contrato ' + numero + '?\n\nEsta ação não pode ser desfeita.')) return;
     try {
@@ -6192,6 +6333,18 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
 
 })();
 </script>
+<!-- Modal confirmação de envio de contrato -->
+<div id="ctr-modal-confirmar" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:2000;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;border-radius:16px;padding:28px 24px;max-width:480px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.18)">
+    <h3 style="margin:0 0 6px;font-size:15px;color:#3B2A1E">📨 Confirmar envio do contrato</h3>
+    <p style="margin:0 0 18px;font-size:12px;color:#9B7A60">Após confirmar, o documento ficará imutável e o link será gerado.</p>
+    <div id="ctr-modal-resumo" style="background:#f9f3ec;border-radius:10px;padding:14px 16px;font-size:13px;color:#3B2A1E;margin-bottom:20px;line-height:1.7"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="secondary" onclick="document.getElementById('ctr-modal-confirmar').style.display='none'">← Voltar</button>
+      <button class="primary" style="background:#059669" onclick="obaContractConfirmarEnvio()">✅ Confirmar envio</button>
+    </div>
+  </div>
+</div>
 <!-- FIM ABA CONTRATOS -->
 
 <!-- =========================================================
