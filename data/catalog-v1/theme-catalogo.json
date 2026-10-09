@@ -1,74 +1,88 @@
 {
+  "schemaVersion": 4,
+  "updatedAt": "2026-10-09",
+  "pg1": {
+    "rotulo": "Catálogo",
+    "titulo": "Descubra a Oba",
+    "paragrafo1": "Uma coleção de sabores artesanais, criados para despertar os sentidos e transformar pequenos momentos em lembranças especiais. Brigadeiros cremosos, combinações delicadas e receitas cuidadosamente preparadas para quem aprecia doces feitos de verdade.",
+    "paragrafo2": "Explore nossos sabores, descubra seus favoritos e deixe-se levar pela experiência Oba.",
+    "cta": "Conhecer nossos sabores →",
+    "logo": "",
+    "tamanhoLogo": "medio",
+    "corFundo": "",
+    "corTitulo": "",
+    "corTexto": "",
+    "corCTA": "",
+    "tamTitulo": "",
+    "pesoTitulo": "",
+    "tamTexto": "",
+    "pesoTexto": "",
+    "tamCTA": "",
+    "pesoCTA": ""
+  },
+  "pg2": {
+    "subtitulo": "Encontre seu favorito",
+    "logo": "",
+    "tamanhoLogo": "medio",
+    "corFundo": "",
+    "corSubtitulo": "",
+    "tamSubtitulo": "",
+    "pesoSubtitulo": "",
+    "grupos_ordem": [
+      {
+        "id": "artesanais",
+        "label": "Doces Artesanais",
+        "sublabel": "Artesanais",
+        "icone": "🍫",
+        "destaque": true,
+        "visivel": true
+      },
+      {
+        "id": "finos",
+        "label": "Doces Finos",
+        "sublabel": "Exclusivos",
+        "icone": "✨",
+        "destaque": false,
+        "visivel": true
+      }
+    ]
+  },
   "grupos": {
     "artesanais": {
       "ativo": true,
-      "corFundo": "",
-      "corSubtitulo": "",
-      "corTitulo": "",
-      "pesoSubtitulo": "",
-      "pesoTitulo": "",
+      "titulo": "Doces Artesanais",
       "subtitulo": "Tradicionais, Clássicos e Especiais",
-      "tamSubtitulo": "",
+      "corTitulo": "",
+      "corSubtitulo": "",
+      "corFundo": "",
       "tamTitulo": "",
-      "titulo": "Doces Artesanais"
+      "pesoTitulo": "",
+      "tamSubtitulo": "",
+      "pesoSubtitulo": ""
     },
     "finos": {
       "ativo": true,
-      "corFundo": "",
-      "corSubtitulo": "",
-      "corTitulo": "",
-      "pesoSubtitulo": "",
-      "pesoTitulo": "",
+      "titulo": "Doces Finos",
       "subtitulo": "Linha exclusiva",
-      "tamSubtitulo": "",
+      "corTitulo": "",
+      "corSubtitulo": "",
+      "corFundo": "",
       "tamTitulo": "",
-      "titulo": "Doces Finos"
+      "pesoTitulo": "",
+      "tamSubtitulo": "",
+      "pesoSubtitulo": ""
     }
   },
-  "pg1": {
-    "corCTA": "",
-    "corFundo": "",
-    "corTexto": "",
-    "corTitulo": "",
-    "cta": "Conhecer nossos sabores →",
-    "logo": "",
-    "paragrafo1": "Uma coleção de sabores artesanais, criados para despertar os sentidos e transformar pequenos momentos em lembranças especiais. Brigadeiros cremosos, combinações delicadas e receitas cuidadosamente preparadas para quem aprecia doces feitos de verdade.",
-    "paragrafo2": "Explore nossos sabores, descubra seus favoritos e deixe-se levar pela experiência Oba.",
-    "pesoCTA": "",
-    "pesoTexto": "",
-    "pesoTitulo": "",
-    "rotulo": "Catálogo",
-    "tamCTA": "",
-    "tamTexto": "",
-    "tamTitulo": "",
-    "tamanhoLogo": "medio",
-    "titulo": "Descubra a Oba"
-  },
-  "pg2": {
-    "artesanais_label": "Doces Artesanais",
-    "artesanais_sublabel": "Artesanais",
-    "corFundo": "",
-    "corSubtitulo": "",
-    "finos_label": "Doces Finos",
-    "finos_sublabel": "Exclusivos",
-    "logo": "",
-    "pesoSubtitulo": "",
-    "subtitulo": "Encontre seu favorito",
-    "tamSubtitulo": "",
-    "tamanhoLogo": "medio"
-  },
-  "schemaVersion": 3,
   "tema": {
-    "arredondamento": "",
-    "corCard": "",
-    "corFundo": "",
-    "corLinha": "",
-    "corMuted": "",
     "corPrimaria": "",
+    "corFundo": "",
     "corTexto": "",
+    "corMuted": "",
+    "corCard": "",
+    "corLinha": "",
     "fonte": "",
+    "tamanhoTitulo": "",
     "tamanhoCorpo": "",
-    "tamanhoTitulo": ""
-  },
-  "updatedAt": "2026-10-08"
+    "arredondamento": ""
+  }
 }

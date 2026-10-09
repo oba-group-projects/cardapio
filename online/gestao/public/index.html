@@ -1097,12 +1097,16 @@ function obaLogout() {
         <label>Subtítulo</label>
         <input id="cat-ed-pg2-subtitulo" placeholder="Escolha o tipo de doce">
       </div>
-      <div style="grid-column:1/-1"><p class="oba-secao-titulo">🍫 Botão Artesanais</p></div>
-      <div class="field"><label>Sublabel</label><input id="cat-ed-art-sublabel" placeholder="Artesanais"></div>
-      <div class="field"><label>Label principal</label><input id="cat-ed-art-label" placeholder="Doces Artesanais"></div>
-      <div style="grid-column:1/-1"><p class="oba-secao-titulo">✨ Botão Finos</p></div>
-      <div class="field"><label>Sublabel</label><input id="cat-ed-fin-sublabel" placeholder="Exclusivos"></div>
-      <div class="field"><label>Label principal</label><input id="cat-ed-fin-label" placeholder="Doces Finos"></div>
+
+      <div style="grid-column:1/-1"><p class="oba-secao-titulo">🍫 Botões de grupo</p></div>
+      <div style="grid-column:1/-1">
+        <p class="hint" style="margin-bottom:10px">Cada botão representa um grupo de doces. Adicione, reordene, oculte ou duplique. O destino de cada botão é o <strong>ID do grupo</strong> — deve corresponder ao valor do campo <em>Grupo do catálogo</em> nas categorias cadastradas.</p>
+        <div id="cat-pg2-grupos-lista" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button type="button" class="secondary" style="font-size:12px" onclick="catEdAdicionarGrupo()">+ Novo grupo</button>
+          <button type="button" class="secondary" style="font-size:12px" onclick="catEdRestaurarGrupos()">↺ Restaurar padrão</button>
+        </div>
+      </div>
 
       <div style="grid-column:1/-1"><p class="oba-secao-titulo">🖼️ Logo</p></div>
       <div class="field full">
@@ -2958,12 +2962,16 @@ $('formConfig').onsubmit=async e=>{
     stSel('cat-ed-pg1-tamTexto',   pg1.tamTexto);   stSel('cat-ed-pg1-pesoTexto',  pg1.pesoTexto);
     stSel('cat-ed-pg1-tamCTA',     pg1.tamCTA);     stSel('cat-ed-pg1-pesoCTA',    pg1.pesoCTA);
     /* Pg2 — textos */
-    sv('cat-ed-pg2-subtitulo',  pg2.subtitulo            || 'Escolha o tipo de doce');
+    sv('cat-ed-pg2-subtitulo',  pg2.subtitulo || 'Escolha o tipo de doce');
     const pg2AtivoEl = $('cat-ed-pg2-ativo'); if (pg2AtivoEl) pg2AtivoEl.checked = pg2.ativo !== false;
-    sv('cat-ed-art-sublabel',   pg2.artesanais_sublabel  || 'Artesanais');
-    sv('cat-ed-art-label',      pg2.artesanais_label     || 'Doces Artesanais');
-    sv('cat-ed-fin-sublabel',   pg2.finos_sublabel       || 'Exclusivos');
-    sv('cat-ed-fin-label',      pg2.finos_label          || 'Doces Finos');
+    /* Pg2 — grupos_ordem (schema v4) com fallback para campos legados (schema v3) */
+    const gruposOrdemEd = pg2.grupos_ordem && pg2.grupos_ordem.length > 0
+      ? pg2.grupos_ordem
+      : [
+          { id: 'artesanais', label: pg2.artesanais_label || 'Doces Artesanais', sublabel: pg2.artesanais_sublabel || 'Artesanais', icone: '🍫', destaque: true,  visivel: true },
+          { id: 'finos',      label: pg2.finos_label      || 'Doces Finos',      sublabel: pg2.finos_sublabel      || 'Exclusivos', icone: '✨', destaque: false, visivel: true }
+        ];
+    if (typeof catEdRenderizarGrupos === 'function') catEdRenderizarGrupos(gruposOrdemEd);
     /* Pg2 — logo */
     sv('cat-ed-pg2-logo', pg2.logo || '');
     const sel2 = $('cat-ed-pg2-tamanhoLogo'); if (sel2) sel2.value = pg2.tamanhoLogo || 'medio';
@@ -3024,10 +3032,7 @@ $('formConfig').onsubmit=async e=>{
       pg2: {
         subtitulo: $('cat-ed-pg2-subtitulo')?.value.trim() || '',
         ativo: $('cat-ed-pg2-ativo')?.checked !== false,
-        artesanais_sublabel: $('cat-ed-art-sublabel')?.value.trim() || '',
-        artesanais_label:    $('cat-ed-art-label')?.value.trim()    || '',
-        finos_sublabel:      $('cat-ed-fin-sublabel')?.value.trim() || '',
-        finos_label:         $('cat-ed-fin-label')?.value.trim()    || '',
+        grupos_ordem: typeof catEdLerGrupos === 'function' ? catEdLerGrupos() : [],
         logo: $('cat-ed-pg2-logo')?.value.trim() || '', tamanhoLogo: $('cat-ed-pg2-tamanhoLogo')?.value || 'medio',
         corFundo:     hx('cat-ed-pg2-corFundo'), corSubtitulo: hx('cat-ed-pg2-corSubtitulo'),
         tamSubtitulo: $('cat-ed-pg2-tamSubtitulo')?.value || '', pesoSubtitulo: $('cat-ed-pg2-pesoSubtitulo')?.value || '',
@@ -3075,12 +3080,30 @@ $('formConfig').onsubmit=async e=>{
     try {
       const temaCat = obaLerFormCatalogo();
 
-      /* Validação: pg2 inativa + todos os grupos inativos = configuração inválida */
+      /* Validação: IDs de grupo não podem ser vazios ou duplicados */
+      const gruposOrdem = temaCat.pg2?.grupos_ordem || [];
+      const ids = gruposOrdem.map(g => (g.id || '').trim());
+      const idVazio = ids.some(id => !id);
+      if (idVazio) {
+        msg('Configuração inválida: todos os grupos precisam ter um ID preenchido.', 'erro');
+        return;
+      }
+      const idsDuplicados = ids.length !== new Set(ids).size;
+      if (idsDuplicados) {
+        msg('Configuração inválida: dois ou mais grupos têm o mesmo ID. Cada grupo precisa de um ID único.', 'erro');
+        return;
+      }
+
+      /* Validação: pg2 inativa + nenhum grupo visível = catálogo inacessível */
       const pg2Ativo = temaCat.pg2?.ativo !== false;
-      const artAtivo = temaCat.grupos?.artesanais?.ativo !== false;
-      const finAtivo = temaCat.grupos?.finos?.ativo !== false;
-      if (!pg2Ativo && !artAtivo && !finAtivo) {
-        msg('Configuração inválida: não é possível desativar a Página 2 e todos os grupos ao mesmo tempo. O catálogo ficaria inacessível.', 'erro');
+      const temGrupoVisivel = gruposOrdem.some(g => g.visivel !== false);
+      if (!pg2Ativo && !temGrupoVisivel) {
+        msg('Configuração inválida: não é possível desativar a Página 2 sem ter ao menos um grupo visível. O catálogo ficaria inacessível.', 'erro');
+        return;
+      }
+      /* Validação: ao menos um grupo visível (independente de pg2) */
+      if (!temGrupoVisivel) {
+        msg('Configuração inválida: ao menos um grupo precisa estar visível no catálogo.', 'erro');
         return;
       }
 
@@ -3099,6 +3122,179 @@ $('formConfig').onsubmit=async e=>{
   if (frmCat2) frmCat2.onsubmit = async e => { e.preventDefault(); await _salvarCatalogo('Catálogo Pg2'); };
   const frmCat34 = $('formCatalogoPg34');
   if (frmCat34) frmCat34.onsubmit = async e => { e.preventDefault(); await _salvarCatalogo('Catálogo Pg3/4'); };
+
+  /* ================================================================
+     EDITOR DINÂMICO DE GRUPOS DO CATÁLOGO (Pg2)
+  ================================================================ */
+
+  /* Ícones disponíveis para grupos */
+  const catIconesGrupo = ['🍫','✨','🎁','🌸','🎄','🐰','🍰','🍬','⭐','🧁','🎉','🌟'];
+
+  /* Defaults */
+  window.catEdGruposDefault = function() {
+    return [
+      { id: 'artesanais', label: 'Doces Artesanais', sublabel: 'Artesanais', icone: '🍫', destaque: true,  visivel: true },
+      { id: 'finos',      label: 'Doces Finos',      sublabel: 'Exclusivos',  icone: '✨', destaque: false, visivel: true }
+    ];
+  };
+
+  /* Renderiza a lista de cards */
+  window.catEdRenderizarGrupos = function(grupos) {
+    const lista = $('cat-pg2-grupos-lista');
+    if (!lista) return;
+    lista.innerHTML = '';
+    (grupos || []).forEach(g => catEdAdicionarCardGrupo(g));
+  };
+
+  /* Cria um card de edição para um grupo */
+  function catEdAdicionarCardGrupo(g) {
+    const lista = $('cat-pg2-grupos-lista');
+    if (!lista) return;
+    const total = lista.children.length;
+    const card = document.createElement('div');
+    card.className = 'oba-botao-card';
+    card.dataset.grupoId = g?.id || '';
+
+    const iconesHtml = catIconesGrupo.map(ic =>
+      `<button type="button" class="oba-icone-btn${g && g.icone === ic ? ' oba-icone-ativo' : ''}"
+        onclick="catEdEscolherIcone(this,'${ic}')" title="${ic}" data-icone="${ic}" style="font-size:18px;width:38px;height:38px">${ic}</button>`
+    ).join('');
+
+    card.innerHTML = `
+      <div class="oba-botao-card-header">
+        <span class="oba-botao-num">${total + 1}</span>
+        <span class="oba-botao-preview-label">${g?.label || 'Novo grupo'}</span>
+        <div style="margin-left:auto;display:flex;gap:6px">
+          <button type="button" class="secondary" style="padding:4px 8px;font-size:11px" onclick="catEdMoverGrupo(this,-1)" title="Mover para cima">↑</button>
+          <button type="button" class="secondary" style="padding:4px 8px;font-size:11px" onclick="catEdMoverGrupo(this,1)"  title="Mover para baixo">↓</button>
+          <button type="button" class="secondary cat-grupo-visivel-toggle" style="padding:4px 8px;font-size:11px" onclick="catEdToggleVisivel(this)" title="Alternar visibilidade">${(!g || g.visivel !== false) ? '👁' : '🚫'}</button>
+          <button type="button" class="secondary" style="padding:4px 8px;font-size:11px" onclick="catEdDuplicarGrupo(this)" title="Duplicar">⧉</button>
+          <button type="button" class="danger"    style="padding:4px 8px;font-size:11px" onclick="catEdRemoverGrupo(this)"  title="Remover">✕</button>
+        </div>
+      </div>
+      <div class="oba-botao-card-body grid">
+        <div class="field">
+          <label>Label principal <span class="hint">(nome visível)</span></label>
+          <input class="cat-grupo-label" value="${g?.label || ''}" placeholder="Ex: Doces Artesanais"
+            oninput="this.closest('.oba-botao-card').querySelector('.oba-botao-preview-label').textContent=this.value||'Novo grupo'">
+        </div>
+        <div class="field">
+          <label>Sublabel <span class="hint">(texto pequeno acima)</span></label>
+          <input class="cat-grupo-sublabel" value="${g?.sublabel || ''}" placeholder="Ex: Artesanais">
+        </div>
+        <div class="field full">
+          <label>ID do grupo <span class="hint">(deve coincidir com o campo "Grupo do catálogo" das categorias)</span></label>
+          <input class="cat-grupo-id" value="${g?.id || ''}" placeholder="Ex: artesanais" style="font-family:monospace">
+        </div>
+        <div class="field full">
+          <label>Ícone</label>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">${iconesHtml}</div>
+          <input type="hidden" class="cat-grupo-icone" value="${g?.icone || '🍫'}">
+        </div>
+        <div class="field full" style="display:flex;gap:20px;flex-wrap:wrap">
+          <label class="oba-toggle-label">
+            <input type="checkbox" class="cat-grupo-destaque" ${g?.destaque ? 'checked' : ''}> Botão em destaque (fundo marrom)
+          </label>
+          <label class="oba-toggle-label">
+            <input type="checkbox" class="cat-grupo-visivel" ${(!g || g.visivel !== false) ? 'checked' : ''}
+              onchange="const t=this.closest('.oba-botao-card').querySelector('.cat-grupo-visivel-toggle');if(t)t.textContent=this.checked?'👁':'🚫'"> Visível no catálogo
+          </label>
+        </div>
+      </div>`;
+    lista.appendChild(card);
+    catEdAtualizarNumeracao();
+  }
+
+  /* Adicionar grupo vazio */
+  window.catEdAdicionarGrupo = function() {
+    catEdAdicionarCardGrupo({ id: '', label: '', sublabel: '', icone: '🍫', destaque: false, visivel: true });
+    const lista = $('cat-pg2-grupos-lista');
+    lista?.lastElementChild?.querySelector('.cat-grupo-label')?.focus();
+  };
+
+  /* Restaurar padrão */
+  window.catEdRestaurarGrupos = function() {
+    if (!confirm('Restaurar os grupos padrão (Artesanais e Finos)?')) return;
+    catEdRenderizarGrupos(catEdGruposDefault());
+  };
+
+  /* Remover */
+  window.catEdRemoverGrupo = function(btn) {
+    const card = btn.closest('.oba-botao-card');
+    const lista = card?.parentElement;
+    if (!lista) return;
+    if (lista.children.length <= 1) { alert('O catálogo precisa de pelo menos 1 grupo.'); return; }
+    if (!confirm('Remover este grupo? Os produtos associados não serão apagados.')) return;
+    card.remove();
+    catEdAtualizarNumeracao();
+  };
+
+  /* Duplicar */
+  window.catEdDuplicarGrupo = function(btn) {
+    const card = btn.closest('.oba-botao-card');
+    if (!card) return;
+    const copia = {
+      id:       card.querySelector('.cat-grupo-id')?.value.trim() || '',
+      label:    card.querySelector('.cat-grupo-label')?.value.trim() || '',
+      sublabel: card.querySelector('.cat-grupo-sublabel')?.value.trim() || '',
+      icone:    card.querySelector('.cat-grupo-icone')?.value || '🍫',
+      destaque: card.querySelector('.cat-grupo-destaque')?.checked === true,
+      visivel:  card.querySelector('.cat-grupo-visivel')?.checked !== false,
+    };
+    catEdAdicionarCardGrupo(copia);
+    const lista = card.parentElement;
+    card.after(lista.lastElementChild);
+    catEdAtualizarNumeracao();
+  };
+
+  /* Toggle visibilidade rápido */
+  window.catEdToggleVisivel = function(btn) {
+    const card = btn.closest('.oba-botao-card');
+    const chk = card?.querySelector('.cat-grupo-visivel');
+    if (!chk) return;
+    chk.checked = !chk.checked;
+    btn.textContent = chk.checked ? '👁' : '🚫';
+  };
+
+  /* Mover ↑↓ */
+  window.catEdMoverGrupo = function(btn, dir) {
+    const card = btn.closest('.oba-botao-card');
+    if (!card) return;
+    const lista = card.parentElement;
+    if (dir === -1 && card.previousElementSibling) lista.insertBefore(card, card.previousElementSibling);
+    else if (dir === 1 && card.nextElementSibling) lista.insertBefore(card.nextElementSibling, card);
+    catEdAtualizarNumeracao();
+  };
+
+  /* Escolher ícone */
+  window.catEdEscolherIcone = function(btn, icone) {
+    const card = btn.closest('.oba-botao-card');
+    card?.querySelectorAll('.oba-icone-btn').forEach(b => b.classList.remove('oba-icone-ativo'));
+    btn.classList.add('oba-icone-ativo');
+    const hidden = card?.querySelector('.cat-grupo-icone');
+    if (hidden) hidden.value = icone;
+  };
+
+  /* Renumerar cards */
+  function catEdAtualizarNumeracao() {
+    document.querySelectorAll('#cat-pg2-grupos-lista .oba-botao-card').forEach((c, i) => {
+      const n = c.querySelector('.oba-botao-num');
+      if (n) n.textContent = i + 1;
+    });
+  }
+
+  /* Ler todos os grupos da lista */
+  window.catEdLerGrupos = function() {
+    const cards = document.querySelectorAll('#cat-pg2-grupos-lista .oba-botao-card');
+    return Array.from(cards).map(card => ({
+      id:       card.querySelector('.cat-grupo-id')?.value.trim() || '',
+      label:    card.querySelector('.cat-grupo-label')?.value.trim() || '',
+      sublabel: card.querySelector('.cat-grupo-sublabel')?.value.trim() || '',
+      icone:    card.querySelector('.cat-grupo-icone')?.value || '🍫',
+      destaque: card.querySelector('.cat-grupo-destaque')?.checked === true,
+      visivel:  card.querySelector('.cat-grupo-visivel')?.checked !== false,
+    }));
+  };
   const frmCatTema = $('formCatalogoTema');
   if (frmCatTema) frmCatTema.onsubmit = async e => { e.preventDefault(); await _salvarCatalogo('Catálogo Tema Global'); };
 

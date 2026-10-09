@@ -469,22 +469,29 @@ function catNavegar(num) {
   if (num === 3 && _catDados) {
     const pg2Ativo = _catDados.temaCatalogo?.pg2?.ativo !== false;
     if (!pg2Ativo) {
+      const pg2 = _catDados.temaCatalogo?.pg2 || {};
       const gruposCfg = _catDados.temaCatalogo?.grupos || {};
       const cats = _catDados.categorias || [];
-      const artAtivo = gruposCfg.artesanais?.ativo !== false && cats.some(c => c.grupoCatalogo === 'artesanais' && c.ativo !== false);
-      const finAtivo = gruposCfg.finos?.ativo !== false && cats.some(c => c.grupoCatalogo === 'finos' && c.ativo !== false);
-      const ativos = [artAtivo && 'artesanais', finAtivo && 'finos'].filter(Boolean);
+      /* Resolver grupos_ordem[] com fallback para schema v3 */
+      const gruposOrdem = pg2.grupos_ordem && pg2.grupos_ordem.length > 0
+        ? pg2.grupos_ordem
+        : [
+            { id: 'artesanais', visivel: true },
+            { id: 'finos',      visivel: true }
+          ];
+      const ativos = gruposOrdem
+        .filter(g => g.visivel !== false)
+        .filter(g => (gruposCfg[g.id]?.ativo !== false))
+        .filter(g => cats.some(c => c.grupoCatalogo === g.id && c.ativo !== false))
+        .map(g => g.id);
       if (ativos.length === 1) {
-        /* Um único grupo — vai direto para ele */
         catAbrirGrupo(ativos[0], _catDados);
         return;
       } else if (ativos.length === 0) {
-        /* Nenhum grupo ativo — mostra aviso e fica em Pg1 */
         const el = document.getElementById('loading');
         if (el) { el.innerHTML = '<p style="color:var(--muted);font-size:13px;text-align:center;padding:24px">Catálogo temporariamente indisponível.</p>'; el.style.display = 'block'; }
         return;
       }
-      /* Se dois grupos ativos mas pg2 inativa — situação inconsistente, mostra pg3 mesmo assim */
     }
   }
 
@@ -631,36 +638,37 @@ function catMontarPg3(dados) {
   _catSet('cat-pg3-subtitulo', pg2.subtitulo);
 
   const cats = dados.categorias || [];
-  const temArtesanais = cats.some(c => c.grupoCatalogo === 'artesanais' && c.ativo !== false);
-  const temFinos      = cats.some(c => c.grupoCatalogo === 'finos'      && c.ativo !== false);
-
-  /* Respeita flag ativo do grupo no tema */
   const gruposCfg = dados.temaCatalogo?.grupos || {};
-  const artAtivo = temArtesanais && gruposCfg.artesanais?.ativo !== false;
-  const finAtivo = temFinos      && gruposCfg.finos?.ativo      !== false;
+
+  /* Usar grupos_ordem[] (schema v4) com fallback para campos legados (schema v3) */
+  const gruposOrdem = pg2.grupos_ordem && pg2.grupos_ordem.length > 0
+    ? pg2.grupos_ordem
+    : [
+        { id: 'artesanais', label: pg2.artesanais_label || 'Doces Artesanais', sublabel: pg2.artesanais_sublabel || 'Artesanais', icone: '🍫', destaque: true,  visivel: true },
+        { id: 'finos',      label: pg2.finos_label      || 'Doces Finos',      sublabel: pg2.finos_sublabel      || 'Exclusivos', icone: '✨', destaque: false, visivel: true }
+      ];
 
   const container = document.getElementById('cat-grupos');
   container.innerHTML = '';
+  let visiveis = 0;
 
-  if (artAtivo) {
+  gruposOrdem.forEach(g => {
+    /* Um grupo é exibido se: visível no schema E ativo no grupos{} E tem categorias no catálogo */
+    if (g.visivel === false) return;
+    const cfgGrupo = gruposCfg[g.id] || {};
+    if (cfgGrupo.ativo === false) return;
+    const temCats = cats.some(c => c.grupoCatalogo === g.id && c.ativo !== false);
+    if (!temCats) return;
+
     const btn = document.createElement('button');
-    btn.className = 'oba-cat-btn destaque';
-    const subA = pg2.artesanais_sublabel || 'Artesanais';
-    const lblA = pg2.artesanais_label    || 'Doces Artesanais';
-    btn.innerHTML = `<div><span class="btn-sub">${subA}</span><span class="btn-lbl">${lblA}</span></div><span class="btn-ico">🍫</span>`;
-    btn.onclick = () => catAbrirGrupo('artesanais', dados);
+    btn.className = 'oba-cat-btn' + (g.destaque ? ' destaque' : '');
+    btn.innerHTML = `<div><span class="btn-sub">${g.sublabel || ''}</span><span class="btn-lbl">${g.label || g.id}</span></div><span class="btn-ico">${g.icone || '🍫'}</span>`;
+    btn.onclick = () => catAbrirGrupo(g.id, dados);
     container.appendChild(btn);
-  }
-  if (finAtivo) {
-    const btn = document.createElement('button');
-    btn.className = 'oba-cat-btn';
-    const subF = pg2.finos_sublabel || 'Exclusivos';
-    const lblF = pg2.finos_label    || 'Doces Finos';
-    btn.innerHTML = `<div><span class="btn-sub">${subF}</span><span class="btn-lbl">${lblF}</span></div><span class="btn-ico">✨</span>`;
-    btn.onclick = () => catAbrirGrupo('finos', dados);
-    container.appendChild(btn);
-  }
-  if (!artAtivo && !finAtivo) {
+    visiveis++;
+  });
+
+  if (visiveis === 0) {
     container.innerHTML = '<p style="color:var(--muted);font-size:13px;text-align:center;padding:32px 0">Nenhum grupo configurado ainda.</p>';
   }
 }
@@ -669,8 +677,11 @@ function catMontarPg3(dados) {
 function catAbrirGrupo(grupo, dados) {
   const grupos = dados.temaCatalogo?.grupos || {};
   const cfg = grupos[grupo] || {};
-  const titulo    = cfg.titulo    || (grupo === 'artesanais' ? 'Doces Artesanais' : 'Doces Finos');
-  const subtitulo = cfg.subtitulo || (grupo === 'artesanais' ? 'Tradicionais, Clássicos e Especiais' : 'Linha exclusiva');
+  /* Título e subtítulo: usa cfg do grupos{} se existir, senão tenta grupos_ordem[], senão fallback genérico */
+  const gruposOrdem = dados.temaCatalogo?.pg2?.grupos_ordem || [];
+  const cfgOrdem = gruposOrdem.find(g => g.id === grupo) || {};
+  const titulo    = cfg.titulo    || cfgOrdem.label    || grupo;
+  const subtitulo = cfg.subtitulo || cfgOrdem.sublabel || '';
   _catGrupoAtivo = grupo;
   _catCatAtiva = 'todos';
 
