@@ -4727,6 +4727,24 @@ body{font-family:system-ui,sans-serif;background:#FAF7F4;color:#3B2A1E;min-heigh
 .card-ok .ico{font-size:48px;margin-bottom:16px}
 .card-ok h2{font-size:18px;margin-bottom:8px;color:#059669}
 .card-ok p{font-size:13px;color:#888;line-height:1.6}
+.btn-pdf{display:inline-flex;align-items:center;gap:6px;margin-top:20px;padding:12px 24px;background:#8B4513;color:#fff;border:none;border-radius:12px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;width:100%;justify-content:center}
+.btn-pdf:active{opacity:.85}
+.link-box{margin-top:16px;background:#FAF7F4;border:1px solid #EDD9C0;border-radius:12px;padding:12px 14px;text-align:left}
+.link-box p{font-size:11px;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px}
+.link-row{display:flex;align-items:center;gap:8px}
+.link-url{flex:1;font-size:11px;color:#3B2A1E;word-break:break-all;line-height:1.4}
+.btn-copiar{padding:7px 12px;border:1.5px solid #EDD9C0;border-radius:8px;background:#fff;font:inherit;font-size:11px;font-weight:600;cursor:pointer;color:#8B4513;white-space:nowrap;flex-shrink:0}
+.btn-copiar:active{background:#FFF7EC}
+.link-copiado{font-size:11px;color:#059669;margin-top:6px;display:none}
+/* ── @media print ─────────────────────────────────── */
+@media print{
+  .topo{position:static!important;border:none}
+  #etapa-wpp,#aceite-bar,#etapa-confirmado,.btn-pdf,.link-box,.btn-copiar,#etapa-contrato>.contrato-wrap>.aceito-acoes{display:none!important}
+  .print-only{display:block!important}
+  body{background:#fff}
+  iframe{page-break-inside:avoid}
+  .aceito-banner{break-inside:avoid}
+}
 </style>
 </head>
 <body>
@@ -4738,8 +4756,19 @@ body{font-family:system-ui,sans-serif;background:#FAF7F4;color:#3B2A1E;min-heigh
 ${contract.status === "aceito" ? `
 <div id="etapa-contrato" style="display:block">
   <div class="contrato-wrap">
-    <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:14px 16px;margin-bottom:24px;font-size:13px;color:#166534">
+    <div class="aceito-banner" style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:14px 16px;margin-bottom:16px;font-size:13px;color:#166534">
       ✅ Contrato aceito eletronicamente em ${dataAceite ? new Date(dataAceite.data_hora).toLocaleString("pt-BR") : "—"}
+    </div>
+    <div class="aceito-acoes" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;align-items:flex-start">
+      <button class="btn-pdf" style="width:auto;padding:11px 20px" onclick="window.print()">📄 Salvar como PDF</button>
+      <div class="link-box" style="flex:1;min-width:220px;margin-top:0">
+        <p>Link permanente do contrato</p>
+        <div class="link-row">
+          <span class="link-url" id="link-permanente-aceito"></span>
+          <button class="btn-copiar" onclick="obaCopiarLink('link-permanente-aceito','copiado-aceito')">Copiar</button>
+        </div>
+        <div class="link-copiado" id="copiado-aceito">✓ Link copiado!</div>
+      </div>
     </div>
     <iframe srcdoc="${contract.snapshot_html.replace(/"/g, "&quot;")}" style="width:100%;min-height:900px;border:none;border-radius:12px;background:#fff" title="Contrato"></iframe>
   </div>
@@ -4784,12 +4813,47 @@ ${contract.status === "aceito" ? `
     <div class="ico">✅</div>
     <h2>Contrato aceito!</h2>
     <p id="txt-confirmado"></p>
+    <button class="btn-pdf" onclick="window.print()">📄 Salvar como PDF</button>
+    <div class="link-box">
+      <p>Link permanente do contrato</p>
+      <div class="link-row">
+        <span class="link-url" id="link-permanente-confirmado"></span>
+        <button class="btn-copiar" onclick="obaCopiarLink('link-permanente-confirmado','copiado-confirmado')">Copiar</button>
+      </div>
+      <div class="link-copiado" id="copiado-confirmado">✓ Link copiado!</div>
+    </div>
+    <p style="font-size:11px;color:#aaa;margin-top:12px;line-height:1.5">Salve o PDF ou copie o link para consultar o contrato a qualquer momento.</p>
   </div>
 </div>
 
 <script>
 const TOKEN = ${JSON.stringify(token)};
 let wppValidado = '';
+const LINK_PERMANENTE = window.location.origin + '/contrato/' + TOKEN;
+
+// Preenche links permanentes visíveis na tela (ambos os cenários)
+(function() {
+  ['link-permanente-confirmado','link-permanente-aceito'].forEach(function(id) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = LINK_PERMANENTE;
+  });
+})();
+
+function obaCopiarLink(linkId, statusId) {
+  const texto = document.getElementById(linkId) ? document.getElementById(linkId).textContent : LINK_PERMANENTE;
+  navigator.clipboard.writeText(texto).then(function() {
+    const el = document.getElementById(statusId);
+    if (el) { el.style.display = 'block'; setTimeout(function(){ el.style.display = 'none'; }, 2500); }
+  }).catch(function() {
+    // Fallback para browsers sem clipboard API
+    const ta = document.createElement('textarea');
+    ta.value = texto; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+    const el = document.getElementById(statusId);
+    if (el) { el.style.display = 'block'; setTimeout(function(){ el.style.display = 'none'; }, 2500); }
+  });
+}
 
 function obaVerifTab(tab) {
   const isWpp = tab === 'wpp';
@@ -4850,7 +4914,10 @@ async function aceitarContrato() {
       const conf = document.getElementById('etapa-confirmado');
       conf.style.display = 'flex';
       const dt = d.data_hora ? new Date(d.data_hora).toLocaleString('pt-BR') : '';
-      document.getElementById('txt-confirmado').textContent = 'Aceite registrado em ' + dt + '. Guarde este comprovante.';
+      document.getElementById('txt-confirmado').textContent = 'Aceite registrado em ' + dt + '.';
+      // Preenche link no card de confirmação
+      const lp = document.getElementById('link-permanente-confirmado');
+      if (lp) lp.textContent = LINK_PERMANENTE;
     } else {
       btn.disabled = false;
       btn.textContent = 'Aceitar contrato';
