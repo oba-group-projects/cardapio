@@ -4765,7 +4765,7 @@ ${contract.status === "aceito" ? `
         <p>Link permanente do contrato</p>
         <div class="link-row">
           <span class="link-url" id="link-permanente-aceito"></span>
-          <button class="btn-copiar" onclick="obaCopiarLink('link-permanente-aceito','copiado-aceito')">Copiar</button>
+          <button class="btn-copiar" onclick="obaCopiarLinkGlobal('link-permanente-aceito','copiado-aceito')">Copiar</button>
         </div>
         <div class="link-copiado" id="copiado-aceito">✓ Link copiado!</div>
       </div>
@@ -4818,7 +4818,7 @@ ${contract.status === "aceito" ? `
       <p>Link permanente do contrato</p>
       <div class="link-row">
         <span class="link-url" id="link-permanente-confirmado"></span>
-        <button class="btn-copiar" onclick="obaCopiarLink('link-permanente-confirmado','copiado-confirmado')">Copiar</button>
+        <button class="btn-copiar" onclick="obaCopiarLinkGlobal('link-permanente-confirmado','copiado-confirmado')">Copiar</button>
       </div>
       <div class="link-copiado" id="copiado-confirmado">✓ Link copiado!</div>
     </div>
@@ -4830,30 +4830,6 @@ ${contract.status === "aceito" ? `
 const TOKEN = ${JSON.stringify(token)};
 let wppValidado = '';
 const LINK_PERMANENTE = window.location.origin + '/contrato/' + TOKEN;
-
-// Preenche links permanentes visíveis na tela (ambos os cenários)
-(function() {
-  ['link-permanente-confirmado','link-permanente-aceito'].forEach(function(id) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = LINK_PERMANENTE;
-  });
-})();
-
-function obaCopiarLink(linkId, statusId) {
-  const texto = document.getElementById(linkId) ? document.getElementById(linkId).textContent : LINK_PERMANENTE;
-  navigator.clipboard.writeText(texto).then(function() {
-    const el = document.getElementById(statusId);
-    if (el) { el.style.display = 'block'; setTimeout(function(){ el.style.display = 'none'; }, 2500); }
-  }).catch(function() {
-    // Fallback para browsers sem clipboard API
-    const ta = document.createElement('textarea');
-    ta.value = texto; ta.style.position = 'fixed'; ta.style.opacity = '0';
-    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
-    document.body.removeChild(ta);
-    const el = document.getElementById(statusId);
-    if (el) { el.style.display = 'block'; setTimeout(function(){ el.style.display = 'none'; }, 2500); }
-  });
-}
 
 function obaVerifTab(tab) {
   const isWpp = tab === 'wpp';
@@ -4915,9 +4891,6 @@ async function aceitarContrato() {
       conf.style.display = 'flex';
       const dt = d.data_hora ? new Date(d.data_hora).toLocaleString('pt-BR') : '';
       document.getElementById('txt-confirmado').textContent = 'Aceite registrado em ' + dt + '.';
-      // Preenche link no card de confirmação
-      const lp = document.getElementById('link-permanente-confirmado');
-      if (lp) lp.textContent = LINK_PERMANENTE;
     } else {
       btn.disabled = false;
       btn.textContent = 'Aceitar contrato';
@@ -4930,6 +4903,35 @@ async function aceitarContrato() {
   }
 }
 </script>`}
+
+<script>
+const TOKEN = ${JSON.stringify(token)};
+const LINK_PERMANENTE = window.location.origin + '/contrato/' + TOKEN;
+// Preenche links permanentes visíveis na tela (ambos os cenários)
+(function() {
+  ['link-permanente-confirmado','link-permanente-aceito'].forEach(function(id) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = LINK_PERMANENTE;
+  });
+})();
+function obaCopiarLinkGlobal(linkId, statusId) {
+  const el = document.getElementById(linkId);
+  const texto = el ? el.textContent : LINK_PERMANENTE;
+  function _show() {
+    const s = document.getElementById(statusId);
+    if (s) { s.style.display = 'block'; setTimeout(function(){ s.style.display = 'none'; }, 2500); }
+  }
+  navigator.clipboard ? navigator.clipboard.writeText(texto).then(_show).catch(function() {
+    const ta = document.createElement('textarea');
+    ta.value = texto; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta); _show();
+  }) : (function(){ const ta = document.createElement('textarea');
+    ta.value = texto; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta); _show(); })();
+}
+</script>
 
 </body></html>`;
 
