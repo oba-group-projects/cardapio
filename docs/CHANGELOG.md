@@ -2,6 +2,32 @@
 
 Formato inspirado em Keep a Changelog.
 
+## [Sessão 11] — 2026-10-09 — commit babaeb4
+
+### Added
+- Pós-envio de contrato: scroll automático para caixa de link após confirmação
+- Botão "📱 Enviar pelo WhatsApp" em destaque (verde, largura total) com mensagem personalizada (nome, tipo evento, data, nº contrato, link)
+- Função `obaContractEnviarWppAtivo()` — usa dados em memória, sem fetch extra
+- Flag `incluido` em `proposal_items` (migration 0020): item marcado como cortesia exibe valor riscado + "Incluído", não entra no total
+- Checkbox "incluído" no editor de itens livres da Central — preservado na cópia de cenário
+- Tabela de produtos profissional: categorias `__total__` em destaque, sabores individuais suprimidos quando categoria tem total, nota descritiva do desconto, nota vinculando sabores à proposta
+- Referência da proposta no cabeçalho do contrato (cliente · tipo · data)
+- `obaGetCatalogPrecos` retorna `catNomes` (mapa cid → nome)
+- PDF via `window.print()` com CSS `@media print` na página pública do contrato
+- Link permanente copiável pós-aceite (Clipboard API + fallback execCommand)
+- Caixa de link permanente funciona em ambos os cenários: pós-aceite imediato e contrato já aceito
+
+### Fixed
+- Link permanente estava vazio no bloco "já aceito" — script global movido para fora do ternário
+- `obaContractConfirmarEnvio` substituiu `alert()` por scroll suave até a caixa de link
+
+### Changed
+- `obaGerarContratoHTML` aceita 6º parâmetro `catNomes`
+- `obaContractCenarioTotal` exclui itens com `incluido=1` do subtotal
+- Label do campo descrição de item livre: "Nome do produto ou serviço (ex: Montagem da mesa)"
+- `obaUpsertScenarios` persiste campo `incluido`
+- `livreLinhas` na proposta pública exibe "Incluído" quando `incluido=1`
+
 ## [Unreleased]
 
 ### Added

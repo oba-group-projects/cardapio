@@ -1,149 +1,103 @@
 ﻿# CURRENT STATE
 
-Atualizado: 2026-10-07 (sessão 8)
+Atualizado: 2026-10-09 (sessão 11)
 
 ## Git
 Branch: feature/gestao-online-segura
-Commit HEAD: 5d5a611
+Commit HEAD: babaeb4
 
 ## Estado funcional
 - Central privada autenticada e operacional
 - Fluxo DRAFT → PREVIEW → PUBLISHED funcional
 - Cardápio público funcional em /cardapio — Pg1 Interpretação B + refinamentos
 - Catálogo público funcional em /catalogo — Verde Sálvia + Ed. Visual Etapa A
+- Módulo de Contratos completo e em uso real
+
+## Módulo de Contratos — estado atual (sessão 11)
+
+### Fluxo completo validado em produção:
+1. Proposta aceita → botão 📄 Contrato
+2. Editor: nome completo, CPF/CNPJ, condições de pagamento, campos opcionais
+3. Resumo financeiro calculado no Worker com preços reais
+4. Modal de confirmação → "Confirmar envio" → snapshot imutável + token
+5. Pós-envio: caixa verde com link + botão 📱 Enviar pelo WhatsApp (mensagem personalizada)
+6. Página pública /contrato/:token — verificação WhatsApp OU CPF
+7. Aceite registra IP, data/hora, hash
+8. Pós-aceite: botão "Salvar como PDF" + link permanente copiável
+
+### Tabela de produtos no contrato:
+- Categorias __total__: exibe nome da categoria + qtd + preço referência
+- Sabores específicos: suprimidos quando categoria tem __total__ (aparecem na proposta)
+- Itens livres: descrição + qtd + preço
+- Flag incluido: valor riscado + "Incluído" (não entra no total)
+- Nota de desconto descritiva abaixo da tabela (tipo + valor + percentual)
+- Nota vinculando sabores à proposta comercial
+- Referência da proposta no cabeçalho (cliente · tipo · data)
+
+### PDF e link permanente:
+- Botão "Salvar como PDF" via window.print() com CSS @media print
+- Link permanente copiável (Clipboard API com fallback)
+- Funciona em ambos os cenários: pós-aceite e contrato já aceito
+
+### Migrations aplicadas em produção:
+- 0016: tabelas contracts + contract_aceites
+- 0017: campos nome_completo, horario_entrega, responsavel_recebimento
+- 0018: status cancelado no CHECK constraint
+- 0019: scenario_aceito_id na tabela proposals
+- ALTER manual: valor_total REAL em contracts
+- 0020: incluido INTEGER DEFAULT 0 em proposal_items
+
+### Itens livres na Central:
+- Campo: "Nome do produto ou serviço (ex: Montagem da mesa)"
+- Checkbox "incluído" com tooltip — não entra no subtotal quando marcado
+- Preservado na cópia de cenário
 
 ## Cardápio — estado atual
-### Pg1
-- Título/subtítulo originais: ocultos. Título "Nossa Essência": Cormorant Garamond 2.4rem/500
-- 2 parágrafos: pag1-ne-texto (D1 nossa_essencia.texto) + pag1-ne-texto-2 (D1 nossa_essencia.texto2)
-- Citação: 14px, centralizada. CTA: py-3.5, max-w-280px, centralizado
+### Pg1 — Interpretação B
+- Título/subtítulo originais: ocultos. Título "Nossa Essência": Cormorant Garamond 3rem/500
+- 2 parágrafos (D1) + citação + CTA
 ### Pg3
 - Labels .oba-btn-label: 15px/500, subtítulo 13px, ícones 1.5rem/.35
 ### Fluxo
-- Categorias: grid 3 colunas, secao-passo1/2: padding 16px, mt 12px
+- Categorias: grid 3 colunas
 
 ## Catálogo — estado atual
 - Paleta Verde Sálvia (#6B9E7A, #F4F8F4)
 - Ed. Visual Etapa A: catHidratarTema(), catMontarPg1/Pg3 com cores+logo+tipografia
-- catAbrirGrupo: lê temaCatalogo.grupos com fallback
-- **Ed. Visual Pg3/4 profissional (sessão 8):**
-  - Estado ativo/inativo por grupo (artesanais/finos)
-  - Cor do subtítulo por grupo
-  - Cor de fundo da Pg4 por grupo
-  - Tipografia granular por grupo (tam+peso título + tam+peso subtítulo)
-- theme-catalogo.json schemaVersion 3 (campos novos adicionados retrocompativelmente)
+- Ed. Visual Pg3/4 profissional: ativo/inativo, corSubtitulo, corFundo, tipografia granular
 
-## Central — estado atual
-- ✏️ Ed. Visual Cardápio: Páginas (Pg1/Pg2/Pg3) + Tema Global (intacto)
-- 🗂️ Ed. Visual Catálogo: sub-abas Páginas/Tema Global completas
-  - Pg3/4 profissional: ativo/inativo, corSubtitulo, corFundo, tipografia (sessão 8)
-- obaSaveDraftWith('tema_catalogo', ...) salva no D1 e sincroniza GitHub
+## Pendente — próximas sessões
 
-## Pontos de retorno seguros
-- HEAD atual = 5d5a611
-- Anterior = 4789a82
+### Contratos (fase 2 — não urgente)
+- Revisão jurídica das cláusulas antes de uso em produção real (externo — não é código)
+- Aditivos
+- Templates de cláusulas editáveis na Central
+- Integração Autentique (sandbox primeiro)
 
-## Links
-- Central: https://oba-cardapio-gestao.obadoceria.workers.dev/
-- Cardápio: https://oba-cardapio-gestao.obadoceria.workers.dev/cardapio
-- Catálogo: https://oba-cardapio-gestao.obadoceria.workers.dev/catalogo
-- GitHub: https://github.com/oba-group-projects/cardapio
+### Editor Visual do Catálogo (aprovado para implementação)
+- P1: editar textos existentes, mostrar/ocultar, reordenar botões e seções
+- P2: criar/duplicar/excluir botões com destinos válidos
+- P3 (fase futura): criar/remover seções — requer decisão de produto
 
-## Git
-Branch: feature/gestao-online-segura
-Commit HEAD: 6a2a2bb
+### Outras melhorias visuais
+- Catálogo: "Encontre o seu favorito" (Pg sabores)
+- Hardening: substituir querySelector frágil por getElementById
 
-## Estado funcional
-- Central privada autenticada e operacional
-- Fluxo DRAFT → PREVIEW → PUBLISHED funcional
-- Cardápio público funcional em /cardapio — Pg1 Interpretação B + refinamentos visuais
-- Catálogo público funcional em /catalogo — Verde Sálvia + Edição Visual implementada
-
-## Cardápio — estado atual aprovado
-
-### Pg1 — Interpretação B
-- Título/subtítulo originais: ocultos via CSS (DOM intacto)
-- Título principal: "Nossa Essência" — Cormorant Garamond 3rem/500
-- 2 parágrafos de texto fixos no HTML
-- Citação: 14px, centralizada
-- CTA: py-3.5, max-w-280px, shadow-md
-
-### Pg3 — Menu Principal
-- Labels .oba-btn-label: 15px/500
-- Subtítulo: 13px/rgba(139,69,19,0.85)
-- Ícones brancos: opacity .35
-
-### Fluxo
-- Categorias: grid 3 colunas
-- Resumo caixa: text-left
-
-## Catálogo — estado atual aprovado
-- Paleta Verde Sálvia (#6B9E7A)
-- Layout editorial Pg1 unificada
-- Edição Visual (12C-4): theme-catalogo.json + hidratação + formulário na Central
-
-## Central — estado atual
-- Edição Visual cardápio: avisos Pg1/Pg2 sobre relação dos campos
-- Edição Visual catálogo: formulário "Catálogo Pg1" funcional
-- Pipeline completo funcional
+## REGRAS TÉCNICAS CRÍTICAS
+1. Nunca usar Set-Content/Out-File do PowerShell — adiciona BOM
+2. theme.json = cardápio. theme-catalogo.json = catálogo. NUNCA misturar.
+3. cpf_cnpj está em contracts, NÃO em proposals
+4. valor_total calculado pelo Worker via obaCalcularValorContrato() — não recalcular no frontend
+5. Rota /contrato/:token fica ANTES de validateSession — é pública por design
+6. Status permitidos em contracts: rascunho, enviado, aceito, recusado, cancelado
+7. scenario_aceito_id em proposals — gravado no PATCH de status quando = aceita
+8. obaGetCatalogPrecos retorna { catPM, saborPM, catNomes }
+9. obaGerarContratoHTML recebe 6 parâmetros: contract, proposal, scenario, catPM, saborPM, catNomes
+10. Itens com incluido=1 não somam no total (obaContractCenarioTotal e recalcularCenario)
 
 ## Pontos de retorno seguros
-- HEAD atual = 6a2a2bb
-- Anterior = 9376512
-
-## Links
-- Central: https://oba-cardapio-gestao.obadoceria.workers.dev/
-- Cardápio: https://oba-cardapio-gestao.obadoceria.workers.dev/cardapio
-- Catálogo: https://oba-cardapio-gestao.obadoceria.workers.dev/catalogo
-- GitHub: https://github.com/oba-group-projects/cardapio
-
-## Git
-Branch: feature/gestao-online-segura
-Commit HEAD: b644fd2
-
-## Estado funcional
-- Central privada autenticada e operacional (senha Oba2026!)
-- Fluxo DRAFT → PREVIEW → PUBLISHED funcional e aprovado
-- Cardápio público funcional em /cardapio — Pg1 Interpretação B aplicada e validada
-- Catálogo público funcional em /catalogo — paleta Verde Sálvia aprovada
-
-## Cardápio — estado final aprovado e validado
-
-### Pg1 — Interpretação B (Nossa Essência como título principal)
-- `#oba-pag1-titulo` e `#oba-pag1-subtitulo`: ocultos via CSS (`display: none`), DOM intacto
-- Título principal: `#pag1-ne-titulo` — Cormorant Garamond 2.6rem/300, cor #3B2A1E, à esquerda
-- Rótulo: `#pag1-ne-rotulo` — "CARDÁPIO" com linha decorativa ::after
-- Texto: `#pag1-ne-texto` — 14px, #4B5563
-- Citação: `#pag1-ne-citacao` — itálico, ♡ via ::after
-- Logo: `align-self: flex-start`
-- `#pag-1`: `align-items: flex-start`, `max-width: 100%`, padding lateral 28px
-- CTA: `navegarPara(2)` intacto
-- Cormorant Garamond no `@import` de fonts
-
-### Pg2
-- Título: "Nossa Essência"
-- Texto condensado, dois parágrafos em um
-- Citação em itálico
-
-### Bugs corrigidos em sessões anteriores
-- Ícone ← quebrado (←🔲): byte de controle 0x19 removido de 4 locais
-- Unificação Pg1+Pg2 (commit 9b49c69)
-- CTA movido para após bloco de essência (commit 8f908e6)
-
-### Como textos chegam ao cardápio
-1. theme.json local → Static Asset (fallback)
-2. D1 PUBLISHED → prevalece sobre o HTML
-3. Para atualizar: Central → Edição Visual → Salvar → Publicar
-
-## Catálogo — estado aprovado
-- Paleta Verde Sálvia médio (#6B9E7A, #F4F8F4)
-- Layout editorial Pg1 unificada
-- Float-bar 3 botões: Voltar / WhatsApp / Montar pedido
-- Lightbox card branco
-
-## Pontos de retorno seguros
-- HEAD atual = b644fd2 (aprovado, validado — Pg1 Interpretação B)
-- Anterior estável = 8f908e6
+- HEAD atual = babaeb4 (estável, deploy validado)
+- Anterior = 652ad8f
 
 ## Links
 - Central: https://oba-cardapio-gestao.obadoceria.workers.dev/
