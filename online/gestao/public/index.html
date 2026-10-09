@@ -4766,7 +4766,8 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
           ultimo.querySelectorAll('.prop-livre-desc').forEach((inp, i) => {
             const desc = inp.value.trim();
             const preco = Number(inp.parentElement?.querySelector('.prop-livre-preco')?.value || 0);
-            if (desc || preco) dadosCopia.items.push({ tipo: 'livre', descricao: desc, qtd: 1, preco_unit: preco });
+            const incluido = inp.parentElement?.querySelector('.prop-livre-incluido')?.checked ? 1 : 0;
+            if (desc || preco) dadosCopia.items.push({ tipo: 'livre', descricao: desc, qtd: 1, preco_unit: preco, incluido });
           });
           adicionarCenario(dadosCopia);
           // Após criar, restaurar totais de categoria (os que não tinham sabores)
@@ -4900,8 +4901,12 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     itemDiv.style.cssText = 'display:flex;gap:6px;align-items:center;margin-bottom:8px;padding:8px;border:1px dashed #e8d5b5;border-radius:10px;background:#fff;flex-wrap:wrap';
     itemDiv.innerHTML = `
       <span style="font-size:11px;color:#888;white-space:nowrap">Item livre:</span>
-      <input placeholder="Descrição (ex: Frete)" value="${dados?.descricao||''}" style="flex:2;min-width:100px;font-size:12px" class="prop-livre-desc" oninput="recalcularCenario('${cid}')">
+      <input placeholder="Nome do produto ou serviço (ex: Montagem da mesa)" value="${dados?.descricao||''}" style="flex:2;min-width:120px;font-size:12px" class="prop-livre-desc" oninput="recalcularCenario('${cid}')">
       <input type="number" min="0" step="0.01" value="${dados?.preco_unit||''}" placeholder="Valor R$" style="width:90px;font-size:12px" class="prop-livre-preco" oninput="recalcularCenario('${cid}')">
+      <label style="font-size:11px;color:#666;white-space:nowrap;display:flex;align-items:center;gap:4px;cursor:pointer" title="Marca como cortesia — aparece no contrato com valor riscado e 'Incluído'">
+        <input type="checkbox" class="prop-livre-incluido" ${dados?.incluido ? 'checked' : ''} onchange="recalcularCenario('${cid}')">
+        incluído
+      </label>
       <span class="prop-livre-sub" style="font-size:11px;color:var(--brand);white-space:nowrap;min-width:60px">—</span>
       <button class="secondary" style="padding:2px 7px;font-size:11px;color:#dc2626" onclick="this.parentElement.remove();recalcularCenario('${cid}')">✕</button>
     `;
@@ -4963,9 +4968,10 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     // Itens livres
     container.querySelectorAll('.prop-livre-preco').forEach(inp => {
       const v = Number(inp.value || 0);
+      const incluido = inp.parentElement?.querySelector('.prop-livre-incluido')?.checked;
       const subEl = inp.parentElement?.querySelector('.prop-livre-sub');
-      if (subEl) subEl.textContent = v > 0 ? fmt(v) : '—';
-      subtotal += v;
+      if (subEl) subEl.textContent = incluido ? 'Incluído' : (v > 0 ? fmt(v) : '—');
+      if (!incluido) subtotal += v;
     });
 
     const tipo = document.getElementById(cid + '-desconto-tipo')?.value || 'none';
@@ -5099,8 +5105,9 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       document.querySelectorAll('#' + cid + '-categorias > div:not([data-cat-id])').forEach(row => {
         const desc = row.querySelector('.prop-livre-desc')?.value.trim() || '';
         const preco = Number(row.querySelector('.prop-livre-preco')?.value || 0);
+        const incluido = row.querySelector('.prop-livre-incluido')?.checked ? 1 : 0;
         if (!desc && !preco) return;
-        items.push({ tipo: 'livre', descricao: desc, qtd: 1, preco_unit: preco });
+        items.push({ tipo: 'livre', descricao: desc, qtd: 1, preco_unit: preco, incluido });
       });
 
       scenarios.push({

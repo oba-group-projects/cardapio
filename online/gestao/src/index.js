@@ -2446,8 +2446,8 @@ async function obaUpsertScenarios(env, proposalId, scenarios) {
     for (let j = 0; j < items.length; j++) {
       const it = items[j];
       await env.DB.prepare(`
-        INSERT INTO proposal_items (item_id, scenario_id, tipo, ref_id, descricao, qtd, preco_unit, ordem)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO proposal_items (item_id, scenario_id, tipo, ref_id, descricao, qtd, preco_unit, incluido, ordem)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).bind(
         obaItemId(), scenarioId,
         it.tipo || "livre",
@@ -2455,6 +2455,7 @@ async function obaUpsertScenarios(env, proposalId, scenarios) {
         it.descricao || "",
         Number(it.qtd) || 1,
         Number(it.preco_unit) || 0,
+        it.incluido ? 1 : 0,
         j + 1
       ).run();
     }
@@ -2940,7 +2941,8 @@ async function obaHandlePropostaPublica(request, env, url) {
 
     const livreLinhas=livres.map(function(it){
       var toTC=function(s){return s?s.toLowerCase().replace(/(?:^|\s)\S/g,function(a){return a.toUpperCase();}):s;};
-      return "<tr><td class=\"td-n\">"+toTC(it.descricao)+"</td><td class=\"td-q\"></td><td class=\"td-v\">"+R(it.preco_unit)+"</td></tr>";
+      var valor=it.incluido?("Inclu\u00eddo"):R(it.preco_unit);
+      return "<tr><td class=\"td-n\">"+toTC(it.descricao)+"</td><td class=\"td-q\"></td><td class=\"td-v\">"+valor+"</td></tr>";
     }).join("");
 
     const descLinha=desc>0?"<tr class=\"tr-d\"><td colspan=\"2\">Desconto</td><td>&minus;&nbsp;"+R(desc)+"</td></tr>":"";
@@ -4284,6 +4286,7 @@ const CLAUSULA_FORO_PADRAO = `As partes elegem o foro da Comarca de Santo Cristo
 function obaContractCenarioTotal(scenario, catPM, saborPM) {
   let sub = 0;
   (scenario.items || []).forEach(it => {
+    if (it.incluido === 1 || it.incluido === true) return; // itens incluídos não somam
     if (it.tipo === "catalogo" && it.ref_id) {
       const parts = (it.ref_id || "").split(":");
       const cid = parts[0], sid = parts[1];
@@ -4305,20 +4308,58 @@ function obaFmtData(d) {
 }
 
 /* Gera HTML completo do contrato para snapshot */
-function obaGerarContratoHTML(contract, proposal, scenario, catPM, saborPM) {
+function obaGerarContratoHTML(contract, proposal, scenario, catPM, saborPM, catNomes) {
+  catNomes = catNomes || {};
   const R = v => {
     const n = Number(v || 0).toFixed(2), [i, dec] = n.split(".");
     return "R$ " + i.replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "," + dec;
   };
   const tots = obaContractCenarioTotal(scenario, catPM, saborPM);
 
+  // Renderiza os 3 tipos de item: catalogo/__total__, catalogo/sabor, livre
+  // Itens com incluido=1 aparecem com valor riscado + "Incluído" e não somam no total
   const itensRows = (scenario.items || [])
-    .filter(it => it.tipo !== "catalogo" || (it.ref_id && !it.ref_id.endsWith(":__total__")))
     .filter(it => Number(it.qtd || 0) > 0)
     .map(it => {
-      const preco = Number(it.preco_unit || 0);
-      const qtd = Number(it.qtd || 0);
-      return `<tr><td style="padding:6px 8px;border-bottom:1px solid #eee">${it.descricao || ""}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:center">${qtd}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right">${preco > 0 ? R(preco) : "—"}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right">${preco > 0 ? R(qtd * preco) : "—"}</td></tr>`;
+      const incluido = it.incluido === 1 || it.incluido === true;
+
+      if (it.tipo === "catalogo" && it.ref_id) {
+        const parts = (it.ref_id || "").split(":");
+        const cid = parts[0], sid = parts[1];
+        const qtd = Number(it.qtd || 0);
+
+        if (sid === "__total__") {
+          // Categoria agregada — nome vem de catNomes
+          const nomeCat = catNomes[cid] || cid;
+          const precoRef = catPM[cid] || 0;
+          const totalVal = qtd * precoRef;
+          const tdNome = `Doces ${nomeCat}`;
+          const tdQtd = `${qtd} un.`;
+          const tdPreco = precoRef > 0 ? R(precoRef) : "—";
+          const tdTotal = incluido
+            ? `<s style="color:#aaa">${totalVal > 0 ? R(totalVal) : "—"}</s> <strong>Incluído</strong>`
+            : (totalVal > 0 ? R(totalVal) : "—");
+          return `<tr><td style="padding:6px 8px;border-bottom:1px solid #eee">${tdNome}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:center">${tdQtd}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right">${incluido ? `<s style="color:#aaa">${tdPreco}</s>` : tdPreco}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right">${tdTotal}</td></tr>`;
+        } else {
+          // Sabor específico
+          const preco = Number(it.preco_unit || 0) || (saborPM[sid] || 0);
+          const totalVal = qtd * preco;
+          const tdNome = it.descricao || sid;
+          const tdTotal = incluido
+            ? `<s style="color:#aaa">${totalVal > 0 ? R(totalVal) : "—"}</s> <strong>Incluído</strong>`
+            : (totalVal > 0 ? R(totalVal) : "—");
+          return `<tr><td style="padding:6px 8px;border-bottom:1px solid #eee">${tdNome}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:center">${qtd} un.</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right">${incluido ? `<s style="color:#aaa">${preco > 0 ? R(preco) : "—"}</s>` : (preco > 0 ? R(preco) : "—")}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right">${tdTotal}</td></tr>`;
+        }
+      } else {
+        // Item livre
+        const preco = Number(it.preco_unit || 0);
+        const qtd = Number(it.qtd || 0);
+        const totalVal = preco * qtd;
+        const tdTotal = incluido
+          ? `<s style="color:#aaa">${totalVal > 0 ? R(totalVal) : "—"}</s> <strong>Incluído</strong>`
+          : (totalVal > 0 ? R(totalVal) : "—");
+        return `<tr><td style="padding:6px 8px;border-bottom:1px solid #eee">${it.descricao || ""}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:center">${qtd}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right">${incluido ? `<s style="color:#aaa">${preco > 0 ? R(preco) : "—"}</s>` : (preco > 0 ? R(preco) : "—")}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right">${tdTotal}</td></tr>`;
+      }
     }).join("");
 
   const hoje = new Date().toLocaleDateString("pt-BR");
@@ -4421,15 +4462,18 @@ async function obaLoadContract(env, contractId) {
 
 /* Carrega catálogo PUBLISHED para preços */
 async function obaGetCatalogPrecos(env) {
-  const catPM = {}, saborPM = {};
+  const catPM = {}, saborPM = {}, catNomes = {};
   try {
     const pub = await obaLoadCatalogSlot(env, "PUBLISHED");
     if (pub && pub.payload) {
-      (pub.payload.categorias || pub.payload.categories || []).forEach(c => { catPM[String(c.id)] = Number(c.precoReferencia || 0); });
+      (pub.payload.categorias || pub.payload.categories || []).forEach(c => {
+        catPM[String(c.id)] = Number(c.precoReferencia || 0);
+        catNomes[String(c.id)] = c.nome || c.id;
+      });
       (pub.payload.sabores || pub.payload.flavors || []).forEach(f => { saborPM[String(f.id)] = Number(f.preco || 0); });
     }
   } catch (e) {}
-  return { catPM, saborPM };
+  return { catPM, saborPM, catNomes };
 }
 
 /* Calcula valor_total de um contrato a partir do cenário e do catálogo publicado */
@@ -4564,8 +4608,8 @@ async function obaHandleContractsApi(request, env, url) {
     const items = await env.DB.prepare("SELECT * FROM proposal_items WHERE scenario_id = ? ORDER BY ordem").bind(contract.scenario_id).all();
     const scenarioComItems = { ...scenario, items: items.results || [] };
 
-    const { catPM, saborPM } = await obaGetCatalogPrecos(env);
-    const snapshotHtml = obaGerarContratoHTML(contract, proposal, scenarioComItems, catPM, saborPM);
+    const { catPM, saborPM, catNomes } = await obaGetCatalogPrecos(env);
+    const snapshotHtml = obaGerarContratoHTML(contract, proposal, scenarioComItems, catPM, saborPM, catNomes);
     const snapshotHash = await obaHashContent(snapshotHtml);
     const tokenPublico = randomToken(32);
 
