@@ -4316,39 +4316,62 @@ function obaGerarContratoHTML(contract, proposal, scenario, catPM, saborPM, catN
   };
   const tots = obaContractCenarioTotal(scenario, catPM, saborPM);
 
-  // Renderiza os 3 tipos de item: catalogo/__total__, catalogo/sabor, livre
-  // Itens com incluido=1 aparecem com valor riscado + "Incluído" e não somam no total
+  // Pré-processamento: identificar quais categorias têm item __total__
+  // Se uma categoria tem __total__, seus sabores específicos são suprimidos no contrato
+  // (os sabores constam na proposta comercial, não no contrato)
+  const catsComTotal = new Set();
+  (scenario.items || []).forEach(it => {
+    if (it.tipo === "catalogo" && it.ref_id) {
+      const [cid, sid] = (it.ref_id || "").split(":");
+      if (sid === "__total__" && Number(it.qtd || 0) > 0) catsComTotal.add(cid);
+    }
+  });
+
+  // Flag: há sabores com __total__ suprimidos? Usado para exibir nota sobre proposta
+  let temSaboresSuprimidos = false;
+  (scenario.items || []).forEach(it => {
+    if (it.tipo === "catalogo" && it.ref_id) {
+      const [cid, sid] = (it.ref_id || "").split(":");
+      if (sid !== "__total__" && catsComTotal.has(cid)) temSaboresSuprimidos = true;
+    }
+  });
+
+  // Renderiza itens: categorias __total__, sabores sem __total__ na categoria, e livres
   const itensRows = (scenario.items || [])
-    .filter(it => Number(it.qtd || 0) > 0)
+    .filter(it => {
+      if (Number(it.qtd || 0) <= 0) return false;
+      if (it.tipo === "catalogo" && it.ref_id) {
+        const [cid, sid] = (it.ref_id || "").split(":");
+        // Suprimir sabores individuais de categorias que têm __total__
+        if (sid !== "__total__" && catsComTotal.has(cid)) return false;
+      }
+      return true;
+    })
     .map(it => {
       const incluido = it.incluido === 1 || it.incluido === true;
+      const tdStyle = "padding:6px 8px;border-bottom:1px solid #eee";
 
       if (it.tipo === "catalogo" && it.ref_id) {
-        const parts = (it.ref_id || "").split(":");
-        const cid = parts[0], sid = parts[1];
+        const [cid, sid] = (it.ref_id || "").split(":");
         const qtd = Number(it.qtd || 0);
 
         if (sid === "__total__") {
-          // Categoria agregada — nome vem de catNomes
           const nomeCat = catNomes[cid] || cid;
           const precoRef = catPM[cid] || 0;
           const totalVal = qtd * precoRef;
-          const tdNome = `Doces ${nomeCat}`;
-          const tdQtd = `${qtd} un.`;
           const tdPreco = precoRef > 0 ? R(precoRef) : "—";
           const tdTotal = incluido
             ? `<s style="color:#aaa">${totalVal > 0 ? R(totalVal) : "—"}</s> <strong>Incluído</strong>`
             : (totalVal > 0 ? R(totalVal) : "—");
-          return `<tr><td style="padding:6px 8px;border-bottom:1px solid #eee">${tdNome}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:center">${tdQtd}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right">${incluido ? `<s style="color:#aaa">${tdPreco}</s>` : tdPreco}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right">${tdTotal}</td></tr>`;
+          return `<tr><td style="${tdStyle}">${nomeCat}</td><td style="${tdStyle};text-align:center">${qtd} un.</td><td style="${tdStyle};text-align:right">${incluido ? `<s style="color:#aaa">${tdPreco}</s>` : tdPreco}</td><td style="${tdStyle};text-align:right">${tdTotal}</td></tr>`;
         } else {
-          // Sabor específico
+          // Sabor específico de categoria sem __total__
           const preco = Number(it.preco_unit || 0) || (saborPM[sid] || 0);
           const totalVal = qtd * preco;
-          const tdNome = it.descricao || sid;
           const tdTotal = incluido
             ? `<s style="color:#aaa">${totalVal > 0 ? R(totalVal) : "—"}</s> <strong>Incluído</strong>`
             : (totalVal > 0 ? R(totalVal) : "—");
-          return `<tr><td style="padding:6px 8px;border-bottom:1px solid #eee">${tdNome}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:center">${qtd} un.</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right">${incluido ? `<s style="color:#aaa">${preco > 0 ? R(preco) : "—"}</s>` : (preco > 0 ? R(preco) : "—")}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right">${tdTotal}</td></tr>`;
+          return `<tr><td style="${tdStyle}">${it.descricao || sid}</td><td style="${tdStyle};text-align:center">${qtd} un.</td><td style="${tdStyle};text-align:right">${incluido ? `<s style="color:#aaa">${preco > 0 ? R(preco) : "—"}</s>` : (preco > 0 ? R(preco) : "—")}</td><td style="${tdStyle};text-align:right">${tdTotal}</td></tr>`;
         }
       } else {
         // Item livre
@@ -4358,9 +4381,35 @@ function obaGerarContratoHTML(contract, proposal, scenario, catPM, saborPM, catN
         const tdTotal = incluido
           ? `<s style="color:#aaa">${totalVal > 0 ? R(totalVal) : "—"}</s> <strong>Incluído</strong>`
           : (totalVal > 0 ? R(totalVal) : "—");
-        return `<tr><td style="padding:6px 8px;border-bottom:1px solid #eee">${it.descricao || ""}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:center">${qtd}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right">${incluido ? `<s style="color:#aaa">${preco > 0 ? R(preco) : "—"}</s>` : (preco > 0 ? R(preco) : "—")}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right">${tdTotal}</td></tr>`;
+        return `<tr><td style="${tdStyle}">${it.descricao || ""}</td><td style="${tdStyle};text-align:center">${qtd}</td><td style="${tdStyle};text-align:right">${incluido ? `<s style="color:#aaa">${preco > 0 ? R(preco) : "—"}</s>` : (preco > 0 ? R(preco) : "—")}</td><td style="${tdStyle};text-align:right">${tdTotal}</td></tr>`;
       }
     }).join("");
+
+  // Nota descritiva do desconto
+  const notaDesconto = tots.desconto > 0 ? (() => {
+    const tipo = scenario.desconto_tipo || "none";
+    const val = Number(scenario.desconto_valor || 0);
+    let descricaoDesc = "";
+    if (tipo === "percentual") descricaoDesc = `${val}% sobre o subtotal de ${R(tots.subtotal)}`;
+    else if (tipo === "reais") descricaoDesc = `valor fixo negociado`;
+    return `<p style="font-size:11px;color:#666;margin-top:10px;font-style:italic">* Desconto aplicado: ${descricaoDesc} (${R(tots.desconto)}), conforme condição comercial acordada.</p>`;
+  })() : "";
+
+  // Nota de sabores — vincula a proposta quando há sabores suprimidos
+  const notaSabores = temSaboresSuprimidos
+    ? `<p style="font-size:11px;color:#666;margin-top:6px;font-style:italic">** Os sabores de cada categoria foram definidos na proposta comercial e são parte integrante deste contrato.</p>`
+    : "";
+
+  // Ref da proposta para o cabeçalho
+  const refProposta = proposal.proposal_id
+    ? (() => {
+        const partes = [];
+        if (proposal.cliente) partes.push(proposal.cliente);
+        if (proposal.tipo_evento) partes.push(proposal.tipo_evento);
+        if (proposal.data_evento) partes.push(obaFmtData(proposal.data_evento));
+        return partes.join(" · ");
+      })()
+    : "";
 
   const hoje = new Date().toLocaleDateString("pt-BR");
 
@@ -4389,7 +4438,7 @@ td{font-size:12px;vertical-align:top}
 </head>
 <body>
 <h1>Contrato de Prestação de Serviços</h1>
-<p class="sub">Nº ${contract.numero} &nbsp;·&nbsp; Emitido em ${hoje}</p>
+<p class="sub">Nº ${contract.numero} &nbsp;·&nbsp; Emitido em ${hoje}${refProposta ? ` &nbsp;·&nbsp; Ref.: ${refProposta}` : ""}</p>
 
 <h2>1. Das Partes</h2>
 <table>
@@ -4415,10 +4464,12 @@ ${contract.responsavel_recebimento ? `<tr><td style="padding:4px 0;color:#666;fo
 <thead><tr><th>Produto</th><th style="text-align:center">Qtd</th><th style="text-align:right">Preço unit.</th><th style="text-align:right">Total</th></tr></thead>
 <tbody>${itensRows || '<tr><td colspan="4" style="padding:8px;color:#888;font-size:11px">Itens conforme combinado</td></tr>'}</tbody>
 <tfoot>
-${tots.desconto > 0 ? `<tr class="total-row"><td colspan="3" style="padding:6px 8px;text-align:right;color:#666">Subtotal</td><td style="padding:6px 8px;text-align:right">${R(tots.subtotal)}</td></tr><tr><td colspan="3" style="padding:4px 8px;text-align:right;color:#c0392b">Desconto</td><td style="padding:4px 8px;text-align:right;color:#c0392b">- ${R(tots.desconto)}</td></tr>` : ""}
+${tots.desconto > 0 ? `<tr class="total-row"><td colspan="3" style="padding:6px 8px;text-align:right;color:#666">Subtotal</td><td style="padding:6px 8px;text-align:right">${R(tots.subtotal)}</td></tr><tr><td colspan="3" style="padding:4px 8px;text-align:right;color:#c0392b">Desconto *</td><td style="padding:4px 8px;text-align:right;color:#c0392b">- ${R(tots.desconto)}</td></tr>` : ""}
 <tr class="total-row"><td colspan="3" style="padding:8px;text-align:right">VALOR TOTAL</td><td style="padding:8px;text-align:right;font-size:15px">${R(tots.total)}</td></tr>
 </tfoot>
 </table>
+${notaDesconto}
+${notaSabores}
 
 <h2>4. Das Condições Financeiras</h2>
 <p class="clausula">${(contract.cond_pagamento || "Condições a combinar conforme acordado entre as partes.").replace(/</g, "&lt;")}</p>
