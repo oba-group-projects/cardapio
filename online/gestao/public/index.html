@@ -5875,13 +5875,16 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
 
     <!-- Link gerado (aparece após envio) -->
     <div id="ctr-link-box" style="display:none;padding:16px;background:#f0fdf4;border:1px solid #86efac;border-radius:12px;margin-bottom:16px">
-      <p style="font-size:13px;font-weight:700;color:#166534;margin-bottom:4px">✅ Link do contrato gerado</p>
-      <p class="hint" style="margin-bottom:10px">O documento está pronto. Compartilhe o link com a cliente pelo WhatsApp para que ela possa revisar e aceitar.</p>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <p style="font-size:13px;font-weight:700;color:#166534;margin-bottom:4px">✅ Contrato gerado com sucesso</p>
+      <p class="hint" style="margin-bottom:12px">O documento está pronto e imutável. Envie o link para a cliente revisar e assinar eletronicamente.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
         <input id="ctr-link-input" readonly style="flex:1;min-width:200px;font-size:12px;background:#fff">
-        <button class="secondary" style="font-size:12px" onclick="obaContractCopiarLink()">📋 Copiar</button>
-        <button class="secondary" style="font-size:12px;background:#25d366;color:#fff;border:none" onclick="obaContractEnviarWpp()">📱 WhatsApp</button>
+        <button class="secondary" style="font-size:12px" onclick="obaContractCopiarLink()">📋 Copiar link</button>
       </div>
+      <button style="width:100%;padding:13px;background:#25d366;color:#fff;border:none;border-radius:12px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px" onclick="obaContractEnviarWppAtivo()">
+        📱 Enviar pelo WhatsApp
+      </button>
+      <p class="hint" style="margin-top:8px;font-size:11px">Abrirá o WhatsApp com mensagem e link pré-preenchidos. Você revisa antes de enviar.</p>
     </div>
 
     <!-- Registro de aceite (aparece se aceito) -->
@@ -6310,7 +6313,8 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         $('contracts-status-badge').textContent = 'Enviado';
         $('contracts-status-badge').style.background = sc + '18';
         $('contracts-status-badge').style.color = sc;
-        alert('Contrato enviado! Copie o link e envie ao cliente pelo WhatsApp.');
+        // Rolar até a caixa de link — usuário vê os botões de envio imediatamente
+        setTimeout(() => { $('ctr-link-box')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
       } else {
         if (d.campos) alert('Campos obrigatórios faltando:\n• ' + d.campos.join('\n• '));
         else alert('Erro: ' + (d.error || 'desconhecido'));
@@ -6387,7 +6391,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         $('contracts-status-badge').textContent = 'Enviado';
         $('contracts-status-badge').style.background = sc + '18';
         $('contracts-status-badge').style.color = sc;
-        alert('Contrato enviado! Copie o link e envie ao cliente pelo WhatsApp.');
+        setTimeout(() => { $('ctr-link-box')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
       } else alert('Erro: ' + (d.error || 'desconhecido'));
     } catch(e) { alert('Erro de conexão.'); }
   };
@@ -6408,6 +6412,26 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     if (!wpp) { alert('Proposta sem WhatsApp cadastrado.'); return; }
     const msg = encodeURIComponent('Olá! Segue o link do contrato da Oba Doceria para você revisar e aceitar:\n\n' + link);
     window.open('https://wa.me/55' + wpp.replace(/\D/g,'') + '?text=' + msg, '_blank');
+  };
+
+  // Enviar WhatsApp usando dados já em memória (pós-confirmação de envio)
+  window.obaContractEnviarWppAtivo = function() {
+    const link = $('ctr-link-input')?.value || '';
+    if (!link) { alert('Link não disponível.'); return; }
+    const wpp = (obaContractPropostaAtiva?.whatsapp || '').replace(/\D/g, '');
+    if (!wpp) { alert('Proposta sem WhatsApp cadastrado.'); return; }
+    const nome = obaContractPropostaAtiva?.cliente || 'cliente';
+    const tipo = obaContractPropostaAtiva?.tipo_evento || 'evento';
+    const dataEvt = obaContractPropostaAtiva?.data_evento
+      ? new Date(obaContractPropostaAtiva.data_evento + 'T12:00:00').toLocaleDateString('pt-BR') : '';
+    const numero = obaContractAtivo?.numero || '';
+    const msg = encodeURIComponent(
+      'Olá, ' + nome + '! 😊\n\n' +
+      'Segue o contrato ' + numero + ' referente ao seu ' + tipo + (dataEvt ? ' em ' + dataEvt : '') + '.\n\n' +
+      'Acesse o link abaixo para revisar e aceitar:\n' + link + '\n\n' +
+      'Qualquer dúvida, é só me chamar! 🍫\nOba Doceria'
+    );
+    window.open('https://wa.me/55' + wpp + '?text=' + msg, '_blank');
   };
 
   window.obaContractEnviarWppById = async function(contractId, link) {
