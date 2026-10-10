@@ -2889,31 +2889,41 @@ $('formConfig').onsubmit=async e=>{
     try {
       const temaCat = obaLerFormCatalogo();
 
-      /* Validação: IDs de grupo não podem ser vazios ou duplicados */
-      const gruposOrdem = temaCat.pg2?.grupos_ordem || [];
-      const ids = gruposOrdem.map(g => (g.id || '').trim());
-      const idVazio = ids.some(id => !id);
-      if (idVazio) {
-        msg('Configuração inválida: todos os grupos precisam ter um ID preenchido.', 'erro');
-        return;
-      }
-      const idsDuplicados = ids.length !== new Set(ids).size;
-      if (idsDuplicados) {
-        msg('Configuração inválida: dois ou mais grupos têm o mesmo ID. Cada grupo precisa de um ID único.', 'erro');
-        return;
-      }
+      /* Validação: IDs de grupo não podem ser vazios ou duplicados
+         Só valida grupos_ordem se a lista da Pg2 foi renderizada (tem cards).
+         Se não foi aberta, usa os dados já salvos em memória como fallback. */
+      const listaPg2 = document.getElementById('cat-pg2-grupos-lista');
+      const listaPopulada = listaPg2 && listaPg2.children.length > 0;
+      const gruposOrdem = listaPopulada
+        ? (temaCat.pg2?.grupos_ordem || [])
+        : (catalogo.tema_catalogo?.pg2?.grupos_ordem || temaCat.pg2?.grupos_ordem || []);
 
-      /* Validação: pg2 inativa + nenhum grupo visível = catálogo inacessível */
-      const pg2Ativo = temaCat.pg2?.ativo !== false;
-      const temGrupoVisivel = gruposOrdem.some(g => g.visivel !== false);
-      if (!pg2Ativo && !temGrupoVisivel) {
-        msg('Configuração inválida: não é possível desativar a Página 2 sem ter ao menos um grupo visível. O catálogo ficaria inacessível.', 'erro');
-        return;
+      if (listaPopulada) {
+        const ids = gruposOrdem.map(g => (g.id || '').trim());
+        const idVazio = ids.some(id => !id);
+        if (idVazio) {
+          msg('Configuração inválida: todos os grupos precisam ter um ID preenchido.', 'erro');
+          return;
+        }
+        const idsDuplicados = ids.length !== new Set(ids).size;
+        if (idsDuplicados) {
+          msg('Configuração inválida: dois ou mais grupos têm o mesmo ID. Cada grupo precisa de um ID único.', 'erro');
+          return;
+        }
+        const pg2Ativo = temaCat.pg2?.ativo !== false;
+        const temGrupoVisivel = gruposOrdem.some(g => g.visivel !== false);
+        if (!pg2Ativo && !temGrupoVisivel) {
+          msg('Configuração inválida: não é possível desativar a Página 2 sem ter ao menos um grupo visível. O catálogo ficaria inacessível.', 'erro');
+          return;
+        }
+        if (!temGrupoVisivel) {
+          msg('Configuração inválida: ao menos um grupo precisa estar visível no catálogo.', 'erro');
+          return;
+        }
       }
-      /* Validação: ao menos um grupo visível (independente de pg2) */
-      if (!temGrupoVisivel) {
-        msg('Configuração inválida: ao menos um grupo precisa estar visível no catálogo.', 'erro');
-        return;
+      /* Quando Pg2 não foi aberta, preservar grupos_ordem existente */
+      if (!listaPopulada && catalogo.tema_catalogo?.pg2?.grupos_ordem?.length) {
+        temaCat.pg2 = { ...temaCat.pg2, grupos_ordem: catalogo.tema_catalogo.pg2.grupos_ordem };
       }
 
       const res = await obaSaveDraftWith('tema_catalogo', temaCat);
