@@ -1891,7 +1891,13 @@ function abrirEditor(tipo,id=null,duplicar=false){
     const wGrupo=document.createElement('div');wGrupo.className='field full';
     const lGrupo=document.createElement('label');lGrupo.textContent='Grupo no Catálogo de Sabores';
     const sGrupo=document.createElement('select');sGrupo.id='edGrupoCatalogo';
-    [['','Não aparece no Catálogo'],['artesanais','Doces Artesanais'],['finos','Doces Finos']].forEach(([v,t])=>{const o=new Option(t,v);if((item.grupoCatalogo||'')===(v))o.selected=true;sGrupo.add(o);});
+    // Popula dinamicamente com grupos existentes + opção de não aparecer
+    const gruposExistentes=[...new Set((catalogo.categories||catalogo.categorias||[]).filter(c=>c.grupoCatalogo&&String(c.grupoCatalogo).trim()).map(c=>String(c.grupoCatalogo).trim()))].sort();
+    const optsGrupo=[['','Não aparece no Catálogo'],...gruposExistentes.map(g=>[g,g])];
+    // Se valor atual não está na lista, adiciona como opção extra
+    const valorAtualGrupo=(item.grupoCatalogo||'').trim();
+    if(valorAtualGrupo && !gruposExistentes.includes(valorAtualGrupo)) optsGrupo.push([valorAtualGrupo, valorAtualGrupo + ' (novo)']);
+    optsGrupo.forEach(([v,t])=>{const o=new Option(t,v);if(valorAtualGrupo===v)o.selected=true;sGrupo.add(o);});
     wGrupo.append(lGrupo,sGrupo);box.append(wGrupo);
     box.append(checks(item));
   }
@@ -3187,7 +3193,7 @@ $('formConfig').onsubmit=async e=>{
           <select class="cat-grupo-id-sel" style="font-family:monospace" onchange="catEdOnGrupoIdChange(this)"></select>
           <input class="cat-grupo-id cat-grupo-id-custom" value="" placeholder="Ex: sazonais" style="font-family:monospace;margin-top:6px;display:none">
           <input type="hidden" class="cat-grupo-id" value="${g?.id || ''}">
-          <div class="cat-grupo-aviso" style="display:none;margin-top:6px;padding:7px 10px;background:#fef3c7;border:1px solid #fbbf24;border-radius:8px;font-size:11px;color:#92400e">⚠️ Nenhuma categoria encontrada com este ID. O botão aparecerá mas a Pg4 ficará vazia.</div>
+          <div class="cat-grupo-aviso" style="display:none;margin-top:6px;padding:7px 10px;background:#fef3c7;border:1px solid #fbbf24;border-radius:8px;font-size:11px;color:#92400e">⚠️ Nenhuma categoria encontrada com este ID. O botão aparecerá mas a Pg4 ficará vazia. <a href="#" class="cat-grupo-aviso-link" style="color:#92400e;font-weight:700;text-decoration:underline" onclick="catEdIrParaCategorias(this);return false">→ Criar categorias para este grupo</a></div>
         </div>
         <div class="field full">
           <label>Ícone</label>
@@ -3368,6 +3374,34 @@ $('formConfig').onsubmit=async e=>{
     } else {
       if (customInput) customInput.style.display = 'none';
       catEdAtualizarGrupoId(card, sel.value);
+    }
+  };
+
+  /* Atalho: ir para aba Categorias com grupo pré-preenchido */
+  window.catEdIrParaCategorias = function(link) {
+    // Recupera o ID do grupo a partir do card pai
+    const card = link.closest('.oba-botao-card');
+    const grupoId = card ? (card.querySelector('.cat-grupo-id[type="hidden"]') || card.querySelector('.cat-grupo-id'))?.value.trim() : '';
+    // Navega para a aba Categorias
+    const tabCat = document.querySelector('.tab[data-tab="categories"]');
+    if (tabCat) tabCat.click();
+    // Abre o editor de nova categoria
+    if (typeof abrirEditor === 'function') {
+      abrirEditor('categories');
+      // Pré-preenche o campo grupo após o editor abrir (aguarda DOM)
+      setTimeout(function() {
+        const sel = document.getElementById('edGrupoCatalogo');
+        if (sel && grupoId) {
+          // Se o grupo já existe como opção, seleciona
+          let found = false;
+          for (const opt of sel.options) { if (opt.value === grupoId) { opt.selected = true; found = true; break; } }
+          // Se não existe, adiciona como opção temporária e seleciona
+          if (!found) {
+            const opt = new Option(grupoId + ' (novo)', grupoId, true, true);
+            sel.add(opt);
+          }
+        }
+      }, 80);
     }
   };
 
