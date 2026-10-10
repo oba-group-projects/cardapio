@@ -45,12 +45,27 @@
     "titulo": "Descubra a Oba"
   },
   "pg2": {
-    "artesanais_label": "Doces Artesanais",
-    "artesanais_sublabel": "Artesanais",
+    "ativo": true,
     "corFundo": "",
     "corSubtitulo": "",
-    "finos_label": "Doces Finos",
-    "finos_sublabel": "Exclusivos",
+    "grupos_ordem": [
+      {
+        "destaque": true,
+        "icone": "🍫",
+        "id": "artesanais",
+        "label": "Doces Artesanais",
+        "sublabel": "Artesanais",
+        "visivel": true
+      },
+      {
+        "destaque": false,
+        "icone": "✨",
+        "id": "finos",
+        "label": "Doces Finos",
+        "sublabel": "Exclusivos",
+        "visivel": true
+      }
+    ],
     "logo": "",
     "pesoSubtitulo": "",
     "subtitulo": "Encontre seu favorito",
@@ -70,5 +85,5 @@
     "tamanhoCorpo": "",
     "tamanhoTitulo": ""
   },
-  "updatedAt": "2026-10-08"
+  "updatedAt": "2026-10-10"
 }
