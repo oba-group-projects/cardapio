@@ -6165,16 +6165,52 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         <div class="field full"><label>Responsável pelo recebimento <span class="hint">(opcional)</span></label><input id="ctr-responsavel" placeholder="Ex: João Silva — (55) 99999-0000"></div>
         <div class="field full">
           <label>Condições de pagamento <span style="color:#dc2626">*</span></label>
-          <select id="ctr-cond-pagamento-sel" onchange="obaContractCondPagamento(this.value)" style="width:100%;margin-bottom:8px;font-size:13px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:#fff;font:inherit;cursor:pointer">
+          <select id="ctr-cond-pagamento-sel" onchange="obaContractCondPagamento(this.value)" style="width:100%;margin-bottom:10px;font-size:13px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:#fff;font:inherit;cursor:pointer">
             <option value="">Selecione uma opção...</option>
-            <option value="50% no pedido, 50% na entrega">50% no pedido, 50% na entrega</option>
-            <option value="30% no pedido, 70% na entrega">30% no pedido, 70% na entrega</option>
-            <option value="100% no pedido">100% no pedido (pagamento integral)</option>
-            <option value="Parcelado em 2x">Parcelado em 2x (combinar datas)</option>
-            <option value="Parcelado em 3x">Parcelado em 3x (combinar datas)</option>
+            <option value="50/50">50% no pedido, 50% na entrega</option>
+            <option value="30/70">30% no pedido, 70% na entrega</option>
+            <option value="100">100% no pedido (pagamento integral)</option>
+            <option value="2x">Parcelado em 2x</option>
+            <option value="3x">Parcelado em 3x</option>
             <option value="outro">Outro — especificar abaixo</option>
           </select>
-          <input id="ctr-cond-pagamento" placeholder="Descreva as condições de pagamento" style="display:none">
+          <!-- Campos auxiliares estruturados (aparecem para opções com sinal) -->
+          <div id="ctr-cond-campos" style="display:none;background:#f9f3ec;border-radius:10px;padding:12px 14px;margin-bottom:10px">
+            <div class="grid" style="gap:8px">
+              <div class="field">
+                <label style="font-size:11px">Valor do sinal <span class="hint">(calculado automaticamente se vazio)</span></label>
+                <div style="display:flex;gap:6px;align-items:center">
+                  <span style="font-size:13px;color:#888">R$</span>
+                  <input id="ctr-cond-sinal-valor" type="number" min="0" step="0.01" placeholder="Automático" style="flex:1;font-size:13px" oninput="obaContractCondGerarTexto()">
+                </div>
+              </div>
+              <div class="field">
+                <label style="font-size:11px">Vencimento do sinal</label>
+                <input id="ctr-cond-sinal-venc" type="date" style="width:100%;font-size:13px" onchange="obaContractCondGerarTexto()">
+              </div>
+              <div class="field">
+                <label style="font-size:11px">Vencimento do saldo</label>
+                <input id="ctr-cond-saldo-venc" type="date" placeholder="Ex: data do evento" style="width:100%;font-size:13px" onchange="obaContractCondGerarTexto()">
+              </div>
+              <div class="field">
+                <label style="font-size:11px">Forma de pagamento</label>
+                <select id="ctr-cond-forma" style="width:100%;font-size:13px" onchange="obaContractCondGerarTexto()">
+                  <option value="">Não especificada</option>
+                  <option value="Pix">Pix</option>
+                  <option value="Dinheiro">Dinheiro</option>
+                  <option value="Cartão">Cartão</option>
+                  <option value="Pix ou Dinheiro">Pix ou Dinheiro</option>
+                  <option value="Transferência">Transferência bancária</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <!-- Texto gerado automaticamente (ou campo livre para "outro") -->
+          <div style="position:relative">
+            <label style="font-size:11px;color:#888;display:block;margin-bottom:4px" id="ctr-cond-label-texto">Texto para o contrato <span class="hint">(editável)</span></label>
+            <textarea id="ctr-cond-pagamento" rows="3" placeholder="Descreva as condições de pagamento" style="width:100%;font-size:12px;line-height:1.6;resize:vertical"></textarea>
+          </div>
+          <input type="hidden" id="ctr-cond-pagamento-modo">
         </div>
       </div>
     </div>
@@ -6419,25 +6455,37 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       sv('ctr-local', d.contract.local_evento || '');
       sv('ctr-horario-entrega', d.contract.horario_entrega || '');
       sv('ctr-responsavel', d.contract.responsavel_recebimento || '');
-      sv('ctr-cond-pagamento', d.contract.cond_pagamento || '');
-      // Popular select de condições de pagamento
+      // Popular condições de pagamento — textarea sempre mostra o texto salvo
       const selCond = $('ctr-cond-pagamento-sel');
-      const inputCond = $('ctr-cond-pagamento');
+      const textareaCond = $('ctr-cond-pagamento');
+      const condAtual = d.contract.cond_pagamento || '';
+      if (textareaCond) textareaCond.value = condAtual;
       if (selCond) {
-        const condAtual = d.contract.cond_pagamento || '';
-        const opcoesValores = ['50% no pedido, 50% na entrega','30% no pedido, 70% na entrega','100% no pedido','Parcelado em 2x','Parcelado em 3x'];
-        const opcaoMatch = opcoesValores.find(o => condAtual.startsWith(o));
+        // Tenta identificar qual opção gerou o texto salvo
         if (!condAtual) {
           selCond.value = '';
-          if (inputCond) inputCond.style.display = 'none';
-        } else if (opcaoMatch) {
-          selCond.value = opcaoMatch;
-          if (inputCond) inputCond.style.display = 'none';
+          const camposDiv = $('ctr-cond-campos'); if (camposDiv) camposDiv.style.display = 'none';
+        } else if (condAtual.startsWith('100% no pedido')) {
+          selCond.value = '100';
+          const camposDiv = $('ctr-cond-campos'); if (camposDiv) camposDiv.style.display = 'none';
+        } else if (condAtual.startsWith('Parcelado em 2x') || /^R\$.*R\$.*2x/.test(condAtual)) {
+          selCond.value = '2x';
+          const camposDiv = $('ctr-cond-campos'); if (camposDiv) camposDiv.style.display = '';
+        } else if (condAtual.startsWith('Parcelado em 3x') || /^R\$.*R\$.*3x/.test(condAtual)) {
+          selCond.value = '3x';
+          const camposDiv = $('ctr-cond-campos'); if (camposDiv) camposDiv.style.display = '';
+        } else if (/^50%|^R\$.*50%|50%.*no pedido/.test(condAtual) || condAtual.includes('50% no pedido')) {
+          selCond.value = '50/50';
+          const camposDiv = $('ctr-cond-campos'); if (camposDiv) camposDiv.style.display = '';
+        } else if (/^30%|30%.*no pedido/.test(condAtual) || condAtual.includes('30% no pedido')) {
+          selCond.value = '30/70';
+          const camposDiv = $('ctr-cond-campos'); if (camposDiv) camposDiv.style.display = '';
         } else {
           selCond.value = 'outro';
-          if (inputCond) { inputCond.style.display = ''; inputCond.value = condAtual; }
+          const camposDiv = $('ctr-cond-campos'); if (camposDiv) camposDiv.style.display = 'none';
         }
       }
+      sv('ctr-cond-pagamento', condAtual); // mantém compatibilidade
       sv('ctr-clausula-cancelamento', d.contract.clausula_cancelamento || '');
       sv('ctr-clausula-responsabilidades', d.contract.clausula_responsabilidades || '');
       sv('ctr-clausula-foro', d.contract.clausula_foro || '');
@@ -6464,6 +6512,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       $('ctr-acoes-rascunho').style.display = isRascunho ? 'flex' : 'none';
       // Campos editáveis só no rascunho
       ['ctr-nome-completo','ctr-email','ctr-cpf-cnpj','ctr-local','ctr-cond-pagamento',
+       'ctr-cond-pagamento-sel','ctr-cond-sinal-valor','ctr-cond-sinal-venc','ctr-cond-saldo-venc','ctr-cond-forma',
        'ctr-horario-entrega','ctr-responsavel',
        'ctr-clausula-cancelamento','ctr-clausula-responsabilidades','ctr-clausula-foro','ctr-scenario-id'].forEach(id => {
         const el = $(id);
@@ -6652,7 +6701,8 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         $('ctr-documento-box').style.display = 'none';
         $('ctr-resumo-financeiro').style.display = 'none';
         ['ctr-nome-completo','ctr-email','ctr-cpf-cnpj','ctr-local','ctr-cond-pagamento',
-         'ctr-cond-pagamento-sel','ctr-horario-entrega','ctr-responsavel',
+         'ctr-cond-pagamento-sel','ctr-cond-sinal-valor','ctr-cond-sinal-venc','ctr-cond-saldo-venc','ctr-cond-forma',
+         'ctr-horario-entrega','ctr-responsavel',
          'ctr-clausula-cancelamento','ctr-clausula-responsabilidades','ctr-clausula-foro','ctr-scenario-id'].forEach(id => {
           const el = $(id); if (el) el.disabled = true;
         });
@@ -6825,21 +6875,93 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     if (erroEl) erroEl.style.display = (digits.length > 0 && digits.length !== 11 && digits.length !== 14) ? 'block' : 'none';
   };
 
-  /* Lê condições de pagamento (select + campo livre) */
+  /* Lê condições de pagamento — retorna o texto final do textarea */
   window.obaContractLerCondPagamento = function() {
-    const sel = document.getElementById('ctr-cond-pagamento-sel');
-    if (!sel) return document.getElementById('ctr-cond-pagamento')?.value.trim() || '';
-    if (sel.value === 'outro') return document.getElementById('ctr-cond-pagamento')?.value.trim() || '';
-    return sel.value || '';
+    return document.getElementById('ctr-cond-pagamento')?.value.trim() || '';
   };
 
-  /* Mostra/oculta campo livre de condições */
+  /* Mostra/oculta campos auxiliares conforme opção selecionada */
   window.obaContractCondPagamento = function(val) {
-    const input = document.getElementById('ctr-cond-pagamento');
-    if (input) {
-      input.style.display = val === 'outro' ? '' : 'none';
-      if (val !== 'outro') input.value = '';
+    const camposDiv = document.getElementById('ctr-cond-campos');
+    const textarea  = document.getElementById('ctr-cond-pagamento');
+    const modoEl    = document.getElementById('ctr-cond-pagamento-modo');
+    if (modoEl) modoEl.value = val;
+
+    const temCampos = ['50/50','30/70','2x','3x'].includes(val);
+    const isOutro   = val === 'outro';
+    const is100     = val === '100';
+
+    if (camposDiv) camposDiv.style.display = temCampos ? '' : 'none';
+
+    if (is100) {
+      // 100% no pedido — sem campos auxiliares, gera texto direto
+      if (textarea) textarea.value = '100% no pedido (pagamento integral).';
+    } else if (isOutro || val === '') {
+      // Campo livre — limpa o texto gerado, usuário digita
+      if (val === 'outro' && textarea) textarea.value = '';
+    } else if (temCampos) {
+      // Gera texto a partir dos campos auxiliares
+      obaContractCondGerarTexto();
     }
+  };
+
+  /* Gera o texto de condições de pagamento a partir dos campos auxiliares */
+  window.obaContractCondGerarTexto = function() {
+    const sel     = document.getElementById('ctr-cond-pagamento-sel')?.value || '';
+    const forma   = document.getElementById('ctr-cond-forma')?.value || '';
+    const sinVenc = document.getElementById('ctr-cond-sinal-venc')?.value || '';
+    const salVenc = document.getElementById('ctr-cond-saldo-venc')?.value || '';
+    const sinValEl = document.getElementById('ctr-cond-sinal-valor');
+    const textarea = document.getElementById('ctr-cond-pagamento');
+    if (!textarea) return;
+
+    // Tenta usar valor_total do resumo para calcular o sinal
+    const valorTotalEl = document.getElementById('ctr-resumo-conteudo');
+    let valorTotal = 0;
+    try {
+      const match = (valorTotalEl?.textContent || '').match(/R\$\s*([\d.,]+)/g);
+      if (match && match.length) {
+        const last = match[match.length - 1].replace('R$','').replace(/\./g,'').replace(',','.').trim();
+        valorTotal = parseFloat(last) || 0;
+      }
+    } catch(e) {}
+
+    const fmtData = iso => {
+      if (!iso) return '';
+      const [y,m,d] = iso.split('-');
+      return `${d}/${m}/${y}`;
+    };
+    const fmtVal = v => v > 0 ? 'R$ ' + v.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.') : '';
+    const formaStr = forma ? ` via ${forma}` : '';
+
+    let pct1 = 0, pct2 = 0;
+    if (sel === '50/50') { pct1 = 0.5;  pct2 = 0.5; }
+    if (sel === '30/70') { pct1 = 0.3;  pct2 = 0.7; }
+    if (sel === '2x')    { pct1 = 0.5;  pct2 = 0.5; }
+    if (sel === '3x')    { pct1 = 1/3;  pct2 = 2/3; }
+
+    // Valor do sinal: usa campo manual se preenchido, senão calcula
+    let sinValManual = parseFloat((sinValEl?.value || '').replace(',','.')) || 0;
+    let sinVal = sinValManual > 0 ? sinValManual : (valorTotal > 0 ? Math.round(valorTotal * pct1 * 100) / 100 : 0);
+    let salVal = valorTotal > 0 ? Math.round((valorTotal - sinVal) * 100) / 100 : 0;
+
+    const sinVencStr = sinVenc ? ` até ${fmtData(sinVenc)}` : '';
+    const salVencStr = salVenc ? ` até ${fmtData(salVenc)}` : '';
+
+    let texto = '';
+    if (sel === '2x' || sel === '3x') {
+      const parcelas = sel === '2x' ? 2 : 3;
+      const valParc = valorTotal > 0 ? fmtVal(Math.round(valorTotal / parcelas * 100) / 100) : '';
+      texto = `Parcelado em ${parcelas}x${valParc ? ' de ' + valParc : ''}${formaStr}.`;
+      if (sinVencStr) texto += ` 1ª parcela${sinVencStr}.`;
+      if (salVencStr) texto += ` Última parcela${salVencStr}.`;
+    } else {
+      const sinStr = sinVal > 0 ? fmtVal(sinVal) : `${Math.round(pct1*100)}% do valor total`;
+      const salStr = salVal > 0 ? fmtVal(salVal) : `saldo restante`;
+      texto = `${sinStr} no pedido (sinal${formaStr}${sinVencStr}), ${salStr} na entrega${formaStr}${salVencStr}.`;
+    }
+
+    textarea.value = texto;
   };
 
   // ── INTEGRAÇÃO COM ABA ────────────────────────────────────

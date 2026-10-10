@@ -4308,8 +4308,9 @@ function obaFmtData(d) {
 }
 
 /* Gera HTML completo do contrato para snapshot */
-function obaGerarContratoHTML(contract, proposal, scenario, catPM, saborPM, catNomes) {
+function obaGerarContratoHTML(contract, proposal, scenario, catPM, saborPM, catNomes, dadosAceite) {
   catNomes = catNomes || {};
+  dadosAceite = dadosAceite || null;
   const R = v => {
     const n = Number(v || 0).toFixed(2), [i, dec] = n.split(".");
     return "R$ " + i.replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "," + dec;
@@ -4489,7 +4490,10 @@ ${notaSabores}
 <p style="font-size:12px;color:#555;margin-bottom:12px">Este contrato foi disponibilizado digitalmente pela Oba Doceria. O aceite eletrônico registra que o CONTRATANTE leu e concordou com todos os termos acima.</p>
 <table>
 <tr><td style="padding:4px 0;width:160px;color:#666;font-size:11px">Contrato nº</td><td style="padding:4px 0;font-weight:bold">${contract.numero}</td></tr>
-<tr><td style="padding:4px 0;color:#666;font-size:11px">Status</td><td style="padding:4px 0">${contract.status === "aceito" ? "✅ Aceito eletronicamente" : "Aguardando aceite"}</td></tr>
+<tr><td style="padding:4px 0;color:#666;font-size:11px">Status</td><td style="padding:4px 0">${dadosAceite ? "✅ Aceito eletronicamente" : "Aguardando aceite"}</td></tr>
+${dadosAceite ? `<tr><td style="padding:4px 0;color:#666;font-size:11px">Data/hora</td><td style="padding:4px 0;font-weight:bold;color:#166534">${new Date(dadosAceite.data_hora).toLocaleString("pt-BR", {timeZone:"America/Sao_Paulo"})}</td></tr>
+<tr><td style="padding:4px 0;color:#666;font-size:11px">Verificação</td><td style="padding:4px 0">${dadosAceite.whatsapp_confirmado?.startsWith("CPF:") ? "CPF/CNPJ" : "WhatsApp"}</td></tr>
+<tr><td style="padding:4px 0;color:#666;font-size:11px">Hash do documento</td><td style="padding:4px 0;font-size:10px;word-break:break-all;color:#666">${dadosAceite.snapshot_hash}</td></tr>` : ""}
 </table>
 </div>
 
@@ -4751,12 +4755,34 @@ async function obaHandleContratoPublico(request, env, url) {
       const aceiteId = obaAceiteId();
       const ip = request.headers.get("CF-Connecting-IP") || request.headers.get("X-Forwarded-For") || "desconhecido";
       const ua = request.headers.get("User-Agent") || "";
+      const whatsappConf = wppOk ? wppInformado : ("CPF:" + cpfInformado);
+
       await env.DB.prepare(`
         INSERT INTO contract_aceites (aceite_id, contract_id, data_hora, ip, user_agent, whatsapp_confirmado, snapshot_hash, criado_em)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `).bind(aceiteId, contract.contract_id, now, ip, ua, wppOk ? wppInformado : ("CPF:" + cpfInformado), contract.snapshot_hash, now).run();
+      `).bind(aceiteId, contract.contract_id, now, ip, ua, whatsappConf, contract.snapshot_hash, now).run();
 
       await env.DB.prepare("UPDATE contracts SET status = 'aceito', atualizado_em = ? WHERE contract_id = ?").bind(now, contract.contract_id).run();
+
+      // Gerar snapshot_aceite_html com dados do aceite incorporados
+      try {
+        const proposal = await env.DB.prepare("SELECT * FROM proposals WHERE proposal_id = ?").bind(contract.proposal_id).first();
+        const scenario = await env.DB.prepare("SELECT * FROM proposal_scenarios WHERE scenario_id = ?").bind(contract.scenario_id).first();
+        if (proposal && scenario) {
+          const items = await env.DB.prepare("SELECT * FROM proposal_items WHERE scenario_id = ? ORDER BY ordem").bind(contract.scenario_id).all();
+          const scenarioComItems = { ...scenario, items: items.results || [] };
+          const { catPM, saborPM, catNomes } = await obaGetCatalogPrecos(env);
+          const dadosAceite = { data_hora: now, whatsapp_confirmado: whatsappConf, snapshot_hash: contract.snapshot_hash };
+          const contratoAceito = { ...contract, status: "aceito" };
+          const snapshotAceiteHtml = obaGerarContratoHTML(contratoAceito, proposal, scenarioComItems, catPM, saborPM, catNomes, dadosAceite);
+          await env.DB.prepare("UPDATE contracts SET snapshot_aceite_html = ? WHERE contract_id = ?")
+            .bind(snapshotAceiteHtml, contract.contract_id).run();
+        }
+      } catch(e) {
+        // Falha silenciosa — o aceite já foi registrado, o snapshot_aceite é melhoramento
+        console.error("[aceite] Falha ao gerar snapshot_aceite_html:", e.message || e);
+      }
+
       return json({ ok: true, aceito: true, data_hora: now });
     }
 
@@ -4865,7 +4891,7 @@ ${contract.status === "aceito" ? `
         <div class="link-copiado" id="copiado-aceito">✓ Link copiado!</div>
       </div>
     </div>
-    <iframe srcdoc="${contract.snapshot_html.replace(/"/g, "&quot;")}" style="width:100%;min-height:900px;border:none;border-radius:12px;background:#fff" title="Contrato"></iframe>
+    <iframe srcdoc="${(contract.snapshot_aceite_html || contract.snapshot_html).replace(/"/g, "&quot;")}" style="width:100%;min-height:900px;border:none;border-radius:12px;background:#fff" title="Contrato"></iframe>
   </div>
 </div>` : `
 <div id="etapa-wpp">
