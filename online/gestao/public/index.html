@@ -3006,7 +3006,7 @@ $('formConfig').onsubmit=async e=>{
           <select class="cat-grupo-id-sel" style="font-family:monospace" onchange="catEdOnGrupoIdChange(this)"></select>
           <input class="cat-grupo-id cat-grupo-id-custom" value="" placeholder="Ex: sazonais" style="font-family:monospace;margin-top:6px;display:none">
           <input type="hidden" class="cat-grupo-id" value="${g?.id || ''}">
-          <div class="cat-grupo-aviso" style="display:none;margin-top:6px;padding:7px 10px;background:#fef3c7;border:1px solid #fbbf24;border-radius:8px;font-size:11px;color:#92400e">⚠️ Nenhuma categoria encontrada com este ID. O botão aparecerá mas a Pg4 ficará vazia. <a href="#" class="cat-grupo-aviso-link" style="color:#92400e;font-weight:700;text-decoration:underline" onclick="catEdIrParaCategorias(this);return false">→ Criar categorias para este grupo</a></div>
+          <div class="cat-grupo-aviso" style="display:none;margin-top:6px;padding:7px 10px;background:#fef3c7;border:1px solid #fbbf24;border-radius:8px;font-size:11px;color:#92400e">⚠️ Nenhuma categoria encontrada com este ID. O botão aparecerá mas a Pg4 ficará vazia. <a href="#" class="cat-grupo-aviso-link" style="color:#92400e;font-weight:700;text-decoration:underline" onclick="catAbrirModalCategoria(this);return false">→ Criar categorias para este grupo</a></div>
         </div>
         <div class="field full">
           <label>Ícone</label>
@@ -3299,32 +3299,87 @@ $('formConfig').onsubmit=async e=>{
     return resultado;
   };
 
-  /* Atalho: ir para aba Categorias com grupo pré-preenchido */
-  window.catEdIrParaCategorias = function(link) {
-    // Recupera o ID do grupo a partir do card pai
+  /* Modal: abrir criação rápida de categoria a partir do aviso */
+  window.catAbrirModalCategoria = function(link) {
     const card = link.closest('.oba-botao-card');
-    const grupoId = card ? (card.querySelector('.cat-grupo-id[type="hidden"]') || card.querySelector('.cat-grupo-id'))?.value.trim() : '';
-    // Navega para a aba Categorias
-    const tabCat = document.querySelector('.tab[data-tab="categories"]');
-    if (tabCat) tabCat.click();
-    // Abre o editor de nova categoria
-    if (typeof abrirEditor === 'function') {
-      abrirEditor('categories');
-      // Pré-preenche o campo grupo após o editor abrir (aguarda DOM)
-      setTimeout(function() {
-        const sel = document.getElementById('edGrupoCatalogo');
-        if (sel && grupoId) {
-          // Se o grupo já existe como opção, seleciona
-          let found = false;
-          for (const opt of sel.options) { if (opt.value === grupoId) { opt.selected = true; found = true; break; } }
-          // Se não existe, adiciona como opção temporária e seleciona
-          if (!found) {
-            const opt = new Option(grupoId + ' (novo)', grupoId, true, true);
-            sel.add(opt);
-          }
-        }
-      }, 80);
+    const grupoId = card
+      ? (card.querySelector('.cat-grupo-id[type="hidden"]') || card.querySelector('.cat-grupo-id'))?.value.trim()
+      : '';
+    // Preenche e abre o modal
+    const nomeEl  = document.getElementById('cat-modal-cat-nome');
+    const precoEl = document.getElementById('cat-modal-cat-preco');
+    const grupoEl = document.getElementById('cat-modal-cat-grupo');
+    const erroEl  = document.getElementById('cat-modal-cat-erro');
+    if (nomeEl)  { nomeEl.value  = ''; }
+    if (precoEl) { precoEl.value = ''; }
+    if (grupoEl) { grupoEl.value = grupoId; }
+    if (erroEl)  { erroEl.style.display = 'none'; erroEl.textContent = ''; }
+    // Guarda referência ao card de origem para atualizar o select depois
+    document.getElementById('cat-modal-nova-categoria')._cardOrigem = card;
+    document.getElementById('cat-modal-nova-categoria').style.display = 'flex';
+    setTimeout(() => nomeEl?.focus(), 80);
+  };
+
+  /* Modal: fechar */
+  window.catFecharModalCategoria = function() {
+    document.getElementById('cat-modal-nova-categoria').style.display = 'none';
+  };
+
+  /* Modal: salvar categoria e atualizar o select */
+  window.catSalvarModalCategoria = async function() {
+    const nomeEl  = document.getElementById('cat-modal-cat-nome');
+    const precoEl = document.getElementById('cat-modal-cat-preco');
+    const grupoEl = document.getElementById('cat-modal-cat-grupo');
+    const erroEl  = document.getElementById('cat-modal-cat-erro');
+    const btnSalvar = document.querySelector('#cat-modal-nova-categoria .primary');
+
+    const nome  = nomeEl?.value.trim()  || '';
+    const preco = precoEl?.value !== '' ? Number(precoEl.value) : null;
+    const grupo = grupoEl?.value.trim() || '';
+
+    if (!nome) {
+      if (erroEl) { erroEl.textContent = 'Nome da categoria é obrigatório.'; erroEl.style.display = ''; }
+      nomeEl?.focus();
+      return;
     }
+
+    if (btnSalvar) { btnSalvar.disabled = true; btnSalvar.textContent = 'Salvando...'; }
+
+    try {
+      const novoItem = {
+        id:              novoId('categories', nome),
+        nome:            nome,
+        precoReferencia: preco,
+        grupoCatalogo:   grupo,
+        ordem:           nextOrder('categories'),
+        ativo:           true,
+        disponivel:      true,
+      };
+      const items = [...(catalogo.categories || []), novoItem];
+      await obaSaveDraftWith('categories', items);
+      catalogo.categories = items;
+      renderTudo();
+      addPendencia('Criado: ' + nome);
+
+      // Atualizar o select do card de origem
+      const modal = document.getElementById('cat-modal-nova-categoria');
+      const card  = modal._cardOrigem;
+      if (card && typeof catEdPopularSelectGrupo === 'function') {
+        catEdPopularSelectGrupo(card, grupo);
+      }
+
+      catFecharModalCategoria();
+      msg('Categoria "' + nome + '" criada com sucesso! Publique para ver no catálogo.');
+    } catch(e) {
+      if (erroEl) { erroEl.textContent = 'Erro ao salvar: ' + (e.message || e); erroEl.style.display = ''; }
+    } finally {
+      if (btnSalvar) { btnSalvar.disabled = false; btnSalvar.textContent = '✅ Criar categoria'; }
+    }
+  };
+
+  /* Manter catEdIrParaCategorias como fallback para outros contextos */
+  window.catEdIrParaCategorias = function(link) {
+    catAbrirModalCategoria(link);
   };
 
   /* Atualiza hidden + aviso a partir do ID resolvido */
@@ -6753,6 +6808,32 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     <div style="display:flex;gap:10px;justify-content:flex-end">
       <button class="secondary" onclick="document.getElementById('ctr-modal-confirmar').style.display='none'">← Voltar</button>
       <button class="primary" style="background:#059669" onclick="obaContractConfirmarEnvio()">✅ Confirmar envio</button>
+    </div>
+  </div>
+</div>
+<!-- Modal: criar categoria rápida a partir do Editor Visual do Catálogo -->
+<div id="cat-modal-nova-categoria" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:3000;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;border-radius:16px;padding:28px 24px;max-width:420px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.2)">
+    <h3 style="margin:0 0 6px;font-size:15px;color:#3B2A1E">📂 Nova categoria</h3>
+    <p style="font-size:12px;color:#888;margin-bottom:18px">Crie a primeira categoria do grupo. Você pode adicionar mais categorias depois na aba <strong>Categorias</strong>.</p>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div>
+        <label style="font-size:12px;font-weight:600;color:#3B2A1E;display:block;margin-bottom:4px">Nome da categoria <span style="color:#c00">*</span></label>
+        <input id="cat-modal-cat-nome" placeholder="Ex: Tradicionais I" style="width:100%;padding:10px;border:1.5px solid #EDD9C0;border-radius:10px;font:inherit;font-size:13px">
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:#3B2A1E;display:block;margin-bottom:4px">Preço de referência <span style="font-weight:400;color:#888">(por unidade, opcional)</span></label>
+        <input id="cat-modal-cat-preco" type="number" min="0" step="0.01" placeholder="Ex: 3.50" style="width:100%;padding:10px;border:1.5px solid #EDD9C0;border-radius:10px;font:inherit;font-size:13px">
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:#3B2A1E;display:block;margin-bottom:4px">Grupo do catálogo</label>
+        <input id="cat-modal-cat-grupo" readonly style="width:100%;padding:10px;border:1.5px solid #EDD9C0;border-radius:10px;font:inherit;font-size:13px;font-family:monospace;background:#f9f3ec;color:#8B4513;font-weight:700">
+      </div>
+      <p id="cat-modal-cat-erro" style="display:none;font-size:12px;color:#c00;margin:0"></p>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px">
+      <button class="secondary" onclick="catFecharModalCategoria()">← Voltar</button>
+      <button class="primary" style="background:#8B4513" onclick="catSalvarModalCategoria()">✅ Criar categoria</button>
     </div>
   </div>
 </div>
