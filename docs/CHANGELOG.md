@@ -2,7 +2,20 @@
 
 Formato inspirado em Keep a Changelog.
 
-## [Sessão 12] — 2026-10-09 — commit 777a0d2
+## [Sessão 13] — 2026-10-09 — commit dbeb0ea
+
+### Added
+- Select dinâmico para ID de grupo no editor de Pg2 do catálogo — populado de `catalogo.categories.grupoCatalogo`
+- Opção "Personalizado..." com input de texto para IDs novos
+- Aviso inline ⚠️ quando ID não tem categorias correspondentes
+- Link "→ Criar categorias para este grupo" no aviso — `catEdIrParaCategorias(link)`
+- `catEdPopularSelectGrupo`, `catEdOnGrupoIdChange`, `catEdAtualizarGrupoId`, `catEdIdsGruposDisponiveis`, `catEdIrParaCategorias`
+
+### Changed
+- `edGrupoCatalogo` no editor de Categorias: dinâmico (era hardcoded artesanais/finos)
+- Leituras de `.cat-grupo-id` atualizadas para seletor `[type="hidden"]` prioritário
+
+
 
 ### Added
 - Editor Visual Catálogo P1+P2: editor dinâmico de grupos `#cat-pg2-grupos-lista` na Central

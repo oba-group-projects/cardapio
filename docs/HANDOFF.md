@@ -1,16 +1,18 @@
 # HANDOFF
 
-Atualizado: 2026-10-09 (sessão 12)
+Atualizado: 2026-10-09 (sessão 13)
 
 Branch: feature/gestao-online-segura
-HEAD: 777a0d2
+HEAD: dbeb0ea
 
 ## Última entrega
-Editor Visual do Catálogo P1+P2 — grupos dinâmicos, schema v4, catMontarPg3/catAbrirGrupo refatorados.
+Editor Visual Catálogo — ID de grupo como select dinâmico, aviso com atalho para Categorias, edGrupoCatalogo dinâmico.
 
 ## Commits desta sessão
 | Commit   | O que fez |
 |----------|-----------|
+| dbeb0ea  | feat(catalogo): atalho "Criar categorias" no aviso, edGrupoCatalogo dinâmico, catEdIrParaCategorias |
+| 99f9b71  | feat(catalogo): ID grupo como select dinâmico — opções do catálogo, aviso inline, opção personalizado |
 | 777a0d2  | feat(catalogo): Editor Visual P1+P2 — grupos dinâmicos, schema v4, catMontarPg3/catAbrirGrupo refatorados |
 
 ## Estado atual — TUDO APROVADO E EM PRODUÇÃO
@@ -35,10 +37,20 @@ Editor Visual do Catálogo P1+P2 — grupos dinâmicos, schema v4, catMontarPg3/
 - Validações: ID vazio, IDs duplicados, mínimo 1 grupo visível
 - Botões: "+ Novo grupo" e "↺ Restaurar padrão"
 
+**ID de grupo como select dinâmico (sessão 13):**
+- Select populado automaticamente a partir de `catalogo.categories.grupoCatalogo`
+- Opção "Personalizado..." com input de texto para IDs novos
+- Aviso amarelo ⚠️ quando ID não tem categorias correspondentes
+- Link "→ Criar categorias para este grupo" no aviso — navega para aba Categorias com editor aberto e grupo pré-preenchido
+- `edGrupoCatalogo` no editor de Categorias também dinâmico (era hardcoded artesanais/finos)
+- Função `catEdIrParaCategorias(link)`: navega para Categorias, abre editor, pré-preenche grupo
+
 **Funções novas na Central:**
 `catEdAdicionarCardGrupo`, `catEdAdicionarGrupo`, `catEdRestaurarGrupos`,
 `catEdRemoverGrupo`, `catEdDuplicarGrupo`, `catEdToggleVisivel`,
-`catEdMoverGrupo`, `catEdEscolherIcone`, `catEdAtualizarNumeracao`, `catEdLerGrupos`
+`catEdMoverGrupo`, `catEdEscolherIcone`, `catEdAtualizarNumeracao`, `catEdLerGrupos`,
+`catEdPopularSelectGrupo`, `catEdOnGrupoIdChange`, `catEdAtualizarGrupoId`,
+`catEdIdsGruposDisponiveis`, `catEdIrParaCategorias`
 
 ### Módulo de Contratos — estado sessão 11 (sem alterações nesta sessão)
 Ver HANDOFF anterior para detalhes completos.
@@ -77,8 +89,8 @@ Sem alterações visuais nesta sessão.
 - Hardening: substituir querySelector frágil por getElementById
 
 ## Pontos de retorno seguros
-- HEAD atual = 777a0d2 (estável, deploy validado)
-- Anterior = 7fee08e (handoff sessão 11)
+- HEAD atual = dbeb0ea (estável, deploy validado)
+- Anterior = 777a0d2
 
 ## Links
 - Central: https://oba-cardapio-gestao.obadoceria.workers.dev/
