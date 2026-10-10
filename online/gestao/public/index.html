@@ -1100,7 +1100,7 @@ function obaLogout() {
 
       <div style="grid-column:1/-1"><p class="oba-secao-titulo">🍫 Botões de grupo</p></div>
       <div style="grid-column:1/-1">
-        <p class="hint" style="margin-bottom:10px">Cada botão representa um grupo de doces. Adicione, reordene, oculte ou duplique. O destino de cada botão é o <strong>ID do grupo</strong> — deve corresponder ao valor do campo <em>Grupo do catálogo</em> nas categorias cadastradas.</p>
+        <p class="hint" style="margin-bottom:10px">Cada botão representa um grupo de doces. Adicione, reordene, oculte ou duplique. O <strong>ID do grupo</strong> é preenchido automaticamente a partir das categorias cadastradas.</p>
         <div id="cat-pg2-grupos-lista" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px"></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button type="button" class="secondary" style="font-size:12px" onclick="catEdAdicionarGrupo()">+ Novo grupo</button>
@@ -3183,8 +3183,11 @@ $('formConfig').onsubmit=async e=>{
           <input class="cat-grupo-sublabel" value="${g?.sublabel || ''}" placeholder="Ex: Artesanais">
         </div>
         <div class="field full">
-          <label>ID do grupo <span class="hint">(deve coincidir com o campo "Grupo do catálogo" das categorias)</span></label>
-          <input class="cat-grupo-id" value="${g?.id || ''}" placeholder="Ex: artesanais" style="font-family:monospace">
+          <label>ID do grupo <span class="hint">(grupo de categorias no catálogo)</span></label>
+          <select class="cat-grupo-id-sel" style="font-family:monospace" onchange="catEdOnGrupoIdChange(this)"></select>
+          <input class="cat-grupo-id cat-grupo-id-custom" value="" placeholder="Ex: sazonais" style="font-family:monospace;margin-top:6px;display:none">
+          <input type="hidden" class="cat-grupo-id" value="${g?.id || ''}">
+          <div class="cat-grupo-aviso" style="display:none;margin-top:6px;padding:7px 10px;background:#fef3c7;border:1px solid #fbbf24;border-radius:8px;font-size:11px;color:#92400e">⚠️ Nenhuma categoria encontrada com este ID. O botão aparecerá mas a Pg4 ficará vazia.</div>
         </div>
         <div class="field full">
           <label>Ícone</label>
@@ -3203,6 +3206,8 @@ $('formConfig').onsubmit=async e=>{
       </div>`;
     lista.appendChild(card);
     catEdAtualizarNumeracao();
+    // Popular o select de ID com os grupos disponíveis
+    if (typeof catEdPopularSelectGrupo === 'function') catEdPopularSelectGrupo(card, g?.id || '');
   }
 
   /* Adicionar grupo vazio */
@@ -3234,7 +3239,7 @@ $('formConfig').onsubmit=async e=>{
     const card = btn.closest('.oba-botao-card');
     if (!card) return;
     const copia = {
-      id:       card.querySelector('.cat-grupo-id')?.value.trim() || '',
+      id:       (card.querySelector('.cat-grupo-id[type="hidden"]') || card.querySelector('.cat-grupo-id'))?.value.trim() || '',
       label:    card.querySelector('.cat-grupo-label')?.value.trim() || '',
       sublabel: card.querySelector('.cat-grupo-sublabel')?.value.trim() || '',
       icone:    card.querySelector('.cat-grupo-icone')?.value || '🍫',
@@ -3244,8 +3249,7 @@ $('formConfig').onsubmit=async e=>{
     catEdAdicionarCardGrupo(copia);
     const lista = card.parentElement;
     card.after(lista.lastElementChild);
-    catEdAtualizarNumeracao();
-  };
+    catEdAtualizarNumeracao();  };
 
   /* Toggle visibilidade rápido */
   window.catEdToggleVisivel = function(btn) {
@@ -3287,7 +3291,7 @@ $('formConfig').onsubmit=async e=>{
   window.catEdLerGrupos = function() {
     const cards = document.querySelectorAll('#cat-pg2-grupos-lista .oba-botao-card');
     return Array.from(cards).map(card => ({
-      id:       card.querySelector('.cat-grupo-id')?.value.trim() || '',
+      id:       (card.querySelector('.cat-grupo-id[type="hidden"]') || card.querySelector('.cat-grupo-id'))?.value.trim() || '',
       label:    card.querySelector('.cat-grupo-label')?.value.trim() || '',
       sublabel: card.querySelector('.cat-grupo-sublabel')?.value.trim() || '',
       icone:    card.querySelector('.cat-grupo-icone')?.value || '🍫',
@@ -3295,6 +3299,88 @@ $('formConfig').onsubmit=async e=>{
       visivel:  card.querySelector('.cat-grupo-visivel')?.checked !== false,
     }));
   };
+
+  /* Retorna IDs de grupos distintos existentes nas categorias do catálogo */
+  function catEdIdsGruposDisponiveis() {
+    const cats = catalogo.categories || catalogo.categorias || [];
+    const ids = [...new Set(
+      cats
+        .filter(c => c.ativo !== false && c.grupoCatalogo && String(c.grupoCatalogo).trim())
+        .map(c => String(c.grupoCatalogo).trim())
+    )].sort();
+    return ids;
+  }
+
+  /* Popula o select de ID do grupo num card específico */
+  window.catEdPopularSelectGrupo = function(card, valorAtual) {
+    const sel = card.querySelector('.cat-grupo-id-sel');
+    const hidden = card.querySelector('.cat-grupo-id[type="hidden"]');
+    const customInput = card.querySelector('.cat-grupo-id-custom');
+    const aviso = card.querySelector('.cat-grupo-aviso');
+    if (!sel) return;
+
+    const ids = catEdIdsGruposDisponiveis();
+    const valorECustom = valorAtual && !ids.includes(valorAtual);
+
+    sel.innerHTML = '';
+    // Opção vazia/padrão
+    const optVazio = document.createElement('option');
+    optVazio.value = ''; optVazio.textContent = '— selecione um grupo —';
+    sel.appendChild(optVazio);
+    // Opções dos grupos existentes
+    ids.forEach(id => {
+      const opt = document.createElement('option');
+      opt.value = id;
+      opt.textContent = id;
+      if (id === valorAtual) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    // Opção personalizado
+    const optCustom = document.createElement('option');
+    optCustom.value = '__custom__';
+    optCustom.textContent = 'Personalizado...';
+    if (valorECustom) optCustom.selected = true;
+    sel.appendChild(optCustom);
+
+    // Se valor atual é customizado, mostrar o input e preencher
+    if (valorECustom) {
+      if (customInput) { customInput.style.display = ''; customInput.value = valorAtual; }
+    } else {
+      if (customInput) customInput.style.display = 'none';
+    }
+
+    // Atualizar hidden e aviso
+    catEdAtualizarGrupoId(card, valorAtual || '');
+  };
+
+  /* Handler do change do select */
+  window.catEdOnGrupoIdChange = function(sel) {
+    const card = sel.closest('.oba-botao-card');
+    if (!card) return;
+    const customInput = card.querySelector('.cat-grupo-id-custom');
+    if (sel.value === '__custom__') {
+      if (customInput) {
+        customInput.style.display = '';
+        customInput.focus();
+        customInput.oninput = () => catEdAtualizarGrupoId(card, customInput.value.trim());
+      }
+      catEdAtualizarGrupoId(card, customInput?.value.trim() || '');
+    } else {
+      if (customInput) customInput.style.display = 'none';
+      catEdAtualizarGrupoId(card, sel.value);
+    }
+  };
+
+  /* Atualiza hidden + aviso a partir do ID resolvido */
+  function catEdAtualizarGrupoId(card, id) {
+    const hidden = card.querySelector('.cat-grupo-id[type="hidden"]');
+    const aviso = card.querySelector('.cat-grupo-aviso');
+    if (hidden) hidden.value = id;
+    if (aviso) {
+      const ids = catEdIdsGruposDisponiveis();
+      aviso.style.display = (id && !ids.includes(id)) ? '' : 'none';
+    }
+  }
   const frmCatTema = $('formCatalogoTema');
   if (frmCatTema) frmCatTema.onsubmit = async e => { e.preventDefault(); await _salvarCatalogo('Catálogo Tema Global'); };
 
