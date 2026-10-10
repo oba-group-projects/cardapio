@@ -1,96 +1,92 @@
 # HANDOFF
 
-Atualizado: 2026-10-09 (sessão 13)
+Atualizado: 2026-10-09 (sessão 14)
 
 Branch: feature/gestao-online-segura
-HEAD: dbeb0ea
+HEAD: eba02a0
 
 ## Última entrega
-Editor Visual Catálogo — ID de grupo como select dinâmico, aviso com atalho para Categorias, edGrupoCatalogo dinâmico.
+Editor Visual do Catálogo — completo. Modal de criação de categoria inline com dois modos, Pg3/4 dinâmico, select de ID com "+ Criar novo grupo...", sugestão automática de ID.
 
 ## Commits desta sessão
 | Commit   | O que fez |
 |----------|-----------|
-| dbeb0ea  | feat(catalogo): atalho "Criar categorias" no aviso, edGrupoCatalogo dinâmico, catEdIrParaCategorias |
+| eba02a0  | feat(catalogo): modal nova categoria — campo ID bloqueado/editável por contexto, select "+ Criar novo grupo...", sugestão automática de ID |
+| 175584c  | feat(catalogo): modal criar categoria inline — sem sair do editor visual, atualiza select automaticamente |
+| 2f97635  | fix(catalogo): salvar Pg3/4 sem abrir Pg2 não dispara erro de validação — fallback para dados em memória |
+| c0c67e2  | feat(catalogo): Pg3/4 dinâmico — editor de grupos gerado por catEdRenderizarGruposPg34, sem hardcode artesanais/finos |
+| dbeb0ea  | feat(catalogo): atalho Criar categorias no aviso, edGrupoCatalogo dinâmico, catEdIrParaCategorias |
 | 99f9b71  | feat(catalogo): ID grupo como select dinâmico — opções do catálogo, aviso inline, opção personalizado |
-| 777a0d2  | feat(catalogo): Editor Visual P1+P2 — grupos dinâmicos, schema v4, catMontarPg3/catAbrirGrupo refatorados |
 
 ## Estado atual — TUDO APROVADO E EM PRODUÇÃO
 
-### Editor Visual do Catálogo — completo (P1+P2)
+### Editor Visual do Catálogo — COMPLETO (sessões 12–14)
+
+**Pg1:** textos, logo, cores, tipografia
+**Pg2 — Seleção de Grupo:**
+- Editor dinâmico de grupos: ↑↓, 👁/🚫, ⧉, ✕, "+ Novo grupo"
+- Select de ID com grupos existentes + "+ Criar novo grupo..." (com separador)
+- Modal inline de criação de categoria — dois modos:
+  - *Aviso amarelo (grupo sem categorias):* campo ID bloqueado (disabled), visual cinza/cadeado
+  - *"+ Criar novo grupo..." no select:* campo ID editável + sugestão automática a partir do label (slug normalizado), validação de formato
+- Após salvar no modal: select atualizado, aviso some, card reflete novo ID
+- `edGrupoCatalogo` no editor de Categorias: dinâmico (era hardcoded artesanais/finos)
+**Pg3/4 — Grids de Sabores:**
+- Editor dinâmico por grupo (sem hardcode artesanais/finos)
+- `catEdRenderizarGruposPg34` gera blocos de ativo/inativo + titulo/subtitulo + cores + tipografia para cada grupo existente no catálogo
+- `catEdLerGruposPg34` lê todos os valores do DOM
+- Salvar Pg3/4 sem ter aberto Pg2: preserva grupos_ordem[] existente (fallback para dados em memória)
+**Tema Global:** paleta, fonte, tipografia, arredondamento
 
 **Schema v4 (theme-catalogo.json):**
-- `pg2.grupos_ordem[]` — array dinâmico substituindo campos legados `artesanais_label/sublabel/finos_label/sublabel`
-- Cada item: `{ id, label, sublabel, icone, destaque, visivel }`
-- `grupos{}` mantido para configurações de Pg4 (titulo, subtítulo, cores, tipografia)
-- Retrocompatível com schema v3 via fallback nos campos legados
+- `pg2.grupos_ordem[]`: `[{ id, label, sublabel, icone, destaque, visivel }]`
+- Retrocompatível com v3 via fallback nos campos legados
+- `grupos{}` mantido para configurações de Pg4
 
 **Catálogo público (ui-catalogo/index.html):**
-- `catMontarPg3()` — itera sobre `grupos_ordem[]` com fallback schema v3
-- `catAbrirGrupo()` — título/subtítulo de `grupos{}` → `grupos_ordem[]` → fallback genérico (sem hardcode artesanais/finos)
-- `catNavegar()` — lógica de "único grupo ativo" generalizada para N grupos
+- `catMontarPg3()`: itera `grupos_ordem[]` sem hardcode
+- `catAbrirGrupo()`: título/subtítulo de `grupos{}` → `grupos_ordem[]` → fallback genérico
+- `catNavegar()`: lógica de único grupo generalizada para N grupos
 
-**Central — Ed. Visual Catálogo Pg2:**
-- Editor de lista `#cat-pg2-grupos-lista` com cards `.oba-botao-card`
-- Por card: ID (monospace), label, sublabel, ícone (12 emojis), destaque, visível
-- ↑↓ reordenar, 👁/🚫 toggle visibilidade, ⧉ duplicar, ✕ excluir
-- Validações: ID vazio, IDs duplicados, mínimo 1 grupo visível
-- Botões: "+ Novo grupo" e "↺ Restaurar padrão"
-
-**ID de grupo como select dinâmico (sessão 13):**
-- Select populado automaticamente a partir de `catalogo.categories.grupoCatalogo`
-- Opção "Personalizado..." com input de texto para IDs novos
-- Aviso amarelo ⚠️ quando ID não tem categorias correspondentes
-- Link "→ Criar categorias para este grupo" no aviso — navega para aba Categorias com editor aberto e grupo pré-preenchido
-- `edGrupoCatalogo` no editor de Categorias também dinâmico (era hardcoded artesanais/finos)
-- Função `catEdIrParaCategorias(link)`: navega para Categorias, abre editor, pré-preenche grupo
-
-**Funções novas na Central:**
+**Funções da Central (todas as novas):**
 `catEdAdicionarCardGrupo`, `catEdAdicionarGrupo`, `catEdRestaurarGrupos`,
 `catEdRemoverGrupo`, `catEdDuplicarGrupo`, `catEdToggleVisivel`,
 `catEdMoverGrupo`, `catEdEscolherIcone`, `catEdAtualizarNumeracao`, `catEdLerGrupos`,
 `catEdPopularSelectGrupo`, `catEdOnGrupoIdChange`, `catEdAtualizarGrupoId`,
-`catEdIdsGruposDisponiveis`, `catEdIrParaCategorias`
+`catEdIdsGruposDisponiveis`, `catAbrirModalCategoria`, `catFecharModalCategoria`,
+`catSalvarModalCategoria`, `catModalGrupoIdInput`,
+`catEdRenderizarGruposPg34`, `catEdLerGruposPg34`, `catEdGerarBlocoPg34`
 
 ### Módulo de Contratos — estado sessão 11 (sem alterações nesta sessão)
-Ver HANDOFF anterior para detalhes completos.
-
-### Cardápio e Catálogo — intactos
-Sem alterações visuais nesta sessão.
+Ver HANDOFF sessão 11 para detalhes.
 
 ## REGRAS TÉCNICAS CRÍTICAS
 1. Nunca usar Set-Content/Out-File do PowerShell — adiciona BOM
 2. theme.json = cardápio. theme-catalogo.json = catálogo. NUNCA misturar.
 3. theme-catalogo.json é schemaVersion 4 — `pg2.grupos_ordem[]` é o campo canônico
-4. Ao ler grupos: checar `pg2.grupos_ordem` primeiro, fallback para campos legados `artesanais_label/sublabel`
-5. `grupos{}` no theme-catalogo.json = configurações de Pg4 (cores, tipografia). NÃO confundir com `pg2.grupos_ordem[]`
+4. Ao ler grupos: checar `pg2.grupos_ordem` primeiro, fallback para campos legados
+5. `grupos{}` = configurações de Pg4 (cores, tipografia). NÃO confundir com `pg2.grupos_ordem[]`
 6. catAbrirGrupo recebe qualquer string como `grupo` — não assume artesanais/finos
-7. cpf_cnpj está em contracts, NÃO em proposals
-8. Rota /contrato/:token fica ANTES de validateSession — é pública por design
-9. obaGetCatalogPrecos retorna { catPM, saborPM, catNomes }
-10. Itens com incluido=1 não somam no total — obaContractCenarioTotal e recalcularCenario
+7. Modal `cat-modal-nova-categoria`: `_cardOrigem` e `_modoNovoGrupo` são propriedades dinâmicas no elemento DOM
+8. `catEdPopularSelectGrupo(card, valorAtual)` deve ser chamado após qualquer operação que muda o ID do grupo
+9. cpf_cnpj está em contracts, NÃO em proposals
+10. Rota /contrato/:token fica ANTES de validateSession — é pública por design
 
 ## Pendente — próximas sessões
 
-### Contratos (fase 2 — não urgente)
+### Catálogo — melhorias menores
+- "Encontre o seu favorito" (Pg sabores) — texto/estilo da seção de sabores
+- Hardening: substituir querySelector frágil por getElementById em alguns pontos
+
+### Contratos — fase 2 (não urgente)
 - Revisão jurídica das cláusulas (externo — cancelamento, condições financeiras, foro)
 - Condições financeiras: valor do sinal, vencimentos, forma de pagamento
 - Status no snapshot pós-aceite (hoje grava "Aguardando aceite")
-- Aditivos
-- Templates de cláusulas editáveis na Central
-- Integração Autentique (sandbox primeiro)
-
-### Editor Visual do Catálogo — melhorias futuras
-- Pg3/4 (grupos{}) no editor: o usuário hoje edita via `formCatalogoPg34` com campos fixos para artesanais/finos. Quando um terceiro grupo for criado via `grupos_ordem[]`, ele não terá campos de Pg4 correspondentes automaticamente — será necessário tornar o `formCatalogoPg34` dinâmico também (fase futura)
-- Avisar na Central quando um grupo em `grupos_ordem[]` não tem categorias correspondentes no D1
-
-### Catálogo — melhorias visuais
-- "Encontre o seu favorito" (Pg sabores)
-- Hardening: substituir querySelector frágil por getElementById
+- Aditivos, templates de cláusulas, integração Autentique
 
 ## Pontos de retorno seguros
-- HEAD atual = dbeb0ea (estável, deploy validado)
-- Anterior = 777a0d2
+- HEAD atual = eba02a0 (estável, deploy validado)
+- Anterior = ea8f3a2 (handoff sessão 13)
 
 ## Links
 - Central: https://oba-cardapio-gestao.obadoceria.workers.dev/
