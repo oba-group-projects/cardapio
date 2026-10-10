@@ -1,10 +1,10 @@
 ﻿# CURRENT STATE
 
-Atualizado: 2026-10-09 (sessão 11)
+Atualizado: 2026-10-09 (sessão 12)
 
 ## Git
 Branch: feature/gestao-online-segura
-Commit HEAD: babaeb4
+Commit HEAD: 777a0d2
 
 ## Estado funcional
 - Central privada autenticada e operacional
@@ -61,9 +61,12 @@ Commit HEAD: babaeb4
 ### Fluxo
 - Categorias: grid 3 colunas
 
-## Catálogo — estado atual
+## Catálogo — estado atual (sessão 12)
 - Paleta Verde Sálvia (#6B9E7A, #F4F8F4)
-- Ed. Visual Etapa A: catHidratarTema(), catMontarPg1/Pg3 com cores+logo+tipografia
+- Ed. Visual completo: Pg1/Pg2/Pg3/4 + Tema Global
+- **Schema v4**: `pg2.grupos_ordem[]` dinâmico — `[{ id, label, sublabel, icone, destaque, visivel }]`
+- Editor de grupos na Central: ↑↓, 👁/🚫, ⧉, ✕, validações
+- `catMontarPg3` e `catAbrirGrupo` sem hardcode — suportam N grupos
 - Ed. Visual Pg3/4 profissional: ativo/inativo, corSubtitulo, corFundo, tipografia granular
 
 ## Pendente — próximas sessões
@@ -96,8 +99,8 @@ Commit HEAD: babaeb4
 10. Itens com incluido=1 não somam no total (obaContractCenarioTotal e recalcularCenario)
 
 ## Pontos de retorno seguros
-- HEAD atual = babaeb4 (estável, deploy validado)
-- Anterior = 652ad8f
+- HEAD atual = 777a0d2 (estável, deploy validado)
+- Anterior = 7fee08e
 
 ## Links
 - Central: https://oba-cardapio-gestao.obadoceria.workers.dev/

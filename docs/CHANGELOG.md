@@ -2,7 +2,24 @@
 
 Formato inspirado em Keep a Changelog.
 
-## [Sessão 11] — 2026-10-09 — commit babaeb4
+## [Sessão 12] — 2026-10-09 — commit 777a0d2
+
+### Added
+- Editor Visual Catálogo P1+P2: editor dinâmico de grupos `#cat-pg2-grupos-lista` na Central
+- Schema `theme-catalogo.json` v4: `pg2.grupos_ordem[]` — array dinâmico de botões de grupo
+- Funções: `catEdAdicionarCardGrupo`, `catEdAdicionarGrupo`, `catEdRestaurarGrupos`, `catEdRemoverGrupo`, `catEdDuplicarGrupo`, `catEdToggleVisivel`, `catEdMoverGrupo`, `catEdEscolherIcone`, `catEdAtualizarNumeracao`, `catEdLerGrupos`
+- Cards com: ID (monospace), label, sublabel, ícone (12 emojis), destaque, visível, ↑↓, 👁/🚫, ⧉, ✕
+- Validações em `_salvarCatalogo`: ID vazio, IDs duplicados, mínimo 1 grupo visível
+
+### Changed
+- `catMontarPg3()`: refatorado para iterar `grupos_ordem[]` com fallback v3
+- `catAbrirGrupo()`: sem hardcode artesanais/finos — usa `grupos{}` → `grupos_ordem[]` → fallback genérico
+- `catNavegar()`: lógica de único grupo generalizada para N grupos
+- `obaPopularFormCatalogo()`: popula editor via `catEdRenderizarGrupos()` com fallback v3
+- `obaLerFormCatalogo()`: grava `grupos_ordem` via `catEdLerGrupos()`
+- `_salvarCatalogo()`: validação dinâmica substituindo hardcode artesanais/finos
+
+
 
 ### Added
 - Pós-envio de contrato: scroll automático para caixa de link após confirmação

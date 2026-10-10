@@ -1,90 +1,84 @@
 # HANDOFF
 
-Atualizado: 2026-10-09 (sessão 11)
+Atualizado: 2026-10-09 (sessão 12)
 
 Branch: feature/gestao-online-segura
-HEAD: babaeb4
+HEAD: 777a0d2
 
 ## Última entrega
-Módulo de Contratos refinado e em uso real — tabela de produtos profissional, flag incluido,
-pós-envio com botão WhatsApp personalizado, PDF + link permanente pós-aceite.
+Editor Visual do Catálogo P1+P2 — grupos dinâmicos, schema v4, catMontarPg3/catAbrirGrupo refatorados.
 
 ## Commits desta sessão
 | Commit   | O que fez |
 |----------|-----------|
-| babaeb4  | feat(contratos): pós-envio — scroll para link-box, botão WhatsApp com mensagem personalizada |
-| 652ad8f  | feat(contratos): tabela limpa — categorias em destaque, sabores suprimidos, nota desconto, ref proposta |
-| 5f1bb1b  | feat(contratos): tabela produtos completa — 3 tipos de item, flag incluido, label corrigida |
-| 2ec19fc  | fix(contratos): link permanente visível em ambos os cenários — script global fora do ternário |
-| 79d18d7  | feat(contratos): PDF + link permanente pós-aceite — botão Salvar PDF, link copiável, CSS print |
+| 777a0d2  | feat(catalogo): Editor Visual P1+P2 — grupos dinâmicos, schema v4, catMontarPg3/catAbrirGrupo refatorados |
 
 ## Estado atual — TUDO APROVADO E EM PRODUÇÃO
 
-### Módulo de Contratos — completo
-**Fluxo end-to-end funcional:**
-1. Proposta aceita → botão 📄 Contrato aparece
-2. Editor: nome completo, CPF/CNPJ (com máscara), condições de pagamento (select + livre)
-3. Resumo financeiro calculado no Worker com preços reais do catálogo
-4. Modal confirmação → "Confirmar envio" → snapshot imutável (HTML + SHA-256) + token público
-5. Pós-envio: caixa verde aparece com scroll automático → link copiável + botão 📱 WhatsApp
-6. Mensagem WhatsApp personalizada: nome, tipo evento, data, nº contrato, link
-7. Página pública /contrato/:token — verificação dupla: WhatsApp OU CPF/CNPJ
-8. Aceite registra IP, data/hora, hash, método de verificação
-9. Pós-aceite: botão "📄 Salvar como PDF" (window.print()) + link permanente copiável
-10. Contrato já aceito: mesmos botões visíveis acima do iframe
+### Editor Visual do Catálogo — completo (P1+P2)
 
-**Tabela de produtos:**
-- Categorias __total__: nome da categoria + qtd + preço referência (sem listar sabores)
-- Sabores individuais: suprimidos quando categoria tem __total__ (aparecem na proposta)
-- Itens livres: descrição + qtd + preço
-- Flag incluido: exibe valor de tabela riscado + "Incluído", não soma no total
-- Nota descritiva do desconto (tipo + percentual + valor)
-- Nota vinculando sabores à proposta comercial
-- Referência da proposta no cabeçalho (cliente · tipo · data)
+**Schema v4 (theme-catalogo.json):**
+- `pg2.grupos_ordem[]` — array dinâmico substituindo campos legados `artesanais_label/sublabel/finos_label/sublabel`
+- Cada item: `{ id, label, sublabel, icone, destaque, visivel }`
+- `grupos{}` mantido para configurações de Pg4 (titulo, subtítulo, cores, tipografia)
+- Retrocompatível com schema v3 via fallback nos campos legados
 
-**Migrations aplicadas em produção:**
-- 0016–0019: tabelas contracts, contract_aceites, campos, status, scenario_aceito_id
-- ALTER manual: valor_total REAL em contracts
-- 0020: incluido INTEGER DEFAULT 0 em proposal_items
+**Catálogo público (ui-catalogo/index.html):**
+- `catMontarPg3()` — itera sobre `grupos_ordem[]` com fallback schema v3
+- `catAbrirGrupo()` — título/subtítulo de `grupos{}` → `grupos_ordem[]` → fallback genérico (sem hardcode artesanais/finos)
+- `catNavegar()` — lógica de "único grupo ativo" generalizada para N grupos
 
-**Central — itens livres:**
-- Placeholder: "Nome do produto ou serviço (ex: Montagem da mesa)"
-- Checkbox "incluído" — não entra no subtotal, exibe "Incluído" na proposta pública e no contrato
+**Central — Ed. Visual Catálogo Pg2:**
+- Editor de lista `#cat-pg2-grupos-lista` com cards `.oba-botao-card`
+- Por card: ID (monospace), label, sublabel, ícone (12 emojis), destaque, visível
+- ↑↓ reordenar, 👁/🚫 toggle visibilidade, ⧉ duplicar, ✕ excluir
+- Validações: ID vazio, IDs duplicados, mínimo 1 grupo visível
+- Botões: "+ Novo grupo" e "↺ Restaurar padrão"
+
+**Funções novas na Central:**
+`catEdAdicionarCardGrupo`, `catEdAdicionarGrupo`, `catEdRestaurarGrupos`,
+`catEdRemoverGrupo`, `catEdDuplicarGrupo`, `catEdToggleVisivel`,
+`catEdMoverGrupo`, `catEdEscolherIcone`, `catEdAtualizarNumeracao`, `catEdLerGrupos`
+
+### Módulo de Contratos — estado sessão 11 (sem alterações nesta sessão)
+Ver HANDOFF anterior para detalhes completos.
 
 ### Cardápio e Catálogo — intactos
-Sem alterações nesta sessão.
-
-## Pendente — próximas sessões
-
-### Contratos (fase 2)
-- Revisão jurídica das cláusulas (externo — não é código)
-  - Cancelamento: retenção 100% com <15 dias pode ser contestada pelo CDC
-  - Condições financeiras: falta valor do sinal, vencimentos, forma de pagamento
-  - Aceite eletrônico no snapshot: hoje grava "Aguardando aceite" — corrigir status pós-aceite
-- Aditivos
-- Templates de cláusulas editáveis na Central
-- Integração Autentique (sandbox primeiro)
-
-### Editor Visual do Catálogo (aprovado, aguarda implementação)
-- P1: editar textos, mostrar/ocultar, reordenar
-- P2: criar/duplicar/excluir botões com destinos válidos
-- P3 (fase futura): criar/remover seções
+Sem alterações visuais nesta sessão.
 
 ## REGRAS TÉCNICAS CRÍTICAS
 1. Nunca usar Set-Content/Out-File do PowerShell — adiciona BOM
 2. theme.json = cardápio. theme-catalogo.json = catálogo. NUNCA misturar.
-3. cpf_cnpj está em contracts, NÃO em proposals
-4. valor_total calculado pelo Worker via obaCalcularValorContrato() — não recalcular no frontend
-5. Rota /contrato/:token fica ANTES de validateSession — é pública por design
-6. Status permitidos em contracts: rascunho, enviado, aceito, recusado, cancelado
-7. scenario_aceito_id em proposals — gravado no PATCH de status quando = aceita
-8. obaGetCatalogPrecos retorna { catPM, saborPM, catNomes }
-9. obaGerarContratoHTML: 6 parâmetros (contract, proposal, scenario, catPM, saborPM, catNomes)
+3. theme-catalogo.json é schemaVersion 4 — `pg2.grupos_ordem[]` é o campo canônico
+4. Ao ler grupos: checar `pg2.grupos_ordem` primeiro, fallback para campos legados `artesanais_label/sublabel`
+5. `grupos{}` no theme-catalogo.json = configurações de Pg4 (cores, tipografia). NÃO confundir com `pg2.grupos_ordem[]`
+6. catAbrirGrupo recebe qualquer string como `grupo` — não assume artesanais/finos
+7. cpf_cnpj está em contracts, NÃO em proposals
+8. Rota /contrato/:token fica ANTES de validateSession — é pública por design
+9. obaGetCatalogPrecos retorna { catPM, saborPM, catNomes }
 10. Itens com incluido=1 não somam no total — obaContractCenarioTotal e recalcularCenario
 
+## Pendente — próximas sessões
+
+### Contratos (fase 2 — não urgente)
+- Revisão jurídica das cláusulas (externo — cancelamento, condições financeiras, foro)
+- Condições financeiras: valor do sinal, vencimentos, forma de pagamento
+- Status no snapshot pós-aceite (hoje grava "Aguardando aceite")
+- Aditivos
+- Templates de cláusulas editáveis na Central
+- Integração Autentique (sandbox primeiro)
+
+### Editor Visual do Catálogo — melhorias futuras
+- Pg3/4 (grupos{}) no editor: o usuário hoje edita via `formCatalogoPg34` com campos fixos para artesanais/finos. Quando um terceiro grupo for criado via `grupos_ordem[]`, ele não terá campos de Pg4 correspondentes automaticamente — será necessário tornar o `formCatalogoPg34` dinâmico também (fase futura)
+- Avisar na Central quando um grupo em `grupos_ordem[]` não tem categorias correspondentes no D1
+
+### Catálogo — melhorias visuais
+- "Encontre o seu favorito" (Pg sabores)
+- Hardening: substituir querySelector frágil por getElementById
+
 ## Pontos de retorno seguros
-- HEAD atual = babaeb4 (estável, deploy validado)
-- Anterior = 652ad8f
+- HEAD atual = 777a0d2 (estável, deploy validado)
+- Anterior = 7fee08e (handoff sessão 11)
 
 ## Links
 - Central: https://oba-cardapio-gestao.obadoceria.workers.dev/
