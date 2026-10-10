@@ -1167,163 +1167,10 @@ function obaLogout() {
   <details class="oba-pg-details">
     <summary class="oba-pg-summary">Catálogo — Páginas 3 e 4 (Grids de Sabores)</summary>
     <form id="formCatalogoPg34" class="oba-pg-form grid">
-
-      <!-- ── GRUPO DOCES ARTESANAIS ── -->
-      <div style="grid-column:1/-1"><p class="oba-secao-titulo">🍫 Grupo Doces Artesanais</p></div>
-
-      <div style="grid-column:1/-1;display:flex;gap:20px;flex-wrap:wrap;align-items:center">
-        <label class="oba-toggle-label"><input type="checkbox" id="cat-ed-art-ativo" checked> Grupo ativo no catálogo</label>
-        <span class="hint" style="color:#a06000">Desativar oculta este grupo para os clientes, mas preserva todo o conteúdo.</span>
+      <div style="grid-column:1/-1">
+        <p class="hint" style="margin-bottom:10px">Configure o título, subtítulo, cores e tipografia de cada grupo de sabores. Os grupos listados abaixo correspondem aos IDs cadastrados nas categorias do catálogo.</p>
+        <div id="cat-pg34-grupos-container" style="display:flex;flex-direction:column;gap:20px"></div>
       </div>
-
-      <div class="field"><label>Título do grupo</label><input id="cat-ed-art-titulo" placeholder="Doces Artesanais"></div>
-      <div class="field"><label>Subtítulo do grupo</label><input id="cat-ed-art-subtitulo" placeholder="Tradicionais, Clássicos e Especiais"></div>
-
-      <div class="field">
-        <label>Cor do título <span class="hint">(vazio = tema global)</span></label>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input type="color" id="cat-ed-art-corTitulo" value="#6B9E7A" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
-          <input type="text" id="cat-ed-art-corTitulo-hex" maxlength="7" placeholder="Padrão" style="width:110px">
-          <button type="button" class="secondary" style="padding:6px 10px;font-size:11px" onclick="obaCatClearCor('cat-ed-art-corTitulo')">✕ Limpar</button>
-        </div>
-      </div>
-      <div class="field">
-        <label>Cor do subtítulo <span class="hint">(vazio = tema global)</span></label>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input type="color" id="cat-ed-art-corSubtitulo" value="#6B9E7A" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
-          <input type="text" id="cat-ed-art-corSubtitulo-hex" maxlength="7" placeholder="Padrão" style="width:110px">
-          <button type="button" class="secondary" style="padding:6px 10px;font-size:11px" onclick="obaCatClearCor('cat-ed-art-corSubtitulo')">✕ Limpar</button>
-        </div>
-      </div>
-      <div class="field">
-        <label>Cor de fundo da página <span class="hint">(vazio = tema global)</span></label>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input type="color" id="cat-ed-art-corFundo" value="#F4F8F4" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
-          <input type="text" id="cat-ed-art-corFundo-hex" maxlength="7" placeholder="Tema global" style="width:110px">
-          <button type="button" class="secondary" style="padding:6px 10px;font-size:11px" onclick="obaCatClearCor('cat-ed-art-corFundo')">✕ Limpar</button>
-        </div>
-      </div>
-
-      <div style="grid-column:1/-1"><p class="oba-secao-titulo">🔤 Tipografia — Artesanais <span class="hint">(vazio = tema global)</span></p></div>
-      <div class="field">
-        <label>Tamanho do título</label>
-        <select id="cat-ed-art-tamTitulo">
-          <option value="">Tema global</option>
-          <option value="16">Pequeno (16px)</option>
-          <option value="20">Médio (20px)</option>
-          <option value="24">Grande (24px)</option>
-          <option value="28">Extra grande (28px)</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Peso do título</label>
-        <select id="cat-ed-art-pesoTitulo">
-          <option value="">Tema global</option>
-          <option value="400">400 — Normal</option>
-          <option value="500">500 — Médio</option>
-          <option value="600">600 — Semibold</option>
-          <option value="700">700 — Negrito</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Tamanho do subtítulo</label>
-        <select id="cat-ed-art-tamSubtitulo">
-          <option value="">Tema global</option>
-          <option value="11">Pequeno (11px)</option>
-          <option value="13">Médio (13px)</option>
-          <option value="15">Grande (15px)</option>
-          <option value="18">Extra grande (18px)</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Peso do subtítulo</label>
-        <select id="cat-ed-art-pesoSubtitulo">
-          <option value="">Tema global</option>
-          <option value="400">400 — Normal</option>
-          <option value="500">500 — Médio</option>
-          <option value="600">600 — Semibold</option>
-          <option value="700">700 — Negrito</option>
-        </select>
-      </div>
-
-      <!-- ── GRUPO DOCES FINOS ── -->
-      <div style="grid-column:1/-1;margin-top:12px"><p class="oba-secao-titulo">✨ Grupo Doces Finos</p></div>
-
-      <div style="grid-column:1/-1;display:flex;gap:20px;flex-wrap:wrap;align-items:center">
-        <label class="oba-toggle-label"><input type="checkbox" id="cat-ed-fin-ativo" checked> Grupo ativo no catálogo</label>
-        <span class="hint" style="color:#a06000">Desativar oculta este grupo para os clientes, mas preserva todo o conteúdo.</span>
-      </div>
-
-      <div class="field"><label>Título do grupo</label><input id="cat-ed-fin-titulo" placeholder="Doces Finos"></div>
-      <div class="field"><label>Subtítulo do grupo</label><input id="cat-ed-fin-subtitulo" placeholder="Linha exclusiva"></div>
-
-      <div class="field">
-        <label>Cor do título <span class="hint">(vazio = tema global)</span></label>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input type="color" id="cat-ed-fin-corTitulo" value="#6B9E7A" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
-          <input type="text" id="cat-ed-fin-corTitulo-hex" maxlength="7" placeholder="Padrão" style="width:110px">
-          <button type="button" class="secondary" style="padding:6px 10px;font-size:11px" onclick="obaCatClearCor('cat-ed-fin-corTitulo')">✕ Limpar</button>
-        </div>
-      </div>
-      <div class="field">
-        <label>Cor do subtítulo <span class="hint">(vazio = tema global)</span></label>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input type="color" id="cat-ed-fin-corSubtitulo" value="#6B9E7A" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
-          <input type="text" id="cat-ed-fin-corSubtitulo-hex" maxlength="7" placeholder="Padrão" style="width:110px">
-          <button type="button" class="secondary" style="padding:6px 10px;font-size:11px" onclick="obaCatClearCor('cat-ed-fin-corSubtitulo')">✕ Limpar</button>
-        </div>
-      </div>
-      <div class="field">
-        <label>Cor de fundo da página <span class="hint">(vazio = tema global)</span></label>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input type="color" id="cat-ed-fin-corFundo" value="#F4F8F4" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
-          <input type="text" id="cat-ed-fin-corFundo-hex" maxlength="7" placeholder="Tema global" style="width:110px">
-          <button type="button" class="secondary" style="padding:6px 10px;font-size:11px" onclick="obaCatClearCor('cat-ed-fin-corFundo')">✕ Limpar</button>
-        </div>
-      </div>
-
-      <div style="grid-column:1/-1"><p class="oba-secao-titulo">🔤 Tipografia — Doces Finos <span class="hint">(vazio = tema global)</span></p></div>
-      <div class="field">
-        <label>Tamanho do título</label>
-        <select id="cat-ed-fin-tamTitulo">
-          <option value="">Tema global</option>
-          <option value="16">Pequeno (16px)</option>
-          <option value="20">Médio (20px)</option>
-          <option value="24">Grande (24px)</option>
-          <option value="28">Extra grande (28px)</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Peso do título</label>
-        <select id="cat-ed-fin-pesoTitulo">
-          <option value="">Tema global</option>
-          <option value="400">400 — Normal</option>
-          <option value="500">500 — Médio</option>
-          <option value="600">600 — Semibold</option>
-          <option value="700">700 — Negrito</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Tamanho do subtítulo</label>
-        <select id="cat-ed-fin-tamSubtitulo">
-          <option value="">Tema global</option>
-          <option value="11">Pequeno (11px)</option>
-          <option value="13">Médio (13px)</option>
-          <option value="15">Grande (15px)</option>
-          <option value="18">Extra grande (18px)</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Peso do subtítulo</label>
-        <select id="cat-ed-fin-pesoSubtitulo">
-          <option value="">Tema global</option>
-          <option value="400">400 — Normal</option>
-          <option value="500">500 — Médio</option>
-          <option value="600">600 — Semibold</option>
-          <option value="700">700 — Negrito</option>
-        </select>
-      </div>
-
       <div class="field full actions"><button class="primary" type="submit">Salvar Páginas 3 e 4</button></div>
     </form>
   </details>
@@ -2987,27 +2834,8 @@ $('formConfig').onsubmit=async e=>{
     /* Pg2 — tipografia */
     stSel('cat-ed-pg2-tamSubtitulo',  pg2.tamSubtitulo);
     stSel('cat-ed-pg2-pesoSubtitulo', pg2.pesoSubtitulo);
-    /* Pg3/4 */
-    sv('cat-ed-art-titulo',    art.titulo    || 'Doces Artesanais');
-    sv('cat-ed-art-subtitulo', art.subtitulo || 'Tradicionais, Clássicos e Especiais');
-    sv('cat-ed-fin-titulo',    fin.titulo    || 'Doces Finos');
-    sv('cat-ed-fin-subtitulo', fin.subtitulo || 'Linha exclusiva');
-    sc('cat-ed-art-corTitulo',    art.corTitulo    || '');
-    sc('cat-ed-art-corSubtitulo', art.corSubtitulo || '');
-    sc('cat-ed-art-corFundo',     art.corFundo     || '');
-    sc('cat-ed-fin-corTitulo',    fin.corTitulo    || '');
-    sc('cat-ed-fin-corSubtitulo', fin.corSubtitulo || '');
-    sc('cat-ed-fin-corFundo',     fin.corFundo     || '');
-    stSel('cat-ed-art-tamTitulo',    art.tamTitulo    || '');
-    stSel('cat-ed-art-pesoTitulo',   art.pesoTitulo   || '');
-    stSel('cat-ed-art-tamSubtitulo', art.tamSubtitulo || '');
-    stSel('cat-ed-art-pesoSubtitulo',art.pesoSubtitulo|| '');
-    stSel('cat-ed-fin-tamTitulo',    fin.tamTitulo    || '');
-    stSel('cat-ed-fin-pesoTitulo',   fin.pesoTitulo   || '');
-    stSel('cat-ed-fin-tamSubtitulo', fin.tamSubtitulo || '');
-    stSel('cat-ed-fin-pesoSubtitulo',fin.pesoSubtitulo|| '');
-    const artAtivoEl = $('cat-ed-art-ativo'); if (artAtivoEl) artAtivoEl.checked = art.ativo !== false;
-    const finAtivoEl = $('cat-ed-fin-ativo'); if (finAtivoEl) finAtivoEl.checked = fin.ativo !== false;
+    /* Pg3/4 — renderização dinâmica por grupo */
+    if (typeof catEdRenderizarGruposPg34 === 'function') catEdRenderizarGruposPg34(tc.grupos || {});
     /* Tema Global */
     sc('cat-ed-tema-corPrimaria', tm.corPrimaria || ''); sc('cat-ed-tema-corFundo',  tm.corFundo  || '');
     sc('cat-ed-tema-corTexto',    tm.corTexto    || ''); sc('cat-ed-tema-corMuted', tm.corMuted || '');
@@ -3043,32 +2871,7 @@ $('formConfig').onsubmit=async e=>{
         corFundo:     hx('cat-ed-pg2-corFundo'), corSubtitulo: hx('cat-ed-pg2-corSubtitulo'),
         tamSubtitulo: $('cat-ed-pg2-tamSubtitulo')?.value || '', pesoSubtitulo: $('cat-ed-pg2-pesoSubtitulo')?.value || '',
       },
-      grupos: {
-        artesanais: {
-          titulo:        $('cat-ed-art-titulo')?.value.trim()    || '',
-          subtitulo:     $('cat-ed-art-subtitulo')?.value.trim() || '',
-          corTitulo:     hx('cat-ed-art-corTitulo'),
-          corSubtitulo:  hx('cat-ed-art-corSubtitulo'),
-          corFundo:      hx('cat-ed-art-corFundo'),
-          tamTitulo:     $('cat-ed-art-tamTitulo')?.value    || '',
-          pesoTitulo:    $('cat-ed-art-pesoTitulo')?.value   || '',
-          tamSubtitulo:  $('cat-ed-art-tamSubtitulo')?.value  || '',
-          pesoSubtitulo: $('cat-ed-art-pesoSubtitulo')?.value || '',
-          ativo:         $('cat-ed-art-ativo')?.checked !== false,
-        },
-        finos: {
-          titulo:        $('cat-ed-fin-titulo')?.value.trim()    || '',
-          subtitulo:     $('cat-ed-fin-subtitulo')?.value.trim() || '',
-          corTitulo:     hx('cat-ed-fin-corTitulo'),
-          corSubtitulo:  hx('cat-ed-fin-corSubtitulo'),
-          corFundo:      hx('cat-ed-fin-corFundo'),
-          tamTitulo:     $('cat-ed-fin-tamTitulo')?.value    || '',
-          pesoTitulo:    $('cat-ed-fin-pesoTitulo')?.value   || '',
-          tamSubtitulo:  $('cat-ed-fin-tamSubtitulo')?.value  || '',
-          pesoSubtitulo: $('cat-ed-fin-pesoSubtitulo')?.value || '',
-          ativo:         $('cat-ed-fin-ativo')?.checked !== false,
-        }
-      },
+      grupos: typeof catEdLerGruposPg34 === 'function' ? catEdLerGruposPg34() : {},
       tema: {
         corPrimaria: hx('cat-ed-tema-corPrimaria'), corFundo:  hx('cat-ed-tema-corFundo'),
         corTexto:    hx('cat-ed-tema-corTexto'),    corMuted:  hx('cat-ed-tema-corMuted'),
@@ -3375,6 +3178,115 @@ $('formConfig').onsubmit=async e=>{
       if (customInput) customInput.style.display = 'none';
       catEdAtualizarGrupoId(card, sel.value);
     }
+  };
+
+  /* ================================================================
+     EDITOR DINÂMICO DE GRUPOS — Pg3/4 (títulos, cores, tipografia)
+  ================================================================ */
+
+  /* Gera o HTML de um bloco de grupo para Pg3/4 */
+  function catEdGerarBlocoPg34(grupoId, cfg) {
+    const sid = 'cat-g34-' + grupoId; // prefixo de ID para evitar colisões
+    const nomePrettify = s => s.charAt(0).toUpperCase() + s.slice(1).replace(/-/g,' ');
+    const ativo = cfg?.ativo !== false;
+    const titulo = cfg?.titulo || '';
+    const subtitulo = cfg?.subtitulo || '';
+    const sv = (f, v) => v ? `value="${v.replace(/"/g,'&quot;')}"` : '';
+
+    const selOpts = (cur, opts) => opts.map(([v,t]) =>
+      `<option value="${v}"${cur===v?' selected':''}>${t}</option>`
+    ).join('');
+    const tamOpts = [['','Tema global'],['16','Pequeno (16px)'],['20','Médio (20px)'],['24','Grande (24px)'],['28','Extra grande (28px)']];
+    const pesoOpts = [['','Tema global'],['400','400 — Normal'],['500','500 — Médio'],['600','600 — Semibold'],['700','700 — Negrito']];
+
+    const corField = (label, baseId, val) => {
+      const hex = val && /^#[0-9a-fA-F]{6}$/.test(val) ? val : '#6B9E7A';
+      const hexVal = val || '';
+      return `<div class="field">
+        <label>${label} <span class="hint">(vazio = tema global)</span></label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="color" id="${baseId}" value="${hex}" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
+          <input type="text" id="${baseId}-hex" maxlength="7" placeholder="Padrão" style="width:110px" value="${hexVal}">
+          <button type="button" class="secondary" style="padding:6px 10px;font-size:11px" onclick="obaCatClearCor('${baseId}')">✕ Limpar</button>
+        </div>
+      </div>`;
+    };
+
+    return `<div class="cat-g34-bloco" data-grupo-id="${grupoId}" style="border:1px solid var(--line);border-radius:12px;padding:16px;background:#fff">
+      <div style="grid-column:1/-1;margin-bottom:10px"><p class="oba-secao-titulo">📂 Grupo: ${nomePrettify(grupoId)}</p></div>
+      <div class="grid" style="gap:12px">
+        <div style="grid-column:1/-1;display:flex;gap:20px;flex-wrap:wrap;align-items:center">
+          <label class="oba-toggle-label"><input type="checkbox" id="${sid}-ativo" ${ativo?'checked':''}> Grupo ativo no catálogo</label>
+          <span class="hint" style="color:#a06000">Desativar oculta este grupo para os clientes, mas preserva todo o conteúdo.</span>
+        </div>
+        <div class="field"><label>Título do grupo</label><input id="${sid}-titulo" ${sv('',titulo)} placeholder="${nomePrettify(grupoId)}"></div>
+        <div class="field"><label>Subtítulo do grupo</label><input id="${sid}-subtitulo" ${sv('',subtitulo)} placeholder="Descrição breve do grupo"></div>
+        ${corField('Cor do título', sid+'-corTitulo', cfg?.corTitulo)}
+        ${corField('Cor do subtítulo', sid+'-corSubtitulo', cfg?.corSubtitulo)}
+        ${corField('Cor de fundo da página', sid+'-corFundo', cfg?.corFundo)}
+        <div style="grid-column:1/-1"><p class="oba-secao-titulo">🔤 Tipografia <span class="hint">(vazio = tema global)</span></p></div>
+        <div class="field"><label>Tamanho do título</label><select id="${sid}-tamTitulo">${selOpts(cfg?.tamTitulo||'',tamOpts)}</select></div>
+        <div class="field"><label>Peso do título</label><select id="${sid}-pesoTitulo">${selOpts(cfg?.pesoTitulo||'',pesoOpts)}</select></div>
+        <div class="field"><label>Tamanho do subtítulo</label><select id="${sid}-tamSubtitulo">${selOpts(cfg?.tamSubtitulo||'',tamOpts)}</select></div>
+        <div class="field"><label>Peso do subtítulo</label><select id="${sid}-pesoSubtitulo">${selOpts(cfg?.pesoSubtitulo||'',pesoOpts)}</select></div>
+      </div>
+    </div>`;
+  }
+
+  /* Renderiza todos os blocos de grupo no container Pg3/4 */
+  window.catEdRenderizarGruposPg34 = function(gruposCfg) {
+    const container = document.getElementById('cat-pg34-grupos-container');
+    if (!container) return;
+    // Determina quais grupos mostrar: union de grupos_ordem[] + chaves de grupos{}
+    const idsOrdem = (catalogo.tema_catalogo?.pg2?.grupos_ordem || []).map(g => g.id).filter(Boolean);
+    const idsCfg   = Object.keys(gruposCfg || {});
+    const idsCat   = catEdIdsGruposDisponiveis();
+    // Prioridade: grupos_ordem > grupos{} > catálogo
+    const ids = [...new Set([...idsOrdem, ...idsCat, ...idsCfg])].filter(Boolean);
+
+    if (!ids.length) {
+      container.innerHTML = '<p class="hint" style="padding:16px 0">Nenhum grupo encontrado. Cadastre categorias com o campo "Grupo do catálogo" preenchido.</p>';
+      return;
+    }
+    container.innerHTML = ids.map(id => catEdGerarBlocoPg34(id, gruposCfg[id] || {})).join('');
+    // Sincronizar color pickers com hex após render
+    container.querySelectorAll('input[type="color"]').forEach(picker => {
+      const hexId = picker.id + '-hex';
+      const hexEl = document.getElementById(hexId);
+      if (hexEl) {
+        picker.addEventListener('input', () => { hexEl.value = picker.value; });
+        hexEl.addEventListener('input', () => { const v = hexEl.value; if (/^#[0-9a-fA-F]{6}$/.test(v)) picker.value = v; });
+      }
+    });
+  };
+
+  /* Lê todos os blocos de grupo do container Pg3/4 */
+  window.catEdLerGruposPg34 = function() {
+    const container = document.getElementById('cat-pg34-grupos-container');
+    if (!container) return {};
+    const resultado = {};
+    container.querySelectorAll('.cat-g34-bloco[data-grupo-id]').forEach(bloco => {
+      const id = bloco.dataset.grupoId;
+      if (!id) return;
+      const sid = 'cat-g34-' + id;
+      const hxVal = elId => {
+        const hex = document.getElementById(elId + '-hex')?.value.trim();
+        return hex && /^#[0-9a-fA-F]{6}$/.test(hex) ? hex : '';
+      };
+      resultado[id] = {
+        ativo:         document.getElementById(sid + '-ativo')?.checked !== false,
+        titulo:        document.getElementById(sid + '-titulo')?.value.trim()    || '',
+        subtitulo:     document.getElementById(sid + '-subtitulo')?.value.trim() || '',
+        corTitulo:     hxVal(sid + '-corTitulo'),
+        corSubtitulo:  hxVal(sid + '-corSubtitulo'),
+        corFundo:      hxVal(sid + '-corFundo'),
+        tamTitulo:     document.getElementById(sid + '-tamTitulo')?.value    || '',
+        pesoTitulo:    document.getElementById(sid + '-pesoTitulo')?.value   || '',
+        tamSubtitulo:  document.getElementById(sid + '-tamSubtitulo')?.value  || '',
+        pesoSubtitulo: document.getElementById(sid + '-pesoSubtitulo')?.value || '',
+      };
+    });
+    return resultado;
   };
 
   /* Atalho: ir para aba Categorias com grupo pré-preenchido */
