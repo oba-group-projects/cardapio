@@ -1,88 +1,89 @@
 {
-  "schemaVersion": 4,
-  "updatedAt": "2026-10-09",
-  "pg1": {
-    "rotulo": "Catálogo",
-    "titulo": "Descubra a Oba",
-    "paragrafo1": "Uma coleção de sabores artesanais, criados para despertar os sentidos e transformar pequenos momentos em lembranças especiais. Brigadeiros cremosos, combinações delicadas e receitas cuidadosamente preparadas para quem aprecia doces feitos de verdade.",
-    "paragrafo2": "Explore nossos sabores, descubra seus favoritos e deixe-se levar pela experiência Oba.",
-    "cta": "Conhecer nossos sabores →",
-    "logo": "",
-    "tamanhoLogo": "medio",
-    "corFundo": "",
-    "corTitulo": "",
-    "corTexto": "",
-    "corCTA": "",
-    "tamTitulo": "",
-    "pesoTitulo": "",
-    "tamTexto": "",
-    "pesoTexto": "",
-    "tamCTA": "",
-    "pesoCTA": ""
-  },
-  "pg2": {
-    "subtitulo": "Encontre seu favorito",
-    "logo": "",
-    "tamanhoLogo": "medio",
-    "corFundo": "",
-    "corSubtitulo": "",
-    "tamSubtitulo": "",
-    "pesoSubtitulo": "",
-    "grupos_ordem": [
-      {
-        "id": "artesanais",
-        "label": "Doces Artesanais",
-        "sublabel": "Artesanais",
-        "icone": "🍫",
-        "destaque": true,
-        "visivel": true
-      },
-      {
-        "id": "finos",
-        "label": "Doces Finos",
-        "sublabel": "Exclusivos",
-        "icone": "✨",
-        "destaque": false,
-        "visivel": true
-      }
-    ]
-  },
   "grupos": {
     "artesanais": {
       "ativo": true,
-      "titulo": "Doces Artesanais",
-      "subtitulo": "Tradicionais, Clássicos e Especiais",
-      "corTitulo": "",
-      "corSubtitulo": "",
       "corFundo": "",
-      "tamTitulo": "",
+      "corSubtitulo": "",
+      "corTitulo": "",
+      "pesoSubtitulo": "",
       "pesoTitulo": "",
+      "subtitulo": "Tradicionais, Clássicos e Especiais",
       "tamSubtitulo": "",
-      "pesoSubtitulo": ""
+      "tamTitulo": "",
+      "titulo": "Doces Artesanais"
     },
     "finos": {
       "ativo": true,
-      "titulo": "Doces Finos",
-      "subtitulo": "Linha exclusiva",
-      "corTitulo": "",
-      "corSubtitulo": "",
       "corFundo": "",
-      "tamTitulo": "",
+      "corSubtitulo": "",
+      "corTitulo": "",
+      "pesoSubtitulo": "",
       "pesoTitulo": "",
+      "subtitulo": "Linha exclusiva",
       "tamSubtitulo": "",
-      "pesoSubtitulo": ""
+      "tamTitulo": "",
+      "titulo": "Doces Finos"
     }
   },
-  "tema": {
-    "corPrimaria": "",
+  "pg1": {
+    "corCTA": "",
     "corFundo": "",
     "corTexto": "",
-    "corMuted": "",
+    "corTitulo": "",
+    "cta": "Conhecer nossos sabores →",
+    "logo": "",
+    "paragrafo1": "Uma coleção de sabores artesanais, criados para despertar os sentidos e transformar pequenos momentos em lembranças especiais. Brigadeiros cremosos, combinações delicadas e receitas cuidadosamente preparadas para quem aprecia doces feitos de verdade.",
+    "paragrafo2": "Explore nossos sabores, descubra seus favoritos e deixe-se levar pela experiência Oba.",
+    "pesoCTA": "",
+    "pesoTexto": "",
+    "pesoTitulo": "",
+    "rotulo": "Catálogo",
+    "tamCTA": "",
+    "tamTexto": "",
+    "tamTitulo": "",
+    "tamanhoLogo": "medio",
+    "titulo": "Descubra a Oba"
+  },
+  "pg2": {
+    "ativo": true,
+    "corFundo": "",
+    "corSubtitulo": "",
+    "grupos_ordem": [
+      {
+        "destaque": true,
+        "icone": "🍫",
+        "id": "artesanais",
+        "label": "Doces Artesanais",
+        "sublabel": "Artesanais",
+        "visivel": true
+      },
+      {
+        "destaque": false,
+        "icone": "✨",
+        "id": "finos",
+        "label": "Doces Finos",
+        "sublabel": "Exclusivos",
+        "visivel": true
+      }
+    ],
+    "logo": "",
+    "pesoSubtitulo": "",
+    "subtitulo": "Encontre seu favorito",
+    "tamSubtitulo": "",
+    "tamanhoLogo": "medio"
+  },
+  "schemaVersion": 3,
+  "tema": {
+    "arredondamento": "",
     "corCard": "",
+    "corFundo": "",
     "corLinha": "",
+    "corMuted": "",
+    "corPrimaria": "",
+    "corTexto": "",
     "fonte": "",
-    "tamanhoTitulo": "",
     "tamanhoCorpo": "",
-    "arredondamento": ""
-  }
+    "tamanhoTitulo": ""
+  },
+  "updatedAt": "2026-10-10"
 }
