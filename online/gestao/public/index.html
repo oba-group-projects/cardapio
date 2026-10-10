@@ -3154,10 +3154,15 @@ $('formConfig').onsubmit=async e=>{
       if (id === valorAtual) opt.selected = true;
       sel.appendChild(opt);
     });
-    // Opção personalizado
+    // Separador visual + opção de criar novo grupo
+    if (ids.length > 0) {
+      const sep = document.createElement('option');
+      sep.disabled = true; sep.textContent = '─────────────────';
+      sel.appendChild(sep);
+    }
     const optCustom = document.createElement('option');
     optCustom.value = '__custom__';
-    optCustom.textContent = 'Personalizado...';
+    optCustom.textContent = '+ Criar novo grupo...';
     if (valorECustom) optCustom.selected = true;
     sel.appendChild(optCustom);
 
@@ -3178,12 +3183,12 @@ $('formConfig').onsubmit=async e=>{
     if (!card) return;
     const customInput = card.querySelector('.cat-grupo-id-custom');
     if (sel.value === '__custom__') {
-      if (customInput) {
-        customInput.style.display = '';
-        customInput.focus();
-        customInput.oninput = () => catEdAtualizarGrupoId(card, customInput.value.trim());
-      }
-      catEdAtualizarGrupoId(card, customInput?.value.trim() || '');
+      // Volta para vazio no select enquanto o modal não confirma
+      sel.value = '';
+      catEdAtualizarGrupoId(card, '');
+      // Abre modal em modo "novo grupo" — campo ID editável + sugestão a partir do label
+      const labelVal = card.querySelector('.cat-grupo-label')?.value.trim() || '';
+      catAbrirModalCategoria(null, { modoNovoGrupo: true, labelSugestao: labelVal, card });
     } else {
       if (customInput) customInput.style.display = 'none';
       catEdAtualizarGrupoId(card, sel.value);
@@ -3299,25 +3304,57 @@ $('formConfig').onsubmit=async e=>{
     return resultado;
   };
 
-  /* Modal: abrir criação rápida de categoria a partir do aviso */
-  window.catAbrirModalCategoria = function(link) {
-    const card = link.closest('.oba-botao-card');
-    const grupoId = card
-      ? (card.querySelector('.cat-grupo-id[type="hidden"]') || card.querySelector('.cat-grupo-id'))?.value.trim()
-      : '';
-    // Preenche e abre o modal
+  /* Modal: abrir criação rápida de categoria
+     opts.modoNovoGrupo = true → campo ID editável, sugestão automática
+     opts.modoNovoGrupo = false/undefined → campo ID bloqueado (vindo do aviso) */
+  window.catAbrirModalCategoria = function(link, opts) {
+    const modoNovoGrupo = opts?.modoNovoGrupo === true;
+    const card = opts?.card || (link ? link.closest('.oba-botao-card') : null);
+    const grupoId = opts?.grupoId ||
+      (card ? (card.querySelector('.cat-grupo-id[type="hidden"]') || card.querySelector('.cat-grupo-id'))?.value.trim() : '') || '';
+
+    // Limpar campos
     const nomeEl  = document.getElementById('cat-modal-cat-nome');
     const precoEl = document.getElementById('cat-modal-cat-preco');
     const grupoEl = document.getElementById('cat-modal-cat-grupo');
+    const grupoEditEl = document.getElementById('cat-modal-cat-grupo-edit');
     const erroEl  = document.getElementById('cat-modal-cat-erro');
+    const fixoDiv = document.getElementById('cat-modal-grupo-fixo');
+    const editDiv = document.getElementById('cat-modal-grupo-editavel');
+
     if (nomeEl)  { nomeEl.value  = ''; }
     if (precoEl) { precoEl.value = ''; }
-    if (grupoEl) { grupoEl.value = grupoId; }
     if (erroEl)  { erroEl.style.display = 'none'; erroEl.textContent = ''; }
-    // Guarda referência ao card de origem para atualizar o select depois
-    document.getElementById('cat-modal-nova-categoria')._cardOrigem = card;
-    document.getElementById('cat-modal-nova-categoria').style.display = 'flex';
+
+    if (modoNovoGrupo) {
+      // Modo novo grupo: campo ID editável, sugestão automática a partir do label
+      if (fixoDiv)  fixoDiv.style.display  = 'none';
+      if (editDiv)  editDiv.style.display  = '';
+      const sugestao = opts?.labelSugestao
+        ? opts.labelSugestao.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')
+        : '';
+      if (grupoEditEl) { grupoEditEl.value = sugestao; }
+    } else {
+      // Modo categoria de grupo existente: campo ID bloqueado
+      if (fixoDiv)  fixoDiv.style.display  = '';
+      if (editDiv)  editDiv.style.display  = 'none';
+      if (grupoEl)  grupoEl.value = grupoId;
+    }
+
+    // Guarda contexto
+    const modal = document.getElementById('cat-modal-nova-categoria');
+    modal._cardOrigem    = card;
+    modal._modoNovoGrupo = modoNovoGrupo;
+    modal.style.display  = 'flex';
     setTimeout(() => nomeEl?.focus(), 80);
+  };
+
+  /* Normaliza o ID enquanto o usuário digita no modo novo grupo */
+  window.catModalGrupoIdInput = function(input) {
+    const cursor = input.selectionStart;
+    const val = input.value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9-]/g,'');
+    input.value = val;
+    input.setSelectionRange(cursor, cursor);
   };
 
   /* Modal: fechar */
@@ -3327,19 +3364,33 @@ $('formConfig').onsubmit=async e=>{
 
   /* Modal: salvar categoria e atualizar o select */
   window.catSalvarModalCategoria = async function() {
-    const nomeEl  = document.getElementById('cat-modal-cat-nome');
-    const precoEl = document.getElementById('cat-modal-cat-preco');
-    const grupoEl = document.getElementById('cat-modal-cat-grupo');
-    const erroEl  = document.getElementById('cat-modal-cat-erro');
+    const nomeEl    = document.getElementById('cat-modal-cat-nome');
+    const precoEl   = document.getElementById('cat-modal-cat-preco');
+    const erroEl    = document.getElementById('cat-modal-cat-erro');
     const btnSalvar = document.querySelector('#cat-modal-nova-categoria .primary');
+    const modal     = document.getElementById('cat-modal-nova-categoria');
+    const modoNovoGrupo = modal._modoNovoGrupo;
 
-    const nome  = nomeEl?.value.trim()  || '';
+    const nome  = nomeEl?.value.trim() || '';
     const preco = precoEl?.value !== '' ? Number(precoEl.value) : null;
-    const grupo = grupoEl?.value.trim() || '';
+    // Grupo vem do campo fixo ou do campo editável dependendo do modo
+    const grupo = modoNovoGrupo
+      ? (document.getElementById('cat-modal-cat-grupo-edit')?.value.trim() || '')
+      : (document.getElementById('cat-modal-cat-grupo')?.value.trim() || '');
 
     if (!nome) {
       if (erroEl) { erroEl.textContent = 'Nome da categoria é obrigatório.'; erroEl.style.display = ''; }
       nomeEl?.focus();
+      return;
+    }
+    if (modoNovoGrupo && !grupo) {
+      if (erroEl) { erroEl.textContent = 'ID do grupo é obrigatório.'; erroEl.style.display = ''; }
+      document.getElementById('cat-modal-cat-grupo-edit')?.focus();
+      return;
+    }
+    if (modoNovoGrupo && !/^[a-z0-9-]+$/.test(grupo)) {
+      if (erroEl) { erroEl.textContent = 'ID do grupo só pode ter letras minúsculas, números e hífens.'; erroEl.style.display = ''; }
+      document.getElementById('cat-modal-cat-grupo-edit')?.focus();
       return;
     }
 
@@ -3362,10 +3413,13 @@ $('formConfig').onsubmit=async e=>{
       addPendencia('Criado: ' + nome);
 
       // Atualizar o select do card de origem
-      const modal = document.getElementById('cat-modal-nova-categoria');
       const card  = modal._cardOrigem;
       if (card && typeof catEdPopularSelectGrupo === 'function') {
         catEdPopularSelectGrupo(card, grupo);
+      }
+      // No modo novo grupo, atualizar também o hidden e o label do card
+      if (modoNovoGrupo && card) {
+        catEdAtualizarGrupoId(card, grupo);
       }
 
       catFecharModalCategoria();
@@ -6825,9 +6879,16 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         <label style="font-size:12px;font-weight:600;color:#3B2A1E;display:block;margin-bottom:4px">Preço de referência <span style="font-weight:400;color:#888">(por unidade, opcional)</span></label>
         <input id="cat-modal-cat-preco" type="number" min="0" step="0.01" placeholder="Ex: 3.50" style="width:100%;padding:10px;border:1.5px solid #EDD9C0;border-radius:10px;font:inherit;font-size:13px">
       </div>
-      <div>
-        <label style="font-size:12px;font-weight:600;color:#3B2A1E;display:block;margin-bottom:4px">Grupo do catálogo</label>
-        <input id="cat-modal-cat-grupo" readonly style="width:100%;padding:10px;border:1.5px solid #EDD9C0;border-radius:10px;font:inherit;font-size:13px;font-family:monospace;background:#f9f3ec;color:#8B4513;font-weight:700">
+      <!-- Grupo fixo (vindo do aviso) -->
+      <div id="cat-modal-grupo-fixo">
+        <label style="font-size:12px;font-weight:600;color:#3B2A1E;display:block;margin-bottom:4px">🔒 Grupo do catálogo <span style="font-weight:400;color:#888">(definido automaticamente)</span></label>
+        <input id="cat-modal-cat-grupo" disabled style="width:100%;padding:10px;border:1.5px solid #EDD9C0;border-radius:10px;font:inherit;font-size:13px;font-family:monospace;background:#f0f0f0;color:#666;cursor:not-allowed">
+      </div>
+      <!-- Grupo editável (modo novo grupo via select) -->
+      <div id="cat-modal-grupo-editavel" style="display:none">
+        <label style="font-size:12px;font-weight:600;color:#3B2A1E;display:block;margin-bottom:4px">ID do grupo <span style="font-weight:400;color:#888">(minúsculas, sem espaço)</span></label>
+        <input id="cat-modal-cat-grupo-edit" placeholder="Ex: sazonais" style="width:100%;padding:10px;border:1.5px solid #EDD9C0;border-radius:10px;font:inherit;font-size:13px;font-family:monospace" oninput="catModalGrupoIdInput(this)">
+        <p style="font-size:11px;color:#888;margin-top:4px">Deve coincidir com o campo "Grupo do catálogo" das categorias cadastradas.</p>
       </div>
       <p id="cat-modal-cat-erro" style="display:none;font-size:12px;color:#c00;margin:0"></p>
     </div>
