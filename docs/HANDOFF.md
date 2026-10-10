@@ -1,18 +1,20 @@
 # HANDOFF
 
-Atualizado: 2026-10-09 (sessão 14)
+Atualizado: 2026-10-09 (sessão 15)
 
 Branch: feature/gestao-online-segura
-HEAD: eba02a0
+HEAD: 0e11ad6
 
 ## Última entrega
-Editor Visual do Catálogo — completo. Modal de criação de categoria inline com dois modos, Pg3/4 dinâmico, select de ID com "+ Criar novo grupo...", sugestão automática de ID.
+Contratos fase 2: condições financeiras estruturadas com geração automática de texto + snapshot_aceite_html com dados do aceite incorporados.
 
 ## Commits desta sessão
 | Commit   | O que fez |
 |----------|-----------|
+| 0e11ad6  | feat(contratos): condições financeiras estruturadas + snapshot_aceite_html com dados do aceite incorporados |
 | eba02a0  | feat(catalogo): modal nova categoria — campo ID bloqueado/editável por contexto, select "+ Criar novo grupo...", sugestão automática de ID |
 | 175584c  | feat(catalogo): modal criar categoria inline — sem sair do editor visual, atualiza select automaticamente |
+| 2f97635  | fix(catalogo): salvar Pg3/4 sem abrir Pg2 não dispara erro de validação |
 | 2f97635  | fix(catalogo): salvar Pg3/4 sem abrir Pg2 não dispara erro de validação — fallback para dados em memória |
 | c0c67e2  | feat(catalogo): Pg3/4 dinâmico — editor de grupos gerado por catEdRenderizarGruposPg34, sem hardcode artesanais/finos |
 | dbeb0ea  | feat(catalogo): atalho Criar categorias no aviso, edGrupoCatalogo dinâmico, catEdIrParaCategorias |
@@ -80,13 +82,13 @@ Ver HANDOFF sessão 11 para detalhes.
 
 ### Contratos — fase 2 (não urgente)
 - Revisão jurídica das cláusulas (externo — cancelamento, condições financeiras, foro)
-- Condições financeiras: valor do sinal, vencimentos, forma de pagamento
-- Status no snapshot pós-aceite (hoje grava "Aguardando aceite")
+- ~~Condições financeiras: valor do sinal, vencimentos, forma de pagamento~~ ✅ Implementado sessão 15
+- ~~Status no snapshot pós-aceite~~ ✅ Implementado sessão 15 (snapshot_aceite_html)
 - Aditivos, templates de cláusulas, integração Autentique
 
 ## Pontos de retorno seguros
-- HEAD atual = eba02a0 (estável, deploy validado)
-- Anterior = ea8f3a2 (handoff sessão 13)
+- HEAD atual = 0e11ad6 (estável, deploy validado)
+- Anterior = eba02a0
 
 ## Links
 - Central: https://oba-cardapio-gestao.obadoceria.workers.dev/
