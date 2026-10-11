@@ -4401,6 +4401,33 @@ function obaGerarContratoHTML(contract, proposal, scenario, catPM, saborPM, catN
 
   const itensRowsStr = [...itensRows, ...linhasSinteticas].join("");
 
+  // Separar categorias (doces) de itens livres (serviços/extras) para sub-seções distintas
+  // Categorias: __total__ explícito + sintéticos calculados
+  // Livres: tipo === "livre"
+  const rowsDoces = [...itensRows, ...linhasSinteticas].join("");
+  const rowsLivres = (scenario.items || [])
+    .filter(it => it.tipo !== "catalogo" && Number(it.qtd || 0) > 0)
+    .map(it => {
+      const incluido = it.incluido === 1 || it.incluido === true;
+      const tdStyle = "padding:6px 8px;border-bottom:1px solid #eee";
+      const preco = Number(it.preco_unit || 0);
+      const qtd   = Number(it.qtd || 0);
+      const totalVal = preco * qtd;
+      const tdPreco = preco > 0 ? R(preco) : "—";
+      const tdTotal = incluido
+        ? `<s style="color:#aaa">${totalVal > 0 ? R(totalVal) : "—"}</s> <strong>Incluído</strong>`
+        : (totalVal > 0 ? R(totalVal) : "—");
+      return `<tr><td style="${tdStyle}">${it.descricao || ""}</td><td style="${tdStyle};text-align:center">${qtd}</td><td style="${tdStyle};text-align:right">${incluido ? `<s style="color:#aaa">${tdPreco}</s>` : tdPreco}</td><td style="${tdStyle};text-align:right">${tdTotal}</td></tr>`;
+    }).join("");
+
+  // Total de unidades de doces
+  const totalUnidadesDoces = [...(scenario.items || []).filter(it => it.tipo === "catalogo" && it.ref_id && it.ref_id.split(":")[1] === "__total__")]
+    .reduce((acc, it) => acc + Number(it.qtd || 0), 0)
+    + Object.values(catsTotaisCalculados).reduce((acc, v) => acc + v, 0);
+  const linhaTotalDoces = totalUnidadesDoces > 0
+    ? `<tr style="background:#f9f3ec"><td style="padding:6px 8px;font-weight:700;color:#3B2A1E">Total de doces</td><td style="padding:6px 8px;text-align:center;font-weight:700;color:#3B2A1E">${totalUnidadesDoces} un.</td><td></td><td></td></tr>`
+    : "";
+
   // Nota descritiva do desconto
   const notaDesconto = tots.desconto > 0 ? (() => {
     const tipo = scenario.desconto_tipo || "none";
@@ -4476,9 +4503,22 @@ ${contract.responsavel_recebimento ? `<tr><td style="padding:4px 0;color:#666;fo
 </table>
 
 <h2>3. Dos Produtos</h2>
+
+${rowsDoces ? `<p style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#8B4513;margin-bottom:6px;font-weight:700">3.1 Doces</p>
 <table>
-<thead><tr><th>Produto</th><th style="text-align:center">Qtd</th><th style="text-align:right">Preço unit.</th><th style="text-align:right">Total</th></tr></thead>
-<tbody>${itensRowsStr || '<tr><td colspan="4" style="padding:8px;color:#888;font-size:11px">Itens conforme combinado</td></tr>'}</tbody>
+<thead><tr><th>Categoria</th><th style="text-align:center">Qtd</th><th style="text-align:right">Preço unit.</th><th style="text-align:right">Total</th></tr></thead>
+<tbody>${rowsDoces}${linhaTotalDoces}</tbody>
+</table>` : ""}
+
+${rowsLivres ? `<p style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#8B4513;margin:16px 0 6px;font-weight:700">3.2 Serviços e extras</p>
+<table>
+<thead><tr><th>Descrição</th><th style="text-align:center">Qtd</th><th style="text-align:right">Valor unit.</th><th style="text-align:right">Total</th></tr></thead>
+<tbody>${rowsLivres}</tbody>
+</table>` : ""}
+
+${!rowsDoces && !rowsLivres ? `<table><tbody><tr><td colspan="4" style="padding:8px;color:#888;font-size:11px">Itens conforme combinado</td></tr></tbody></table>` : ""}
+
+<table style="margin-top:8px">
 <tfoot>
 ${tots.desconto > 0 ? `<tr class="total-row"><td colspan="3" style="padding:6px 8px;text-align:right;color:#666">Subtotal</td><td style="padding:6px 8px;text-align:right">${R(tots.subtotal)}</td></tr><tr><td colspan="3" style="padding:4px 8px;text-align:right;color:#c0392b">Desconto *</td><td style="padding:4px 8px;text-align:right;color:#c0392b">- ${R(tots.desconto)}</td></tr>` : ""}
 <tr class="total-row"><td colspan="3" style="padding:8px;text-align:right">VALOR TOTAL</td><td style="padding:8px;text-align:right;font-size:15px">${R(tots.total)}</td></tr>
