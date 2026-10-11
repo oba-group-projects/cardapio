@@ -4317,9 +4317,11 @@ function obaGerarContratoHTML(contract, proposal, scenario, catPM, saborPM, catN
   };
   const tots = obaContractCenarioTotal(scenario, catPM, saborPM);
 
-  // Pré-processamento: identificar quais categorias têm item __total__
-  // Se uma categoria tem __total__, seus sabores específicos são suprimidos no contrato
-  // (os sabores constam na proposta comercial, não no contrato)
+  // Opção C: contrato sempre exibe categorias agregadas, nunca sabores individuais.
+  // Sabores individuais são suprimidos. Se não houver __total__ para uma categoria,
+  // calcula o total somando as qtds dos sabores e usa o precoReferencia da categoria.
+
+  // Passo 1: mapear categorias que têm __total__ explícito
   const catsComTotal = new Set();
   (scenario.items || []).forEach(it => {
     if (it.tipo === "catalogo" && it.ref_id) {
@@ -4328,23 +4330,31 @@ function obaGerarContratoHTML(contract, proposal, scenario, catPM, saborPM, catN
     }
   });
 
-  // Flag: há sabores com __total__ suprimidos? Usado para exibir nota sobre proposta
-  let temSaboresSuprimidos = false;
+  // Passo 2: para categorias SEM __total__, calcular total a partir dos sabores
+  const catsTotaisCalculados = {}; // cid → qtd total calculada
   (scenario.items || []).forEach(it => {
     if (it.tipo === "catalogo" && it.ref_id) {
       const [cid, sid] = (it.ref_id || "").split(":");
-      if (sid !== "__total__" && catsComTotal.has(cid)) temSaboresSuprimidos = true;
+      if (sid !== "__total__" && !catsComTotal.has(cid) && Number(it.qtd || 0) > 0) {
+        catsTotaisCalculados[cid] = (catsTotaisCalculados[cid] || 0) + Number(it.qtd);
+      }
     }
   });
 
-  // Renderiza itens: categorias __total__, sabores sem __total__ na categoria, e livres
+  // Há sabores individuais? → sempre true se existirem itens de sabor (para nota)
+  const temSaboresSuprimidos = (scenario.items || []).some(it =>
+    it.tipo === "catalogo" && it.ref_id && it.ref_id.split(":")[1] !== "__total__" && Number(it.qtd || 0) > 0
+  );
+
+  // Renderiza itens: apenas __total__ (explícito ou calculado) + itens livres
+  // Sabores individuais são sempre suprimidos (Opção C)
+  const cidJaRenderizado = new Set();
   const itensRows = (scenario.items || [])
     .filter(it => {
       if (Number(it.qtd || 0) <= 0) return false;
       if (it.tipo === "catalogo" && it.ref_id) {
         const [cid, sid] = (it.ref_id || "").split(":");
-        // Suprimir sabores individuais de categorias que têm __total__
-        if (sid !== "__total__" && catsComTotal.has(cid)) return false;
+        if (sid !== "__total__") return false; // suprimir sempre sabores individuais
       }
       return true;
     })
@@ -4355,25 +4365,16 @@ function obaGerarContratoHTML(contract, proposal, scenario, catPM, saborPM, catN
       if (it.tipo === "catalogo" && it.ref_id) {
         const [cid, sid] = (it.ref_id || "").split(":");
         const qtd = Number(it.qtd || 0);
-
-        if (sid === "__total__") {
-          const nomeCat = catNomes[cid] || cid;
-          const precoRef = catPM[cid] || 0;
-          const totalVal = qtd * precoRef;
-          const tdPreco = precoRef > 0 ? R(precoRef) : "—";
-          const tdTotal = incluido
-            ? `<s style="color:#aaa">${totalVal > 0 ? R(totalVal) : "—"}</s> <strong>Incluído</strong>`
-            : (totalVal > 0 ? R(totalVal) : "—");
-          return `<tr><td style="${tdStyle}">${nomeCat}</td><td style="${tdStyle};text-align:center">${qtd} un.</td><td style="${tdStyle};text-align:right">${incluido ? `<s style="color:#aaa">${tdPreco}</s>` : tdPreco}</td><td style="${tdStyle};text-align:right">${tdTotal}</td></tr>`;
-        } else {
-          // Sabor específico de categoria sem __total__
-          const preco = Number(it.preco_unit || 0) || (saborPM[sid] || 0);
-          const totalVal = qtd * preco;
-          const tdTotal = incluido
-            ? `<s style="color:#aaa">${totalVal > 0 ? R(totalVal) : "—"}</s> <strong>Incluído</strong>`
-            : (totalVal > 0 ? R(totalVal) : "—");
-          return `<tr><td style="${tdStyle}">${it.descricao || sid}</td><td style="${tdStyle};text-align:center">${qtd} un.</td><td style="${tdStyle};text-align:right">${incluido ? `<s style="color:#aaa">${preco > 0 ? R(preco) : "—"}</s>` : (preco > 0 ? R(preco) : "—")}</td><td style="${tdStyle};text-align:right">${tdTotal}</td></tr>`;
-        }
+        // sid === "__total__" garantido pelo filtro acima
+        const nomeCat = catNomes[cid] || cid;
+        const precoRef = catPM[cid] || 0;
+        const totalVal = qtd * precoRef;
+        const tdPreco = precoRef > 0 ? R(precoRef) : "—";
+        const tdTotal = incluido
+          ? `<s style="color:#aaa">${totalVal > 0 ? R(totalVal) : "—"}</s> <strong>Incluído</strong>`
+          : (totalVal > 0 ? R(totalVal) : "—");
+        cidJaRenderizado.add(cid);
+        return `<tr><td style="${tdStyle}">${nomeCat}</td><td style="${tdStyle};text-align:center">${qtd} un.</td><td style="${tdStyle};text-align:right">${incluido ? `<s style="color:#aaa">${tdPreco}</s>` : tdPreco}</td><td style="${tdStyle};text-align:right">${tdTotal}</td></tr>`;
       } else {
         // Item livre
         const preco = Number(it.preco_unit || 0);
@@ -4384,7 +4385,21 @@ function obaGerarContratoHTML(contract, proposal, scenario, catPM, saborPM, catN
           : (totalVal > 0 ? R(totalVal) : "—");
         return `<tr><td style="${tdStyle}">${it.descricao || ""}</td><td style="${tdStyle};text-align:center">${qtd}</td><td style="${tdStyle};text-align:right">${incluido ? `<s style="color:#aaa">${preco > 0 ? R(preco) : "—"}</s>` : (preco > 0 ? R(preco) : "—")}</td><td style="${tdStyle};text-align:right">${tdTotal}</td></tr>`;
       }
-    }).join("");
+    });
+
+  // Acrescenta linhas sintéticas para categorias sem __total__ (calculadas a partir dos sabores)
+  const linhasSinteticas = Object.entries(catsTotaisCalculados).map(([cid, qtdTotal]) => {
+    const incluido = false;
+    const tdStyle = "padding:6px 8px;border-bottom:1px solid #eee";
+    const nomeCat = catNomes[cid] || cid;
+    const precoRef = catPM[cid] || 0;
+    const totalVal = qtdTotal * precoRef;
+    const tdPreco = precoRef > 0 ? R(precoRef) : "—";
+    const tdTotal = totalVal > 0 ? R(totalVal) : "—";
+    return `<tr><td style="${tdStyle}">${nomeCat}</td><td style="${tdStyle};text-align:center">${qtdTotal} un.</td><td style="${tdStyle};text-align:right">${tdPreco}</td><td style="${tdStyle};text-align:right">${tdTotal}</td></tr>`;
+  });
+
+  const itensRowsStr = [...itensRows, ...linhasSinteticas].join("");
 
   // Nota descritiva do desconto
   const notaDesconto = tots.desconto > 0 ? (() => {
@@ -4463,7 +4478,7 @@ ${contract.responsavel_recebimento ? `<tr><td style="padding:4px 0;color:#666;fo
 <h2>3. Dos Produtos</h2>
 <table>
 <thead><tr><th>Produto</th><th style="text-align:center">Qtd</th><th style="text-align:right">Preço unit.</th><th style="text-align:right">Total</th></tr></thead>
-<tbody>${itensRows || '<tr><td colspan="4" style="padding:8px;color:#888;font-size:11px">Itens conforme combinado</td></tr>'}</tbody>
+<tbody>${itensRowsStr || '<tr><td colspan="4" style="padding:8px;color:#888;font-size:11px">Itens conforme combinado</td></tr>'}</tbody>
 <tfoot>
 ${tots.desconto > 0 ? `<tr class="total-row"><td colspan="3" style="padding:6px 8px;text-align:right;color:#666">Subtotal</td><td style="padding:6px 8px;text-align:right">${R(tots.subtotal)}</td></tr><tr><td colspan="3" style="padding:4px 8px;text-align:right;color:#c0392b">Desconto *</td><td style="padding:4px 8px;text-align:right;color:#c0392b">- ${R(tots.desconto)}</td></tr>` : ""}
 <tr class="total-row"><td colspan="3" style="padding:8px;text-align:right">VALOR TOTAL</td><td style="padding:8px;text-align:right;font-size:15px">${R(tots.total)}</td></tr>
