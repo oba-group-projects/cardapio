@@ -719,7 +719,6 @@ function catMontarPg1(dados) {
   const imgSrc = pg1.imagem_destaque ? catImageUrl(pg1.imagem_destaque) : '';
   const posX   = pg1.imagem_pos_x != null ? pg1.imagem_pos_x + '%' : '50%';
   const posY   = pg1.imagem_pos_y != null ? pg1.imagem_pos_y + '%' : '40%';
-  const elPg1  = document.getElementById('pg-1');
 
   ['cat-pg1-destaque-wrap', 'cat-pg1-destaque-wrap-desktop'].forEach((wrapId, i) => {
     const wrap = document.getElementById(wrapId);
