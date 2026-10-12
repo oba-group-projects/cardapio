@@ -6225,6 +6225,10 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
           <textarea id="ctr-clausula-cancelamento" rows="8" style="font-size:12px;line-height:1.7;resize:vertical"></textarea>
         </div>
         <div class="field full">
+          <label>Alterações de Pedido</label>
+          <textarea id="ctr-clausula-alteracoes" rows="3" style="font-size:12px;line-height:1.7;resize:vertical"></textarea>
+        </div>
+        <div class="field full">
           <label>Responsabilidades</label>
           <textarea id="ctr-clausula-responsabilidades" rows="10" style="font-size:12px;line-height:1.7;resize:vertical"></textarea>
         </div>
@@ -6487,6 +6491,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       }
       sv('ctr-cond-pagamento', condAtual); // mantém compatibilidade
       sv('ctr-clausula-cancelamento', d.contract.clausula_cancelamento || '');
+      sv('ctr-clausula-alteracoes', d.contract.clausula_alteracoes || '');
       sv('ctr-clausula-responsabilidades', d.contract.clausula_responsabilidades || '');
       sv('ctr-clausula-foro', d.contract.clausula_foro || '');
 
@@ -6514,7 +6519,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       ['ctr-nome-completo','ctr-email','ctr-cpf-cnpj','ctr-local','ctr-cond-pagamento',
        'ctr-cond-pagamento-sel','ctr-cond-sinal-valor','ctr-cond-sinal-venc','ctr-cond-saldo-venc','ctr-cond-forma',
        'ctr-horario-entrega','ctr-responsavel',
-       'ctr-clausula-cancelamento','ctr-clausula-responsabilidades','ctr-clausula-foro','ctr-scenario-id'].forEach(id => {
+       'ctr-clausula-cancelamento','ctr-clausula-alteracoes','ctr-clausula-responsabilidades','ctr-clausula-foro','ctr-scenario-id'].forEach(id => {
         const el = $(id);
         if (el) el.disabled = !isRascunho;
       });      // Link box
@@ -6571,6 +6576,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
       responsavel_recebimento:   $('ctr-responsavel')?.value.trim() || '',
       cond_pagamento:            obaContractLerCondPagamento(),
       clausula_cancelamento:     $('ctr-clausula-cancelamento')?.value || '',
+      clausula_alteracoes:       $('ctr-clausula-alteracoes')?.value || '',
       clausula_responsabilidades:$('ctr-clausula-responsabilidades')?.value || '',
       clausula_foro:             $('ctr-clausula-foro')?.value || '',
     };
@@ -6703,7 +6709,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         ['ctr-nome-completo','ctr-email','ctr-cpf-cnpj','ctr-local','ctr-cond-pagamento',
          'ctr-cond-pagamento-sel','ctr-cond-sinal-valor','ctr-cond-sinal-venc','ctr-cond-saldo-venc','ctr-cond-forma',
          'ctr-horario-entrega','ctr-responsavel',
-         'ctr-clausula-cancelamento','ctr-clausula-responsabilidades','ctr-clausula-foro','ctr-scenario-id'].forEach(id => {
+         'ctr-clausula-cancelamento','ctr-clausula-alteracoes','ctr-clausula-responsabilidades','ctr-clausula-foro','ctr-scenario-id'].forEach(id => {
           const el = $(id); if (el) el.disabled = true;
         });
         const sc = ctrStatusColor('enviado');
@@ -6781,7 +6787,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
         $('ctr-acoes-rascunho').style.display = 'none';
         ['ctr-nome-completo','ctr-email','ctr-cpf-cnpj','ctr-local','ctr-cond-pagamento',
          'ctr-horario-entrega','ctr-responsavel',
-         'ctr-clausula-cancelamento','ctr-clausula-responsabilidades','ctr-clausula-foro','ctr-scenario-id'].forEach(id => {
+         'ctr-clausula-cancelamento','ctr-clausula-alteracoes','ctr-clausula-responsabilidades','ctr-clausula-foro','ctr-scenario-id'].forEach(id => {
           const el = $(id); if (el) el.disabled = true;
         });
         const sc = ctrStatusColor('enviado');

@@ -4254,14 +4254,18 @@ async function obaNextContractNumero(env) {
 }
 
 /* Textos padrao das clausulas */
-const CLAUSULA_CANCELAMENTO_PADRAO = `O cancelamento deste contrato deverá ser comunicado por escrito à CONTRATADA com antecedência mínima de 30 (trinta) dias da data do evento.
+const CLAUSULA_CANCELAMENTO_PADRAO = `Direito de arrependimento: nos contratos celebrados à distância ou fora do estabelecimento comercial, o CONTRATANTE poderá exercer o direito de arrependimento no prazo de 7 (sete) dias corridos a contar da data de celebração, com devolução integral de todos os valores pagos, conforme art. 49 do Código de Defesa do Consumidor. Este prazo não se aplica quando o evento ocorrer dentro dos 7 dias seguintes à contratação.
 
-Em caso de cancelamento pelo CONTRATANTE:
+O cancelamento além do prazo de arrependimento deverá ser comunicado por escrito à CONTRATADA com antecedência mínima de 30 (trinta) dias da data do evento.
+
+Em caso de cancelamento pelo CONTRATANTE fora do prazo de arrependimento:
 • Mais de 30 dias de antecedência: devolução integral dos valores pagos, descontados custos com insumos já adquiridos exclusivamente para o pedido.
 • Entre 15 e 30 dias: retenção de 50% do valor total contratado.
-• Menos de 15 dias: retenção de 100% do valor total contratado, em razão dos insumos adquiridos e impossibilidade de reaproveitamento da data.
+• Menos de 15 dias: retenção de 70% do valor total contratado, em razão dos insumos adquiridos e impossibilidade de reaproveitamento da data.
 
 Em caso de cancelamento pela CONTRATADA: devolução integral de todos os valores pagos, acrescida de indenização de 10% do valor total.`;
+
+const CLAUSULA_ALTERACOES_PADRAO = `Alterações de quantidade, sabores ou itens somente serão válidas se comunicadas por escrito à CONTRATADA e confirmadas expressamente por ela, com antecedência mínima de 15 (quinze) dias da data do evento. Solicitações não confirmadas pela CONTRATADA não geram obrigação de atendimento.`;
 
 const CLAUSULA_RESPONSABILIDADES_PADRAO = `A CONTRATADA responsabiliza-se por:
 • Entregar os produtos nas quantidades, sabores e condições acordados neste contrato;
@@ -4270,7 +4274,7 @@ const CLAUSULA_RESPONSABILIDADES_PADRAO = `A CONTRATADA responsabiliza-se por:
 • Embalar os produtos adequadamente para transporte e apresentação.
 
 A CONTRATADA não se responsabiliza por:
-• Danos causados aos produtos após a entrega e recebimento formal pelo CONTRATANTE;
+• Danos causados aos produtos após a entrega e recebimento pelo CONTRATANTE ou por seu representante;
 • Alterações de sabor, textura ou aparência decorrentes de armazenamento inadequado após a entrega;
 • Atrasos ou impossibilidade de entrega por caso fortuito ou força maior, desde que comunicados imediatamente.
 
@@ -4278,7 +4282,9 @@ O CONTRATANTE responsabiliza-se por:
 • Fornecer informações corretas e completas sobre o evento;
 • Comunicar alterações no número de convidados ou local com antecedência mínima de 15 dias;
 • Efetuar os pagamentos nos prazos e formas acordados;
-• Garantir condições adequadas de recebimento e armazenamento no local do evento.`;
+• Garantir condições adequadas de recebimento e armazenamento no local do evento.
+
+Considera-se recebimento a assinatura de nota de entrega, confirmação por mensagem de texto ou qualquer outro meio que comprove a ciência da entrega pelo CONTRATANTE.`;
 
 const CLAUSULA_FORO_PADRAO = `As partes elegem o foro da Comarca de Santo Cristo, Estado do Rio Grande do Sul, para dirimir quaisquer dúvidas ou litígios decorrentes deste contrato, renunciando a qualquer outro, por mais privilegiado que seja.`;
 
@@ -4522,10 +4528,13 @@ ${notaSabores}
 <h2>5. Do Cancelamento</h2>
 <p class="clausula">${(contract.clausula_cancelamento || CLAUSULA_CANCELAMENTO_PADRAO).replace(/</g, "&lt;")}</p>
 
-<h2>6. Das Responsabilidades</h2>
+<h2>6. Das Alterações de Pedido</h2>
+<p class="clausula">${(contract.clausula_alteracoes || CLAUSULA_ALTERACOES_PADRAO).replace(/</g, "&lt;")}</p>
+
+<h2>7. Das Responsabilidades</h2>
 <p class="clausula">${(contract.clausula_responsabilidades || CLAUSULA_RESPONSABILIDADES_PADRAO).replace(/</g, "&lt;")}</p>
 
-<h2>7. Do Foro</h2>
+<h2>8. Do Foro</h2>
 <p class="clausula">${(contract.clausula_foro || CLAUSULA_FORO_PADRAO).replace(/</g, "&lt;")}</p>
 
 <div class="aceite-box">
@@ -4622,16 +4631,16 @@ async function obaHandleContractsApi(request, env, url) {
       INSERT INTO contracts (contract_id, proposal_id, scenario_id, numero, status,
         nome_completo, email_cliente, cpf_cnpj, local_evento, cond_pagamento,
         horario_entrega, responsavel_recebimento,
-        clausula_cancelamento, clausula_responsabilidades, clausula_foro,
+        clausula_cancelamento, clausula_alteracoes, clausula_responsabilidades, clausula_foro,
         valor_total,
         criado_em, atualizado_em)
-      VALUES (?, ?, ?, ?, 'rascunho', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, 'rascunho', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       contractId, proposal_id, scenario_id, numero,
       body.nome_completo || null, body.email_cliente || null, body.cpf_cnpj || null,
       body.local_evento || null, body.cond_pagamento || null,
       body.horario_entrega || null, body.responsavel_recebimento || null,
-      CLAUSULA_CANCELAMENTO_PADRAO, CLAUSULA_RESPONSABILIDADES_PADRAO, CLAUSULA_FORO_PADRAO,
+      CLAUSULA_CANCELAMENTO_PADRAO, CLAUSULA_ALTERACOES_PADRAO, CLAUSULA_RESPONSABILIDADES_PADRAO, CLAUSULA_FORO_PADRAO,
       await obaCalcularValorContrato(env, scenario_id),
       now, now
     ).run();
@@ -4663,7 +4672,7 @@ async function obaHandleContractsApi(request, env, url) {
         nome_completo = ?, email_cliente = ?, cpf_cnpj = ?,
         local_evento = ?, cond_pagamento = ?,
         horario_entrega = ?, responsavel_recebimento = ?,
-        clausula_cancelamento = ?, clausula_responsabilidades = ?, clausula_foro = ?,
+        clausula_cancelamento = ?, clausula_alteracoes = ?, clausula_responsabilidades = ?, clausula_foro = ?,
         scenario_id = ?, valor_total = ?,
         atualizado_em = ?
       WHERE contract_id = ?
@@ -4672,6 +4681,7 @@ async function obaHandleContractsApi(request, env, url) {
       body.local_evento || null, body.cond_pagamento || null,
       body.horario_entrega || null, body.responsavel_recebimento || null,
       body.clausula_cancelamento || CLAUSULA_CANCELAMENTO_PADRAO,
+      body.clausula_alteracoes || CLAUSULA_ALTERACOES_PADRAO,
       body.clausula_responsabilidades || CLAUSULA_RESPONSABILIDADES_PADRAO,
       body.clausula_foro || CLAUSULA_FORO_PADRAO,
       body.scenario_id || null,
