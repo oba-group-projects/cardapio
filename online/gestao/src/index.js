@@ -4346,65 +4346,53 @@ function obaGerarContratoHTML(contract, proposal, scenario, catPM, saborPM, catN
     it.tipo === "catalogo" && it.ref_id && it.ref_id.split(":")[1] !== "__total__" && Number(it.qtd || 0) > 0
   );
 
-  // Renderiza itens: apenas __total__ (explícito ou calculado) + itens livres
-  // Sabores individuais são sempre suprimidos (Opção C)
+  // Renderiza APENAS itens de catálogo com __total__ (sabores e livres excluídos aqui)
   const cidJaRenderizado = new Set();
   const itensRows = (scenario.items || [])
     .filter(it => {
       if (Number(it.qtd || 0) <= 0) return false;
-      if (it.tipo === "catalogo" && it.ref_id) {
-        const [cid, sid] = (it.ref_id || "").split(":");
-        if (sid !== "__total__") return false; // suprimir sempre sabores individuais
-      }
+      if (it.tipo !== "catalogo" || !it.ref_id) return false; // excluir livres
+      const [, sid] = (it.ref_id || "").split(":");
+      if (sid !== "__total__") return false; // excluir sabores individuais
       return true;
     })
     .map(it => {
       const incluido = it.incluido === 1 || it.incluido === true;
       const tdStyle = "padding:6px 8px;border-bottom:1px solid #eee";
-
-      if (it.tipo === "catalogo" && it.ref_id) {
-        const [cid, sid] = (it.ref_id || "").split(":");
-        const qtd = Number(it.qtd || 0);
-        // sid === "__total__" garantido pelo filtro acima
-        const nomeCat = catNomes[cid] || cid;
-        const precoRef = catPM[cid] || 0;
-        const totalVal = qtd * precoRef;
-        const tdPreco = precoRef > 0 ? R(precoRef) : "—";
-        const tdTotal = incluido
-          ? `<s style="color:#aaa">${totalVal > 0 ? R(totalVal) : "—"}</s> <strong>Incluído</strong>`
-          : (totalVal > 0 ? R(totalVal) : "—");
-        cidJaRenderizado.add(cid);
-        return `<tr><td style="${tdStyle}">${nomeCat}</td><td style="${tdStyle};text-align:center">${qtd} un.</td><td style="${tdStyle};text-align:right">${incluido ? `<s style="color:#aaa">${tdPreco}</s>` : tdPreco}</td><td style="${tdStyle};text-align:right">${tdTotal}</td></tr>`;
-      } else {
-        // Item livre
-        const preco = Number(it.preco_unit || 0);
-        const qtd = Number(it.qtd || 0);
-        const totalVal = preco * qtd;
-        const tdTotal = incluido
-          ? `<s style="color:#aaa">${totalVal > 0 ? R(totalVal) : "—"}</s> <strong>Incluído</strong>`
-          : (totalVal > 0 ? R(totalVal) : "—");
-        return `<tr><td style="${tdStyle}">${it.descricao || ""}</td><td style="${tdStyle};text-align:center">${qtd}</td><td style="${tdStyle};text-align:right">${incluido ? `<s style="color:#aaa">${preco > 0 ? R(preco) : "—"}</s>` : (preco > 0 ? R(preco) : "—")}</td><td style="${tdStyle};text-align:right">${tdTotal}</td></tr>`;
-      }
+      const [cid] = (it.ref_id || "").split(":");
+      const qtd = Number(it.qtd || 0);
+      const nomeCat = catNomes[cid] || cid;
+      const precoRef = catPM[cid] || 0;
+      const totalVal = qtd * precoRef;
+      const tdPreco = precoRef > 0 ? R(precoRef) : "—";
+      const tdTotal = incluido
+        ? `<s style="color:#aaa">${totalVal > 0 ? R(totalVal) : "—"}</s> <strong>Incluído</strong>`
+        : (totalVal > 0 ? R(totalVal) : "—");
+      cidJaRenderizado.add(cid);
+      return { nome: nomeCat, html: `<tr><td style="${tdStyle}">${nomeCat}</td><td style="${tdStyle};text-align:center">${qtd} un.</td><td style="${tdStyle};text-align:right">${incluido ? `<s style="color:#aaa">${tdPreco}</s>` : tdPreco}</td><td style="${tdStyle};text-align:right">${tdTotal}</td></tr>` };
     });
 
   // Acrescenta linhas sintéticas para categorias sem __total__ (calculadas a partir dos sabores)
   const linhasSinteticas = Object.entries(catsTotaisCalculados).map(([cid, qtdTotal]) => {
-    const incluido = false;
     const tdStyle = "padding:6px 8px;border-bottom:1px solid #eee";
     const nomeCat = catNomes[cid] || cid;
     const precoRef = catPM[cid] || 0;
     const totalVal = qtdTotal * precoRef;
     const tdPreco = precoRef > 0 ? R(precoRef) : "—";
     const tdTotal = totalVal > 0 ? R(totalVal) : "—";
-    return `<tr><td style="${tdStyle}">${nomeCat}</td><td style="${tdStyle};text-align:center">${qtdTotal} un.</td><td style="${tdStyle};text-align:right">${tdPreco}</td><td style="${tdStyle};text-align:right">${tdTotal}</td></tr>`;
+    return { nome: nomeCat, html: `<tr><td style="${tdStyle}">${nomeCat}</td><td style="${tdStyle};text-align:center">${qtdTotal} un.</td><td style="${tdStyle};text-align:right">${tdPreco}</td><td style="${tdStyle};text-align:right">${tdTotal}</td></tr>` };
   });
 
-  const itensRowsStr = [...itensRows, ...linhasSinteticas].join("");
+  // Mesclar e ordenar alfabeticamente pelo nome da categoria
+  const todasCategorias = [...itensRows, ...linhasSinteticas]
+    .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
 
-  // Separar categorias (doces) de itens livres (serviços/extras) para sub-seções distintas
-  // Categorias: __total__ explícito + sintéticos calculados
-  // Livres: tipo === "livre"
-  const rowsDoces = [...itensRows, ...linhasSinteticas].join("");
+  const itensRowsStr = todasCategorias.map(x => x.html).join("");
+
+  // rowsDoces: categorias ordenadas alfabeticamente
+  const rowsDoces = itensRowsStr;
+
+  // rowsLivres: apenas itens de tipo livre, na ordem original
   const rowsLivres = (scenario.items || [])
     .filter(it => it.tipo !== "catalogo" && Number(it.qtd || 0) > 0)
     .map(it => {
