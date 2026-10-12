@@ -1,16 +1,18 @@
 # HANDOFF
 
-Atualizado: 2026-10-11 (sessão 16)
+Atualizado: 2026-10-12 (sessão 17)
 
 Branch: feature/gestao-online-segura
-HEAD: bb86bf4
+HEAD: cf67f05
 
 ## Última entrega
-Contratos fase 2 — cláusulas jurídicas revisadas: direito de arrependimento (CDC art. 49), tabela de cancelamento com 70% para <15 dias, nova cláusula de alterações de pedido, recebimento por qualquer meio comprobatório. Migration 0022 aplicada em produção. Deploy realizado.
+Verificação objetiva de UX (catálogo e cardápio) — 5 achados documentados. Correção do Achado 2: função `catVoltarDe(pagina)` no catálogo público — botões Voltar agora respeitam o estado de Pg2, evitando página inconsistente no cenário de bypass de grupo único.
 
 ## Commits desta sessão
 | Commit   | O que fez |
 |----------|-----------|
+| cf67f05  | fix(catalogo): catVoltarDe — botoes Voltar respeitam estado de Pg2, evitam pagina inconsistente no bypass de grupo unico |
+| b5d1081  | docs: handoff sessao 16 — clausulas juridicas v2, migration 0022, docs atualizados |
 | bb86bf4  | feat(contratos): clausulas juridicas v2 — arrependimento CDC, 70% <15d, alteracoes de pedido, recebimento por qualquer meio; migration 0022 |
 
 ## Estado atual — TUDO APROVADO E EM PRODUÇÃO
@@ -69,6 +71,9 @@ Ver HANDOFF sessão 11 para detalhes.
 
 ## Pendente — próximas sessões
 
+### Catálogo — ação imediata sem código
+- **Subtítulo Pg2**: alterar "Escolha o tipo de doce" → "Encontre o seu favorito" via Central (Editor Visual → Catálogo → Pg2 → Subtítulo → Salvar → Publicar)
+
 ### Editor Visual do Catálogo — P1+P2 (próximo item de código)
 - P1: editar textos existentes, mostrar/ocultar, reordenar botões e seções
 - P2: criar/duplicar/excluir botões com destinos válidos
@@ -85,8 +90,8 @@ Ver HANDOFF sessão 11 para detalhes.
 - Aditivos, templates de cláusulas, integração Autentique
 
 ## Pontos de retorno seguros
-- HEAD atual = bb86bf4 (estável, deploy validado — sessão 16)
-- Anterior = da982df
+- HEAD atual = cf67f05 (estável, deploy validado — sessão 17)
+- Anterior = b5d1081
 
 ## Links
 - Central: https://oba-cardapio-gestao.obadoceria.workers.dev/
