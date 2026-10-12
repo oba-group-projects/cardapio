@@ -126,6 +126,68 @@
   }
   .pg1-cta:active { background: var(--brand-dark); transform: scale(.98); }
 
+  /* ── DESTAQUE FOTOGRÁFICO Pg1 ──
+     Mobile: imagem abaixo do texto, altura fixa, oculta por padrão
+     Desktop (≥600px): grid 2 colunas, imagem ocupa coluna direita em altura total
+  */
+  .pg1-destaque-img-wrap {
+    display: none; /* oculto até uma imagem ser configurada */
+    overflow: hidden;
+    background: var(--brand-light);
+    /* Mobile: bloco abaixo do texto */
+    width: 100%; height: 220px;
+    border-radius: 0;
+    order: 3; /* entre corpo e CTA */
+    flex-shrink: 0;
+  }
+  .pg1-destaque-img-wrap.com-imagem { display: block; }
+  .pg1-destaque-img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: 50% 40%; /* padrão: foco no centro-alto */
+    display: block;
+  }
+
+  /* Layout lateral em telas ≥ 600px */
+  @media (min-width: 600px) {
+    #pg-1 {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr;
+      overflow: hidden;
+      height: 100dvh;
+      max-height: 100dvh;
+    }
+    /* Coluna esquerda: todo o conteúdo de texto */
+    .pg1-conteudo {
+      grid-column: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      height: 100%;
+    }
+    /* Coluna direita: só a imagem */
+    .pg1-destaque-img-wrap {
+      grid-column: 2;
+      height: 100% !important;
+      width: 100%;
+      border-radius: 0;
+      order: unset;
+      display: none; /* ainda oculta se sem imagem */
+    }
+    .pg1-destaque-img-wrap.com-imagem {
+      display: block;
+    }
+    /* Quando sem imagem: conteúdo ocupa as 2 colunas */
+    #pg-1:not(.tem-imagem) {
+      grid-template-columns: 1fr;
+    }
+    #pg-1:not(.tem-imagem) .pg1-conteudo {
+      max-width: 480px;
+      margin: 0 auto;
+    }
+  }
+
   /* ═══════════════════════════════════════════════════
      PG 3 — MENU DE GRUPOS
   ═══════════════════════════════════════════════════ */
@@ -367,6 +429,9 @@
 ══════════════════════════════════════════════════ -->
 <div class="oba-page" id="pg-1">
 
+  <!-- Coluna de conteúdo (texto + CTA) -->
+  <div class="pg1-conteudo">
+
   <!-- Topo: logo + rótulo de seção -->
   <div class="pg1-topo">
     <img id="cat-pg1-logo"
@@ -393,11 +458,23 @@
     </p>
   </div>
 
+  <!-- Imagem de destaque — mobile: aparece aqui, entre texto e CTA -->
+  <div class="pg1-destaque-img-wrap" id="cat-pg1-destaque-wrap">
+    <img class="pg1-destaque-img" id="cat-pg1-destaque-img" src="" alt="Destaque Oba Doceria">
+  </div>
+
   <!-- CTA -->
   <div class="pg1-cta-wrap">
     <button class="pg1-cta" onclick="catNavegar(3)" id="cat-pg1-cta">
       Conhecer nossos sabores →
     </button>
+  </div>
+
+  </div><!-- /pg1-conteudo -->
+
+  <!-- Imagem de destaque — desktop: coluna direita (via CSS grid) -->
+  <div class="pg1-destaque-img-wrap pg1-destaque-desktop" id="cat-pg1-destaque-wrap-desktop" aria-hidden="true">
+    <img class="pg1-destaque-img" id="cat-pg1-destaque-img-desktop" src="" alt="">
   </div>
 
 </div>
@@ -637,6 +714,29 @@ function catMontarPg1(dados) {
   _catSet('cat-pg1-p1',     pg1.paragrafo1);
   _catSet('cat-pg1-p2',     pg1.paragrafo2);
   _catSet('cat-pg1-cta',    pg1.cta);
+
+  /* Destaque fotográfico — aplicado nas duas cópias (mobile + desktop) */
+  const imgSrc = pg1.imagem_destaque ? catImageUrl(pg1.imagem_destaque) : '';
+  const posX   = pg1.imagem_pos_x != null ? pg1.imagem_pos_x + '%' : '50%';
+  const posY   = pg1.imagem_pos_y != null ? pg1.imagem_pos_y + '%' : '40%';
+  const elPg1  = document.getElementById('pg-1');
+
+  ['cat-pg1-destaque-wrap', 'cat-pg1-destaque-wrap-desktop'].forEach((wrapId, i) => {
+    const wrap = document.getElementById(wrapId);
+    const imgId = i === 0 ? 'cat-pg1-destaque-img' : 'cat-pg1-destaque-img-desktop';
+    const img   = document.getElementById(imgId);
+    if (!wrap || !img) return;
+    if (imgSrc) {
+      img.src = imgSrc;
+      img.style.objectPosition = posX + ' ' + posY;
+      wrap.classList.add('com-imagem');
+      if (elPg1) elPg1.classList.add('tem-imagem');
+    } else {
+      img.src = '';
+      wrap.classList.remove('com-imagem');
+      if (elPg1) elPg1.classList.remove('tem-imagem');
+    }
+  });
 }
 
 /* ── MONTAR PG 3 ── */

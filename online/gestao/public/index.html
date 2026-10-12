@@ -1077,6 +1077,31 @@ function obaLogout() {
         </select>
       </div>
 
+      <div style="grid-column:1/-1"><p class="oba-secao-titulo">🖼️ Destaque visual <span class="hint">(opcional — imagem na Pg1)</span></p></div>
+      <div class="field full">
+        <label>Imagem <span class="hint">(URL ou caminho da galeria — vazio = sem destaque)</span></label>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input id="cat-ed-pg1-imagem-destaque" placeholder="Images/Sabores_Doces/Cappuccino.jpeg" style="flex:1;min-width:200px">
+          <button type="button" class="secondary" style="padding:7px 10px;font-size:12px;white-space:nowrap" onclick="obaAbrirGaleria('cat-ed-pg1-imagem-destaque','cat-ed-pg1-destaque-preview')">📁 Galeria</button>
+          <img id="cat-ed-pg1-destaque-preview" src="" alt="preview" onerror="this.style.display='none'" style="width:80px;height:60px;object-fit:cover;border:1px solid var(--line);border-radius:8px;display:none">
+        </div>
+        <p class="hint" style="margin-top:6px">Mobile: aparece entre o texto e o botão. Desktop (≥600px): ocupa a coluna direita em altura total.</p>
+      </div>
+      <div class="field">
+        <label>Foco horizontal <span class="hint">(0 = esquerda · 50 = centro · 100 = direita)</span></label>
+        <div style="display:flex;gap:10px;align-items:center">
+          <input type="range" id="cat-ed-pg1-pos-x" min="0" max="100" value="50" style="flex:1" oninput="document.getElementById('cat-ed-pg1-pos-x-val').textContent=this.value+'%'">
+          <span id="cat-ed-pg1-pos-x-val" style="font-size:12px;min-width:36px;text-align:right">50%</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Foco vertical <span class="hint">(0 = topo · 40 = centro-alto · 100 = base)</span></label>
+        <div style="display:flex;gap:10px;align-items:center">
+          <input type="range" id="cat-ed-pg1-pos-y" min="0" max="100" value="40" style="flex:1" oninput="document.getElementById('cat-ed-pg1-pos-y-val').textContent=this.value+'%'">
+          <span id="cat-ed-pg1-pos-y-val" style="font-size:12px;min-width:36px;text-align:right">40%</span>
+        </div>
+      </div>
+
       <div class="field full actions"><button class="primary" type="submit">Salvar Página 1</button></div>
     </form>
   </details>
@@ -2832,6 +2857,13 @@ $('formConfig').onsubmit=async e=>{
     /* Pg1 — logo */
     sv('cat-ed-pg1-logo', pg1.logo || '');
     const sel1 = $('cat-ed-pg1-tamanhoLogo'); if (sel1) sel1.value = pg1.tamanhoLogo || 'medio';
+    /* Pg1 — destaque visual */
+    sv('cat-ed-pg1-imagem-destaque', pg1.imagem_destaque || '');
+    const rngX = $('cat-ed-pg1-pos-x'); if (rngX) { rngX.value = pg1.imagem_pos_x ?? 50; document.getElementById('cat-ed-pg1-pos-x-val').textContent = rngX.value + '%'; }
+    const rngY = $('cat-ed-pg1-pos-y'); if (rngY) { rngY.value = pg1.imagem_pos_y ?? 40; document.getElementById('cat-ed-pg1-pos-y-val').textContent = rngY.value + '%'; }
+    /* preview da imagem de destaque */
+    const prevDest = $('cat-ed-pg1-destaque-preview');
+    if (prevDest && pg1.imagem_destaque) { prevDest.src = pg1.imagem_destaque; prevDest.style.display = ''; }
     /* Pg1 — cores */
     sc('cat-ed-pg1-corFundo',  pg1.corFundo  || '');
     sc('cat-ed-pg1-corTitulo', pg1.corTitulo || '');
@@ -2895,6 +2927,9 @@ $('formConfig').onsubmit=async e=>{
         tamTitulo: $('cat-ed-pg1-tamTitulo')?.value || '', pesoTitulo: $('cat-ed-pg1-pesoTitulo')?.value || '',
         tamTexto:  $('cat-ed-pg1-tamTexto')?.value  || '', pesoTexto:  $('cat-ed-pg1-pesoTexto')?.value  || '',
         tamCTA:    $('cat-ed-pg1-tamCTA')?.value    || '', pesoCTA:    $('cat-ed-pg1-pesoCTA')?.value    || '',
+        imagem_destaque: $('cat-ed-pg1-imagem-destaque')?.value.trim() || '',
+        imagem_pos_x:    Number($('cat-ed-pg1-pos-x')?.value ?? 50),
+        imagem_pos_y:    Number($('cat-ed-pg1-pos-y')?.value ?? 40),
       },
       pg2: {
         subtitulo: $('cat-ed-pg2-subtitulo')?.value.trim() || '',
