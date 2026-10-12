@@ -1,24 +1,17 @@
 # HANDOFF
 
-Atualizado: 2026-10-09 (sessão 15)
+Atualizado: 2026-10-11 (sessão 16)
 
 Branch: feature/gestao-online-segura
-HEAD: 0e11ad6
+HEAD: bb86bf4
 
 ## Última entrega
-Contratos fase 2: condições financeiras estruturadas com geração automática de texto + snapshot_aceite_html com dados do aceite incorporados.
+Contratos fase 2 — cláusulas jurídicas revisadas: direito de arrependimento (CDC art. 49), tabela de cancelamento com 70% para <15 dias, nova cláusula de alterações de pedido, recebimento por qualquer meio comprobatório. Migration 0022 aplicada em produção. Deploy realizado.
 
 ## Commits desta sessão
 | Commit   | O que fez |
 |----------|-----------|
-| 0e11ad6  | feat(contratos): condições financeiras estruturadas + snapshot_aceite_html com dados do aceite incorporados |
-| eba02a0  | feat(catalogo): modal nova categoria — campo ID bloqueado/editável por contexto, select "+ Criar novo grupo...", sugestão automática de ID |
-| 175584c  | feat(catalogo): modal criar categoria inline — sem sair do editor visual, atualiza select automaticamente |
-| 2f97635  | fix(catalogo): salvar Pg3/4 sem abrir Pg2 não dispara erro de validação |
-| 2f97635  | fix(catalogo): salvar Pg3/4 sem abrir Pg2 não dispara erro de validação — fallback para dados em memória |
-| c0c67e2  | feat(catalogo): Pg3/4 dinâmico — editor de grupos gerado por catEdRenderizarGruposPg34, sem hardcode artesanais/finos |
-| dbeb0ea  | feat(catalogo): atalho Criar categorias no aviso, edGrupoCatalogo dinâmico, catEdIrParaCategorias |
-| 99f9b71  | feat(catalogo): ID grupo como select dinâmico — opções do catálogo, aviso inline, opção personalizado |
+| bb86bf4  | feat(contratos): clausulas juridicas v2 — arrependimento CDC, 70% <15d, alteracoes de pedido, recebimento por qualquer meio; migration 0022 |
 
 ## Estado atual — TUDO APROVADO E EM PRODUÇÃO
 
@@ -76,19 +69,24 @@ Ver HANDOFF sessão 11 para detalhes.
 
 ## Pendente — próximas sessões
 
+### Editor Visual do Catálogo — P1+P2 (próximo item de código)
+- P1: editar textos existentes, mostrar/ocultar, reordenar botões e seções
+- P2: criar/duplicar/excluir botões com destinos válidos
+
 ### Catálogo — melhorias menores
 - "Encontre o seu favorito" (Pg sabores) — texto/estilo da seção de sabores
 - Hardening: substituir querySelector frágil por getElementById em alguns pontos
 
-### Contratos — fase 2 (não urgente)
-- Revisão jurídica das cláusulas (externo — cancelamento, condições financeiras, foro)
-- ~~Condições financeiras: valor do sinal, vencimentos, forma de pagamento~~ ✅ Implementado sessão 15
-- ~~Status no snapshot pós-aceite~~ ✅ Implementado sessão 15 (snapshot_aceite_html)
+### Contratos — fase 2 (itens restantes)
+- ~~Revisão jurídica das cláusulas~~ ✅ sessão 16
+- ~~Condições financeiras~~ ✅ sessão 15
+- ~~Status no snapshot pós-aceite~~ ✅ sessão 15
+- ~~Cláusula de alterações de pedido~~ ✅ sessão 16
 - Aditivos, templates de cláusulas, integração Autentique
 
 ## Pontos de retorno seguros
-- HEAD atual = 0e11ad6 (estável, deploy validado)
-- Anterior = eba02a0
+- HEAD atual = bb86bf4 (estável, deploy validado — sessão 16)
+- Anterior = da982df
 
 ## Links
 - Central: https://oba-cardapio-gestao.obadoceria.workers.dev/

@@ -1,10 +1,10 @@
 ﻿# CURRENT STATE
 
-Atualizado: 2026-10-09 (sessão 12)
+Atualizado: 2026-10-11 (sessão 16)
 
 ## Git
 Branch: feature/gestao-online-segura
-Commit HEAD: 777a0d2
+Commit HEAD: bb86bf4
 
 ## Estado funcional
 - Central privada autenticada e operacional
@@ -71,11 +71,12 @@ Commit HEAD: 777a0d2
 
 ## Pendente — próximas sessões
 
-### Contratos (fase 2 — não urgente)
-- Revisão jurídica das cláusulas antes de uso em produção real (externo — não é código)
-- Aditivos
-- Templates de cláusulas editáveis na Central
-- Integração Autentique (sandbox primeiro)
+### Contratos (fase 2 — itens restantes)
+- ~~Revisão jurídica das cláusulas~~ ✅ sessão 16
+- ~~Condições financeiras~~ ✅ sessão 15
+- ~~Status no snapshot pós-aceite~~ ✅ sessão 15
+- ~~Cláusula de alterações de pedido~~ ✅ sessão 16
+- Aditivos, templates de cláusulas, integração Autentique
 
 ### Editor Visual do Catálogo (aprovado para implementação)
 - P1: editar textos existentes, mostrar/ocultar, reordenar botões e seções
@@ -99,8 +100,8 @@ Commit HEAD: 777a0d2
 10. Itens com incluido=1 não somam no total (obaContractCenarioTotal e recalcularCenario)
 
 ## Pontos de retorno seguros
-- HEAD atual = 777a0d2 (estável, deploy validado)
-- Anterior = 7fee08e
+- HEAD atual = bb86bf4 (estável, deploy validado — sessão 16)
+- Anterior = da982df
 
 ## Links
 - Central: https://oba-cardapio-gestao.obadoceria.workers.dev/

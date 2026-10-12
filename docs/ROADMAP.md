@@ -34,6 +34,12 @@ Atualizado: 2026-10-09 (sessão 11)
 - Cancelar/excluir contratos
 - Avisos: data passada, cenário sem produtos, campos obrigatórios
 
+### Contratos — Fase 2 parcial (sessões 15–16)
+- Condições financeiras estruturadas: sinal, vencimentos, forma de pagamento
+- Snapshot pós-aceite com dados do aceite incorporados
+- Cláusulas jurídicas v2: direito de arrependimento (CDC art. 49), 70% para <15 dias, cláusula de alterações de pedido, recebimento por qualquer meio comprobatório
+- Migration 0022 (clausula_alteracoes)
+
 ## Próximo passo recomendado
 
 **Editor Visual do Catálogo — P1+P2**
@@ -44,13 +50,13 @@ Atualizado: 2026-10-09 (sessão 11)
 
 ## Planejado
 
-### Contratos — Fase 2
-- Revisão jurídica das cláusulas (cancelamento, condições financeiras, foro)
-- Condições financeiras: valor do sinal, vencimentos, forma de pagamento
-- Status no snapshot pós-aceite (hoje grava "Aguardando aceite")
+### Contratos — Fase 2 (itens restantes)
 - Aditivos
 - Templates de cláusulas editáveis na Central
 - Integração Autentique (sandbox primeiro)
+- ~~Revisão jurídica das cláusulas~~ ✅
+- ~~Condições financeiras~~ ✅
+- ~~Status no snapshot pós-aceite~~ ✅
 
 ### Editor Visual do Catálogo — P3 (fase futura)
 - Criar/remover seções (requer decisão de produto)

@@ -103,19 +103,18 @@ Central de Gestão (privada, autenticada)
 ## Próximos passos
 
 ### Agora
-1. ~~Atualizar documentação~~ ← você está aqui
-2. Dois textos do catálogo via Central (sem código):
+1. ~~Atualizar documentação~~ ✅
+2. Dois textos do catálogo via Central (sem código — fazer pela interface):
    - Pg1: segundo parágrafo → "Explore nossos sabores, descubra seus favoritos e deixe-se levar pela experiência Oba."
    - Pg2: subtítulo "Escolha o tipo de doce" → "Encontre o seu favorito"
 3. Validação visual do catálogo após os textos
+4. Editor Visual Catálogo — P1+P2 (próximo item de código)
+5. Teste completo do fluxo de contrato com proposta real (não de teste)
 
-### Em seguida
-4. Ed. Visual Catálogo — Camada 1:
-   - Pg2 ativo/inativo
-   - Grupos (Artesanais/Finos) ocultar/mostrar
-   - Validação: impedir Pg2 sem grupo ativo
-5. Contratos — cláusula de alterações da contratação
-6. Teste completo do fluxo de contrato com proposta real (não de teste)
+### Concluído recentemente
+- ~~Ed. Visual Catálogo — Camada 1 (Pg2/Pg3/4 dinâmicos, grupos ordem, categorias inline)~~ ✅ sessão 12-14
+- ~~Contratos — condições financeiras estruturadas + snapshot_aceite_html~~ ✅ sessão 15
+- ~~Contratos — cláusulas jurídicas v2 (arrependimento CDC, 70% <15d, alterações de pedido, recebimento por qualquer meio, migration 0022)~~ ✅ sessão 16
 
 ### Futuro — só com necessidade demonstrada
 - Seções extras no catálogo
