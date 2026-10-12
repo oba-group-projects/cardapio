@@ -127,38 +127,57 @@
   .pg1-cta:active { background: var(--brand-dark); transform: scale(.98); }
 
   /* ── DESTAQUE FOTOGRÁFICO Pg1 ──
-     Mobile: imagem abaixo do texto, altura fixa, oculta por padrão
-     Desktop (≥600px): grid 2 colunas, imagem ocupa coluna direita em altura total
+     Mobile (<768px): imagem abaixo do texto, altura fixa, oculta por padrão.
+     Desktop (≥768px): grid lateral — texto à esq, imagem à dir.
+     Composições: lateral-60 (40/60), lateral-50 (50/50).
+     Mobile: adaptar (mesma img) ou ocultar.
   */
+
+  /* Mobile: bloco empilhado */
   .pg1-destaque-img-wrap {
-    display: none; /* oculto até uma imagem ser configurada */
+    display: none;
     overflow: hidden;
     background: var(--brand-light);
-    /* Mobile: bloco abaixo do texto */
-    width: 100%; height: 220px;
-    border-radius: 0;
-    order: 3; /* entre corpo e CTA */
+    width: 100%; height: 240px;
     flex-shrink: 0;
+    position: relative;
   }
   .pg1-destaque-img-wrap.com-imagem { display: block; }
+  /* Oculto no mobile quando destaque_mobile='ocultar' */
+  .pg1-destaque-img-wrap.mobile-ocultar { display: none !important; }
+
   .pg1-destaque-img {
     width: 100%; height: 100%;
     object-fit: cover;
-    object-position: 50% 40%; /* padrão: foco no centro-alto */
+    object-position: 50% 40%;
     display: block;
   }
 
-  /* Layout lateral em telas ≥ 600px */
-  @media (min-width: 600px) {
+  /* Degradê na borda esquerda da imagem — suaviza transição texto/foto no desktop */
+  .pg1-destaque-img-wrap::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(to right, var(--bg) 0%, transparent 18%);
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0; /* desativado no mobile */
+  }
+
+  /* Desktop ≥ 768px — layout em grid */
+  @media (min-width: 768px) {
     #pg-1 {
       display: grid !important;
-      grid-template-columns: 1fr 1fr;
       grid-template-rows: 1fr;
       overflow: hidden;
       height: 100dvh;
       max-height: 100dvh;
     }
-    /* Coluna esquerda: todo o conteúdo de texto */
+    /* Composição padrão: lateral-60 (texto 40%, imagem 60%) */
+    #pg-1 { grid-template-columns: 2fr 3fr; }
+    /* Composição alternativa: lateral-50 (50/50) */
+    #pg-1.comp-lateral-50 { grid-template-columns: 1fr 1fr; }
+
+    /* Coluna esquerda: conteúdo de texto */
     .pg1-conteudo {
       grid-column: 1;
       display: flex;
@@ -166,24 +185,26 @@
       overflow-y: auto;
       height: 100%;
     }
-    /* Coluna direita: só a imagem */
+
+    /* Coluna direita: imagem */
     .pg1-destaque-img-wrap {
       grid-column: 2;
       height: 100% !important;
       width: 100%;
-      border-radius: 0;
       order: unset;
-      display: none; /* ainda oculta se sem imagem */
+      display: none;
     }
-    .pg1-destaque-img-wrap.com-imagem {
-      display: block;
-    }
-    /* Quando sem imagem: conteúdo ocupa as 2 colunas */
+    .pg1-destaque-img-wrap.com-imagem { display: block; }
+
+    /* Ativa o degradê de transição no desktop */
+    .pg1-destaque-img-wrap::before { opacity: 1; }
+
+    /* Sem imagem: conteúdo ocupa colunas completas, centralizado */
     #pg-1:not(.tem-imagem) {
       grid-template-columns: 1fr;
     }
     #pg-1:not(.tem-imagem) .pg1-conteudo {
-      max-width: 480px;
+      max-width: 520px;
       margin: 0 auto;
     }
   }
@@ -716,23 +737,37 @@ function catMontarPg1(dados) {
   _catSet('cat-pg1-cta',    pg1.cta);
 
   /* Destaque fotográfico — aplicado nas duas cópias (mobile + desktop) */
-  const imgSrc = pg1.imagem_destaque ? catImageUrl(pg1.imagem_destaque) : '';
-  const posX   = pg1.imagem_pos_x != null ? pg1.imagem_pos_x + '%' : '50%';
-  const posY   = pg1.imagem_pos_y != null ? pg1.imagem_pos_y + '%' : '40%';
+  const imgSrc      = pg1.imagem_destaque ? catImageUrl(pg1.imagem_destaque) : '';
+  const posX        = pg1.imagem_pos_x != null ? pg1.imagem_pos_x + '%' : '50%';
+  const posY        = pg1.imagem_pos_y != null ? pg1.imagem_pos_y + '%' : '40%';
+  /* destaque_ativo: undefined/true → exibe; false → oculta (retrocompatível) */
+  const destaqueAtivo = pg1.destaque_ativo !== false;
+  const composicao    = pg1.destaque_composicao || 'lateral-60';
+  const mobileMode    = pg1.destaque_mobile     || 'adaptar';
+
+  /* Classes de composição no #pg-1 */
+  elPg1.classList.remove('comp-lateral-50');
+  if (composicao === 'lateral-50') elPg1.classList.add('comp-lateral-50');
 
   ['cat-pg1-destaque-wrap', 'cat-pg1-destaque-wrap-desktop'].forEach((wrapId, i) => {
     const wrap = document.getElementById(wrapId);
     const imgId = i === 0 ? 'cat-pg1-destaque-img' : 'cat-pg1-destaque-img-desktop';
     const img   = document.getElementById(imgId);
     if (!wrap || !img) return;
-    if (imgSrc) {
+
+    if (destaqueAtivo && imgSrc) {
       img.src = imgSrc;
       img.style.objectPosition = posX + ' ' + posY;
       wrap.classList.add('com-imagem');
       if (elPg1) elPg1.classList.add('tem-imagem');
+      /* Comportamento mobile — só afeta o wrap mobile (i === 0) */
+      if (i === 0) {
+        wrap.classList.toggle('mobile-ocultar', mobileMode === 'ocultar');
+      }
     } else {
       img.src = '';
       wrap.classList.remove('com-imagem');
+      wrap.classList.remove('mobile-ocultar');
       if (elPg1) elPg1.classList.remove('tem-imagem');
     }
   });

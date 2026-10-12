@@ -1078,6 +1078,10 @@ function obaLogout() {
       </div>
 
       <div style="grid-column:1/-1"><p class="oba-secao-titulo">🖼️ Destaque visual <span class="hint">(opcional — imagem na Pg1)</span></p></div>
+      <div class="field full" style="display:flex;gap:20px;flex-wrap:wrap;align-items:center">
+        <label class="oba-toggle-label"><input type="checkbox" id="cat-ed-pg1-destaque-ativo"> Usar destaque fotográfico</label>
+        <span class="hint" style="color:#a06000">Desmarcar oculta a imagem sem apagar os ajustes salvos.</span>
+      </div>
       <div class="field full">
         <label>Imagem <span class="hint">(URL ou caminho da galeria — vazio = sem destaque)</span></label>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
@@ -1085,10 +1089,9 @@ function obaLogout() {
           <button type="button" class="secondary" style="padding:7px 10px;font-size:12px;white-space:nowrap" onclick="obaAbrirGaleria('cat-ed-pg1-imagem-destaque','cat-ed-pg1-destaque-preview')">📁 Galeria</button>
           <img id="cat-ed-pg1-destaque-preview" src="" alt="preview" onerror="this.style.display='none'" style="width:80px;height:60px;object-fit:cover;border:1px solid var(--line);border-radius:8px;display:none">
         </div>
-        <p class="hint" style="margin-top:6px">Mobile: aparece entre o texto e o botão. Desktop (≥600px): ocupa a coluna direita em altura total.</p>
       </div>
       <div class="field">
-        <label>Foco horizontal <span class="hint">(0 = esquerda · 50 = centro · 100 = direita)</span></label>
+        <label>Foco horizontal <span class="hint">(0 = esq · 50 = centro · 100 = dir)</span></label>
         <div style="display:flex;gap:10px;align-items:center">
           <input type="range" id="cat-ed-pg1-pos-x" min="0" max="100" value="50" style="flex:1" oninput="document.getElementById('cat-ed-pg1-pos-x-val').textContent=this.value+'%'">
           <span id="cat-ed-pg1-pos-x-val" style="font-size:12px;min-width:36px;text-align:right">50%</span>
@@ -1100,6 +1103,20 @@ function obaLogout() {
           <input type="range" id="cat-ed-pg1-pos-y" min="0" max="100" value="40" style="flex:1" oninput="document.getElementById('cat-ed-pg1-pos-y-val').textContent=this.value+'%'">
           <span id="cat-ed-pg1-pos-y-val" style="font-size:12px;min-width:36px;text-align:right">40%</span>
         </div>
+      </div>
+      <div class="field">
+        <label>Composição no computador</label>
+        <select id="cat-ed-pg1-destaque-composicao">
+          <option value="lateral-60">Imagem ampliada — 60% da tela (recomendada)</option>
+          <option value="lateral-50">Imagem equilibrada — 50% da tela</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Comportamento no celular</label>
+        <select id="cat-ed-pg1-destaque-mobile">
+          <option value="adaptar">Adaptar — mesma imagem, reposicionada</option>
+          <option value="ocultar">Ocultar — sem imagem no celular</option>
+        </select>
       </div>
 
       <div class="field full actions"><button class="primary" type="submit">Salvar Página 1</button></div>
@@ -2859,8 +2876,11 @@ $('formConfig').onsubmit=async e=>{
     const sel1 = $('cat-ed-pg1-tamanhoLogo'); if (sel1) sel1.value = pg1.tamanhoLogo || 'medio';
     /* Pg1 — destaque visual */
     sv('cat-ed-pg1-imagem-destaque', pg1.imagem_destaque || '');
+    const pg1DestAtivoEl = $('cat-ed-pg1-destaque-ativo'); if (pg1DestAtivoEl) pg1DestAtivoEl.checked = pg1.destaque_ativo === true;
     const rngX = $('cat-ed-pg1-pos-x'); if (rngX) { rngX.value = pg1.imagem_pos_x ?? 50; document.getElementById('cat-ed-pg1-pos-x-val').textContent = rngX.value + '%'; }
     const rngY = $('cat-ed-pg1-pos-y'); if (rngY) { rngY.value = pg1.imagem_pos_y ?? 40; document.getElementById('cat-ed-pg1-pos-y-val').textContent = rngY.value + '%'; }
+    const selComp = $('cat-ed-pg1-destaque-composicao'); if (selComp) selComp.value = pg1.destaque_composicao || 'lateral-60';
+    const selMob  = $('cat-ed-pg1-destaque-mobile');     if (selMob)  selMob.value  = pg1.destaque_mobile     || 'adaptar';
     /* preview da imagem de destaque */
     const prevDest = $('cat-ed-pg1-destaque-preview');
     if (prevDest && pg1.imagem_destaque) { prevDest.src = pg1.imagem_destaque; prevDest.style.display = ''; }
@@ -2930,6 +2950,9 @@ $('formConfig').onsubmit=async e=>{
         imagem_destaque: $('cat-ed-pg1-imagem-destaque')?.value.trim() || '',
         imagem_pos_x:    Number($('cat-ed-pg1-pos-x')?.value ?? 50),
         imagem_pos_y:    Number($('cat-ed-pg1-pos-y')?.value ?? 40),
+        destaque_ativo:      $('cat-ed-pg1-destaque-ativo')?.checked === true,
+        destaque_composicao: $('cat-ed-pg1-destaque-composicao')?.value || 'lateral-60',
+        destaque_mobile:     $('cat-ed-pg1-destaque-mobile')?.value     || 'adaptar',
       },
       pg2: {
         subtitulo: $('cat-ed-pg2-subtitulo')?.value.trim() || '',
