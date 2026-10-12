@@ -20,12 +20,12 @@
     },
     "eventos_modal": {
       "ativo": true,
-      "label_botao": "",
-      "label_convidados": "",
-      "label_data": "",
-      "label_nome": "",
+      "label_botao": "Solicitar Proposta",
+      "label_convidados": "Nº Convidados",
+      "label_data": "Data",
+      "label_nome": "Seu Nome Completo",
       "label_tipo": "produto",
-      "titulo": ""
+      "titulo": "Orçamentos de Eventos"
     },
     "menu_principal": {
       "ativo": true,
@@ -87,7 +87,7 @@
       "pesoLabel": "",
       "pesoSublabel": "",
       "pesoSubtitulo": "",
-      "subtitulo": "",
+      "subtitulo": "Escolha sua Experiência",
       "tamLabel": "",
       "tamSublabel": "",
       "tamSubtitulo": "",
@@ -95,7 +95,7 @@
     },
     "nossa_essencia": {
       "ativo": false,
-      "citacao": "",
+      "citacao": "Feito à mão, com amor e precisão.",
       "corFundo": "",
       "corTexto": "",
       "corTitulo": "",
@@ -111,7 +111,7 @@
       "tamanhoLogo": "pequeno",
       "texto": "Na Oba Doceria, acreditamos que um doce artesanal começa muito antes da primeira mordida. Cada receita é criada, testada e produzida com cuidado, utilizando ingredientes selecionados e técnicas que valorizam o verdadeiro sabor de cada elemento. Buscamos o equilíbrio perfeito entre textura, cremosidade e doçura — para que cada brigadeiro seja uma experiência, e não apenas um doce.",
       "texto2": "Tudo é feito à mão, em pequenos detalhes, com tempo, precisão e carinho. Porque sabemos que, quando alguém escolhe a Oba, não está apenas escolhendo doces: está escolhendo algo para celebrar, presentear, compartilhar ou simplesmente tornar um momento mais especial. E é esse cuidado que colocamos em cada pedido, do primeiro preparo até chegar às suas mãos.",
-      "titulo": ""
+      "titulo": "Nossa Essência"
     },
     "personalizados_modal": {
       "ativo": false,
@@ -119,7 +119,7 @@
         "Modelagem artesanal.",
         "Mínimo: 20 unidades."
       ],
-      "info_titulo": "",
+      "info_titulo": "Informações",
       "pacotes": [
         {
           "preco": "196,00",
@@ -134,13 +134,13 @@
           "quantidade": 50
         }
       ],
-      "pacotes_titulo": "",
-      "titulo": ""
+      "pacotes_titulo": "Pacotes Especiais",
+      "titulo": "Doces Personalizados"
     },
     "vitrine_presentes": {
       "ativo": true,
-      "subtitulo": "",
-      "titulo": ""
+      "subtitulo": "Nossas opções exclusivas já vêm montadas com carinho.",
+      "titulo": "Vitrine de Presentes"
     }
   },
   "paginas_customizadas": [],
@@ -165,6 +165,6 @@
     "tamanhoSubtitulo": "11",
     "tamanhoTitulo": "26"
   },
-  "updatedAt": "2026-10-07",
+  "updatedAt": "2026-10-12",
   "variante": "classica"
 }
