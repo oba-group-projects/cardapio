@@ -1,19 +1,18 @@
 # HANDOFF
 
-Atualizado: 2026-10-12 (sessão 17)
+Atualizado: 2026-10-12 (sessão 18)
 
 Branch: feature/gestao-online-segura
-HEAD: cf67f05
+HEAD: afa9536
 
 ## Última entrega
-Verificação objetiva de UX (catálogo e cardápio) — 5 achados documentados. Correção do Achado 2: função `catVoltarDe(pagina)` no catálogo público — botões Voltar agora respeitam o estado de Pg2, evitando página inconsistente no cenário de bypass de grupo único.
+Achados UX 2 e 5 implementados e em produção. Verificação do fluxo de publicação (DRAFT→PREVIEW→PUBLISHED) — usuário confirmou que funcionou após orientação sobre a necessidade de criar Preview antes de Publicar.
 
 ## Commits desta sessão
 | Commit   | O que fez |
 |----------|-----------|
-| cf67f05  | fix(catalogo): catVoltarDe — botoes Voltar respeitam estado de Pg2, evitam pagina inconsistente no bypass de grupo unico |
-| b5d1081  | docs: handoff sessao 16 — clausulas juridicas v2, migration 0022, docs atualizados |
-| bb86bf4  | feat(contratos): clausulas juridicas v2 — arrependimento CDC, 70% <15d, alteracoes de pedido, recebimento por qualquer meio; migration 0022 |
+| afa9536  | feat(catalogo): float-bar Pg4 configurável — visibilidade e texto dos botões WPP e Montar Pedido via Ed. Visual |
+| cf67f05  | fix(catalogo): catVoltarDe — botões Voltar respeitam estado de Pg2, bypass de grupo único |
 
 ## Estado atual — TUDO APROVADO E EM PRODUÇÃO
 
@@ -71,27 +70,20 @@ Ver HANDOFF sessão 11 para detalhes.
 
 ## Pendente — próximas sessões
 
-### Catálogo — ação imediata sem código
-- **Subtítulo Pg2**: alterar "Escolha o tipo de doce" → "Encontre o seu favorito" via Central (Editor Visual → Catálogo → Pg2 → Subtítulo → Salvar → Publicar)
-
-### Editor Visual do Catálogo — P1+P2 (próximo item de código)
-- P1: editar textos existentes, mostrar/ocultar, reordenar botões e seções
-- P2: criar/duplicar/excluir botões com destinos válidos
+### Achados UX restantes (sem código)
+- **Achado 1** ✅ feito pelo usuário — subtítulo Pg2 "Encontre o seu favorito" publicado
+- **Achado 4** — Cardápio Pg3 subtítulo "Escolha sua Experiência" em 11px: avaliar legibilidade via Ed. Visual Cardápio (sem código)
 
 ### Catálogo — melhorias menores
-- "Encontre o seu favorito" (Pg sabores) — texto/estilo da seção de sabores
+- "Encontre o seu favorito" na Pg4 (seção de sabores) — subtítulo já editável via editor Pg3/4
 - Hardening: substituir querySelector frágil por getElementById em alguns pontos
 
 ### Contratos — fase 2 (itens restantes)
-- ~~Revisão jurídica das cláusulas~~ ✅ sessão 16
-- ~~Condições financeiras~~ ✅ sessão 15
-- ~~Status no snapshot pós-aceite~~ ✅ sessão 15
-- ~~Cláusula de alterações de pedido~~ ✅ sessão 16
 - Aditivos, templates de cláusulas, integração Autentique
 
 ## Pontos de retorno seguros
-- HEAD atual = cf67f05 (estável, deploy validado — sessão 17)
-- Anterior = b5d1081
+- HEAD atual = afa9536 (estável, deploy validado — sessão 18)
+- Anterior = cf67f05
 
 ## Links
 - Central: https://oba-cardapio-gestao.obadoceria.workers.dev/
