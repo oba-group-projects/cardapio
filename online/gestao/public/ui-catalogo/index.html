@@ -412,7 +412,7 @@
        onerror="this.style.display='none'">
   <p class="pg3-subtitulo" id="cat-pg3-subtitulo">Escolha o tipo de doce</p>
   <div id="cat-grupos" style="width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center;padding:0 20px"></div>
-  <button class="oba-btn-voltar-dest" onclick="catNavegar(1)">← Voltar</button>
+  <button class="oba-btn-voltar-dest" onclick="catVoltarDe(3)">← Voltar</button>
 </div>
 
 <!-- ══════════════════════════════════════════════════
@@ -431,7 +431,7 @@
 
 <!-- Botões flutuantes — fora do #pg-4 para position:fixed funcionar corretamente -->
 <div class="oba-float-bar" id="cat-float-bar">
-  <button class="oba-float-btn-voltar" onclick="catNavegar(3)">← Voltar</button>
+  <button class="oba-float-btn-voltar" onclick="catVoltarDe(4)">← Voltar</button>
   <button class="oba-float-btn-wpp" id="cat-btn-wpp">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.117.549 4.107 1.512 5.84L0 24l6.335-1.481A11.942 11.942 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.003-1.37l-.36-.214-3.72.869.935-3.614-.235-.372A9.818 9.818 0 012.182 12C2.182 6.58 6.58 2.182 12 2.182c5.42 0 9.818 4.398 9.818 9.818 0 5.42-4.398 9.818-9.818 9.818z"/></svg>
     Pedir via WhatsApp
@@ -503,6 +503,37 @@ function catNavegar(num) {
   /* Barra flutuante só aparece na Pg4 */
   const floatBar = document.getElementById('cat-float-bar');
   if (floatBar) floatBar.classList.toggle('visivel', num === 4);
+}
+
+/* ── VOLTAR — destino correto independente do estado de Pg2 ──
+   Pg4 → volta para Pg3 (ou Pg1 se Pg2 desativada e 1 grupo ativo)
+   Pg3 → volta para Pg1 sempre (Pg2 é o ponto de entrada, não de volta)
+*/
+function catVoltarDe(pagina) {
+  if (pagina === 4) {
+    /* Se Pg2 está inativa e há exatamente 1 grupo ativo, Pg3 foi bypassada —
+       voltar direto para Pg1 em vez de exibir a seleção de grupos "desativada" */
+    if (_catDados) {
+      const pg2Ativo = _catDados.temaCatalogo?.pg2?.ativo !== false;
+      if (!pg2Ativo) {
+        const pg2 = _catDados.temaCatalogo?.pg2 || {};
+        const gruposCfg = _catDados.temaCatalogo?.grupos || {};
+        const cats = _catDados.categorias || [];
+        const gruposOrdem = pg2.grupos_ordem && pg2.grupos_ordem.length > 0
+          ? pg2.grupos_ordem
+          : [{ id: 'artesanais', visivel: true }, { id: 'finos', visivel: true }];
+        const ativos = gruposOrdem
+          .filter(g => g.visivel !== false)
+          .filter(g => gruposCfg[g.id]?.ativo !== false)
+          .filter(g => cats.some(c => c.grupoCatalogo === g.id && c.ativo !== false));
+        if (ativos.length === 1) { catNavegar(1); return; }
+      }
+    }
+    catNavegar(3);
+  } else {
+    /* Pg3 → sempre Pg1 */
+    catNavegar(1);
+  }
 }
 
 /* ── URL DE IMAGEM ── */
