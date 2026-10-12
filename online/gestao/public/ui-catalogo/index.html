@@ -851,12 +851,33 @@ function catFecharLightbox() {
   document.body.style.overflow = '';
 }
 
-/* ── WHATSAPP ── */
+/* ── WHATSAPP + FLOAT-BAR ── */
 function catConfigurarWpp(dados) {
-  const wpp = dados.loja?.store?.whatsapp || dados.loja?.whatsapp || '';
-  const btn = document.getElementById('cat-btn-wpp');
-  if (btn && wpp) {
-    btn.onclick = () => window.open('https://wa.me/' + wpp.replace(/\D/g, ''), '_blank', 'noopener,noreferrer');
+  const wpp  = dados.loja?.store?.whatsapp || dados.loja?.whatsapp || '';
+  const pg4  = dados.temaCatalogo?.pg4 || {};
+
+  /* Botão WhatsApp */
+  const btnWpp = document.getElementById('cat-btn-wpp');
+  if (btnWpp) {
+    /* Visibilidade — padrão: visível */
+    const wppAtivo = pg4.wpp_ativo !== false;
+    btnWpp.style.display = wppAtivo ? '' : 'none';
+    /* Texto personalizado */
+    if (pg4.wpp_texto && pg4.wpp_texto.trim()) {
+      const span = btnWpp.querySelector('span') || btnWpp;
+      /* substitui apenas o nó de texto, preservando o SVG */
+      const textNode = Array.from(btnWpp.childNodes).find(n => n.nodeType === Node.TEXT_NODE && n.textContent.trim());
+      if (textNode) textNode.textContent = ' ' + pg4.wpp_texto.trim();
+    }
+    /* Ação */
+    if (wpp) btnWpp.onclick = () => window.open('https://wa.me/' + wpp.replace(/\D/g, ''), '_blank', 'noopener,noreferrer');
+  }
+
+  /* Botão Montar pedido */
+  const btnCardapio = document.getElementById('cat-btn-cardapio');
+  if (btnCardapio) {
+    const cardapioAtivo = pg4.cardapio_ativo !== false;
+    btnCardapio.style.display = cardapioAtivo ? '' : 'none';
   }
 }
 

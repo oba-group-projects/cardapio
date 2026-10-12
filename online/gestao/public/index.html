@@ -1175,6 +1175,34 @@ function obaLogout() {
     </form>
   </details>
 
+  <!-- Pg4 — Barra inferior (float-bar) -->
+  <details class="oba-pg-details">
+    <summary class="oba-pg-summary">Catálogo — Barra inferior (Página 4)</summary>
+    <form id="formCatalogoPg4" class="oba-pg-form grid">
+
+      <div style="grid-column:1/-1">
+        <p class="hint" style="margin-bottom:10px">Controla os botões fixos na parte inferior da tela de sabores. Os botões ocultados somem apenas do catálogo — o comportamento interno não é alterado.</p>
+      </div>
+
+      <div style="grid-column:1/-1"><p class="oba-secao-titulo">📱 Botão WhatsApp</p></div>
+      <div class="field full" style="display:flex;gap:20px;flex-wrap:wrap;align-items:center">
+        <label class="oba-toggle-label"><input type="checkbox" id="cat-ed-pg4-wpp-ativo" checked> Exibir botão WhatsApp</label>
+      </div>
+      <div class="field full">
+        <label>Texto do botão <span class="hint">(vazio = "Pedir via WhatsApp")</span></label>
+        <input id="cat-ed-pg4-wpp-texto" placeholder="Pedir via WhatsApp">
+      </div>
+
+      <div style="grid-column:1/-1"><p class="oba-secao-titulo">🛒 Botão Montar pedido</p></div>
+      <div class="field full" style="display:flex;gap:20px;flex-wrap:wrap;align-items:center">
+        <label class="oba-toggle-label"><input type="checkbox" id="cat-ed-pg4-cardapio-ativo" checked> Exibir botão "Montar pedido"</label>
+        <span class="hint" style="color:#a06000">Ocultar quando o cardápio de compras não estiver operacional.</span>
+      </div>
+
+      <div class="field full actions"><button class="primary" type="submit">Salvar Barra inferior</button></div>
+    </form>
+  </details>
+
   </div><!-- /cat-vpanel-paginas -->
 
   <!-- ===== SUB-PAINEL: TEMA GLOBAL ===== -->
@@ -2836,6 +2864,11 @@ $('formConfig').onsubmit=async e=>{
     stSel('cat-ed-pg2-pesoSubtitulo', pg2.pesoSubtitulo);
     /* Pg3/4 — renderização dinâmica por grupo */
     if (typeof catEdRenderizarGruposPg34 === 'function') catEdRenderizarGruposPg34(tc.grupos || {});
+    /* Pg4 — barra inferior */
+    const pg4 = tc.pg4 || {};
+    const pg4WppAtivoEl = $('cat-ed-pg4-wpp-ativo'); if (pg4WppAtivoEl) pg4WppAtivoEl.checked = pg4.wpp_ativo !== false;
+    sv('cat-ed-pg4-wpp-texto', pg4.wpp_texto || '');
+    const pg4CardapioAtivoEl = $('cat-ed-pg4-cardapio-ativo'); if (pg4CardapioAtivoEl) pg4CardapioAtivoEl.checked = pg4.cardapio_ativo !== false;
     /* Tema Global */
     sc('cat-ed-tema-corPrimaria', tm.corPrimaria || ''); sc('cat-ed-tema-corFundo',  tm.corFundo  || '');
     sc('cat-ed-tema-corTexto',    tm.corTexto    || ''); sc('cat-ed-tema-corMuted', tm.corMuted || '');
@@ -2872,6 +2905,11 @@ $('formConfig').onsubmit=async e=>{
         tamSubtitulo: $('cat-ed-pg2-tamSubtitulo')?.value || '', pesoSubtitulo: $('cat-ed-pg2-pesoSubtitulo')?.value || '',
       },
       grupos: typeof catEdLerGruposPg34 === 'function' ? catEdLerGruposPg34() : {},
+      pg4: {
+        wpp_ativo:      $('cat-ed-pg4-wpp-ativo')?.checked !== false,
+        wpp_texto:      $('cat-ed-pg4-wpp-texto')?.value.trim() || '',
+        cardapio_ativo: $('cat-ed-pg4-cardapio-ativo')?.checked !== false,
+      },
       tema: {
         corPrimaria: hx('cat-ed-tema-corPrimaria'), corFundo:  hx('cat-ed-tema-corFundo'),
         corTexto:    hx('cat-ed-tema-corTexto'),    corMuted:  hx('cat-ed-tema-corMuted'),
@@ -2941,6 +2979,8 @@ $('formConfig').onsubmit=async e=>{
   if (frmCat2) frmCat2.onsubmit = async e => { e.preventDefault(); await _salvarCatalogo('Catálogo Pg2'); };
   const frmCat34 = $('formCatalogoPg34');
   if (frmCat34) frmCat34.onsubmit = async e => { e.preventDefault(); await _salvarCatalogo('Catálogo Pg3/4'); };
+  const frmCat4 = $('formCatalogoPg4');
+  if (frmCat4) frmCat4.onsubmit = async e => { e.preventDefault(); await _salvarCatalogo('Catálogo Barra inferior'); };
 
   /* ================================================================
      EDITOR DINÂMICO DE GRUPOS DO CATÁLOGO (Pg2)
