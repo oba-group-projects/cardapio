@@ -62,11 +62,11 @@
   /* Topo: logo + rótulo de seção */
   .pg1-topo {
     display: flex; flex-direction: column; align-items: flex-start;
-    padding: 52px 28px 0;
+    padding: 32px 28px 0; /* reduzido de 52px para ganhar espaço no mobile */
   }
   .pg1-logo {
     width: 100px; height: auto; object-fit: contain;
-    margin-bottom: 36px;
+    margin-bottom: 24px; /* reduzido de 36px */
   }
   /* Fallback textual quando logo não carrega */
   .pg1-logo-texto {
@@ -101,18 +101,18 @@
   .pg1-corpo {
     padding: 0 28px;
     display: flex; flex-direction: column; gap: 16px;
-    margin-bottom: 40px;
+    margin-bottom: 20px; /* reduzido de 40px */
   }
   .pg1-paragrafo {
     font-size: 14px; font-weight: 300; line-height: 1.85;
     color: var(--muted);
   }
+  /* Segundo parágrafo: oculto no mobile por padrão, visível no desktop */
+  .pg1-p2-mobile-oculto { display: none; }
 
-  /* CTA fixo na parte inferior */
+  /* CTA */
   .pg1-cta-wrap {
-    padding: 24px 28px 44px;
-    /* margin-top: auto removido — com imagem o CTA já está no lugar certo;
-       sem imagem, o padding-top do conteúdo distribui o espaço */
+    padding: 12px 28px 36px; /* reduzido: top 24→12, bottom 44→36 */
   }
   .pg1-cta {
     display: block; width: 100%;
@@ -140,7 +140,9 @@
     overflow: hidden;
     background: var(--brand-light);
     width: 100%;
-    aspect-ratio: 4/3;    /* responsivo — escala com a largura da tela */
+    /* Cap duplo: no máximo 35% da altura da tela OU 190px, o menor valor.
+       Garante proporção em telas grandes e limite em telas pequenas. */
+    height: min(35vh, 190px);
     flex-shrink: 0;
     position: relative;
     order: 2;
@@ -168,11 +170,19 @@
 
   /* Desktop ≥ 768px — layout em grid */
   @media (min-width: 768px) {
+    /* Restaurar espaçamentos originais no desktop */
+    .pg1-topo { padding-top: 52px; }
+    .pg1-logo { margin-bottom: 36px; }
+    .pg1-corpo { margin-bottom: 40px; }
+    .pg1-cta-wrap { padding: 24px 28px 44px; }
+    /* Segundo parágrafo: visível no desktop */
+    .pg1-p2-mobile-oculto { display: block; }
+
     /* #pg-1 continua position:fixed (herdado de .oba-page), mas passa a fazer scroll */
     #pg-1 {
       display: grid !important;
       grid-template-rows: 1fr;
-      overflow-y: auto;        /* scroll no container fixed */
+      overflow-y: auto;
       overflow-x: hidden;
       height: 100dvh !important;
       max-height: 100dvh;
@@ -182,7 +192,7 @@
     /* Composição alternativa: lateral-50 (50/50) */
     #pg-1.comp-lateral-50 { grid-template-columns: 1fr 1fr; }
 
-    /* Coluna esquerda: conteúdo de texto — altura mínima da viewport */
+    /* Coluna esquerda: conteúdo de texto */
     .pg1-conteudo {
       grid-column: 1;
       display: flex;
@@ -190,14 +200,14 @@
       min-height: 100dvh;
     }
 
-    /* Coluna direita: imagem sticky dentro do scroll do #pg-1 */
+    /* Coluna direita: imagem sticky */
     .pg1-destaque-img-wrap {
       grid-column: 2;
       position: sticky;
       top: 0;
       height: 100dvh;
       width: 100%;
-      align-self: start;       /* necessário para sticky em grid */
+      align-self: start;
       order: unset;
       display: none;
     }
@@ -483,7 +493,7 @@
     <p class="pg1-paragrafo" id="cat-pg1-p1">
       Uma coleção de sabores artesanais, criados para despertar os sentidos e transformar pequenos momentos em lembranças especiais. Brigadeiros cremosos, combinações delicadas e receitas cuidadosamente preparadas para quem aprecia doces feitos de verdade.
     </p>
-    <p class="pg1-paragrafo" id="cat-pg1-p2">
+    <p class="pg1-paragrafo pg1-p2-mobile-oculto" id="cat-pg1-p2">
       Explore nossos sabores, descubra seus favoritos e deixe-se levar pela experiência Oba. Cada doce tem seu jeito de encantar — e talvez o próximo seja exatamente o que você estava procurando.
     </p>
   </div>
@@ -744,6 +754,13 @@ function catMontarPg1(dados) {
   _catSet('cat-pg1-p1',     pg1.paragrafo1);
   _catSet('cat-pg1-p2',     pg1.paragrafo2);
   _catSet('cat-pg1-cta',    pg1.cta);
+
+  /* Segundo parágrafo: oculto no mobile por padrão (p2_mobile_oculto !== false) */
+  const elP2 = document.getElementById('cat-pg1-p2');
+  if (elP2) {
+    const ocultarMobile = pg1.p2_mobile_oculto !== false; /* padrão: ocultar */
+    elP2.classList.toggle('pg1-p2-mobile-oculto', ocultarMobile);
+  }
 
   /* Destaque fotográfico — aplicado nas duas cópias (mobile + desktop) */
   const imgSrc      = pg1.imagem_destaque ? catImageUrl(pg1.imagem_destaque) : '';

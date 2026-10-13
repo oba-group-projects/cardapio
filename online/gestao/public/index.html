@@ -971,6 +971,10 @@ function obaLogout() {
         <label>Segundo parágrafo</label>
         <textarea id="cat-ed-p2" rows="3" placeholder="Explore nossos sabores..."></textarea>
       </div>
+      <div class="field full" style="display:flex;gap:20px;flex-wrap:wrap;align-items:center">
+        <label class="oba-toggle-label"><input type="checkbox" id="cat-ed-p2-mobile-oculto" checked> Ocultar segundo parágrafo no celular</label>
+        <span class="hint">No computador aparece sempre. No celular, ocultar libera espaço para a imagem e o botão ficarem visíveis.</span>
+      </div>
       <div class="field full">
         <label>Texto do botão CTA</label>
         <input id="cat-ed-cta" placeholder="Conhecer nossos sabores →">
@@ -2870,6 +2874,7 @@ $('formConfig').onsubmit=async e=>{
     sv('cat-ed-titulo',    pg1.titulo    || 'Descubra\na Oba');
     sv('cat-ed-p1',        pg1.paragrafo1|| 'Uma coleção de sabores artesanais, criados para despertar os sentidos e transformar pequenos momentos em lembranças especiais. Brigadeiros cremosos, combinações delicadas e receitas cuidadosamente preparadas para quem aprecia doces feitos de verdade.');
     sv('cat-ed-p2',        pg1.paragrafo2|| 'Explore nossos sabores, descubra seus favoritos e deixe-se levar pela experiência Oba.');
+    const p2MobEl = $('cat-ed-p2-mobile-oculto'); if (p2MobEl) p2MobEl.checked = pg1.p2_mobile_oculto !== false;
     sv('cat-ed-cta',       pg1.cta       || 'Conhecer nossos sabores →');
     /* Pg1 — logo */
     sv('cat-ed-pg1-logo', pg1.logo || '');
@@ -2940,6 +2945,7 @@ $('formConfig').onsubmit=async e=>{
       pg1: {
         rotulo: $('cat-ed-rotulo')?.value.trim() || '', titulo: $('cat-ed-titulo')?.value.trim() || '',
         paragrafo1: $('cat-ed-p1')?.value.trim() || '', paragrafo2: $('cat-ed-p2')?.value.trim() || '',
+        p2_mobile_oculto: $('cat-ed-p2-mobile-oculto')?.checked !== false,
         cta: $('cat-ed-cta')?.value.trim() || '',
         logo: $('cat-ed-pg1-logo')?.value.trim() || '', tamanhoLogo: $('cat-ed-pg1-tamanhoLogo')?.value || 'medio',
         corFundo: hx('cat-ed-pg1-corFundo'), corTitulo: hx('cat-ed-pg1-corTitulo'),
