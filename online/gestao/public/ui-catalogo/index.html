@@ -165,11 +165,13 @@
 
   /* Desktop ≥ 768px — layout em grid */
   @media (min-width: 768px) {
+    /* #pg-1 continua position:fixed (herdado de .oba-page), mas passa a fazer scroll */
     #pg-1 {
       display: grid !important;
       grid-template-rows: 1fr;
-      overflow: hidden;
-      height: 100dvh;
+      overflow-y: auto;        /* scroll no container fixed */
+      overflow-x: hidden;
+      height: 100dvh !important;
       max-height: 100dvh;
     }
     /* Composição padrão: lateral-60 (texto 40%, imagem 60%) */
@@ -177,20 +179,22 @@
     /* Composição alternativa: lateral-50 (50/50) */
     #pg-1.comp-lateral-50 { grid-template-columns: 1fr 1fr; }
 
-    /* Coluna esquerda: conteúdo de texto */
+    /* Coluna esquerda: conteúdo de texto — altura mínima da viewport */
     .pg1-conteudo {
       grid-column: 1;
       display: flex;
       flex-direction: column;
-      overflow-y: auto;
-      height: 100%;
+      min-height: 100dvh;
     }
 
-    /* Coluna direita: imagem */
+    /* Coluna direita: imagem sticky dentro do scroll do #pg-1 */
     .pg1-destaque-img-wrap {
       grid-column: 2;
-      height: 100% !important;
+      position: sticky;
+      top: 0;
+      height: 100dvh;
       width: 100%;
+      align-self: start;       /* necessário para sticky em grid */
       order: unset;
       display: none;
     }
