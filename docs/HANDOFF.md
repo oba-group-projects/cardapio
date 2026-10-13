@@ -1,20 +1,49 @@
 # HANDOFF
 
-Atualizado: 2026-10-12 (sessão 18)
+Atualizado: 2026-10-12 (sessão 19)
 
 Branch: feature/gestao-online-segura
-HEAD: afa9536
+HEAD: b1e89d0
 
 ## Última entrega
-Achados UX 2 e 5 implementados e em produção. Verificação do fluxo de publicação (DRAFT→PREVIEW→PUBLISHED) — usuário confirmou que funcionou após orientação sobre a necessidade de criar Preview antes de Publicar.
+Destaque fotográfico Pg1 do catálogo — implementação completa em múltiplas iterações. Layout lateral 40/60 no desktop (≥768px) com imagem sticky, empilhado no mobile com aspect-ratio responsivo. Configurável via Central: toggle ativo/inativo, galeria, foco X/Y, composição, comportamento mobile.
 
-## Commits desta sessão
+## Commits desta sessão (destaque visual)
 | Commit   | O que fez |
 |----------|-----------|
-| afa9536  | feat(catalogo): float-bar Pg4 configurável — visibilidade e texto dos botões WPP e Montar Pedido via Ed. Visual |
-| cf67f05  | fix(catalogo): catVoltarDe — botões Voltar respeitam estado de Pg2, bypass de grupo único |
+| b1e89d0  | fix: imagem mobile responsiva — aspect-ratio 4/3 em vez de height fixa |
+| d5f3081  | fix: mobile — order:2 na imagem, remover margin-top:auto que escondia CTA |
+| 2c1df44  | fix: ocultar cópia mobile da imagem no desktop — dupla exibição |
+| 32743db  | fix: sticky dentro de fixed com scroll no pg-1, align-self:start |
+| ff90e65  | feat: destaque visual v2 — proporção 40/60, breakpoint 768px, degradê, toggle, composição e mobile |
+| 06673f0  | fix: remover declaração duplicada de elPg1 — SyntaxError |
+| 2c2f4e8  | feat: destaque fotográfico Pg1 — imagem lateral configurável, mobile-first, retrocompat |
 
 ## Estado atual — TUDO APROVADO E EM PRODUÇÃO
+
+### Destaque fotográfico Pg1 do Catálogo — COMPLETO (sessão 19)
+
+**Mobile (<768px):**
+- Imagem empilhada entre texto e CTA (`order: 2`)
+- `aspect-ratio: 4/3` — responsivo para qualquer celular sem breakpoints por modelo
+- Opção "Ocultar no celular" disponível na Central
+
+**Desktop (≥768px):**
+- Grid lateral: texto 40% / imagem 60% (padrão) ou 50/50
+- Imagem `position: sticky` — gruda na tela enquanto texto rola
+- Degradê de transição na borda esquerda da imagem
+- `#pg-1` com `overflow-y: auto` para scroll quando conteúdo ultrapassa viewport
+
+**Central — controles disponíveis:**
+- Toggle ativar/desativar (preserva configuração ao desativar)
+- Galeria de imagens
+- Foco horizontal e vertical (sliders 0–100)
+- Composição no computador: lateral-60 (recomendada) ou lateral-50
+- Comportamento no celular: adaptar ou ocultar
+
+**Schema (pg1):** `imagem_destaque`, `imagem_pos_x`, `imagem_pos_y`, `destaque_ativo`, `destaque_composicao`, `destaque_mobile`
+
+**Retrocompatível:** sem `destaque_ativo` salvo → imagem não aparece (padrão seguro)
 
 ### Editor Visual do Catálogo — COMPLETO (sessões 12–14)
 
@@ -70,20 +99,26 @@ Ver HANDOFF sessão 11 para detalhes.
 
 ## Pendente — próximas sessões
 
+### Destaque visual — Passo 2 (se necessário após validação)
+- `imagem_pos_x_mobile` e `imagem_pos_y_mobile` — foco independente para mobile
+- Só implementar se o foco único não servir para ambos os layouts
+
+### Destaque visual — Cardápio (Etapa 2, decisão separada)
+- `#pag-1` do cardápio tem `height: 100dvh; overflow: hidden` — requer abordagem diferente
+- Não iniciar sem decisão explícita
+
 ### Achados UX restantes (sem código)
-- **Achado 1** ✅ feito pelo usuário — subtítulo Pg2 "Encontre o seu favorito" publicado
-- **Achado 4** — Cardápio Pg3 subtítulo "Escolha sua Experiência" em 11px: avaliar legibilidade via Ed. Visual Cardápio (sem código)
+- Achado 4 — Cardápio Pg3 subtítulo "Escolha sua Experiência" em 11px: avaliar via Ed. Visual Cardápio
 
 ### Catálogo — melhorias menores
-- "Encontre o seu favorito" na Pg4 (seção de sabores) — subtítulo já editável via editor Pg3/4
 - Hardening: substituir querySelector frágil por getElementById em alguns pontos
 
 ### Contratos — fase 2 (itens restantes)
 - Aditivos, templates de cláusulas, integração Autentique
 
 ## Pontos de retorno seguros
-- HEAD atual = afa9536 (estável, deploy validado — sessão 18)
-- Anterior = cf67f05
+- HEAD atual = b1e89d0 (estável, deploy validado — sessão 19)
+- Anterior = d5f3081
 
 ## Links
 - Central: https://oba-cardapio-gestao.obadoceria.workers.dev/
