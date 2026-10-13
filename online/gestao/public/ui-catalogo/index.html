@@ -134,8 +134,8 @@
      Mobile: adaptar (mesma img) ou ocultar.
   */
 
-  /* Mobile: bloco empilhado */
-  .pg1-destaque-img-wrap {
+  /* Cópia desktop da imagem — oculta no mobile */
+  .pg1-destaque-desktop { display: none; }
     display: none;
     overflow: hidden;
     background: var(--brand-light);
@@ -201,7 +201,8 @@
     }
 
     /* Coluna direita: imagem sticky */
-    .pg1-destaque-img-wrap {
+    .pg1-destaque-img-wrap,
+    .pg1-destaque-desktop {
       grid-column: 2;
       position: sticky;
       top: 0;
