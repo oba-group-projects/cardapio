@@ -110,8 +110,9 @@
 
   /* CTA fixo na parte inferior */
   .pg1-cta-wrap {
-    padding: 0 28px 44px;
-    margin-top: auto;
+    padding: 24px 28px 44px;
+    /* margin-top: auto removido — com imagem o CTA já está no lugar certo;
+       sem imagem, o padding-top do conteúdo distribui o espaço */
   }
   .pg1-cta {
     display: block; width: 100%;
@@ -141,6 +142,8 @@
     width: 100%; height: 240px;
     flex-shrink: 0;
     position: relative;
+    /* Mobile: aparece entre corpo e CTA via order */
+    order: 2;
   }
   .pg1-destaque-img-wrap.com-imagem { display: block; }
   /* Oculto no mobile quando destaque_mobile='ocultar' */
