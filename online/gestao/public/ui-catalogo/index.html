@@ -62,11 +62,11 @@
   /* Topo: logo + rótulo de seção */
   .pg1-topo {
     display: flex; flex-direction: column; align-items: flex-start;
-    padding: 32px 28px 0; /* reduzido de 52px para ganhar espaço no mobile */
+    padding: 24px 28px 0; /* mobile: 24px */
   }
   .pg1-logo {
-    width: 100px; height: auto; object-fit: contain;
-    margin-bottom: 24px; /* reduzido de 36px */
+    width: 80px; height: auto; object-fit: contain; /* mobile: 80px */
+    margin-bottom: 16px;
   }
   /* Fallback textual quando logo não carrega */
   .pg1-logo-texto {
@@ -78,7 +78,7 @@
   .pg1-logo-texto span { display: block; font-size: 11px; font-weight: 400; letter-spacing: .25em; text-transform: uppercase; color: var(--muted); margin-top: 3px; }
   .pg1-rotulo {
     display: flex; align-items: center; gap: 12px;
-    margin-bottom: 20px;
+    margin-bottom: 12px; /* mobile: 12px em vez de 20px */
   }
   .pg1-rotulo-texto {
     font-size: 13px; font-weight: 700; letter-spacing: .28em;
@@ -94,7 +94,7 @@
     font-size: 48px; font-weight: 600; line-height: 1.05;
     color: var(--text); letter-spacing: -.01em;
     padding: 0 28px;
-    margin-bottom: 28px;
+    margin-bottom: 16px; /* mobile: 16px em vez de 28px */
   }
 
   /* Corpo de texto */
@@ -172,7 +172,9 @@
   @media (min-width: 768px) {
     /* Restaurar espaçamentos originais no desktop */
     .pg1-topo { padding-top: 52px; }
-    .pg1-logo { margin-bottom: 36px; }
+    .pg1-logo { margin-bottom: 36px; width: 100px; }
+    .pg1-rotulo { margin-bottom: 20px; }
+    .pg1-titulo { margin-bottom: 28px; }
     .pg1-corpo { margin-bottom: 40px; }
     .pg1-cta-wrap { padding: 24px 28px 44px; }
     /* Segundo parágrafo: visível no desktop */
