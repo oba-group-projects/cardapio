@@ -49,9 +49,12 @@
   #pg-4 > * { width: 100%; max-width: 100%; min-width: 0; }
 
   /* ═══════════════════════════════════════════════════
-     PG 1 — ABERTURA UNIFICADA (ex Pg1 + Pg2)
-     Layout: coluna, alinhado à esquerda, scroll se necessário
+     PG 1 — ABERTURA
+     Mobile-first: flex column, scroll quando necessário.
+     Desktop ≥768px: grid lateral 40/60 com imagem sticky.
   ═══════════════════════════════════════════════════ */
+
+  /* Container da página */
   #pg-1 {
     justify-content: flex-start;
     overflow-y: auto;
@@ -59,26 +62,40 @@
     background: var(--bg);
   }
 
-  /* Topo: logo + rótulo de seção */
+  /* Coluna de conteúdo — flex column, distribui espaço verticalmente */
+  .pg1-conteudo {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* Topo: logo + rótulo */
   .pg1-topo {
     display: flex; flex-direction: column; align-items: flex-start;
-    padding: 24px 28px 0; /* mobile: 24px */
+    padding: clamp(20px, 4vh, 52px) 28px 0;
+    flex-shrink: 0;
   }
   .pg1-logo {
-    width: 80px; height: auto; object-fit: contain; /* mobile: 80px */
-    margin-bottom: 16px;
+    width: clamp(64px, 20vw, 100px);
+    height: auto; object-fit: contain;
+    margin-bottom: clamp(12px, 2vh, 36px);
   }
-  /* Fallback textual quando logo não carrega */
   .pg1-logo-texto {
     font-family: 'Cormorant Garamond', serif;
     font-size: 22px; font-weight: 600; color: var(--text);
     letter-spacing: .04em; line-height: 1;
     margin-bottom: 36px; display: none;
   }
-  .pg1-logo-texto span { display: block; font-size: 11px; font-weight: 400; letter-spacing: .25em; text-transform: uppercase; color: var(--muted); margin-top: 3px; }
+  .pg1-logo-texto span {
+    display: block; font-size: 11px; font-weight: 400;
+    letter-spacing: .25em; text-transform: uppercase;
+    color: var(--muted); margin-top: 3px;
+  }
   .pg1-rotulo {
     display: flex; align-items: center; gap: 12px;
-    margin-bottom: 12px; /* mobile: 12px em vez de 20px */
+    margin-bottom: clamp(10px, 1.5vh, 20px);
+    flex-shrink: 0;
   }
   .pg1-rotulo-texto {
     font-size: 13px; font-weight: 700; letter-spacing: .28em;
@@ -88,31 +105,73 @@
     width: 28px; height: 1px; background: var(--muted); opacity: .5;
   }
 
-  /* Título principal */
+  /* Título */
   .pg1-titulo {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 48px; font-weight: 600; line-height: 1.05;
+    font-size: clamp(36px, 10vw, 48px);
+    font-weight: 600; line-height: 1.05;
     color: var(--text); letter-spacing: -.01em;
     padding: 0 28px;
-    margin-bottom: 16px; /* mobile: 16px em vez de 28px */
+    margin-bottom: clamp(12px, 2vh, 28px);
+    flex-shrink: 0;
   }
 
   /* Corpo de texto */
   .pg1-corpo {
     padding: 0 28px;
-    display: flex; flex-direction: column; gap: 16px;
-    margin-bottom: 20px; /* reduzido de 40px */
+    display: flex; flex-direction: column; gap: 12px;
+    margin-bottom: clamp(12px, 2vh, 40px);
+    flex-shrink: 0;
   }
   .pg1-paragrafo {
     font-size: 14px; font-weight: 300; line-height: 1.85;
     color: var(--muted);
   }
-  /* Segundo parágrafo: oculto no mobile por padrão, visível no desktop */
+  /* Segundo parágrafo: oculto no mobile por padrão */
   .pg1-p2-mobile-oculto { display: none; }
+
+  /* Imagem de destaque — mobile */
+  .pg1-destaque-img-wrap {
+    display: none; /* oculto até ter imagem */
+    overflow: hidden;
+    background: var(--brand-light);
+    width: 100%;
+    /* Elástico: ocupa espaço disponível entre texto e CTA,
+       com limites para não dominar a tela nem ficar muito pequena */
+    flex: 1 1 auto;
+    min-height: 120px;
+    max-height: min(38vh, 220px);
+    position: relative;
+    order: 2;
+  }
+  .pg1-destaque-img-wrap.com-imagem { display: block; }
+  .pg1-destaque-img-wrap.mobile-ocultar { display: none !important; }
+
+  .pg1-destaque-img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: 50% 40%;
+    display: block;
+  }
+
+  /* Degradê — ativo só no desktop */
+  .pg1-destaque-img-wrap::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(to right, var(--bg) 0%, transparent 18%);
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  /* Cópia desktop — sempre oculta no mobile */
+  .pg1-destaque-desktop { display: none; }
 
   /* CTA */
   .pg1-cta-wrap {
-    padding: 12px 28px 36px; /* reduzido: top 24→12, bottom 44→36 */
+    padding: clamp(10px, 1.5vh, 24px) 28px clamp(24px, 4vh, 44px);
+    margin-top: auto; /* empurra o CTA para o fundo do espaço disponível */
+    flex-shrink: 0;
   }
   .pg1-cta {
     display: block; width: 100%;
@@ -127,83 +186,33 @@
   }
   .pg1-cta:active { background: var(--brand-dark); transform: scale(.98); }
 
-  /* ── DESTAQUE FOTOGRÁFICO Pg1 ──
-     Mobile (<768px): imagem abaixo do texto, altura fixa, oculta por padrão.
-     Desktop (≥768px): grid lateral — texto à esq, imagem à dir.
-     Composições: lateral-60 (40/60), lateral-50 (50/50).
-     Mobile: adaptar (mesma img) ou ocultar.
-  */
-
-  /* Cópia desktop da imagem — oculta no mobile */
-  .pg1-destaque-desktop { display: none; }
-    display: none;
-    overflow: hidden;
-    background: var(--brand-light);
-    width: 100%;
-    /* Cap duplo: no máximo 35% da altura da tela OU 190px, o menor valor.
-       Garante proporção em telas grandes e limite em telas pequenas. */
-    height: min(35vh, 190px);
-    flex-shrink: 0;
-    position: relative;
-    order: 2;
-  }
-  .pg1-destaque-img-wrap.com-imagem { display: block; }
-  /* Oculto no mobile quando destaque_mobile='ocultar' */
-  .pg1-destaque-img-wrap.mobile-ocultar { display: none !important; }
-
-  .pg1-destaque-img {
-    width: 100%; height: 100%;
-    object-fit: cover;
-    object-position: 50% 40%;
-    display: block;
-  }
-
-  /* Degradê na borda esquerda da imagem — suaviza transição texto/foto no desktop */
-  .pg1-destaque-img-wrap::before {
-    content: '';
-    position: absolute; inset: 0;
-    background: linear-gradient(to right, var(--bg) 0%, transparent 18%);
-    z-index: 1;
-    pointer-events: none;
-    opacity: 0; /* desativado no mobile */
-  }
-
-  /* Desktop ≥ 768px — layout em grid */
+  /* ── DESKTOP ≥768px — layout lateral ── */
   @media (min-width: 768px) {
-    /* Restaurar espaçamentos originais no desktop */
-    .pg1-topo { padding-top: 52px; }
-    .pg1-logo { margin-bottom: 36px; width: 100px; }
-    .pg1-rotulo { margin-bottom: 20px; }
-    .pg1-titulo { margin-bottom: 28px; }
-    .pg1-corpo { margin-bottom: 40px; }
-    .pg1-cta-wrap { padding: 24px 28px 44px; }
-    /* Segundo parágrafo: visível no desktop */
-    .pg1-p2-mobile-oculto { display: block; }
-
-    /* #pg-1 continua position:fixed (herdado de .oba-page), mas passa a fazer scroll */
     #pg-1 {
       display: grid !important;
+      grid-template-columns: 2fr 3fr; /* padrão: lateral-60 */
       grid-template-rows: 1fr;
       overflow-y: auto;
       overflow-x: hidden;
       height: 100dvh !important;
       max-height: 100dvh;
     }
-    /* Composição padrão: lateral-60 (texto 40%, imagem 60%) */
-    #pg-1 { grid-template-columns: 2fr 3fr; }
-    /* Composição alternativa: lateral-50 (50/50) */
     #pg-1.comp-lateral-50 { grid-template-columns: 1fr 1fr; }
 
-    /* Coluna esquerda: conteúdo de texto */
+    /* Coluna esquerda */
     .pg1-conteudo {
       grid-column: 1;
-      display: flex;
-      flex-direction: column;
       min-height: 100dvh;
+      overflow: visible;
     }
 
-    /* Coluna direita: imagem sticky */
-    .pg1-destaque-img-wrap,
+    /* Segundo parágrafo: visível no desktop */
+    .pg1-p2-mobile-oculto { display: block; }
+
+    /* Imagem mobile dentro da coluna: oculta no desktop */
+    .pg1-conteudo .pg1-destaque-img-wrap { display: none !important; }
+
+    /* Coluna direita: imagem desktop sticky */
     .pg1-destaque-desktop {
       grid-column: 2;
       position: sticky;
@@ -211,21 +220,28 @@
       height: 100dvh;
       width: 100%;
       align-self: start;
-      order: unset;
+      overflow: hidden;
+      background: var(--brand-light);
       display: none;
     }
-    .pg1-destaque-img-wrap.com-imagem { display: block; }
-    .pg1-destaque-desktop.com-imagem  { display: block; }
-    /* Oculta a cópia mobile dentro da coluna de texto no desktop */
-    .pg1-conteudo .pg1-destaque-img-wrap { display: none !important; }
-
-    /* Ativa o degradê de transição no desktop */
-    .pg1-destaque-img-wrap::before { opacity: 1; }
-
-    /* Sem imagem: conteúdo ocupa colunas completas, centralizado */
-    #pg-1:not(.tem-imagem) {
-      grid-template-columns: 1fr;
+    .pg1-destaque-desktop .pg1-destaque-img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
     }
+    .pg1-destaque-desktop.com-imagem { display: block; }
+
+    /* Degradê na transição texto/imagem */
+    .pg1-destaque-desktop::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(to right, var(--bg) 0%, transparent 18%);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Sem imagem: conteúdo centralizado em coluna única */
+    #pg-1:not(.tem-imagem) { grid-template-columns: 1fr; }
     #pg-1:not(.tem-imagem) .pg1-conteudo {
       max-width: 520px;
       margin: 0 auto;
