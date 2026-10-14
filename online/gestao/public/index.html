@@ -3118,6 +3118,14 @@ $('formConfig').onsubmit=async e=>{
           <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">${iconesHtml}</div>
           <input type="hidden" class="cat-grupo-icone" value="${g?.icone || '🍫'}">
         </div>
+        <div class="field full">
+          <label>Imagem de fundo do botão <span class="hint">(opcional — aparece com transparência no botão da Pg2)</span></label>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <input class="cat-grupo-imagem" value="${g?.imagem || ''}" placeholder="Images/Sabores_Doces/Cappuccino.jpeg" style="flex:1;min-width:200px">
+            <button type="button" class="secondary" style="padding:7px 10px;font-size:12px;white-space:nowrap"
+              onclick="const inp=this.closest('.oba-botao-card-body').querySelector('.cat-grupo-imagem');const uid='prev-grp-img-'+Date.now();inp.id=uid;obaAbrirGaleria(uid,'')">📁 Galeria</button>
+          </div>
+        </div>
         <div class="field full" style="display:flex;gap:20px;flex-wrap:wrap">
           <label class="oba-toggle-label">
             <input type="checkbox" class="cat-grupo-destaque" ${g?.destaque ? 'checked' : ''}> Botão em destaque (fundo marrom)
@@ -3167,6 +3175,7 @@ $('formConfig').onsubmit=async e=>{
       label:    card.querySelector('.cat-grupo-label')?.value.trim() || '',
       sublabel: card.querySelector('.cat-grupo-sublabel')?.value.trim() || '',
       icone:    card.querySelector('.cat-grupo-icone')?.value || '🍫',
+      imagem:   card.querySelector('.cat-grupo-imagem')?.value.trim() || '',
       destaque: card.querySelector('.cat-grupo-destaque')?.checked === true,
       visivel:  card.querySelector('.cat-grupo-visivel')?.checked !== false,
     };
@@ -3219,6 +3228,7 @@ $('formConfig').onsubmit=async e=>{
       label:    card.querySelector('.cat-grupo-label')?.value.trim() || '',
       sublabel: card.querySelector('.cat-grupo-sublabel')?.value.trim() || '',
       icone:    card.querySelector('.cat-grupo-icone')?.value || '🍫',
+      imagem:   card.querySelector('.cat-grupo-imagem')?.value.trim() || '',
       destaque: card.querySelector('.cat-grupo-destaque')?.checked === true,
       visivel:  card.querySelector('.cat-grupo-visivel')?.checked !== false,
     }));
