@@ -38,9 +38,8 @@
     "imagem_pos_x": 50,
     "imagem_pos_y": 50,
     "logo": "",
-    "p2_mobile_oculto": true,
+    "logo_visivel": false,
     "paragrafo1": "Sabores artesanais, brigadeiros intensamente cremosos e combinações delicadas, preparados com cuidado para transformar pequenos momentos em experiências especiais. Descubra o seu favorito e deixe-se encantar pela Oba.",
-    "paragrafo2": "",
     "pesoCTA": "",
     "pesoTexto": "",
     "pesoTitulo": "",
@@ -74,6 +73,7 @@
       }
     ],
     "logo": "",
+    "logo_visivel": false,
     "pesoSubtitulo": "",
     "subtitulo": "Encontre seu favorito",
     "tamSubtitulo": "",
