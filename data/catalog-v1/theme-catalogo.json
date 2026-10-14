@@ -59,6 +59,7 @@
         "destaque": true,
         "icone": "🍫",
         "id": "artesanais",
+        "imagem": "https://raw.githubusercontent.com/oba-group-projects/cardapio/main/Images/Imagens_Layout/Captura%20de%20tela%202026-06-23%20131226.png",
         "label": "Doces Artesanais",
         "sublabel": "Artesanais",
         "visivel": true
@@ -67,6 +68,7 @@
         "destaque": false,
         "icone": "✨",
         "id": "finos",
+        "imagem": "https://raw.githubusercontent.com/oba-group-projects/cardapio/main/Images/Imagens_Layout/Captura%20de%20tela%202026-06-23%20131202.png",
         "label": "Doces Finos",
         "sublabel": "Exclusivos",
         "visivel": true
