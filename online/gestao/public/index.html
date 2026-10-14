@@ -975,6 +975,10 @@ function obaLogout() {
       <div style="grid-column:1/-1"><p class="oba-secao-titulo">🖼️ Imagem</p></div>
       <div class="field full">
         <label>Logo <span class="hint">(caminho ou URL)</span></label>
+        <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
+          <label class="oba-toggle-label"><input type="checkbox" id="cat-ed-pg1-logo-visivel" checked> Exibir logo na Pg1</label>
+          <span class="hint">Desmarque para ocultar a logo até ter uma versão sem fundo branco.</span>
+        </div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <input id="cat-ed-pg1-logo" placeholder="Images/Logo_Oba/logo-vertical.png" style="flex:1;min-width:200px">
           <button type="button" class="secondary" style="padding:7px 10px;font-size:12px;white-space:nowrap" onclick="obaAbrirGaleria('cat-ed-pg1-logo','cat-ed-pg1-logo-preview')">📁 Galeria</button>
@@ -1148,6 +1152,10 @@ function obaLogout() {
 
       <div style="grid-column:1/-1"><p class="oba-secao-titulo">🖼️ Logo</p></div>
       <div class="field full">
+        <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
+          <label class="oba-toggle-label"><input type="checkbox" id="cat-ed-pg2-logo-visivel" checked> Exibir logo na Pg2</label>
+          <span class="hint">Desmarque para ocultar a logo até ter uma versão sem fundo branco.</span>
+        </div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <input id="cat-ed-pg2-logo" placeholder="Images/Logo_Oba/logo-horizontal.png" style="flex:1;min-width:200px">
           <button type="button" class="secondary" style="padding:7px 10px;font-size:12px;white-space:nowrap" onclick="obaAbrirGaleria('cat-ed-pg2-logo','cat-ed-pg2-logo-preview')">📁 Galeria</button>
@@ -2869,6 +2877,7 @@ $('formConfig').onsubmit=async e=>{
     /* Pg1 — logo */
     sv('cat-ed-pg1-logo', pg1.logo || '');
     const sel1 = $('cat-ed-pg1-tamanhoLogo'); if (sel1) sel1.value = pg1.tamanhoLogo || 'medio';
+    const pg1LogoVisivelEl = $('cat-ed-pg1-logo-visivel'); if (pg1LogoVisivelEl) pg1LogoVisivelEl.checked = pg1.logo_visivel !== false;
     /* Pg1 — destaque visual */
     sv('cat-ed-pg1-imagem-destaque', pg1.imagem_destaque || '');
     const pg1DestAtivoEl = $('cat-ed-pg1-destaque-ativo'); if (pg1DestAtivoEl) pg1DestAtivoEl.checked = pg1.destaque_ativo === true;
@@ -2903,6 +2912,7 @@ $('formConfig').onsubmit=async e=>{
     /* Pg2 — logo */
     sv('cat-ed-pg2-logo', pg2.logo || '');
     const sel2 = $('cat-ed-pg2-tamanhoLogo'); if (sel2) sel2.value = pg2.tamanhoLogo || 'medio';
+    const pg2LogoVisivelEl = $('cat-ed-pg2-logo-visivel'); if (pg2LogoVisivelEl) pg2LogoVisivelEl.checked = pg2.logo_visivel !== false;
     /* Pg2 — cores */
     sc('cat-ed-pg2-corFundo',     pg2.corFundo     || '');
     sc('cat-ed-pg2-corSubtitulo', pg2.corSubtitulo || '');
@@ -2937,6 +2947,7 @@ $('formConfig').onsubmit=async e=>{
         paragrafo1: $('cat-ed-p1')?.value.trim() || '',
         cta: $('cat-ed-cta')?.value.trim() || '',
         logo: $('cat-ed-pg1-logo')?.value.trim() || '', tamanhoLogo: $('cat-ed-pg1-tamanhoLogo')?.value || 'medio',
+        logo_visivel: $('cat-ed-pg1-logo-visivel')?.checked !== false,
         corFundo: hx('cat-ed-pg1-corFundo'), corTitulo: hx('cat-ed-pg1-corTitulo'),
         corTexto: hx('cat-ed-pg1-corTexto'), corCTA: hx('cat-ed-pg1-corCTA'),
         tamTitulo: $('cat-ed-pg1-tamTitulo')?.value || '', pesoTitulo: $('cat-ed-pg1-pesoTitulo')?.value || '',
@@ -2954,6 +2965,7 @@ $('formConfig').onsubmit=async e=>{
         ativo: $('cat-ed-pg2-ativo')?.checked !== false,
         grupos_ordem: typeof catEdLerGrupos === 'function' ? catEdLerGrupos() : [],
         logo: $('cat-ed-pg2-logo')?.value.trim() || '', tamanhoLogo: $('cat-ed-pg2-tamanhoLogo')?.value || 'medio',
+        logo_visivel: $('cat-ed-pg2-logo-visivel')?.checked !== false,
         corFundo:     hx('cat-ed-pg2-corFundo'), corSubtitulo: hx('cat-ed-pg2-corSubtitulo'),
         tamSubtitulo: $('cat-ed-pg2-tamSubtitulo')?.value || '', pesoSubtitulo: $('cat-ed-pg2-pesoSubtitulo')?.value || '',
       },

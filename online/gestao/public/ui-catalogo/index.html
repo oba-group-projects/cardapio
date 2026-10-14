@@ -114,6 +114,8 @@
     padding: 0 28px;
     margin-bottom: clamp(12px, 2vh, 28px);
     flex-shrink: 0;
+    /* Permite quebra natural — sem forçar \n no conteúdo */
+    word-break: keep-all;
   }
 
   /* Corpo de texto */
@@ -730,6 +732,8 @@ function catMontarPg1(dados) {
   const logoTamMap = { pequeno: '72px', medio: '100px', grande: '140px' };
   const elLogo1 = document.getElementById('cat-pg1-logo');
   if (elLogo1 && pg1.tamanhoLogo) elLogo1.style.width = logoTamMap[pg1.tamanhoLogo] || '100px';
+  /* Visibilidade da logo Pg1 — padrão: visível (retrocompatível) */
+  if (elLogo1) elLogo1.style.display = pg1.logo_visivel === false ? 'none' : '';
 
   /* Cores específicas da Pg1 */
   const elPg1 = document.getElementById('pg-1');
@@ -815,6 +819,8 @@ function catMontarPg3(dados) {
   const logoTamMap = { pequeno: '72px', medio: '100px', grande: '140px' };
   const elLogo3 = document.getElementById('cat-pg3-logo');
   if (elLogo3 && pg2.tamanhoLogo) elLogo3.style.width = logoTamMap[pg2.tamanhoLogo] || '100px';
+  /* Visibilidade da logo Pg2 — padrão: visível (retrocompatível) */
+  if (elLogo3) elLogo3.style.display = pg2.logo_visivel === false ? 'none' : '';
 
   /* Cores Pg2 */
   const elPg3 = document.getElementById('pg-3');
