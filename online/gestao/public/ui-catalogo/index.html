@@ -44,7 +44,7 @@
     opacity: 1; pointer-events: auto;
     animation: catFadeIn .32s ease-out forwards;
   }
-  #pg-3, #pg-4 { overflow-y: auto; padding-bottom: 110px; }
+  #pg-4 { overflow-y: auto; padding-bottom: 110px; }
   #pg-4 { align-items: stretch; }
   #pg-4 > * { width: 100%; max-width: 100%; min-width: 0; }
 
@@ -258,8 +258,11 @@
   #pg-3 {
     padding-top: 0;
     align-items: center;
-    justify-content: center; /* centraliza verticalmente */
+    justify-content: center;
     gap: 0;
+    /* overflow-y: auto vem da regra global — precisa de height explícito para justify-content funcionar */
+    height: 100%;
+    overflow-y: auto;
   }
   .pg3-logo {
     width: 100px; height: auto; object-fit: contain;
