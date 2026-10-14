@@ -127,22 +127,19 @@
     font-size: 14px; font-weight: 300; line-height: 1.85;
     color: var(--muted);
   }
-  /* Segundo parágrafo: oculto no mobile por padrão */
-  .pg1-p2-mobile-oculto { display: none; }
 
-  /* Imagem de destaque — mobile */
+  /* Imagem de destaque — mobile
+     aspect-ratio: imagem proporcional à largura, sem altura fixa.
+     Sem flex-grow: não expande para preencher espaço sobrando.
+     display:none quando sem imagem: sem espaço vazio residual. */
   .pg1-destaque-img-wrap {
-    display: none; /* oculto até ter imagem */
+    display: none;
     overflow: hidden;
     background: var(--brand-light);
     width: 100%;
-    /* Elástico: ocupa espaço disponível entre texto e CTA,
-       com limites para não dominar a tela nem ficar muito pequena */
-    flex: 1 1 auto;
-    min-height: 120px;
-    max-height: min(38vh, 220px);
+    aspect-ratio: 4/3;
+    flex-shrink: 0;
     position: relative;
-    order: 2;
   }
   .pg1-destaque-img-wrap.com-imagem { display: block; }
   .pg1-destaque-img-wrap.mobile-ocultar { display: none !important; }
@@ -167,10 +164,9 @@
   /* Cópia desktop — sempre oculta no mobile */
   .pg1-destaque-desktop { display: none; }
 
-  /* CTA */
+  /* CTA — segue o fluxo natural após imagem, sem margin-top:auto */
   .pg1-cta-wrap {
-    padding: clamp(10px, 1.5vh, 24px) 28px clamp(24px, 4vh, 44px);
-    margin-top: auto; /* empurra o CTA para o fundo do espaço disponível */
+    padding: clamp(16px, 2.5vh, 24px) 28px clamp(28px, 4vh, 44px);
     flex-shrink: 0;
   }
   .pg1-cta {
@@ -205,9 +201,6 @@
       min-height: 100dvh;
       overflow: visible;
     }
-
-    /* Segundo parágrafo: visível no desktop */
-    .pg1-p2-mobile-oculto { display: block; }
 
     /* Imagem mobile dentro da coluna: oculta no desktop */
     .pg1-conteudo .pg1-destaque-img-wrap { display: none !important; }
@@ -508,13 +501,10 @@
   <!-- Título grande -->
   <h1 class="pg1-titulo" id="cat-pg1-titulo">Descubra<br>a Oba</h1>
 
-  <!-- Corpo de texto — dois parágrafos -->
+  <!-- Corpo de texto — parágrafo único aprovado -->
   <div class="pg1-corpo">
     <p class="pg1-paragrafo" id="cat-pg1-p1">
-      Uma coleção de sabores artesanais, criados para despertar os sentidos e transformar pequenos momentos em lembranças especiais. Brigadeiros cremosos, combinações delicadas e receitas cuidadosamente preparadas para quem aprecia doces feitos de verdade.
-    </p>
-    <p class="pg1-paragrafo pg1-p2-mobile-oculto" id="cat-pg1-p2">
-      Explore nossos sabores, descubra seus favoritos e deixe-se levar pela experiência Oba. Cada doce tem seu jeito de encantar — e talvez o próximo seja exatamente o que você estava procurando.
+      Sabores artesanais, brigadeiros intensamente cremosos e combinações delicadas, preparados com cuidado para transformar pequenos momentos em experiências especiais. Descubra o seu favorito e deixe-se encantar pela Oba.
     </p>
   </div>
 
@@ -771,16 +761,9 @@ function catMontarPg1(dados) {
   /* Textos editáveis via theme-catalogo.json — fallback silencioso para o HTML */
   _catSet('cat-pg1-rotulo', pg1.rotulo);
   _catSet('cat-pg1-titulo', pg1.titulo);
-  _catSet('cat-pg1-p1',     pg1.paragrafo1);
-  _catSet('cat-pg1-p2',     pg1.paragrafo2);
+  /* Parágrafo único: usa paragrafo1 se disponível no schema */
+  _catSet('cat-pg1-p1', pg1.paragrafo1);
   _catSet('cat-pg1-cta',    pg1.cta);
-
-  /* Segundo parágrafo: oculto no mobile por padrão (p2_mobile_oculto !== false) */
-  const elP2 = document.getElementById('cat-pg1-p2');
-  if (elP2) {
-    const ocultarMobile = pg1.p2_mobile_oculto !== false; /* padrão: ocultar */
-    elP2.classList.toggle('pg1-p2-mobile-oculto', ocultarMobile);
-  }
 
   /* Destaque fotográfico — aplicado nas duas cópias (mobile + desktop) */
   const imgSrc      = pg1.imagem_destaque ? catImageUrl(pg1.imagem_destaque) : '';
