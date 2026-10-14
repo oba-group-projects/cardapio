@@ -31,9 +31,16 @@
     "corTexto": "",
     "corTitulo": "",
     "cta": "Conhecer nossos sabores →",
+    "destaque_ativo": true,
+    "destaque_composicao": "lateral-60",
+    "destaque_mobile": "adaptar",
+    "imagem_destaque": "https://raw.githubusercontent.com/oba-group-projects/cardapio/main/Images/Presenteaveis/Opcao_1.png",
+    "imagem_pos_x": 50,
+    "imagem_pos_y": 50,
     "logo": "",
-    "paragrafo1": "Uma coleção de sabores artesanais, criados para despertar os sentidos e transformar pequenos momentos em lembranças especiais. Brigadeiros cremosos, combinações delicadas e receitas cuidadosamente preparadas para quem aprecia doces feitos de verdade.",
-    "paragrafo2": "Explore nossos sabores, descubra seus favoritos e deixe-se levar pela experiência Oba.",
+    "p2_mobile_oculto": true,
+    "paragrafo1": "Sabores artesanais, brigadeiros intensamente cremosos e combinações delicadas, preparados com cuidado para transformar pequenos momentos em experiências especiais. Descubra o seu favorito e deixe-se encantar pela Oba.",
+    "paragrafo2": "",
     "pesoCTA": "",
     "pesoTexto": "",
     "pesoTitulo": "",
@@ -42,7 +49,7 @@
     "tamTexto": "",
     "tamTitulo": "",
     "tamanhoLogo": "medio",
-    "titulo": "Descubra a Oba"
+    "titulo": "Descubra na Oba"
   },
   "pg2": {
     "ativo": true,
@@ -72,6 +79,11 @@
     "tamSubtitulo": "",
     "tamanhoLogo": "medio"
   },
+  "pg4": {
+    "cardapio_ativo": true,
+    "wpp_ativo": true,
+    "wpp_texto": ""
+  },
   "schemaVersion": 3,
   "tema": {
     "arredondamento": "",
@@ -85,5 +97,5 @@
     "tamanhoCorpo": "",
     "tamanhoTitulo": ""
   },
-  "updatedAt": "2026-10-12"
+  "updatedAt": "2026-10-14"
 }
