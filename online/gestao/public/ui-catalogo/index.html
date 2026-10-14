@@ -254,73 +254,99 @@
 
   /* ═══════════════════════════════════════════════════
      PG 3 — MENU DE GRUPOS
+     #pg-3 é position:fixed; inset:0 (herda de .oba-page).
+     justify-content no elemento fixed não funciona — o filho
+     .pg3-inner com height:100% e justify-content:center resolve.
   ═══════════════════════════════════════════════════ */
   #pg-3 {
-    align-items: center;
-    justify-content: center;
     overflow-y: auto;
-    /* Fallback para centralização quando justify-content não funciona
-       (position:fixed não cria contexto de altura para filhos flex) */
-    padding-top: max(40px, 15vh);
-    padding-bottom: max(40px, 8vh);
-  }
-  .pg3-logo {
-    width: 100px; height: auto; object-fit: contain;
-    display: block; margin: 0 auto 16px;
-  }
-  .pg3-subtitulo {
-    font-size: 13px; text-transform: uppercase; letter-spacing: .28em;
-    color: var(--muted); text-align: center; margin-bottom: 28px;
-    font-weight: 700;
-    padding-top: 40px; /* espaço do topo */
-  }
-  /* Container dos botões — ocupa mais espaço vertical */
-  #cat-grupos {
-    flex: 0 0 auto;
-    padding-bottom: 32px;
   }
 
-  /* Botão de grupo — maior, com suporte a imagem de fundo */
+  /* Wrapper interno — centraliza o conteúdo na viewport */
+  .pg3-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    padding: 48px 24px 40px;
+    box-sizing: border-box;
+  }
+
+  .pg3-logo {
+    width: 100px; height: auto; object-fit: contain;
+    display: block; margin: 0 auto 20px;
+  }
+
+  .pg3-subtitulo {
+    font-size: 11px; text-transform: uppercase; letter-spacing: .28em;
+    color: var(--muted); text-align: center;
+    font-weight: 700;
+    margin-bottom: 32px;
+  }
+
+  /* Botões de grupo — presença clara, proporções equilibradas */
   .oba-cat-btn {
     width: 100%; max-width: 420px;
     background: var(--card-bg); border: 1px solid var(--line);
-    border-radius: 2rem; padding: 28px 28px;
+    border-radius: 2rem; padding: 24px 28px;
     display: flex; justify-content: space-between; align-items: center;
-    cursor: pointer; transition: all .2s; margin-bottom: 16px;
+    cursor: pointer; transition: transform .15s, box-shadow .15s;
+    margin-bottom: 14px;
     font-family: inherit;
-    box-shadow: 0 4px 20px rgba(107,158,122,.1);
-    position: relative; overflow: hidden; /* para imagem de fundo */
-    min-height: 90px;
+    box-shadow: 0 3px 16px rgba(107,158,122,.09);
+    position: relative; overflow: hidden;
+    min-height: 80px;
   }
   .oba-cat-btn:active { transform: scale(.97); }
+  .oba-cat-btn.destaque {
+    background: var(--brand); border-color: var(--brand);
+    box-shadow: 0 6px 24px rgba(107,158,122,.28);
+  }
 
   /* Imagem de fundo do botão */
   .oba-cat-btn-bg {
     position: absolute; inset: 0;
     background-size: cover; background-position: center;
-    opacity: .18;
-    transition: opacity .2s;
+    opacity: .15;
     pointer-events: none;
   }
-  .oba-cat-btn:active .oba-cat-btn-bg { opacity: .25; }
 
-  /* Conteúdo do botão acima da imagem */
+  /* Conteúdo acima da imagem */
   .oba-cat-btn > div,
   .oba-cat-btn > span { position: relative; z-index: 1; }
 
-  .oba-cat-btn.destaque {
-    background: var(--brand); border-color: var(--brand);
-    box-shadow: 0 8px 28px rgba(107,158,122,.35);
-  }
   .oba-cat-btn .btn-sub {
     display: block; font-size: 9px; text-transform: uppercase;
-    letter-spacing: .22em; color: var(--muted); margin-bottom: 6px; font-weight: 700;
+    letter-spacing: .22em; color: var(--muted); margin-bottom: 5px; font-weight: 700;
   }
-  .oba-cat-btn .btn-lbl { display: block; font-size: 18px; font-weight: 700; color: var(--text); }
+  .oba-cat-btn .btn-lbl {
+    display: block; font-size: 17px; font-weight: 700; color: var(--text);
+    line-height: 1.2;
+  }
   .oba-cat-btn.destaque .btn-sub { color: rgba(255,255,255,.65); }
   .oba-cat-btn.destaque .btn-lbl { color: #fff; }
-  .oba-cat-btn .btn-ico { font-size: 28px; opacity: .35; }
+  .oba-cat-btn .btn-ico { font-size: 26px; opacity: .4; }
   .oba-cat-btn.destaque .btn-ico { opacity: .85; }
+
+  /* Voltar — claramente secundário */
+  .pg3-voltar {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px; font-style: italic; font-weight: 400;
+    letter-spacing: .04em;
+    cursor: pointer;
+    padding: 12px 0;
+    margin-top: 16px;
+    display: block; text-align: center; width: 100%;
+    border-radius: 0;
+    transition: color .15s;
+  }
+  .pg3-voltar:active { color: var(--brand); }
 
   /* ═══════════════════════════════════════════════════
      PG 4 — SABORES
@@ -574,13 +600,15 @@
      PÁGINA 3 — MENU DE GRUPOS
 ══════════════════════════════════════════════════ -->
 <div class="oba-page" id="pg-3">
-  <img id="cat-pg3-logo"
-       src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png"
-       alt="Oba Doceria" class="pg3-logo"
-       onerror="this.style.display='none'">
-  <p class="pg3-subtitulo" id="cat-pg3-subtitulo">Escolha o tipo de doce</p>
-  <div id="cat-grupos" style="width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center;padding:0 20px"></div>
-  <button class="oba-btn-voltar-dest" onclick="catVoltarDe(3)">← Voltar</button>
+  <div class="pg3-inner">
+    <img id="cat-pg3-logo"
+         src="https://raw.githubusercontent.com/obadoceria-gif/cardapio/main/Images/Logo_Oba/logo-horizontal.png"
+         alt="Oba Doceria" class="pg3-logo"
+         onerror="this.style.display='none'">
+    <p class="pg3-subtitulo" id="cat-pg3-subtitulo">Escolha o tipo de doce</p>
+    <div id="cat-grupos" style="width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center"></div>
+    <button class="oba-btn-voltar-dest pg3-voltar" onclick="catVoltarDe(3)">← Voltar</button>
+  </div>
 </div>
 
 <!-- ══════════════════════════════════════════════════
