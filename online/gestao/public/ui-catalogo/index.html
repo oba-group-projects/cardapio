@@ -256,13 +256,13 @@
      PG 3 — MENU DE GRUPOS
   ═══════════════════════════════════════════════════ */
   #pg-3 {
-    padding-top: 0;
     align-items: center;
     justify-content: center;
-    gap: 0;
-    /* overflow-y: auto vem da regra global — precisa de height explícito para justify-content funcionar */
-    height: 100%;
     overflow-y: auto;
+    /* Fallback para centralização quando justify-content não funciona
+       (position:fixed não cria contexto de altura para filhos flex) */
+    padding-top: max(40px, 15vh);
+    padding-bottom: max(40px, 8vh);
   }
   .pg3-logo {
     width: 100px; height: auto; object-fit: contain;
