@@ -1,11 +1,11 @@
-{
+﻿{
   "schemaVersion": 3,
   "updatedAt": "2026-10-15",
   "pg1": {
-    "rotulo": "Catálogo",
+    "rotulo": "CatÃ¡logo",
     "titulo": "Descubra na Oba",
-    "paragrafo1": "Sabores artesanais, brigadeiros intensamente cremosos e combinações delicadas, preparados com cuidado para transformar pequenos momentos em experiências especiais. Descubra o seu favorito e deixe-se encantar pela Oba.",
-    "cta": "Conhecer nossos sabores →",
+    "paragrafo1": "Sabores artesanais, brigadeiros intensamente cremosos e combinaÃ§Ãµes delicadas, preparados com cuidado para transformar pequenos momentos em experiÃªncias especiais. Descubra o seu favorito e deixe-se encantar pela Oba.",
+    "cta": "Conhecer nossos sabores â†’",
     "logo": "",
     "logo_visivel": false,
     "tamanhoLogo": "medio",
@@ -41,7 +41,7 @@
         "id": "artesanais",
         "label": "Doces Artesanais",
         "sublabel": "Artesanais",
-        "icone": "🍫",
+        "icone": "ðŸ«",
         "destaque": true,
         "visivel": true,
         "imagem": "https://raw.githubusercontent.com/oba-group-projects/cardapio/main/Images/Imagens_Layout/Captura%20de%20tela%202026-06-23%20131226.png"
@@ -50,7 +50,7 @@
         "id": "finos",
         "label": "Doces Finos",
         "sublabel": "Exclusivos",
-        "icone": "✨",
+        "icone": "âœ¨",
         "destaque": false,
         "visivel": true,
         "imagem": "https://raw.githubusercontent.com/oba-group-projects/cardapio/main/Images/Imagens_Layout/Captura%20de%20tela%202026-06-23%20131202.png"
@@ -58,8 +58,8 @@
       {
         "id": "natal-oba-2026",
         "label": "Natal Oba 2026",
-        "sublabel": "Edição Limitada",
-        "icone": "⭐",
+        "sublabel": "EdiÃ§Ã£o Limitada",
+        "icone": "â­",
         "destaque": false,
         "visivel": true,
         "imagem": "https://raw.githubusercontent.com/oba-group-projects/cardapio/main/Images/Imagens_Layout/Captura%20de%20tela%202026-06-23%20131202.png"
@@ -69,7 +69,7 @@
   "grupos": {
     "artesanais": {
       "titulo": "Doces Artesanais",
-      "subtitulo": "Tradicionais, Clássicos e Especiais",
+      "subtitulo": "Tradicionais, ClÃ¡ssicos e Especiais",
       "corTitulo": "",
       "corSubtitulo": "",
       "corFundo": "",
