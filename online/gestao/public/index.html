@@ -189,6 +189,10 @@ function obaLogout() {
 
         <div style="grid-column:1/-1"><p class="oba-secao-titulo">🖼️ Imagem</p></div>
         <div class="field full"><label>Logo (caminho ou URL da imagem)</label>
+          <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
+            <label class="oba-toggle-label"><input type="checkbox" id="pg1-logo-visivel" checked> Exibir logo na Pg1</label>
+            <span class="hint">Desmarque para ocultar a logo até ter uma versão sem fundo branco.</span>
+          </div>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <input id="pg1-logo" placeholder="Images/Logo_Oba/logo-vertical.png" style="flex:1;min-width:200px">
             <button type="button" class="secondary" style="padding:7px 10px;font-size:12px;white-space:nowrap" onclick="obaAbrirGaleria('pg1-logo','pg1-logo-preview')">📁 Galeria</button>
@@ -462,6 +466,10 @@ function obaLogout() {
 
         <div style="grid-column:1/-1"><p class="oba-secao-titulo">🖼️ Imagem</p></div>
         <div class="field full"><label>Logo (caminho ou URL)</label>
+          <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
+            <label class="oba-toggle-label"><input type="checkbox" id="pg3-logo-visivel" checked> Exibir logo na Pg3</label>
+            <span class="hint">Desmarque para ocultar a logo até ter uma versão sem fundo branco.</span>
+          </div>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <input id="pg3-logo" placeholder="Images/Logo_Oba/logo-horizontal.png" style="flex:1;min-width:200px">
             <button type="button" class="secondary" style="padding:7px 10px;font-size:12px;white-space:nowrap" onclick="obaAbrirGaleria('pg3-logo','pg3-logo-preview')">📁 Galeria</button>
@@ -2568,6 +2576,7 @@ $('formConfig').onsubmit=async e=>{
     obaSetVal('pg1-cta',      bv.botaoCTA  || 'Descobrir Nossa História');
     obaSetVal('pg1-logo',bv.logo);
     obaSetSelect('pg1-tamanhoLogo',bv.tamanhoLogo,'medio');
+    obaSetCheck('pg1-logo-visivel', bv.logo_visivel !== false);
     obaSetCorPagina('pg1-corFundo',bv.corFundo);
     obaSetCorPagina('pg1-corTitulo',bv.corTitulo);
     obaSetCheck('pg1-exibirSubtitulo',bv.exibirSubtitulo!==false);
@@ -2596,6 +2605,7 @@ $('formConfig').onsubmit=async e=>{
     obaSetVal('pg3-subtitulo',mp.subtitulo || 'Escolha sua Experiência');
     obaSetVal('pg3-logo',mp.logo);
     obaSetSelect('pg3-tamanhoLogo',mp.tamanhoLogo,'medio');
+    obaSetCheck('pg3-logo-visivel', mp.logo_visivel !== false);
     obaSetCorPagina('pg3-corFundo',mp.corFundo);
     obaSetCorPagina('pg3-corSubtitulo',mp.corSubtitulo);
     obaAtualizarLogoPreview('pg3-logo','pg3-logo-preview');
@@ -2719,6 +2729,7 @@ $('formConfig').onsubmit=async e=>{
         boas_vindas:{
           ativo:$('pg1-ativo')?.checked!==false,
           logo:$('pg1-logo')?.value.trim()||'',
+          logo_visivel:$('pg1-logo-visivel')?.checked!==false,
           tamanhoLogo:$('pg1-tamanhoLogo')?.value||'medio',
           titulo:$('pg1-titulo')?.value.trim()||'',
           subtitulo:$('pg1-subtitulo')?.value.trim()||'',
@@ -2757,6 +2768,7 @@ $('formConfig').onsubmit=async e=>{
         menu_principal:{
           ativo:$('pg3-ativo')?.checked!==false,
           logo:$('pg3-logo')?.value.trim()||'',
+          logo_visivel:$('pg3-logo-visivel')?.checked!==false,
           tamanhoLogo:$('pg3-tamanhoLogo')?.value||'medio',
           subtitulo:$('pg3-subtitulo')?.value.trim()||'',
           corFundo:$('pg3-corFundo-hex')?.value.trim()||'',
