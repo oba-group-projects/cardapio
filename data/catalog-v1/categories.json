@@ -70,5 +70,14 @@
     "nome": "Natal",
     "ordem": 62,
     "precoReferencia": null
+  },
+  {
+    "ativo": true,
+    "disponivel": true,
+    "grupoCatalogo": "finos",
+    "id": "categoria-doces-finos",
+    "nome": "Doces Finos",
+    "ordem": 63,
+    "precoReferencia": null
   }
 ]
