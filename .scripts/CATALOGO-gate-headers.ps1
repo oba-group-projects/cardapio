@@ -90,6 +90,24 @@ try {
     }
 } catch { Fail "Request falhou: $_" }
 
+# ── TESTE 8: /published-bootstrap.js acessível sem autenticação ──────────────
+Write-Host "T8: /published-bootstrap.js — HTTP 200 sem autenticação (causa raiz do bug)"
+try {
+    $r = Invoke-WebRequest -Uri "$BaseUrl/published-bootstrap.js" -UseBasicParsing -TimeoutSec 20
+    if ($r.StatusCode -eq 200) {
+        if ($r.Content -match "nativeFetch" -and $r.Content -match "publishedPromise") {
+            Pass "HTTP 200 — bootstrap acessível sem auth, conteúdo válido"
+        } else {
+            Fail "HTTP 200 mas conteúdo inesperado (nativeFetch ou publishedPromise ausente)"
+        }
+    } else {
+        Fail "Esperado 200, recebido $($r.StatusCode) — bootstrap bloqueado para anônimos"
+    }
+} catch {
+    $code = $_.Exception.Response.StatusCode.value__
+    Fail "Request falhou (código $code): $_ — bootstrap bloqueado para anônimos"
+}
+
 # ── RESULTADO ─────────────────────────────────────────────────────────────────
 Write-Host ""
 Write-Host "================================================================" -ForegroundColor Cyan

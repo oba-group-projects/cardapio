@@ -4093,6 +4093,37 @@ export default {
       return obaHandleMediaServe(request, env, url);
     }
 
+    /* ----------------------------------------------------------------
+     * ASSETS PÚBLICOS — servidos sem autenticação.
+     * published-bootstrap.js é injetado nas páginas públicas /cardapio
+     * e /catalogo. Sem esta rota, usuários anônimos recebem 303 ao
+     * carregar o script, o bootstrap não executa e a página falha.
+     * preview-bootstrap.js também é público (usado em /__preview via
+     * link compartilhado). cardapio-bootstrap.js incluído por simetria.
+     * ---------------------------------------------------------------- */
+    const PUBLIC_ASSETS = [
+      "/published-bootstrap.js",
+      "/preview-bootstrap.js",
+      "/cardapio-bootstrap.js",
+    ];
+    if (PUBLIC_ASSETS.includes(url.pathname) && request.method === "GET") {
+      const assetUrl = new URL(request.url);
+      assetUrl.search = "";
+      assetUrl.hash = "";
+      const asset = await env.ASSETS.fetch(new Request(assetUrl.toString(), { method: "GET" }));
+      if (!asset.ok) {
+        return new Response("Not found", { status: 404, headers: { "Content-Type": "text/plain" } });
+      }
+      return new Response(asset.body, {
+        status: 200,
+        headers: {
+          "Content-Type": asset.headers.get("Content-Type") || "application/javascript; charset=utf-8",
+          "Cache-Control": "public, max-age=60, stale-while-revalidate=300",
+          "X-Content-Type-Options": "nosniff",
+        },
+      });
+    }
+
     const authenticated = await validateSession(request, env);
 
     if (!authenticated) {
