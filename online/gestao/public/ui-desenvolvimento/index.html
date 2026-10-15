@@ -33436,6 +33436,109 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
 </style>
 
+<!-- ================================================================
+     B1 - CSS RESPONSIVO ENTRADA
+     Adicionado em bloco único, sem editar regras anteriores.
+     Cobre: scroll interno Pg1/Pg2/Pg3, grade 2x2 Pg3 desktop,
+     largura desktop Pg1/Pg3, área de toque mínima.
+================================================================ -->
+<style id="b1-responsivo-entrada">
+
+  /* ── SCROLL INTERNO Pg1, Pg2, Pg3 ──────────────────────────────
+     O body fica travado (oba-pagina-fixa) — correto para impedir
+     scroll acidental entre páginas. A seção rola internamente.
+     height:100dvh com fallback 100vh; overflow-y:auto na seção.
+     justify-content muda para flex-start para que o topo seja
+     sempre alcançável; padding-top compensa visualmente.
+     -webkit-overflow-scrolling:touch: momentum scroll em iOS.
+     overscroll-behavior:contain: evita que o bounce do iOS
+     propague para o body.
+  ────────────────────────────────────────────────────────────────── */
+  #pag-1, #pag-2, #pag-3 {
+    height: 100vh !important;
+    height: 100dvh !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+    justify-content: flex-start !important;
+  }
+
+  /* Pg1: já usa align-items:flex-start e padding-top:5dvh no CSS
+     estático — sem ajuste extra necessário. */
+
+  /* Pg2: centralização visual via padding — simula justify-center
+     sem perder o topo em telas pequenas. */
+  #pag-2 {
+    padding-top: max(5dvh, 24px) !important;
+    padding-bottom: max(5dvh, 24px) !important;
+    align-items: center !important;
+  }
+
+  /* Pg3: padding-top compensa a mudança de justify-center.
+     padding-bottom preserva o espaço para o btn WhatsApp fixo
+     (bottom-24 = 96px) + margem de segurança + safe-area.
+     O pb-28 original (112px) é mantido como mínimo. */
+  #pag-3 {
+    padding-top: max(5dvh, 24px) !important;
+    padding-bottom: max(112px, calc(96px + env(safe-area-inset-bottom, 0px))) !important;
+    align-items: center !important;
+  }
+
+  /* ── ÁREA DE TOQUE MÍNIMA ──────────────────────────────────────
+     WCAG 2.5.5: área de toque mínima 44×44px.
+     Aplica ao CTA de Pg1 e a todos os botões de Pg3.
+  ────────────────────────────────────────────────────────────────── */
+  #oba-pag1-btn-cta {
+    min-height: 48px !important;
+  }
+  #oba-menu-botoes > button {
+    min-height: 48px !important;
+  }
+
+  /* ── DESKTOP ≥768px ─────────────────────────────────────────────
+     Pg1: container ligeiramente mais largo, tipografia do título maior.
+     Pg3: container mais largo + grade 2×2 nos botões.
+  ────────────────────────────────────────────────────────────────── */
+  @media (min-width: 768px) {
+
+    /* Pg1: ampliar de max-w-md (448px) para ~560px */
+    #pag-1 {
+      max-width: 560px !important;
+    }
+
+    /* Pg1: título principal ligeiramente maior no desktop */
+    #pag1-ne-titulo {
+      font-size: 2.8rem !important;
+    }
+
+    /* Pg3: ampliar de max-w-md (448px) para 680px */
+    #pag-3 {
+      max-width: 680px !important;
+    }
+
+    /* Pg3: grade 2×2 nos botões.
+       Filhos diretos são <button> (confirmado no HTML).
+       Se forem 3 botões visíveis, o último ocupa a linha inteira.
+       Os elementos [data-oba-overflow-menu] ficam fora de
+       #oba-menu-botoes — não são afetados por este grid. */
+    #oba-menu-botoes {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr !important;
+      gap: 16px !important;
+    }
+    /* Anula o space-y-4 do Tailwind (que vira margin-top nos filhos) */
+    #oba-menu-botoes > button {
+      margin-top: 0 !important;
+    }
+    /* 3 botões visíveis: último ocupa linha inteira */
+    #oba-menu-botoes > button:last-child:nth-child(odd) {
+      grid-column: 1 / -1 !important;
+    }
+  }
+
+</style>
+
 
 <script id="r152-debug-invisivel-runtime">
 
