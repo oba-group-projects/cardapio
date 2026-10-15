@@ -2,7 +2,18 @@
 // published-bootstrap.js — idêntico ao preview-bootstrap.js mas lê /api/catalog (PUBLISHED)
 (function(){
   var nativeFetch = window.fetch.bind(window);
-  var publishedPromise = nativeFetch('/api/catalog', {cache:'no-store'})
+
+  /* Fetch com retry — tenta até 3 vezes com backoff de 1s entre tentativas */
+  function fetchComRetry(url, opts, tentativas) {
+    tentativas = tentativas || 3;
+    return nativeFetch(url, opts).catch(function(err) {
+      if (tentativas <= 1) throw err;
+      return new Promise(function(resolve) { setTimeout(resolve, 1000); })
+        .then(function() { return fetchComRetry(url, opts, tentativas - 1); });
+    });
+  }
+
+  var publishedPromise = fetchComRetry('/api/catalog', {cache:'no-store'})
     .then(function(r){ return r.json(); })
     .then(function(j){
       if (!j) throw new Error('catalog unavailable');
