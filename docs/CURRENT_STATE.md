@@ -1,10 +1,10 @@
 ﻿# CURRENT STATE
 
-Atualizado: 2026-10-12 (sessão 20)
+Atualizado: 2026-10-15 (sessão 21)
 
 ## Git
 Branch: feature/gestao-online-segura
-Commit HEAD: 771fba5
+Commit HEAD: 12b1a5e
 
 ## Estado funcional
 - Central privada autenticada e operacional
@@ -12,6 +12,7 @@ Commit HEAD: 771fba5
 - Cardápio público funcional em /cardapio — Pg1 Interpretação B + refinamentos
 - Catálogo público funcional em /catalogo — Verde Sálvia + Ed. Visual Etapa A
 - Módulo de Contratos completo e em uso real
+- **Bug crítico resolvido (sessão 21):** Catálogo e Cardápio agora funcionam para usuários anônimos em smartphones
 
 ## Módulo de Contratos — estado atual (sessão 11)
 
@@ -100,8 +101,9 @@ Commit HEAD: 771fba5
 10. Itens com incluido=1 não somam no total (obaContractCenarioTotal e recalcularCenario)
 
 ## Pontos de retorno seguros
-- HEAD atual = 771fba5 (estável, deploy validado — sessão 20)
-- Anterior = 8a084fc
+- HEAD atual = 12b1a5e (estável, deploy validado — sessão 21)
+- Anterior = b609189 (fix causa raiz — bootstrap público)
+- Anterior = e1117ae (fix CSP — sessão anterior)
 
 ## Links
 - Central: https://oba-cardapio-gestao.obadoceria.workers.dev/
