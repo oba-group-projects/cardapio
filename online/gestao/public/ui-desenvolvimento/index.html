@@ -3875,6 +3875,8 @@ async function hidratarTemaDoModeloMestre() {
     const logoTamMap = { pequeno: '96px', medio: '176px', grande: '240px' };
     const elLogo1 = document.getElementById('oba-pag1-logo');
     if (elLogo1 && bv.tamanhoLogo) elLogo1.style.width = logoTamMap[bv.tamanhoLogo] || '176px';
+    /* Visibilidade da logo Pg1 — padrão: visível (retrocompatível com rascunhos sem o campo) */
+    if (elLogo1) elLogo1.style.display = bv.logo_visivel === false ? 'none' : '';
 
     /* Cores específicas da pag1 */
     const elPag1 = document.getElementById('pag-1');
@@ -3994,6 +3996,8 @@ async function hidratarTemaDoModeloMestre() {
     /* Tamanho da logo pag3 */
     const elLogo3 = document.getElementById('oba-pag3-logo');
     if (elLogo3 && mp.tamanhoLogo) elLogo3.style.width = logoTamMap[mp.tamanhoLogo] || '144px';
+    /* Visibilidade da logo Pg3 — padrão: visível (retrocompatível) */
+    if (elLogo3) elLogo3.style.display = mp.logo_visivel === false ? 'none' : '';
 
     /* Cores específicas da pag3 */
     const elPag3 = document.getElementById('pag-3');
