@@ -1158,7 +1158,7 @@ async function catIniciar() {
   } catch(err) {
     console.error('[catalogo] Erro ao carregar dados:', err);
     document.getElementById('loading').innerHTML =
-      '<p style="color:#6B9E7A;font-size:14px;text-align:center;padding:24px">Erro ao carregar o catálogo.<br>Tente novamente.</p>';
+      '<p style="color:#6B9E7A;font-size:14px;text-align:center;padding:24px">Erro ao carregar o catálogo.<br>Tente novamente.</p><button onclick="location.reload()" style="display:block;margin:16px auto 0;padding:12px 28px;background:#6B9E7A;color:#fff;border:none;border-radius:999px;font-size:14px;font-weight:600;cursor:pointer">↺ Tentar novamente</button>';
   }
 }
 
