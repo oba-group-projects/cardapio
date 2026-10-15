@@ -1,10 +1,10 @@
 ﻿# CURRENT STATE
 
-Atualizado: 2026-10-12 (sessão 19)
+Atualizado: 2026-10-12 (sessão 20)
 
 ## Git
 Branch: feature/gestao-online-segura
-Commit HEAD: b1e89d0
+Commit HEAD: 771fba5
 
 ## Estado funcional
 - Central privada autenticada e operacional
@@ -100,8 +100,8 @@ Commit HEAD: b1e89d0
 10. Itens com incluido=1 não somam no total (obaContractCenarioTotal e recalcularCenario)
 
 ## Pontos de retorno seguros
-- HEAD atual = b1e89d0 (estável, deploy validado — sessão 19)
-- Anterior = d5f3081
+- HEAD atual = 771fba5 (estável, deploy validado — sessão 20)
+- Anterior = 8a084fc
 
 ## Links
 - Central: https://oba-cardapio-gestao.obadoceria.workers.dev/

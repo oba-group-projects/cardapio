@@ -1,23 +1,21 @@
 # HANDOFF
 
-Atualizado: 2026-10-12 (sessão 19)
+Atualizado: 2026-10-12 (sessão 20)
 
 Branch: feature/gestao-online-segura
-HEAD: b1e89d0
+HEAD: 771fba5
 
 ## Última entrega
-Destaque fotográfico Pg1 do catálogo — implementação completa em múltiplas iterações. Layout lateral 40/60 no desktop (≥768px) com imagem sticky, empilhado no mobile com aspect-ratio responsivo. Configurável via Central: toggle ativo/inativo, galeria, foco X/Y, composição, comportamento mobile.
+Catálogo Pg2 redesenhada (composição, botões, centralização), Pg1 proporção tablet, imagem de fundo por grupo implementada. Diagnóstico aprofundado revelou que o catálogo usa published-bootstrap.js que intercepta fetches e serve do /api/catalog — theme-catalogo.json não é lido diretamente.
 
-## Commits desta sessão (destaque visual)
+## Commits desta sessão (selecionados)
 | Commit   | O que fez |
 |----------|-----------|
-| b1e89d0  | fix: imagem mobile responsiva — aspect-ratio 4/3 em vez de height fixa |
-| d5f3081  | fix: mobile — order:2 na imagem, remover margin-top:auto que escondia CTA |
-| 2c1df44  | fix: ocultar cópia mobile da imagem no desktop — dupla exibição |
-| 32743db  | fix: sticky dentro de fixed com scroll no pg-1, align-self:start |
-| ff90e65  | feat: destaque visual v2 — proporção 40/60, breakpoint 768px, degradê, toggle, composição e mobile |
-| 06673f0  | fix: remover declaração duplicada de elPg1 — SyntaxError |
-| 2c2f4e8  | feat: destaque fotográfico Pg1 — imagem lateral configurável, mobile-first, retrocompat |
+| 771fba5  | fix(sync): theme-catalogo.json reescrito sem BOM |
+| 66ac5c2  | fix(sync): theme-catalogo.json sincronizado com D1 PUBLISHED |
+| 21c2bf6  | fix(catalogo): bgDiv inserido após innerHTML |
+| 8a084fc  | fix(catalogo): Pg2 pg3-inner — centralização vertical correta |
+| a75576f  | feat(catalogo): Pg2 centralizada + botões maiores + imagem por grupo + Pg1 50/50 tablet + título sem br |
 
 ## Estado atual — TUDO APROVADO E EM PRODUÇÃO
 
@@ -99,26 +97,27 @@ Ver HANDOFF sessão 11 para detalhes.
 
 ## Pendente — próximas sessões
 
-### Destaque visual — Passo 2 (se necessário após validação)
-- `imagem_pos_x_mobile` e `imagem_pos_y_mobile` — foco independente para mobile
-- Só implementar se o foco único não servir para ambos os layouts
+### Catálogo — imagem de fundo nos botões Pg2
+- Funcionalidade implementada e funcionando (opacidade 15%)
+- Imagens atuais são capturas de tela — trocar por fotos dos doces na Central quando disponíveis
+- Para aumentar opacidade: CSS `.oba-cat-btn-bg { opacity: .15 }` → ajustar conforme visual
 
-### Destaque visual — Cardápio (Etapa 2, decisão separada)
-- `#pag-1` do cardápio tem `height: 100dvh; overflow: hidden` — requer abordagem diferente
-- Não iniciar sem decisão explícita
+### Catálogo — Borda do botão Voltar
+- Confirmada nos prints — regra `.oba-btn-voltar-dest` ainda aplica borda
+- Uma linha de CSS para remover quando decidido
 
-### Achados UX restantes (sem código)
-- Achado 4 — Cardápio Pg3 subtítulo "Escolha sua Experiência" em 11px: avaliar via Ed. Visual Cardápio
-
-### Catálogo — melhorias menores
-- Hardening: substituir querySelector frágil por getElementById em alguns pontos
+### Arquitetura importante descoberta nesta sessão
+- O catálogo público usa `published-bootstrap.js` que intercepta todos os fetches de JSON
+- Os dados vêm de `/api/catalog` (D1 PUBLISHED), não dos arquivos estáticos individuais
+- `theme-catalogo.json` estático só serve de fallback quando o bootstrap não está presente
+- O sync do GitHub via `obaGitHubSyncPublished` falha silenciosamente — dados no D1 podem divergir dos arquivos estáticos
 
 ### Contratos — fase 2 (itens restantes)
 - Aditivos, templates de cláusulas, integração Autentique
 
 ## Pontos de retorno seguros
-- HEAD atual = b1e89d0 (estável, deploy validado — sessão 19)
-- Anterior = d5f3081
+- HEAD atual = 771fba5 (estável, deploy validado — sessão 20)
+- Anterior = 8a084fc (Pg2 composição consolidada)
 
 ## Links
 - Central: https://oba-cardapio-gestao.obadoceria.workers.dev/
