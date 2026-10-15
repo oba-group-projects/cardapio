@@ -61,5 +61,14 @@
     "nome": "Especiais I",
     "ordem": 61,
     "precoReferencia": 3.25
+  },
+  {
+    "ativo": true,
+    "disponivel": true,
+    "grupoCatalogo": "natal-oba-2026",
+    "id": "categoria-natal",
+    "nome": "Natal",
+    "ordem": 62,
+    "precoReferencia": null
   }
 ]
