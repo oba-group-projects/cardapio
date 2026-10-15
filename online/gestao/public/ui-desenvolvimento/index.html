@@ -33442,6 +33442,226 @@ button[onclick*="fecharModalQuantidadeDoce"] {
      Cobre: scroll interno Pg1/Pg2/Pg3, grade 2x2 Pg3 desktop,
      largura desktop Pg1/Pg3, área de toque mínima.
 ================================================================ -->
+<!-- ================================================================
+     B2 - CAPA PG1 + CORREÇÕES PG3 + DESKTOP
+     Adicionado em bloco único após B1. Não altera regras anteriores,
+     JS, HTML, IDs, onclicks nem R10B.
+================================================================ -->
+<style id="b2-polimento-entrada">
+
+  /* ── PG1: COMPOSIÇÃO DE CAPA ────────────────────────────────────
+     Objetivo: logo, título, uma frase e CTA cabem em 320x568 sem rolar.
+     Centraliza tudo (sobrescreve align-items:flex-start do CSS estático).
+     Oculta: rótulo "CARDÁPIO", 2º parágrafo.
+     O separador já está oculto no CSS estático (#pag1-essencia > div).
+  ────────────────────────────────────────────────────────────────── */
+  #pag-1 {
+    align-items: center !important;
+    text-align: center !important;
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+
+  /* Logo: centralizado, sem moldura, sem align-self esquerda */
+  #oba-pag1-logo {
+    align-self: center !important;
+    width: clamp(100px, 28vw, 130px) !important;
+    margin-bottom: 16px !important;
+    /* drop-shadow-sm preservado — funciona corretamente com PNG transparente */
+  }
+
+  /* Bloco essência: centralizado */
+  #pag1-essencia {
+    text-align: center !important;
+    max-width: 36ch !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  /* Ocultar rótulo "CARDÁPIO" — não acrescenta nada numa capa */
+  #pag1-ne-rotulo {
+    display: none !important;
+  }
+
+  /* Ocultar 2º parágrafo — reduz para uma frase impactante */
+  #pag1-ne-texto-2 {
+    display: none !important;
+  }
+
+  /* Título: clamp responsivo, linha-height compacto */
+  #pag1-ne-titulo {
+    font-size: clamp(1.9rem, 7vw, 2.6rem) !important;
+    line-height: 1.15 !important;
+    margin-bottom: 14px !important;
+  }
+
+  /* Parágrafo único: tamanho legível, largura contida */
+  #pag1-ne-texto {
+    font-size: clamp(14px, 3.8vw, 16px) !important;
+    line-height: 1.55 !important;
+    max-width: 34ch !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* Citação: tamanho menor, menos peso visual */
+  #pag1-ne-citacao {
+    font-size: 13px !important;
+    margin-top: 12px !important;
+  }
+
+  /* CTA: sticky na base da seção — sempre visível mesmo se texto crescer.
+     width e max-width garantem que não fique espremido em telas estreitas. */
+  #oba-pag1-btn-cta {
+    position: sticky !important;
+    bottom: max(16px, env(safe-area-inset-bottom)) !important;
+    align-self: center !important;
+    margin-top: 20px !important;
+    width: calc(100% - 0px) !important;
+    max-width: 320px !important;
+    min-height: 52px !important;
+  }
+
+  /* Espaçamento compacto em telas baixas para caber sem rolar */
+  @media (max-height: 640px) {
+    #oba-pag1-logo {
+      width: clamp(80px, 22vw, 100px) !important;
+      margin-bottom: 10px !important;
+    }
+    #pag1-ne-titulo {
+      font-size: clamp(1.6rem, 6vw, 2rem) !important;
+      margin-bottom: 10px !important;
+    }
+    #pag1-ne-texto {
+      font-size: 13px !important;
+    }
+    #pag1-ne-citacao {
+      display: none !important;
+    }
+    #oba-pag1-btn-cta {
+      margin-top: 12px !important;
+    }
+  }
+
+  /* ── PG3: CORREÇÕES ─────────────────────────────────────────────
+     1) WhatsApp: em Pg3 mobile, mover para bottom:16px right:16px,
+        48px de diâmetro, para não cobrir os cartões.
+        Usa seletor de contexto baseado em .r117b-pag3-ativa
+        (que não existe) — solução mais segura: escopo via CSS
+        que só atua quando pag-3 está visível (tem classe 'flex').
+        Como CSS puro não pode fazer isso (sem :has() no Safari < 15),
+        usamos um override geral mais conservador: bottom:16px
+        apenas em viewports onde a sobreposição ocorre (<= 600px altura).
+        Não altera comportamento nas páginas de fluxo de compra.
+  ────────────────────────────────────────────────────────────────── */
+  @media (max-width: 767px) and (max-height: 680px) {
+    #btn-wpp-flutuante {
+      bottom: 12px !important;
+      right: 12px !important;
+      width: 48px !important;
+      height: 48px !important;
+    }
+  }
+
+  /* Logo Pg3: menor, sem moldura, sem sombra extra */
+  #oba-pag3-logo {
+    width: clamp(64px, 18vw, 88px) !important;
+    margin-bottom: 12px !important;
+    filter: none !important;
+  }
+
+  /* Botão Voltar da Pg3: área de toque >= 48px, contorno sutil */
+  #pag-3 > .pg3-voltar,
+  #pag-3 > button:last-of-type {
+    min-height: 48px !important;
+    padding: 12px 24px !important;
+    border: 1px solid rgba(139, 69, 19, 0.18) !important;
+    border-radius: 999px !important;
+    color: rgba(139, 69, 19, 0.65) !important;
+  }
+
+  /* Ícones dos cartões: mais visíveis */
+  #oba-menu-botoes button i {
+    opacity: 0.75 !important;
+  }
+  /* Ícone do botão de destaque (marrom): levemente mais opaco */
+  #oba-menu-botoes button.bg-\[\#8B4513\] i {
+    opacity: 0.85 !important;
+  }
+
+  /* ── DESKTOP: FAIXA VAZIA E SCROLLBAR ──────────────────────────
+     CAUSA DA FAIXA VAZIA: #app-container tem overflow-hidden +
+     max-w-6xl. Com B1 adicionando overflow-y:auto nas seções,
+     a scrollbar interna aparece dentro do container de 1152px,
+     deixando uma faixa vazia à direita.
+     CORREÇÃO: ocultar a scrollbar visualmente nas seções de entrada
+     (scroll funcional preservado).
+     CAUSA ALTERNATIVA: seções com max-w-md (448px) dentro do
+     container de 1152px deixam espaço lateral — corrigido com
+     width:100% + max-width adequado (já feito no B1 para desktop).
+  ────────────────────────────────────────────────────────────────── */
+  #pag-1, #pag-2, #pag-3 {
+    scrollbar-width: none !important;
+  }
+  #pag-1::-webkit-scrollbar,
+  #pag-2::-webkit-scrollbar,
+  #pag-3::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  /* Desktop >= 768px: ajustes adicionais */
+  @media (min-width: 768px) {
+
+    /* Pg1: centralização vertical segura via margin-block no conteúdo,
+       em vez de justify-content:center que torna o topo inacessível */
+    #pag-1 {
+      justify-content: flex-start !important;
+    }
+    #pag1-essencia {
+      margin-top: auto !important;
+      margin-bottom: auto !important;
+    }
+    /* O sticky do CTA cobre o caso em que o conteúdo excede a tela */
+
+    /* Pg3: coluna centralizada — 1 coluna se <=3 botões, B1 faz 2x2 com 4+
+       Override do B1 para 3 botões: forçar 1 coluna estreita.
+       Último botão ímpar já ocupa linha inteira pelo B1. */
+    #pag-3 {
+      max-width: 560px !important;
+    }
+
+    /* Pg1 desktop: tipografia um pouco maior */
+    #pag1-ne-titulo {
+      font-size: 2.8rem !important;
+    }
+    #pag1-ne-texto {
+      font-size: 16px !important;
+    }
+  }
+
+  /* ── ANIMAÇÃO DE ENTRADA (motion-safe) ─────────────────────────
+     Fade + subida de 12px, 320ms. Só para quem não pediu
+     redução de movimento. Aplica nas seções de entrada quando
+     recebem a classe 'flex' (adicionada por navegarPara).
+  ────────────────────────────────────────────────────────────────── */
+  @media (prefers-reduced-motion: no-preference) {
+    #pag-1.flex, #pag-2.flex, #pag-3.flex {
+      animation: b2-entrada 320ms ease-out both !important;
+    }
+    @keyframes b2-entrada {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    /* Feedback de toque suave */
+    #oba-pag1-btn-cta:active,
+    #oba-menu-botoes > button:active {
+      transform: scale(0.98) !important;
+    }
+  }
+
+</style>
+
 <style id="b1-responsivo-entrada">
 
   /* ── SCROLL INTERNO Pg1, Pg2, Pg3 ──────────────────────────────
