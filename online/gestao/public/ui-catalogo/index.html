@@ -938,6 +938,7 @@ function catMontarPg3(dados) {
       if (imgUrl) bgDiv.style.backgroundImage = `url('${imgUrl}')`;
     }
 
+    /* innerHTML ANTES de inserir bgDiv — innerHTML destrói filhos existentes */
     btn.innerHTML = `<div><span class="btn-sub">${g.sublabel || ''}</span><span class="btn-lbl">${g.label || g.id}</span></div><span class="btn-ico">${g.icone || '🍫'}</span>`;
     btn.insertBefore(bgDiv, btn.firstChild);
     btn.onclick = () => catAbrirGrupo(g.id, dados);
