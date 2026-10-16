@@ -4572,15 +4572,21 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
 
     let compressed;
     try { compressed = await obaCompressImage(file, 900, 0.82); }
-    catch (_) { compressed = file; }
+    catch (_) { compressed = null; }
 
-    const b64 = await new Promise((res, rej) => {
-      const reader = new FileReader();
-      reader.onload  = () => res(reader.result.split(',')[1]);
-      reader.onerror = rej;
-      const blob = (compressed instanceof Blob) ? compressed : new Blob([compressed], { type: file.type });
-      reader.readAsDataURL(blob);
-    });
+    let b64;
+    if (compressed && compressed.base64) {
+      /* obaCompressImage retornou { base64, mimeType, fileName } com sucesso */
+      b64 = compressed.base64;
+    } else {
+      /* fallback: ler o arquivo original como base64 */
+      b64 = await new Promise((res, rej) => {
+        const reader = new FileReader();
+        reader.onload  = () => res(reader.result.split(',')[1]);
+        reader.onerror = rej;
+        reader.readAsDataURL(file);
+      });
+    }
 
     return await api('/api/media/upload', {
       method: 'POST',
