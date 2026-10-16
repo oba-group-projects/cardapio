@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -2520,6 +2520,19 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
     <!-- ── Essência na Pg1 — alimentada pelo JS via pag1-ne-* ── -->
     <div id="pag1-essencia">
       <span id="pag1-ne-rotulo">Cardápio</span>
+
+      <!-- Imagem de capa — inserida pelo JS quando configurada no painel.
+           Oculta por padrão. A classe b2b-com-foto em #pag-1 ativa o layout responsivo. -->
+      <div id="pag1-capa-foto" style="display:none" aria-hidden="true">
+        <img id="pag1-capa-foto-img"
+             src="" alt=""
+             width="800" height="600"
+             decoding="async"
+             fetchpriority="high"
+             class="pag1-capa-img"
+             onerror="this.closest('#pag1-capa-foto').style.display='none';document.getElementById('pag-1').classList.remove('b2b-com-foto');">
+      </div>
+
       <div class="w-10 h-[2px] bg-orange-200/40 mx-auto rounded-full mb-4"></div>
       <h2 id="pag1-ne-titulo" class="text-sm font-semibold tracking-[0.15em] text-[#8B4513] uppercase mb-3">Nossa Essência</h2>
       <p id="pag1-ne-texto" class="text-[13px] text-gray-600 leading-relaxed font-light px-1"></p>
@@ -3246,6 +3259,9 @@ function resolverAssetModeloMestre(caminho) {
     return valor;
   }
 
+  /* Caminhos de API interna (ex: /api/media/123) — servir diretamente */
+  if (valor.startsWith('/api/')) return valor;
+
   const basePath = OBA_CONFIG?.assets?.basePath;
   const imageRoot = OBA_CONFIG?.assets?.imageRoot;
 
@@ -3878,9 +3894,46 @@ async function hidratarTemaDoModeloMestre() {
     /* Visibilidade da logo Pg1 — padrão: visível (retrocompatível com rascunhos sem o campo) */
     if (elLogo1) elLogo1.style.display = bv.logo_visivel === false ? 'none' : '';
 
+    /* Imagem de capa Pg1 — campo capa_ativa === true ativa o layout com foto.
+       Padrão false → sem alteração visual, capa tipográfica preservada. */
+    (function() {
+      const elCapaFoto = document.getElementById('pag1-capa-foto');
+      const elCapaImg  = document.getElementById('pag1-capa-foto-img');
+      const elPg1Capa  = document.getElementById('pag-1');
+      if (!elCapaFoto || !elCapaImg || !elPg1Capa) return;
+
+      const capaAtiva = bv.capa_ativa === true && bv.capa_imagem;
+      if (capaAtiva) {
+        const src   = resolverAssetModeloMestre(bv.capa_imagem);
+        const posX  = (bv.capa_pos_x  ?? 50) + '%';
+        const posY  = (bv.capa_pos_y  ?? 40) + '%';
+        const enq   = bv.capa_enquadramento || 'equilibrada';
+        const alts  = { compacta: 'clamp(160px,32dvh,260px)', equilibrada: 'clamp(200px,40dvh,340px)', ampla: 'clamp(240px,50dvh,420px)' };
+        const alt   = alts[enq] || alts.equilibrada;
+
+        elCapaImg.src              = src;
+        elCapaImg.alt              = bv.capa_alt || 'Brigadeiros Oba Doceria';
+        elCapaImg.style.objectPosition = posX + ' ' + posY;
+        elCapaImg.dataset.altura   = alt;  /* lido pelo CSS via var ou pelo bloco b2b */
+        elCapaFoto.style.display   = '';
+        elCapaFoto.dataset.enquadramento = enq;
+        elPg1Capa.classList.add('b2b-com-foto');
+        elPg1Capa.dataset.capaEnquadramento = enq;
+      } else {
+        elCapaFoto.style.display   = 'none';
+        elCapaImg.src              = '';
+        elPg1Capa.classList.remove('b2b-com-foto');
+        delete elPg1Capa.dataset.capaEnquadramento;
+      }
+    })();
+
     /* Cores específicas da pag1 */
     const elPag1 = document.getElementById('pag-1');
-    if (elPag1 && bv.corFundo) elPag1.style.backgroundColor = bv.corFundo;
+    if (elPag1 && bv.corFundo) {
+      elPag1.style.backgroundColor = bv.corFundo;
+      /* Expor cor de fundo como variável CSS para o degradê da imagem de capa */
+      elPag1.style.setProperty('--b2b-capa-fundo', bv.corFundo);
+    }
     const elTit1 = document.getElementById('oba-pag1-titulo');
     if (elTit1 && bv.corTitulo) elTit1.style.color = bv.corTitulo;
 
@@ -33663,6 +33716,175 @@ button[onclick*="fecharModalQuantidadeDoce"] {
       transform: scale(0.98) !important;
     }
   }
+
+</style>
+
+<!-- ================================================================
+     B2B - IMAGEM DE CAPA DA PG1
+     Bloco isolado — só ativo quando #pag-1.b2b-com-foto existir.
+     Sem foto configurada → zero impacto visual (fallback completo).
+     Não altera motor de compras, Pg2, Pg3 nem fluxo de pedidos.
+================================================================ -->
+<style id="b2b-capa-foto">
+
+  /* ── ELEMENTO DE IMAGEM — oculto por padrão ─────────────────────
+     Sem a classe b2b-com-foto em #pag-1, este bloco todo é inerte.
+  ────────────────────────────────────────────────────────────────── */
+  #pag1-capa-foto {
+    display: none;
+  }
+
+  /* ── MOBILE: foto em cima, texto embaixo ────────────────────────
+     Ativo apenas quando #pag-1 tem a classe b2b-com-foto.
+     Ordem: identificador → foto → título → texto → CTA (sticky).
+  ────────────────────────────────────────────────────────────────── */
+  #pag-1.b2b-com-foto #pag1-capa-foto {
+    display: block !important;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 1rem;
+    margin: 12px 0 20px;
+    position: relative;
+  }
+
+  /* Altura controlada pelo enquadramento via data-attribute no JS */
+  #pag-1.b2b-com-foto[data-capa-enquadramento="compacta"] #pag1-capa-foto {
+    height: clamp(160px, 32dvh, 260px);
+  }
+  #pag-1.b2b-com-foto[data-capa-enquadramento="equilibrada"] #pag1-capa-foto,
+  #pag-1.b2b-com-foto:not([data-capa-enquadramento]) #pag1-capa-foto {
+    height: clamp(200px, 40dvh, 340px);
+  }
+  #pag-1.b2b-com-foto[data-capa-enquadramento="ampla"] #pag1-capa-foto {
+    height: clamp(240px, 50dvh, 420px);
+  }
+
+  /* Imagem — cobre o container, posição controlada pelo JS */
+  .pag1-capa-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 40%; /* sobrescrito pelo JS inline */
+    display: block;
+  }
+
+  /* Degradê creme na base — transição suave para o fundo da página */
+  #pag-1.b2b-com-foto #pag1-capa-foto::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background: linear-gradient(to bottom, transparent, #FAF5F0);
+    pointer-events: none;
+  }
+
+  /* Usar cor de fundo customizada se definida via JS inline no #pag-1 */
+  #pag-1.b2b-com-foto #pag1-capa-foto::after {
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      var(--b2b-capa-fundo, #FAF5F0) 100%
+    );
+  }
+
+  /* ── AJUSTE DE ESPAÇAMENTO quando há foto ───────────────────────
+     Reduzir padding-top: o identificador já respira acima da foto.
+  ────────────────────────────────────────────────────────────────── */
+  #pag-1.b2b-com-foto {
+    padding-top: clamp(16px, 4dvh, 36px) !important;
+  }
+
+  /* Bloco essência: sem max-width restritivo quando há foto no mobile
+     (a foto já tem max-width do container) */
+  #pag-1.b2b-com-foto #pag1-essencia {
+    max-width: 100% !important;
+  }
+
+  /* ── DESKTOP ≥900px: duas colunas ──────────────────────────────
+     Texto à esquerda (~45%), foto à direita (55%), foto preenche altura.
+     Só ativo com b2b-com-foto.
+  ────────────────────────────────────────────────────────────────── */
+  @media (min-width: 900px) {
+    #pag-1.b2b-com-foto {
+      display: grid !important;
+      grid-template-columns: 45fr 55fr !important;
+      grid-template-rows: 1fr !important;
+      align-items: stretch !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+    }
+
+    /* Coluna esquerda: conteúdo textual + CTA */
+    #pag-1.b2b-com-foto > .pg1-conteudo {
+      grid-column: 1 !important;
+      grid-row: 1 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      padding: clamp(32px, 5vw, 64px) clamp(24px, 4vw, 52px) !important;
+      overflow-y: auto !important;
+    }
+
+    /* Coluna direita: foto ocupa altura total da viewport */
+    #pag-1.b2b-com-foto #pag1-capa-foto {
+      grid-column: 2 !important;
+      grid-row: 1 !important;
+      width: 100% !important;
+      height: 100% !important;
+      margin: 0 !important;
+      border-radius: 0 !important;
+      position: relative !important;
+    }
+
+    /* Sem degradê de base no desktop — a divisão de colunas é suficiente */
+    #pag-1.b2b-com-foto #pag1-capa-foto::after {
+      display: none !important;
+    }
+
+    /* Degradê lateral: transição suave entre coluna texto e foto */
+    #pag-1.b2b-com-foto #pag1-capa-foto::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 80px;
+      background: linear-gradient(
+        to right,
+        var(--b2b-capa-fundo, #FAF5F0) 0%,
+        transparent 100%
+      );
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Resetar max-width do essência no desktop com foto */
+    #pag-1.b2b-com-foto #pag1-essencia {
+      max-width: 480px !important;
+    }
+
+    /* CTA: não sticky no desktop — flui normalmente */
+    #pag-1.b2b-com-foto #oba-pag1-btn-cta {
+      position: static !important;
+    }
+  }
+
+  /* ── TELAS MUITO BAIXAS: modo compacto forçado ──────────────────
+     Em 320x568, com foto Ampla, forçar compacta para CTA não sumir.
+     O CTA sticky (B2) já ajuda, mas isso garante o texto visível.
+  ────────────────────────────────────────────────────────────────── */
+  @media (max-height: 580px) {
+    #pag-1.b2b-com-foto #pag1-capa-foto {
+      height: clamp(120px, 26dvh, 180px) !important;
+    }
+  }
+
+  /* ── FALLBACK: sem foto, tudo idêntico ao estado atual ──────────
+     Nenhuma regra acima afeta #pag-1 sem a classe b2b-com-foto.
+     A capa tipográfica existente (B1 + B2) permanece intacta.
+  ────────────────────────────────────────────────────────────────── */
 
 </style>
 
