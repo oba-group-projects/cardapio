@@ -3908,22 +3908,31 @@ async function hidratarTemaDoModeloMestre() {
         const posX  = (bv.capa_pos_x  ?? 50) + '%';
         const posY  = (bv.capa_pos_y  ?? 40) + '%';
         const enq   = bv.capa_enquadramento || 'equilibrada';
+        const zoom  = Math.min(2.0, Math.max(1.0, Number(bv.capa_zoom ?? 1.0)));
+        const grad  = bv.capa_gradiente || 'suave';
         const alts  = { compacta: 'clamp(160px,32dvh,260px)', equilibrada: 'clamp(200px,40dvh,340px)', ampla: 'clamp(240px,50dvh,420px)' };
         const alt   = alts[enq] || alts.equilibrada;
 
         elCapaImg.src              = src;
         elCapaImg.alt              = bv.capa_alt || 'Brigadeiros Oba Doceria';
         elCapaImg.style.objectPosition = posX + ' ' + posY;
-        elCapaImg.dataset.altura   = alt;  /* lido pelo CSS via var ou pelo bloco b2b */
+        /* Zoom: scale() mantém overflow:hidden do container — sem bordas vazias */
+        elCapaImg.style.transform  = zoom > 1.0 ? 'scale(' + zoom.toFixed(2) + ')' : '';
+        elCapaImg.dataset.altura   = alt;
         elCapaFoto.style.display   = '';
         elCapaFoto.dataset.enquadramento = enq;
+        /* Degradê: exposto via data-attr lido pelo CSS b2b */
+        elCapaFoto.dataset.gradiente = grad;
         elPg1Capa.classList.add('b2b-com-foto');
         elPg1Capa.dataset.capaEnquadramento = enq;
+        elPg1Capa.dataset.capaGradiente     = grad;
       } else {
         elCapaFoto.style.display   = 'none';
         elCapaImg.src              = '';
+        elCapaImg.style.transform  = '';
         elPg1Capa.classList.remove('b2b-com-foto');
         delete elPg1Capa.dataset.capaEnquadramento;
+        delete elPg1Capa.dataset.capaGradiente;
       }
     })();
 
@@ -33885,6 +33894,61 @@ button[onclick*="fecharModalQuantidadeDoce"] {
      Nenhuma regra acima afeta #pag-1 sem a classe b2b-com-foto.
      A capa tipográfica existente (B1 + B2) permanece intacta.
   ────────────────────────────────────────────────────────────────── */
+
+</style>
+
+<!-- ================================================================
+     B2C - ZOOM E DEGRADÊ DA CAPA PG1
+     Extensão do B2B. Só ativo com .b2b-com-foto + data-capa-gradiente.
+     Zero impacto sem imagem configurada.
+================================================================ -->
+<style id="b2c-capa-foto">
+
+  /* ── ZOOM via transform:scale() ─────────────────────────────────
+     O JS aplica transform:scale() inline no elemento img.
+     overflow:hidden do container evita bordas vazias.
+     transform-origin:center center garante zoom uniforme.
+  ────────────────────────────────────────────────────────────────── */
+  #pag-1.b2b-com-foto #pag1-capa-foto-img {
+    transform-origin: center center;
+  }
+
+  /* ── DEGRADÊ CONTROLÁVEL ────────────────────────────────────────
+     Três intensidades via data-capa-gradiente no #pag-1.
+     O ::after já existe no B2B — aqui sobrescrevemos por opção.
+     Desktop: ::after oculto no B2B (display:none) — sem override.
+  ────────────────────────────────────────────────────────────────── */
+
+  /* Nenhum */
+  #pag-1.b2b-com-foto[data-capa-gradiente="nenhum"] #pag1-capa-foto::after {
+    display: none !important;
+  }
+
+  /* Suave — padrão quando campo ausente */
+  #pag-1.b2b-com-foto[data-capa-gradiente="suave"] #pag1-capa-foto::after,
+  #pag-1.b2b-com-foto:not([data-capa-gradiente]) #pag1-capa-foto::after {
+    display: block !important;
+    height: 40% !important;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      var(--b2b-capa-fundo, #FAF5F0) 100%
+    ) !important;
+    opacity: 1 !important;
+  }
+
+  /* Pronunciado */
+  #pag-1.b2b-com-foto[data-capa-gradiente="pronunciado"] #pag1-capa-foto::after {
+    display: block !important;
+    height: 65% !important;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      var(--b2b-capa-fundo, #FAF5F0) 80%,
+      var(--b2b-capa-fundo, #FAF5F0) 100%
+    ) !important;
+    opacity: 1 !important;
+  }
 
 </style>
 
