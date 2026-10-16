@@ -2,7 +2,15 @@
   "paginas": {
     "boas_vindas": {
       "ativo": true,
-      "botaoCTA": "Ver o Cardápio",
+      "botaoCTA": "Conhecer nossos doces →",
+      "capa_alt": "",
+      "capa_ativa": true,
+      "capa_enquadramento": "ampla",
+      "capa_gradiente": "suave",
+      "capa_imagem": "/api/media/media_fee230b9b9c54de8",
+      "capa_pos_x": 50,
+      "capa_pos_y": 40,
+      "capa_zoom": 1.75,
       "corFundo": "",
       "corTitulo": "",
       "exibirCTA": true,
@@ -33,11 +41,11 @@
       "botoes": [
         {
           "acao": "caixas",
-          "destaque": false,
+          "destaque": true,
           "icone": "fa-solid fa-box-open",
           "id": "btn-0",
           "label": "Caixas de Doces",
-          "sublabel": "Montagem",
+          "sublabel": "Montar minha caixa",
           "url": "",
           "visivel": true
         },
@@ -47,7 +55,7 @@
           "icone": "fa-solid fa-box-open",
           "id": "btn-1",
           "label": "Doces Finos",
-          "sublabel": "Montagem",
+          "sublabel": "Montar",
           "url": "",
           "visivel": false
         },
@@ -57,7 +65,7 @@
           "icone": "fa-solid fa-gift",
           "id": "btn-2",
           "label": "Presenteáveis / Especiais",
-          "sublabel": "Kits & Presentes",
+          "sublabel": "Escolher um presente especial",
           "url": "",
           "visivel": true
         },
@@ -111,9 +119,9 @@
       "tamTexto": "",
       "tamTitulo": "",
       "tamanhoLogo": "pequeno",
-      "texto": "Brigadeiros artesanais, intensamente cremosos, feitos à mão para adoçar momentos especiais.",
+      "texto": "Brigadeiros artesanais, intensamente cremosos e preparados com cuidado de tornar seus momentos ainda mais especiais.",
       "texto2": "",
-      "titulo": "Pequenos Prazeres, Grandes Momentos"
+      "titulo": "Brigadeiros que ficam na memória."
     },
     "personalizados_modal": {
       "ativo": false,
