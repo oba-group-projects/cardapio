@@ -8,6 +8,7 @@
       "exibirCTA": true,
       "exibirSubtitulo": true,
       "logo": "",
+      "logo_visivel": false,
       "pesoCTA": "",
       "pesoSubtitulo": "",
       "pesoTitulo": "",
@@ -84,6 +85,7 @@
       "corFundo": "",
       "corSubtitulo": "",
       "logo": "",
+      "logo_visivel": false,
       "pesoLabel": "",
       "pesoSublabel": "",
       "pesoSubtitulo": "",
@@ -100,8 +102,8 @@
       "corTexto": "",
       "corTitulo": "",
       "exibirCitacao": false,
-      "exibirSeparador": true,
-      "logo": "",
+      "exibirSeparador": false,
+      "logo": "https://raw.githubusercontent.com/oba-group-projects/cardapio/main/Images/Logo_Oba/logo-circular-transparente%20(1).png",
       "pesoCitacao": "",
       "pesoTexto": "",
       "pesoTitulo": "",
@@ -109,9 +111,9 @@
       "tamTexto": "",
       "tamTitulo": "",
       "tamanhoLogo": "pequeno",
-      "texto": "Na Oba Doceria, acreditamos que um doce artesanal começa muito antes da primeira mordida. Cada receita é criada, testada e produzida com cuidado, utilizando ingredientes selecionados e técnicas que valorizam o verdadeiro sabor de cada elemento. Buscamos o equilíbrio perfeito entre textura, cremosidade e doçura — para que cada brigadeiro seja uma experiência, e não apenas um doce.",
-      "texto2": "Do primeiro preparo até chegar às suas mãos, cada brigadeiro é feito com tempo e carinho.",
-      "titulo": "Nossa Essência"
+      "texto": "Brigadeiros artesanais, intensamente cremosos, feitos à mão para adoçar momentos especiais.",
+      "texto2": "",
+      "titulo": "Pequenos Prazeres, Grandes Momentos"
     },
     "personalizados_modal": {
       "ativo": false,
@@ -165,6 +167,6 @@
     "tamanhoSubtitulo": "11",
     "tamanhoTitulo": "26"
   },
-  "updatedAt": "2026-10-15",
+  "updatedAt": "2026-10-16",
   "variante": "classica"
 }
