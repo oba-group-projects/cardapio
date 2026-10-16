@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -2533,6 +2533,9 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
              onerror="this.closest('#pag1-capa-foto').style.display='none';document.getElementById('pag-1').classList.remove('b2b-com-foto');">
       </div>
 
+      <!-- Identificação da marca — exibida/oculta e estilizada pelo JS via bv.marca_* -->
+      <span id="pag1-ne-marca" style="display:none"></span>
+
       <div class="w-10 h-[2px] bg-orange-200/40 mx-auto rounded-full mb-4"></div>
       <h2 id="pag1-ne-titulo" class="text-sm font-semibold tracking-[0.15em] text-[#8B4513] uppercase mb-3">Nossa Essência</h2>
       <p id="pag1-ne-texto" class="text-[13px] text-gray-600 leading-relaxed font-light px-1"></p>
@@ -2542,7 +2545,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
 
     <!-- CTA — posicionado após a essência para ficar no fundo -->
     <button id="oba-pag1-btn-cta" onclick="navegarPara(2)" class="w-full max-w-[280px] mt-12 py-3.5 bg-[#8B4513] text-white rounded-[1rem] font-medium text-[10px] uppercase tracking-[0.2em] shadow-md shadow-[#8B4513]/15 active:scale-95 flex justify-center items-center gap-3">
-      <span id="oba-pag1-cta">Descobrir Nossa História</span> <i class="fa-solid fa-chevron-right text-[9px]"></i>
+      <span id="oba-pag1-cta">Descobrir Nossa História</span>
     </button>
 
   </section>
@@ -2571,11 +2574,11 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
     <div id="oba-menu-botoes" class="w-full space-y-4">
       <!-- R10A: botões renderizados dinamicamente por hidratarTemaDoModeloMestre() -->
       <button onclick="entFluxoCaixas()" class="w-full p-6 bg-[#8B4513] text-white rounded-[2rem] shadow-xl shadow-[#8B4513]/20 text-left flex justify-between items-center active:scale-95 transition-all">
-        <div><span class="block text-[9px] uppercase tracking-widest opacity-70 mb-1">Montagem</span><span class="text-sm font-medium">Caixas de Doces</span></div>
+        <div><span class="block text-[9px] uppercase tracking-widest opacity-70 mb-1">Monte a sua caixa</span><span class="text-sm font-medium">Caixas de Doces</span></div>
         <i class="fa-solid fa-box-open text-xl opacity-40"></i>
       </button>
       <button onclick="entFluxoPresenteaveis()" class="w-full p-6 bg-white border border-[#8B4513]/10 text-[#8B4513] rounded-[2rem] text-left flex justify-between items-center active:scale-95 transition-all shadow-sm">
-        <div><span class="block text-[9px] uppercase tracking-widest opacity-50 mb-1">Kits & Presentes</span><span class="text-sm font-medium">Presenteáveis / Especiais</span></div>
+        <div><span class="block text-[9px] uppercase tracking-widest opacity-50 mb-1">Escolha o seu presente</span><span class="text-sm font-medium">Presenteáveis / Especiais</span></div>
         <i class="fa-solid fa-gift text-xl opacity-20"></i>
       </button>
       <button data-oba-business-channel="personalizados" onclick="abrirModalEspecial('personalizados')" class="w-full p-6 bg-white border border-[#8B4513]/10 text-[#8B4513] rounded-[2rem] text-left flex justify-between items-center active:scale-95 transition-all shadow-sm">
@@ -2583,7 +2586,7 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
         <i class="fa-solid fa-wand-magic-sparkles text-xl opacity-20"></i>
       </button>
       <button data-oba-business-channel="eventos" onclick="abrirModalEspecial('eventos')" class="w-full p-6 bg-white border border-[#8B4513]/10 text-[#8B4513] rounded-[2rem] text-left flex justify-between items-center active:scale-95 transition-all shadow-sm">
-        <div><span class="block text-[9px] uppercase tracking-widest opacity-50 mb-1">Proposta</span><span class="text-sm font-medium">Grandes Eventos</span></div>
+        <div><span class="block text-[9px] uppercase tracking-widest opacity-50 mb-1">Eventos &amp; Corporativo</span><span class="text-sm font-medium">Grandes Eventos</span></div>
         <i class="fa-solid fa-champagne-glasses text-xl opacity-20"></i>
       </button>
     </div>
@@ -3997,6 +4000,32 @@ async function hidratarTemaDoModeloMestre() {
     _set('pag1-ne-texto',    ne.texto);
     _set('pag1-ne-texto-2',  ne.texto2);
     _set('pag1-ne-citacao',  ne.citacao ? `"${ne.citacao.replace(/^"|"$/g, '')}"` : null);
+
+    /* Visibilidade do segundo parágrafo na Pg1 — padrão: oculto (campo ne.exibirTexto2) */
+    const elTexto2 = document.getElementById('pag1-ne-texto-2');
+    if (elTexto2) elTexto2.style.display = ne.exibirTexto2 === true ? '' : 'none';
+
+    /* Marca na Pg1 — padrão: oculto (campo bv.marca_visivel) */
+    (function() {
+      const elMarca = document.getElementById('pag1-ne-marca');
+      if (!elMarca) return;
+      const marcaVisivel = bv.marca_visivel === true;
+      if (!marcaVisivel) { elMarca.style.display = 'none'; return; }
+      const texto   = (bv.marca_texto || 'OBA DOCERIA').trim();
+      const caixa   = bv.marca_caixa   || 'upper';   /* upper / normal / capitalize */
+      const tam     = bv.marca_tam      || 'pequeno'; /* pequeno / medio / grande */
+      const peso    = bv.marca_peso     || '600';
+      const tamMap  = { pequeno: '10px', medio: '13px', grande: '16px' };
+      elMarca.textContent  = texto;
+      elMarca.style.display          = 'block';
+      elMarca.style.textTransform    = caixa === 'upper' ? 'uppercase' : caixa === 'capitalize' ? 'capitalize' : 'none';
+      elMarca.style.fontSize         = tamMap[tam] || '10px';
+      elMarca.style.fontWeight       = peso;
+      elMarca.style.letterSpacing    = tam === 'grande' ? '.22em' : '.28em';
+      elMarca.style.marginBottom     = '10px';
+      /* Cor: usa corTitulo se definida, senão marrom padrão com opacidade */
+      elMarca.style.color = bv.marca_cor || 'rgba(139,69,19,.6)';
+    })();
 
     /* Tamanho da logo pag2 */
     const elLogo2 = document.getElementById('oba-pag2-logo');
@@ -33948,6 +33977,47 @@ button[onclick*="fecharModalQuantidadeDoce"] {
       var(--b2b-capa-fundo, #FAF5F0) 100%
     ) !important;
     opacity: 1 !important;
+  }
+
+</style>
+
+<!-- ================================================================
+     B3 - REFINAMENTO VISUAL PG3
+     Mais contraste nos cartões secundários, ícones visíveis,
+     botão de destaque com mais peso. Zero impacto no motor de compras.
+================================================================ -->
+<style id="b3-pg3-refinamento">
+
+  /* Bordas dos cartões secundários — de 10% para 25% de opacidade */
+  #oba-menu-botoes button:not(.bg-\[\#8B4513\]) {
+    border-color: rgba(139, 69, 19, 0.25) !important;
+  }
+
+  /* Ícones dos cartões secundários — de 20% para 65% */
+  #oba-menu-botoes button:not(.bg-\[\#8B4513\]) i {
+    opacity: 0.65 !important;
+  }
+
+  /* Ícone do botão de destaque (marrom) — mantém presença sem exagero */
+  #oba-menu-botoes button.bg-\[\#8B4513\] i {
+    opacity: 0.85 !important;
+  }
+
+  /* Botão de destaque — padding ligeiramente maior para criar diferença de peso */
+  #oba-menu-botoes button.bg-\[\#8B4513\] {
+    padding-top: 20px !important;
+    padding-bottom: 20px !important;
+  }
+
+  /* Sublabels dos botões — um pouco mais presentes */
+  #pag-3 .oba-btn-sublabel {
+    opacity: 0.8 !important;
+    letter-spacing: .14em !important;
+  }
+
+  /* Sublabel do destaque — contraste sobre fundo marrom */
+  #oba-menu-botoes button.bg-\[\#8B4513\] .oba-btn-sublabel {
+    opacity: 0.75 !important;
   }
 
 </style>
