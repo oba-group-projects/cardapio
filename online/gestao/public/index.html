@@ -352,6 +352,48 @@ function obaLogout() {
           <label class="oba-toggle-label"><input type="checkbox" id="pg1-exibirCTA" checked> Exibir botão CTA</label>
         </div>
 
+        <div style="grid-column:1/-1"><p class="oba-secao-titulo">🏷️ Identificação da marca <span class="hint">(acima do título na capa)</span></p></div>
+        <div class="field full" style="display:flex;gap:20px;flex-wrap:wrap;align-items:center">
+          <label class="oba-toggle-label"><input type="checkbox" id="pg1-marca-visivel"> Exibir identificação da marca</label>
+          <span class="hint">Aparece acima do título. Oculto por padrão — ative para mostrar.</span>
+        </div>
+        <div class="field">
+          <label>Texto da marca</label>
+          <input id="pg1-marca-texto" placeholder="OBA DOCERIA" value="OBA DOCERIA">
+        </div>
+        <div class="field">
+          <label>Formatação do texto</label>
+          <select id="pg1-marca-caixa">
+            <option value="upper" selected>CAIXA ALTA (OBA DOCERIA)</option>
+            <option value="capitalize">Capitalizado (Oba Doceria)</option>
+            <option value="normal">Como digitado</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Tamanho</label>
+          <select id="pg1-marca-tam">
+            <option value="pequeno" selected>Pequeno — discreto (10px)</option>
+            <option value="medio">Médio (13px)</option>
+            <option value="grande">Grande (16px)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Peso</label>
+          <select id="pg1-marca-peso">
+            <option value="400">Fino (400)</option>
+            <option value="600" selected>Médio (600)</option>
+            <option value="700">Negrito (700)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Cor <span class="hint">(vazio = marrom padrão com opacidade)</span></label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="color" id="pg1-marca-cor" value="#8B4513" style="width:52px;height:38px;padding:2px;border-radius:8px;cursor:pointer">
+            <input type="text" id="pg1-marca-cor-hex" value="" maxlength="9" placeholder="Padrão (rgba)" style="width:140px">
+            <button type="button" class="secondary" style="padding:6px 10px;font-size:11px" onclick="document.getElementById('pg1-marca-cor-hex').value=''">↺ Padrão</button>
+          </div>
+        </div>
+
         <div style="grid-column:1/-1"><p class="oba-secao-titulo">🔤 Tipografia desta página <span class="hint">(vazio = usa o Tema Global)</span></p></div>
         <div class="field">
           <label>Tamanho do título</label>
@@ -493,6 +535,7 @@ function obaLogout() {
 
         <div style="grid-column:1/-1"><p class="oba-secao-titulo">👁️ Visibilidade</p></div>
         <div class="field full" style="display:flex;gap:20px;flex-wrap:wrap">
+          <label class="oba-toggle-label"><input type="checkbox" id="pg2-exibirTexto2"> Exibir segundo parágrafo</label>
           <label class="oba-toggle-label"><input type="checkbox" id="pg2-exibirCitacao" checked> Exibir citação em itálico</label>
           <label class="oba-toggle-label"><input type="checkbox" id="pg2-exibirSeparador" checked> Exibir separador decorativo</label>
         </div>
@@ -2346,10 +2389,10 @@ $('formConfig').onsubmit=async e=>{
   /* Botões padrão para restaurar */
   window.obaDefaultBotoes=function(){
     return [
-      {id:'caixas',        label:'Caixas de Doces',           sublabel:'Montagem',         icone:'fa-solid fa-box-open',            acao:'caixas',         destaque:true,  visivel:true},
-      {id:'presenteaveis', label:'Presenteáveis / Especiais', sublabel:'Kits & Presentes', icone:'fa-solid fa-gift',                acao:'presenteaveis',  destaque:false, visivel:true},
-      {id:'personalizados',label:'Doces Personalizados',       sublabel:'Exclusivo',        icone:'fa-solid fa-wand-magic-sparkles', acao:'personalizados', destaque:false, visivel:true},
-      {id:'eventos',       label:'Grandes Eventos',            sublabel:'Proposta',         icone:'fa-solid fa-champagne-glasses',   acao:'eventos',        destaque:false, visivel:true}
+      {id:'caixas',        label:'Caixas de Doces',           sublabel:'Monte a sua caixa',       icone:'fa-solid fa-box-open',            acao:'caixas',         destaque:true,  visivel:true},
+      {id:'presenteaveis', label:'Presenteáveis / Especiais', sublabel:'Escolha o seu presente',  icone:'fa-solid fa-gift',                acao:'presenteaveis',  destaque:false, visivel:true},
+      {id:'personalizados',label:'Doces Personalizados',       sublabel:'Exclusivo',               icone:'fa-solid fa-wand-magic-sparkles', acao:'personalizados', destaque:false, visivel:true},
+      {id:'eventos',       label:'Grandes Eventos',            sublabel:'Eventos & Corporativo',   icone:'fa-solid fa-champagne-glasses',   acao:'eventos',        destaque:false, visivel:true}
     ];
   };
 
@@ -2701,6 +2744,13 @@ $('formConfig').onsubmit=async e=>{
     obaSetCheck('pg1-exibirSubtitulo',bv.exibirSubtitulo!==false);
     obaSetCheck('pg1-exibirCTA',bv.exibirCTA!==false);
     obaSetCheck('pg1-ativo',bv.ativo!==false);
+    /* Marca */
+    obaSetCheck('pg1-marca-visivel', bv.marca_visivel === true);
+    obaSetVal('pg1-marca-texto', bv.marca_texto || 'OBA DOCERIA');
+    const selMarcaCaixa = $('pg1-marca-caixa'); if (selMarcaCaixa) selMarcaCaixa.value = bv.marca_caixa || 'upper';
+    const selMarcaTam   = $('pg1-marca-tam');   if (selMarcaTam)   selMarcaTam.value   = bv.marca_tam   || 'pequeno';
+    const selMarcaPeso  = $('pg1-marca-peso');  if (selMarcaPeso)  selMarcaPeso.value  = bv.marca_peso  || '600';
+    if ($('pg1-marca-cor-hex')) $('pg1-marca-cor-hex').value = bv.marca_cor || '';
     obaAtualizarLogoPreview('pg1-logo','pg1-logo-preview');
     /* Imagem de capa Pg1 */
     obaSetCheck('pg1-capa-ativa', bv.capa_ativa === true);
@@ -2733,6 +2783,7 @@ $('formConfig').onsubmit=async e=>{
     obaSetCorPagina('pg2-corTexto',ne.corTexto);
     obaSetCheck('pg2-exibirCitacao',ne.exibirCitacao!==false);
     obaSetCheck('pg2-exibirSeparador',ne.exibirSeparador!==false);
+    obaSetCheck('pg2-exibirTexto2', ne.exibirTexto2 === true);
     obaSetCheck('pg2-ativo',ne.ativo!==false);
     obaAtualizarLogoPreview('pg2-logo','pg2-logo-preview');
 
@@ -2994,6 +3045,12 @@ $('formConfig').onsubmit=async e=>{
           pesoCTA:$('pg1-pesoCTA')?.value||'',
           exibirSubtitulo:$('pg1-exibirSubtitulo')?.checked!==false,
           exibirCTA:$('pg1-exibirCTA')?.checked!==false,
+          marca_visivel: $('pg1-marca-visivel')?.checked === true,
+          marca_texto:   $('pg1-marca-texto')?.value.trim() || 'OBA DOCERIA',
+          marca_caixa:   $('pg1-marca-caixa')?.value  || 'upper',
+          marca_tam:     $('pg1-marca-tam')?.value    || 'pequeno',
+          marca_peso:    $('pg1-marca-peso')?.value   || '600',
+          marca_cor:     $('pg1-marca-cor-hex')?.value.trim() || '',
           capa_ativa:$('pg1-capa-ativa')?.checked===true,
           capa_imagem:$('pg1-capa-imagem')?.value.trim()||'',
           capa_alt:$('pg1-capa-alt')?.value.trim()||'',
@@ -3021,7 +3078,8 @@ $('formConfig').onsubmit=async e=>{
           tamCitacao:$('pg2-tamCitacao')?.value||'',
           pesoCitacao:$('pg2-pesoCitacao')?.value||'',
           exibirCitacao:$('pg2-exibirCitacao')?.checked!==false,
-          exibirSeparador:$('pg2-exibirSeparador')?.checked!==false
+          exibirSeparador:$('pg2-exibirSeparador')?.checked!==false,
+          exibirTexto2:$('pg2-exibirTexto2')?.checked===true
         },
         menu_principal:{
           ativo:$('pg3-ativo')?.checked!==false,
