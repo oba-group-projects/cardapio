@@ -209,6 +209,78 @@ function obaLogout() {
           </select>
         </div>
 
+        <div style="grid-column:1/-1"><p class="oba-secao-titulo">📸 Imagem de capa <span class="hint">(opcional — foto do produto na Pg1)</span></p></div>
+        <div class="field full" style="display:flex;gap:20px;flex-wrap:wrap;align-items:center">
+          <label class="oba-toggle-label"><input type="checkbox" id="pg1-capa-ativa"> Exibir imagem de capa</label>
+          <span class="hint" style="color:#a06000">Desmarcar oculta a imagem sem apagar os ajustes salvos.</span>
+        </div>
+        <div class="field full">
+          <label>Imagem <span class="hint">(URL, caminho relativo ou galeria de mídias)</span></label>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <input id="pg1-capa-imagem" placeholder="/api/media/123 ou Images/foto-brigadeiro.jpg" style="flex:1;min-width:200px">
+            <button type="button" class="secondary" style="padding:7px 10px;font-size:12px;white-space:nowrap" onclick="obaAbrirGaleria('pg1-capa-imagem','pg1-capa-preview')">📁 Galeria</button>
+            <img id="pg1-capa-preview" src="" alt="preview" onerror="this.style.display='none'" style="width:80px;height:60px;object-fit:cover;border:1px solid var(--line);border-radius:8px;display:none">
+          </div>
+        </div>
+        <div class="field full">
+          <label>Texto alternativo <span class="hint">(acessibilidade)</span></label>
+          <input id="pg1-capa-alt" placeholder="Brigadeiros artesanais Oba Doceria">
+        </div>
+        <div class="field">
+          <label>Foco horizontal <span class="hint">(0 = esq · 50 = centro · 100 = dir)</span></label>
+          <div style="display:flex;gap:10px;align-items:center">
+            <input type="range" id="pg1-capa-pos-x" min="0" max="100" value="50" style="flex:1" oninput="document.getElementById('pg1-capa-pos-x-val').textContent=this.value+'%';pg1CapaAtualizarPrevia()">
+            <span id="pg1-capa-pos-x-val" style="font-size:12px;min-width:36px;text-align:right">50%</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Foco vertical <span class="hint">(0 = topo · 40 = centro-alto · 100 = base)</span></label>
+          <div style="display:flex;gap:10px;align-items:center">
+            <input type="range" id="pg1-capa-pos-y" min="0" max="100" value="40" style="flex:1" oninput="document.getElementById('pg1-capa-pos-y-val').textContent=this.value+'%';pg1CapaAtualizarPrevia()">
+            <span id="pg1-capa-pos-y-val" style="font-size:12px;min-width:36px;text-align:right">40%</span>
+          </div>
+        </div>
+        <div class="field full" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button type="button" class="secondary" style="font-size:12px" onclick="pg1CapaRestaurarAjustes()">↺ Restaurar ajustes</button>
+          <span class="hint">Volta foco para 50% / 40% e enquadramento para Equilibrada.</span>
+        </div>
+        <div class="field full">
+          <label>Altura da foto no celular</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 14px;border:1.5px solid var(--line);border-radius:8px;font-size:12px;font-weight:600">
+              <input type="radio" name="pg1-capa-enquadramento" value="compacta" style="margin:0"> Compacta
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 14px;border:1.5px solid var(--brand);border-radius:8px;font-size:12px;font-weight:600;background:var(--brand-light)">
+              <input type="radio" name="pg1-capa-enquadramento" value="equilibrada" checked style="margin:0"> Equilibrada
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 14px;border:1.5px solid var(--line);border-radius:8px;font-size:12px;font-weight:600">
+              <input type="radio" name="pg1-capa-enquadramento" value="ampla" style="margin:0"> Ampla
+            </label>
+          </div>
+        </div>
+
+        <!-- Prévia de recorte mobile + desktop -->
+        <div class="field full" id="pg1-capa-previa-container" style="display:none">
+          <p class="oba-secao-titulo" style="margin-bottom:12px">👁️ Prévia do recorte</p>
+          <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start">
+            <!-- Mobile -->
+            <div>
+              <p style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Celular</p>
+              <div id="pg1-capa-previa-mobile" style="width:160px;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#FAF5F0;position:relative">
+                <img id="pg1-capa-previa-mobile-img" src="" alt="" style="width:100%;display:block;object-fit:cover;object-position:50% 40%">
+              </div>
+            </div>
+            <!-- Desktop -->
+            <div>
+              <p style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Desktop (coluna direita)</p>
+              <div id="pg1-capa-previa-desktop" style="width:280px;height:160px;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#FAF5F0">
+                <img id="pg1-capa-previa-desktop-img" src="" alt="" style="width:100%;height:100%;display:block;object-fit:cover;object-position:50% 40%">
+              </div>
+            </div>
+          </div>
+          <p class="hint" style="margin-top:8px">Prévia de recorte — representa como a foto será enquadrada, não o layout completo da página.</p>
+        </div>
+
         <div style="grid-column:1/-1"><p class="oba-secao-titulo">🎨 Cores desta página</p></div>
         <div class="field">
           <label>Cor de fundo <span class="hint">(vazio = usa o tema global)</span></label>
@@ -2583,6 +2655,19 @@ $('formConfig').onsubmit=async e=>{
     obaSetCheck('pg1-exibirCTA',bv.exibirCTA!==false);
     obaSetCheck('pg1-ativo',bv.ativo!==false);
     obaAtualizarLogoPreview('pg1-logo','pg1-logo-preview');
+    /* Imagem de capa Pg1 */
+    obaSetCheck('pg1-capa-ativa', bv.capa_ativa === true);
+    obaSetVal('pg1-capa-imagem', bv.capa_imagem || '');
+    obaSetVal('pg1-capa-alt', bv.capa_alt || '');
+    const rngCapaX = $('pg1-capa-pos-x');
+    if (rngCapaX) { rngCapaX.value = bv.capa_pos_x ?? 50; document.getElementById('pg1-capa-pos-x-val').textContent = rngCapaX.value + '%'; }
+    const rngCapaY = $('pg1-capa-pos-y');
+    if (rngCapaY) { rngCapaY.value = bv.capa_pos_y ?? 40; document.getElementById('pg1-capa-pos-y-val').textContent = rngCapaY.value + '%'; }
+    const enqVal = bv.capa_enquadramento || 'equilibrada';
+    document.querySelectorAll('input[name="pg1-capa-enquadramento"]').forEach(r => { r.checked = r.value === enqVal; });
+    const prevCapaImg = $('pg1-capa-preview');
+    if (prevCapaImg && bv.capa_imagem) { prevCapaImg.src = bv.capa_imagem; prevCapaImg.style.display = ''; }
+    pg1CapaAtualizarPrevia();
 
     /* Nossa Essência */
     const ne=pg.nossa_essencia||{};
@@ -2718,6 +2803,41 @@ $('formConfig').onsubmit=async e=>{
     inp.oninput=()=>{const vv=(inp.value||'').trim();if(vv){img.src=vv;img.style.display=''}else{img.style.display='none'}};
   }
 
+  /* Imagem de capa Pg1 — funções auxiliares do painel */
+  const PG1_CAPA_ENQUADRAMENTOS = { compacta: '100px', equilibrada: '140px', ampla: '180px' };
+  function pg1CapaAtualizarPrevia() {
+    const src = ($('pg1-capa-imagem')?.value || '').trim();
+    const posX = ($('pg1-capa-pos-x')?.value ?? 50) + '%';
+    const posY = ($('pg1-capa-pos-y')?.value ?? 40) + '%';
+    const enq = document.querySelector('input[name="pg1-capa-enquadramento"]:checked')?.value || 'equilibrada';
+    const altMobile = PG1_CAPA_ENQUADRAMENTOS[enq] || '140px';
+    const container = $('pg1-capa-previa-container');
+    if (!src) { if (container) container.style.display = 'none'; return; }
+    if (container) container.style.display = '';
+    const imgM = $('pg1-capa-previa-mobile-img');
+    const imgD = $('pg1-capa-previa-desktop-img');
+    const divM = $('pg1-capa-previa-mobile');
+    if (imgM) { imgM.src = src; imgM.style.objectPosition = posX + ' ' + posY; imgM.style.height = altMobile; }
+    if (divM) divM.style.height = altMobile;
+    if (imgD) { imgD.src = src; imgD.style.objectPosition = posX + ' ' + posY; }
+    /* Atualizar preview pequeno também */
+    const prev = $('pg1-capa-preview');
+    if (prev) { prev.src = src; prev.style.display = ''; }
+  }
+  window.pg1CapaAtualizarPrevia = pg1CapaAtualizarPrevia;
+
+  function pg1CapaRestaurarAjustes() {
+    const rx = $('pg1-capa-pos-x'); if (rx) { rx.value = 50; $('pg1-capa-pos-x-val').textContent = '50%'; }
+    const ry = $('pg1-capa-pos-y'); if (ry) { ry.value = 40; $('pg1-capa-pos-y-val').textContent = '40%'; }
+    document.querySelectorAll('input[name="pg1-capa-enquadramento"]').forEach(r => { r.checked = r.value === 'equilibrada'; });
+    pg1CapaAtualizarPrevia();
+  }
+  window.pg1CapaRestaurarAjustes = pg1CapaRestaurarAjustes;
+
+  /* Atualizar prévia ao digitar no campo de imagem */
+  document.getElementById('pg1-capa-imagem')?.addEventListener('input', pg1CapaAtualizarPrevia);
+  document.querySelectorAll('input[name="pg1-capa-enquadramento"]').forEach(r => r.addEventListener('change', pg1CapaAtualizarPrevia));
+
   /* Monta o objeto tema completo a partir dos campos do form */
   function obaLerFormTema(){
     const varianteAtiva=document.querySelector('.oba-variante-card.oba-variante-ativa')?.dataset?.varianteId||'classica';
@@ -2743,7 +2863,13 @@ $('formConfig').onsubmit=async e=>{
           tamCTA:$('pg1-tamCTA')?.value||'',
           pesoCTA:$('pg1-pesoCTA')?.value||'',
           exibirSubtitulo:$('pg1-exibirSubtitulo')?.checked!==false,
-          exibirCTA:$('pg1-exibirCTA')?.checked!==false
+          exibirCTA:$('pg1-exibirCTA')?.checked!==false,
+          capa_ativa:$('pg1-capa-ativa')?.checked===true,
+          capa_imagem:$('pg1-capa-imagem')?.value.trim()||'',
+          capa_alt:$('pg1-capa-alt')?.value.trim()||'',
+          capa_pos_x:Number($('pg1-capa-pos-x')?.value??50),
+          capa_pos_y:Number($('pg1-capa-pos-y')?.value??40),
+          capa_enquadramento:document.querySelector('input[name="pg1-capa-enquadramento"]:checked')?.value||'equilibrada'
         },
         nossa_essencia:{
           ativo:$('pg2-ativo')?.checked!==false,
