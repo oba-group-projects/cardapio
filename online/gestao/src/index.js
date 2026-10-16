@@ -2174,8 +2174,8 @@ async function obaHandleMediaApi(request, env, url) {
       return obaApiJson({ ok: false, error: "base64_too_short" }, 400);
     }
 
-    if (cleanBase64.length > 2000000) {
-      return obaApiJson({ ok: false, error: "image_too_large_max_1mb" }, 413);
+    if (cleanBase64.length > 3000000) {
+      return obaApiJson({ ok: false, error: "image_too_large_max_2mb" }, 413);
     }
 
     let mimeType = String(body.mime_type || body.mime || "").toLowerCase();

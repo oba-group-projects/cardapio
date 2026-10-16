@@ -4571,7 +4571,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     midiaSetProgress(Math.round((index / total) * 90), 'Enviando ' + (index + 1) + ' de ' + total + ': ' + file.name);
 
     let compressed;
-    try { compressed = await obaCompressImage(file, 1200, 0.88); }
+    try { compressed = await obaCompressImage(file, 900, 0.82); }
     catch (_) { compressed = file; }
 
     const b64 = await new Promise((res, rej) => {
