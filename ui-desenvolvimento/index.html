@@ -34186,22 +34186,20 @@ button[onclick*="fecharModalQuantidadeDoce"] {
     }
   }
 
-  /* ── D) Pg3: sublabel 320px — height fixa, line-clamp ───────────
-     white-space:nowrap já está no B4 (ellipsis). Reforça com
-     height fixo no sublabel para que nenhum sublabel mais longo
-     mude a altura do cartão.
-     -webkit-line-clamp como fallback para navegadores que não
-     suportam line-clamp standalone (iOS < 17).
+  /* ── D) Pg3: sublabel 320px — reduz fonte, sem reticências abruptas ──
+     Estratégia: reduzir font-size em <=360px para que sublabels curtos
+     (ex.: "Presentes & Eventos") caibam sem corte.
+     O nowrap + ellipsis do B4 permanece intacto como último recurso,
+     mas a fonte menor evita que o ellipsis dispare em textos normais.
+     clamp não é necessário aqui: os sublabels são controlados pelo painel
+     e textos excessivamente longos são problema de conteúdo, não de layout.
+     Altura uniforme garantida pelo min-height:76px já no B4.
   ────────────────────────────────────────────────────────────────── */
-  #oba-menu-botoes .oba-btn-sublabel {
-    height: 1.3em !important;           /* altura exata de 1 linha */
-    line-height: 1.3 !important;
-    overflow: hidden !important;
-    display: -webkit-box !important;
-    -webkit-line-clamp: 1 !important;
-    -webkit-box-orient: vertical !important;
-    white-space: normal !important;     /* permite line-clamp funcionar */
-    text-overflow: ellipsis !important;
+  @media (max-width: 360px) {
+    #oba-menu-botoes .oba-btn-sublabel {
+      font-size: 7.5px !important;   /* reduz de 9px → 7.5px em telas <=360px */
+      letter-spacing: .08em !important;
+    }
   }
 
 </style>
@@ -34269,11 +34267,6 @@ button[onclick*="fecharModalQuantidadeDoce"] {
     /* Pg1: ampliar de max-w-md (448px) para ~560px */
     #pag-1 {
       max-width: 560px !important;
-    }
-
-    /* Pg1: título principal ligeiramente maior no desktop */
-    #pag1-ne-titulo {
-      font-size: 2.8rem !important;
     }
 
     /* Pg3: ampliar de max-w-md (448px) para 680px */
