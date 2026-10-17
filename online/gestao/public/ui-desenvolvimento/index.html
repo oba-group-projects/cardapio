@@ -33849,13 +33849,14 @@ button[onclick*="fecharModalQuantidadeDoce"] {
      Texto à esquerda (~45%), foto à direita (55%), foto preenche altura.
      Só ativo com b2b-com-foto.
   ────────────────────────────────────────────────────────────────── */
-  @media (min-width: 900px) {
+  @media (min-width: 1024px) {
     /* ── DESKTOP 2 COLUNAS — abordagem position:absolute ───────────
        #pag1-capa-foto NÃO é filho direto de #pag-1, portanto
        grid-column não funciona. Solução: #pag-1 vira position:relative
        e a foto é arrancada do fluxo com position:absolute, ocupando
        a metade direita. O conteúdo textual flui normalmente à esquerda
        com padding-right reservando espaço para a foto.
+       Breakpoint 1024px: abaixo disso mantém a capa vertical mobile.
     ────────────────────────────────────────────────────────────────── */
     #pag-1.b2b-com-foto {
       position: relative !important;
@@ -33871,6 +33872,12 @@ button[onclick*="fecharModalQuantidadeDoce"] {
       overflow: hidden !important;
     }
 
+    /* Coluna de texto: scroll interno para alturas baixas (ex: 1280×600) */
+    #pag-1.b2b-com-foto > * {
+      overflow-y: auto !important;
+      max-height: 100% !important;
+    }
+
     /* Foto: ocupa a metade direita, altura total da viewport */
     #pag-1.b2b-com-foto #pag1-capa-foto {
       position: absolute !important;
@@ -33881,6 +33888,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
       margin: 0 !important;
       border-radius: 0 !important;
       display: block !important;        /* garante visível independente do mobile */
+      overflow: hidden !important;      /* overflow próprio — não herda do pai */
     }
 
     /* A img dentro da foto preenche o container absoluto */
