@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -3995,9 +3995,11 @@ async function hidratarTemaDoModeloMestre() {
     _set('oba-pag2-texto',         ne.texto);
     _set('oba-pag2-citacao',       ne.citacao ? `"${ne.citacao.replace(/^"|"$/g, '')}"` : null);
 
-    /* Espelha nossa_essencia nos novos elementos da Pg1 unificada */
-    _set('pag1-ne-titulo',   ne.titulo);
-    _set('pag1-ne-texto',    ne.texto);
+    /* Espelha nossa_essencia nos novos elementos da Pg1 unificada.
+       B4: se bv.titulo / bv.subtitulo tiverem valor, têm prioridade sobre ne.titulo / ne.texto.
+       Fallback: campo da Pg2 (comportamento anterior preservado quando Pg1 está vazia). */
+    _set('pag1-ne-titulo',  (bv.titulo  && bv.titulo.trim())  ? bv.titulo  : ne.titulo);
+    _set('pag1-ne-texto',   (bv.subtitulo && bv.subtitulo.trim()) ? bv.subtitulo : ne.texto);
     _set('pag1-ne-texto-2',  ne.texto2);
     _set('pag1-ne-citacao',  ne.citacao ? `"${ne.citacao.replace(/^"|"$/g, '')}"` : null);
 
@@ -4068,6 +4070,9 @@ async function hidratarTemaDoModeloMestre() {
     /* Visibilidade pag2 */
     const elCitacao2 = document.getElementById('oba-pag2-citacao');
     if (elCitacao2) elCitacao2.style.display = ne.exibirCitacao === false ? 'none' : '';
+    /* Bug fix: exibirCitacao controla também o espelho na Pg1 */
+    const elCitacao1 = document.getElementById('pag1-ne-citacao');
+    if (elCitacao1) elCitacao1.style.display = ne.exibirCitacao === false ? 'none' : '';
     const elSep2 = document.querySelector('#pag-2 .bg-orange-200\\/60');
     if (elSep2) elSep2.style.display = ne.exibirSeparador === false ? 'none' : '';
     /* ativo: se falso, oculta pag-2 e ajusta o botão CTA da pag-1 para ir direto para pag-3 */
@@ -33845,35 +33850,44 @@ button[onclick*="fecharModalQuantidadeDoce"] {
      Só ativo com b2b-com-foto.
   ────────────────────────────────────────────────────────────────── */
   @media (min-width: 900px) {
+    /* ── DESKTOP 2 COLUNAS — abordagem position:absolute ───────────
+       #pag1-capa-foto NÃO é filho direto de #pag-1, portanto
+       grid-column não funciona. Solução: #pag-1 vira position:relative
+       e a foto é arrancada do fluxo com position:absolute, ocupando
+       a metade direita. O conteúdo textual flui normalmente à esquerda
+       com padding-right reservando espaço para a foto.
+    ────────────────────────────────────────────────────────────────── */
     #pag-1.b2b-com-foto {
-      display: grid !important;
-      grid-template-columns: 45fr 55fr !important;
-      grid-template-rows: 1fr !important;
-      align-items: stretch !important;
-      padding: 0 !important;
-      overflow: hidden !important;
-    }
-
-    /* Coluna esquerda: conteúdo textual + CTA */
-    #pag-1.b2b-com-foto > .pg1-conteudo {
-      grid-column: 1 !important;
-      grid-row: 1 !important;
+      position: relative !important;
       display: flex !important;
       flex-direction: column !important;
       justify-content: center !important;
-      padding: clamp(32px, 5vw, 64px) clamp(24px, 4vw, 52px) !important;
-      overflow-y: auto !important;
+      /* Limitar largura total da Pg1 para desktop full */
+      max-width: 1100px !important;
+      padding-right: 55% !important;     /* reserva a metade direita para a foto */
+      padding-left: clamp(32px, 5vw, 64px) !important;
+      padding-top: clamp(32px, 5dvh, 60px) !important;
+      padding-bottom: clamp(32px, 5dvh, 60px) !important;
+      overflow: hidden !important;
     }
 
-    /* Coluna direita: foto ocupa altura total da viewport */
+    /* Foto: ocupa a metade direita, altura total da viewport */
     #pag-1.b2b-com-foto #pag1-capa-foto {
-      grid-column: 2 !important;
-      grid-row: 1 !important;
-      width: 100% !important;
+      position: absolute !important;
+      top: 0 !important;
+      right: 0 !important;
+      width: 55% !important;
       height: 100% !important;
       margin: 0 !important;
       border-radius: 0 !important;
-      position: relative !important;
+      display: block !important;        /* garante visível independente do mobile */
+    }
+
+    /* A img dentro da foto preenche o container absoluto */
+    #pag-1.b2b-com-foto #pag1-capa-foto-img {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
     }
 
     /* Sem degradê de base no desktop — a divisão de colunas é suficiente */
@@ -34018,6 +34032,75 @@ button[onclick*="fecharModalQuantidadeDoce"] {
   /* Sublabel do destaque — contraste sobre fundo marrom */
   #oba-menu-botoes button.bg-\[\#8B4513\] .oba-btn-sublabel {
     opacity: 0.75 !important;
+  }
+
+</style>
+
+<!-- ================================================================
+     B4 - CTA, TIPOGRAFIA, DESKTOP 2 COLUNAS, PG3 ALTURA
+     Bloco único isolado. Sem editar regras anteriores.
+     Sem impacto no motor de compras, Pg2, Pg3 funcional, Catálogo.
+================================================================ -->
+<style id="b4-refinamento">
+
+  /* ── CTA DA PG1: sem quebra de linha ────────────────────────────
+     O span do texto CTA não pode separar do ícone/seta em telas
+     estreitas. white-space:nowrap + font-size via clamp.
+     Testado: 320px e 280px sem estouro (overflow:hidden no container).
+  ────────────────────────────────────────────────────────────────── */
+  #oba-pag1-btn-cta {
+    overflow: hidden !important;
+    /* Reduzir tracking para caber mais texto sem quebrar */
+    letter-spacing: .10em !important;
+    /* Font-size responsivo: cabe em 280px sem quebrar */
+    font-size: clamp(9px, 2.8vw, 11px) !important;
+  }
+  #oba-pag1-btn-cta span,
+  #oba-pag1-btn-cta > * {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* ── TÍTULO DA PG1: clamp corrigido ────────────────────────────
+     7vw e 8vw escalavam demais no desktop (>80px em 1440px).
+     Máximo fixo de 2.6rem; no desktop >=768px o override abaixo
+     permite ir até 2.8rem sem usar vw.
+  ────────────────────────────────────────────────────────────────── */
+  #pag1-ne-titulo {
+    font-size: clamp(1.9rem, 6vw, 2.6rem) !important;
+    line-height: 1.12 !important;
+    text-align: center !important;
+  }
+
+  @media (min-width: 768px) {
+    /* Desktop: título fixo, sem vw que escala demais */
+    #pag1-ne-titulo {
+      font-size: clamp(2.2rem, 3vw, 2.8rem) !important;
+      text-align: left !important;
+    }
+    /* Parágrafo alinhado à esquerda no desktop */
+    #pag1-ne-texto {
+      text-align: left !important;
+    }
+  }
+
+  /* ── PG3: ALTURA UNIFORME DOS CARTÕES ───────────────────────────
+     Garante que todos os botões do menu tenham a mesma altura
+     mesmo quando sublabels têm comprimentos diferentes.
+     Usa min-height em vez de height para não cortar conteúdo.
+  ────────────────────────────────────────────────────────────────── */
+  #oba-menu-botoes button {
+    min-height: 76px !important;
+    align-items: center !important;
+  }
+  /* Sublabel e label não quebram em 320px */
+  #oba-menu-botoes .oba-btn-sublabel,
+  #oba-menu-botoes .oba-btn-label {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    max-width: calc(100% - 48px) !important; /* reserva espaço para o ícone */
   }
 
 </style>
