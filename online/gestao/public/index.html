@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Oba Doceria — Gestão do Cardápio</title>
+<!-- Cormorant Garamond: usada na prévia da capa do Cardápio -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#f8f3ed;--card:#fff;--text:#4e352c;--muted:#81736d;--brand:#9d4c0c;--line:#eaded5;--ok:#167544;--danger:#a33636}
 *{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--text)}
@@ -180,11 +184,11 @@ function obaLogout() {
 
         <div style="grid-column:1/-1"><p class="oba-secao-titulo">✏️ Textos</p></div>
         <div style="grid-column:1/-1;padding:12px 14px;border-radius:10px;background:#fff8f0;border:1px solid #f5c89a;margin-bottom:4px">
-          <p style="margin:0 0 4px;font-size:12px;font-weight:700;color:#8B4513">ℹ️ Layout atual da Pg1</p>
-          <p style="margin:0;font-size:12px;color:#666;line-height:1.6">O <strong>Título</strong> e o <strong>Subtítulo</strong> abaixo estão ocultos no cardápio. O conteúdo visual da abertura é controlado pela <strong>Página 2 — Nossa Essência</strong> (título, texto e citação). O <strong>Texto do botão CTA</strong> e a <strong>Logo</strong> continuam ativos normalmente.</p>
+          <p style="margin:0 0 4px;font-size:12px;font-weight:700;color:#8B4513">ℹ️ Título e Subtítulo da Pg1</p>
+          <p style="margin:0;font-size:12px;color:#666;line-height:1.6">Se preenchidos, o <strong>Título</strong> e o <strong>Subtítulo</strong> abaixo controlam diretamente a capa. Se estiverem vazios, o conteúdo vem da <strong>Página 2 — Nossa Essência</strong> (título e texto principal). O <strong>Texto do botão CTA</strong> e a <strong>Logo</strong> sempre são desta página.</p>
         </div>
-        <div class="field"><label>Título <span class="hint">(oculto no layout atual)</span></label><input id="pg1-titulo" placeholder="Bem-vindo"></div>
-        <div class="field"><label>Subtítulo <span class="hint">(oculto no layout atual)</span></label><input id="pg1-subtitulo" placeholder="Prepare-se para descobrir..."></div>
+        <div class="field"><label>Título</label><input id="pg1-titulo" placeholder="Seu momento começa aqui."></div>
+        <div class="field"><label>Subtítulo</label><input id="pg1-subtitulo" placeholder="Doces artesanais feitos à mão, com amor e precisão."></div>
         <div class="field full"><label>Texto do botão CTA</label><input id="pg1-cta" placeholder="Descobrir Nossa História"></div>
 
         <div style="grid-column:1/-1"><p class="oba-secao-titulo">🖼️ Imagem</p></div>
@@ -2951,16 +2955,20 @@ $('formConfig').onsubmit=async e=>{
       fotoWrap.style.display = '';
     }
     if (gradDiv) { gradDiv.style.opacity = gradOp; }
-    /* Texto real dos campos do painel → prévia */
+    /* Texto real dos campos do painel → prévia.
+       T2: se pg1-titulo estiver preenchido, tem prioridade (igual ao comportamento do cardápio).
+       Fallback: pg2-titulo (Nossa Essência), exatamente como o JS do cardápio faz. */
+    const pg1titulo = ($('pg1-titulo')?.value || '').trim();
     const pg2titulo = ($('pg2-titulo')?.value || '').trim();
+    const pg1subtit = ($('pg1-subtitulo')?.value || '').trim();
     const pg2texto  = ($('pg2-texto')?.value  || '').trim();
     const pg1cta    = ($('pg1-cta')?.value    || 'Ver o Cardápio').trim();
     const elTit  = $('pg1-prev-titulo');
     const elTxt  = $('pg1-prev-texto');
     const elCTA  = $('pg1-prev-cta');
     const elRot  = $('pg1-prev-rotulo');
-    if (elTit)  elTit.textContent  = pg2titulo || 'Título da capa';
-    if (elTxt)  elTxt.textContent  = pg2texto  || '';
+    if (elTit)  elTit.textContent  = (pg1titulo || pg2titulo) || 'Título da capa';
+    if (elTxt)  elTxt.textContent  = (pg1subtit || pg2texto)  || '';
     if (elCTA)  elCTA.textContent  = pg1cta;
     if (elRot)  elRot.textContent  = 'OBA DOCERIA';
   }
@@ -3017,7 +3025,10 @@ $('formConfig').onsubmit=async e=>{
   /* Atualizar prévia ao digitar no campo de imagem ou alterar texto/cta */
   document.getElementById('pg1-capa-imagem')?.addEventListener('input', pg1CapaAtualizarPrevia);
   document.getElementById('pg1-cta')?.addEventListener('input', pg1CapaAtualizarPrevia);
-  /* Campos da Pg2 que alimentam a prévia — atualizar enquanto digita */
+  /* Campos da Pg1 que têm prioridade na prévia (T2) */
+  document.getElementById('pg1-titulo')?.addEventListener('input', pg1CapaAtualizarPrevia);
+  document.getElementById('pg1-subtitulo')?.addEventListener('input', pg1CapaAtualizarPrevia);
+  /* Campos da Pg2 que alimentam a prévia como fallback — atualizar enquanto digita */
   document.getElementById('pg2-titulo')?.addEventListener('input', pg1CapaAtualizarPrevia);
   document.getElementById('pg2-texto')?.addEventListener('input', pg1CapaAtualizarPrevia);
   document.querySelectorAll('input[name="pg1-capa-enquadramento"]').forEach(r => r.addEventListener('change', pg1CapaAtualizarPrevia));
