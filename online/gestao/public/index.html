@@ -1705,7 +1705,7 @@ async function obaPreparePreview(){
 }
 
 
-function msg(t,tipo='ok'){const b=$('mensagem');b.textContent=t;b.className=tipo==='ok'?'okbox':'errbox';b.style.display='block';window.scrollTo({top:0,behavior:'smooth'})}
+function msg(t,tipo='ok'){const b=$('mensagem');b.textContent=t;b.className=tipo==='ok'?'okbox':'errbox';b.style.display='block'}
 function td(t,c=''){const x=document.createElement('td');x.textContent=t??'—';if(c)x.className=c;return x}
 
 /* Toggle de status inline — clique no badge muda ativo/disponivel sem abrir editor */
@@ -1834,7 +1834,11 @@ function imgField(item,tipo){
   const galBtn=document.createElement('button');galBtn.type='button';galBtn.className='secondary';
   galBtn.textContent='📁 Galeria';galBtn.style.cssText='padding:7px 10px;font-size:12px;white-space:nowrap';
   galBtn.onclick=()=>window.obaAbrirGaleria(inputId, previewId);
-  row.append(cur,galBtn);
+  /* Botão Limpar — zera URL, hidden e preview */
+  const clearBtn=document.createElement('button');clearBtn.type='button';clearBtn.className='secondary';
+  clearBtn.textContent='✕ Limpar';clearBtn.title='Remover imagem';clearBtn.style.cssText='padding:7px 10px;font-size:12px;white-space:nowrap;color:#dc2626;border-color:#dc2626';
+  clearBtn.onclick=()=>{cur.value='';const h=$('edImagemHidden');if(h)h.value='';const pv=$(previewId);if(pv){pv.src='';pv.style.display='none';}const fv=$('edImagemFile');if(fv)fv.value='';};
+  row.append(cur,galBtn,clearBtn);
 
   // Preview da imagem atual
   const preview=document.createElement('img');preview.id=previewId;preview.alt='Prévia';
@@ -2064,14 +2068,13 @@ async function salvarEditor(){
 
   if(['flavors','products','combos','options'].includes(tipo)){
     item.imagem=await uploadSeNecessario(tipo,item);
-    // Se não houve upload de arquivo, usa o valor do input texto (URL/path da galeria)
+    // Prioridade: upload de arquivo > input texto (URL/galeria) > vazio (limpa a imagem)
+    // Não usa o hidden como fallback — se o campo foi explicitamente apagado, respeita a intenção
     if(!item.imagem){
       const inp=$('edImagem');
-      item.imagem=inp?inp.value.trim():'';
-    }
-    if(!item.imagem){
-      const hidden=$('edImagemHidden');
-      if(hidden)item.imagem=hidden.value.trim();
+      // inp existe: usa o valor mesmo que vazio (permite remover a imagem)
+      // inp não existe: mantém o que veio do servidor (compatibilidade)
+      item.imagem = inp ? inp.value.trim() : (item.imagem ?? '');
     }
   }
 
