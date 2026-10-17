@@ -33849,13 +33849,14 @@ button[onclick*="fecharModalQuantidadeDoce"] {
      Texto à esquerda (~45%), foto à direita (55%), foto preenche altura.
      Só ativo com b2b-com-foto.
   ────────────────────────────────────────────────────────────────── */
-  @media (min-width: 900px) {
+  @media (min-width: 1024px) {
     /* ── DESKTOP 2 COLUNAS — abordagem position:absolute ───────────
        #pag1-capa-foto NÃO é filho direto de #pag-1, portanto
        grid-column não funciona. Solução: #pag-1 vira position:relative
        e a foto é arrancada do fluxo com position:absolute, ocupando
        a metade direita. O conteúdo textual flui normalmente à esquerda
        com padding-right reservando espaço para a foto.
+       Breakpoint 1024px: abaixo disso mantém a capa vertical mobile.
     ────────────────────────────────────────────────────────────────── */
     #pag-1.b2b-com-foto {
       position: relative !important;
@@ -33871,6 +33872,12 @@ button[onclick*="fecharModalQuantidadeDoce"] {
       overflow: hidden !important;
     }
 
+    /* Coluna de texto: scroll interno para alturas baixas (ex: 1280×600) */
+    #pag-1.b2b-com-foto > * {
+      overflow-y: auto !important;
+      max-height: 100% !important;
+    }
+
     /* Foto: ocupa a metade direita, altura total da viewport */
     #pag-1.b2b-com-foto #pag1-capa-foto {
       position: absolute !important;
@@ -33881,6 +33888,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
       margin: 0 !important;
       border-radius: 0 !important;
       display: block !important;        /* garante visível independente do mobile */
+      overflow: hidden !important;      /* overflow próprio — não herda do pai */
     }
 
     /* A img dentro da foto preenche o container absoluto */
@@ -34101,6 +34109,99 @@ button[onclick*="fecharModalQuantidadeDoce"] {
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
     max-width: calc(100% - 48px) !important; /* reserva espaço para o ícone */
+  }
+
+</style>
+
+<!-- ================================================================
+     B5 - BOTÃO CTA sticky, foto telas baixas, desktop estático, Pg3
+     Bloco único isolado. Não toca motor de compras, Pg2, Catálogo.
+================================================================ -->
+<style id="b5-refinamento">
+
+  /* ── A) CTA Pg1: reservar padding-bottom no conteúdo ───────────
+     O botão sticky (posição: sticky; bottom: max(16px,safe-area))
+     ficava sobre o último parágrafo porque o conteúdo acima não
+     reservava altura para ele.
+     Solução: #pag1-essencia recebe padding-bottom = altura do botão
+     (52px mín.) + folga (12px) + safe-area-inset-bottom.
+     Isso garante que o texto role completamente acima do botão em
+     repouso, sem precisar rolar manualmente para ler a última linha.
+  ────────────────────────────────────────────────────────────────── */
+  #pag1-essencia {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  /* Fundo/degradê no botão sticky: impede texto passando por baixo
+     sem separação visual. O pseudo-elemento :before cobre a área
+     entre o conteúdo e o topo do botão com um degradê do fundo. */
+  #oba-pag1-btn-cta::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120%;               /* um pouco mais largo que o botão */
+    height: 32px;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      var(--pag1-fundo, #FAF5F0) 100%
+    );
+    pointer-events: none;
+    z-index: -1;
+  }
+  /* Garantir que o botão tenha position para o ::before funcionar */
+  #oba-pag1-btn-cta {
+    position: sticky !important;
+  }
+
+  /* ── B) Foto Pg1 em telas baixas ────────────────────────────────
+     Em max-height:740px, reduz a foto para que logo, marca, título,
+     parágrafo e botão caibam SEM rolar em 360x640 e 1280x720.
+     clamp(140px, 28dvh, 340px): em 640px altura → ~179px de foto.
+  ────────────────────────────────────────────────────────────────── */
+  @media (max-height: 740px) {
+    #pag1-capa-foto {
+      height: clamp(140px, 28dvh, 340px) !important;
+    }
+    #pag1-capa-foto-img {
+      height: clamp(140px, 28dvh, 340px) !important;
+    }
+  }
+
+  /* ── C) CTA Pg1 em desktop >=1024px: estático, não sticky ───────
+     Em telas largas o conteúdo cabe sem rolar, sticky é desnecessário
+     e pode causar sobreposição em layouts de 2 colunas (B2B).
+     Sem foto (mobile preservado): só afeta >=1024px.
+  ────────────────────────────────────────────────────────────────── */
+  @media (min-width: 1024px) {
+    #oba-pag1-btn-cta {
+      position: static !important;
+      margin-top: 28px !important;
+    }
+    /* Sem o sticky, o padding-bottom de compensação não é necessário */
+    #pag1-essencia {
+      padding-bottom: 0 !important;
+    }
+  }
+
+  /* ── D) Pg3: sublabel 320px — height fixa, line-clamp ───────────
+     white-space:nowrap já está no B4 (ellipsis). Reforça com
+     height fixo no sublabel para que nenhum sublabel mais longo
+     mude a altura do cartão.
+     -webkit-line-clamp como fallback para navegadores que não
+     suportam line-clamp standalone (iOS < 17).
+  ────────────────────────────────────────────────────────────────── */
+  #oba-menu-botoes .oba-btn-sublabel {
+    height: 1.3em !important;           /* altura exata de 1 linha */
+    line-height: 1.3 !important;
+    overflow: hidden !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 1 !important;
+    -webkit-box-orient: vertical !important;
+    white-space: normal !important;     /* permite line-clamp funcionar */
+    text-overflow: ellipsis !important;
   }
 
 </style>
