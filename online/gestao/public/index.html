@@ -4502,7 +4502,7 @@ carregar().catch(e=>msg(String(e.message||e),'erro'));
     if (bar && msg2) {
       msg2.textContent = '● Alterações não salvas em "' + _ctxNomeAtivo + '"';
       bar.classList.add('show');
-      bar.scrollIntoView({behavior:'smooth', block:'nearest'});
+      /* scrollIntoView removido — a barra fica no topo e não precisa mover a página */
     }
   }
 
