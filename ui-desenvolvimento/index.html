@@ -2540,13 +2540,15 @@ body:has(#r120-ux2-selection-trigger:not([hidden]))
       <h2 id="pag1-ne-titulo" class="text-sm font-semibold tracking-[0.15em] text-[#8B4513] uppercase mb-3">Nossa Essência</h2>
       <p id="pag1-ne-texto" class="text-[13px] text-gray-600 leading-relaxed font-light px-1"></p>
       <p id="pag1-ne-texto-2" class="text-[13px] text-gray-600 leading-relaxed font-light px-1 mt-4"></p>
-      <p id="pag1-ne-citacao" class="text-xs text-[#8B4513]/70 italic font-medium mt-3">Feito à mão, com amor e precisão.</p>
     </div>
 
     <!-- CTA — posicionado após a essência para ficar no fundo -->
     <button id="oba-pag1-btn-cta" onclick="navegarPara(2)" class="w-full max-w-[280px] mt-12 py-3.5 bg-[#8B4513] text-white rounded-[1rem] font-medium text-[10px] uppercase tracking-[0.2em] shadow-md shadow-[#8B4513]/15 active:scale-95 flex justify-center items-center gap-3">
       <span id="oba-pag1-cta">Descobrir Nossa História</span>
     </button>
+
+    <!-- Assinatura da marca — exibida/oculta via exibirCitacao, posicionada após o CTA -->
+    <p id="pag1-ne-citacao" class="text-xs text-[#8B4513]/70 italic font-medium mt-3">Feito à mão, com amor e precisão.</p>
 
   </section>
 
@@ -33637,9 +33639,6 @@ button[onclick*="fecharModalQuantidadeDoce"] {
     #pag1-ne-texto {
       font-size: 13px !important;
     }
-    #pag1-ne-citacao {
-      display: none !important;
-    }
     #oba-pag1-btn-cta {
       margin-top: 12px !important;
     }
@@ -34056,6 +34055,67 @@ button[onclick*="fecharModalQuantidadeDoce"] {
   /* Sublabel do destaque — contraste sobre fundo marrom */
   #oba-menu-botoes button.bg-\[\#8B4513\] .oba-btn-sublabel {
     opacity: 0.75 !important;
+  }
+
+</style>
+
+<!-- ================================================================
+     B3B - ESPAÇAMENTOS PG1 + ASSINATURA
+     Ajusta ritmo vertical do bloco de texto da Pg1 e estilo da
+     assinatura. Não altera foto, altura, largura, tipografia de tamanho
+     nem motor de compras. Bloco isolado — fácil de reverter.
+================================================================ -->
+<style id="b3b-espacamentos-pg1">
+
+  /* ── Ritmo vertical do bloco de texto ───────────────────────────
+     Espaçamentos entre os elementos do bloco de abertura da Pg1.
+     Usa margin-bottom com clamp para escalar suavemente entre telas.
+     Seletores dentro de #pag-1 — não afetam Pg2, Pg3 nem outros.
+  ────────────────────────────────────────────────────────────────── */
+
+  /* Identificador: pequeno espaço abaixo antes do título */
+  #pag-1 #pag1-ne-marca {
+    margin-bottom: clamp(6px, 1.2vh, 12px);
+  }
+
+  /* Título: respira antes do parágrafo */
+  #pag-1 #pag1-ne-titulo {
+    margin-bottom: clamp(12px, 2vh, 20px);
+  }
+
+  /* Parágrafo: separação maior antes do botão */
+  #pag-1 #pag1-ne-texto {
+    margin-bottom: clamp(20px, 3vh, 28px);
+  }
+
+  /* CTA: espaço antes da assinatura */
+  #pag-1 #oba-pag1-btn-cta {
+    margin-bottom: clamp(14px, 2vh, 22px);
+  }
+
+  /* ── Assinatura ─────────────────────────────────────────────────
+     Aparece após o CTA. Itálico, pequena, discreta.
+     Cor já definida pela classe Tailwind do elemento (.text-[#8B4513]/70).
+     Apenas ajusta tamanho e alinhamento.
+  ────────────────────────────────────────────────────────────────── */
+  #pag-1 #pag1-ne-citacao {
+    font-size: clamp(11px, 1.2vw, 13px);
+    font-style: italic;
+    opacity: 0.7;
+    text-align: center;
+    margin-top: 0;       /* margem controlada pelo CTA acima via margin-bottom */
+    max-width: 36ch;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Desktop com foto: alinhar assinatura à esquerda junto ao bloco de texto */
+  @media (min-width: 1024px) {
+    #pag-1.b2b-com-foto #pag1-ne-citacao {
+      text-align: left;
+      margin-left: 0;
+      margin-right: 0;
+    }
   }
 
 </style>
