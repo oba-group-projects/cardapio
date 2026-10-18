@@ -4072,7 +4072,8 @@ async function hidratarTemaDoModeloMestre() {
     if (elCitacao2) elCitacao2.style.display = ne.exibirCitacao === false ? 'none' : '';
     /* Bug fix: exibirCitacao controla também o espelho na Pg1 */
     const elCitacao1 = document.getElementById('pag1-ne-citacao');
-    if (elCitacao1) elCitacao1.style.display = ne.exibirCitacao === false ? 'none' : '';
+    /* setProperty com 'important' vence o display:block !important do stylesheet */
+    if (elCitacao1) elCitacao1.style.setProperty('display', ne.exibirCitacao === false ? 'none' : '', ne.exibirCitacao === false ? 'important' : '');
     const elSep2 = document.querySelector('#pag-2 .bg-orange-200\\/60');
     if (elSep2) elSep2.style.display = ne.exibirSeparador === false ? 'none' : '';
     /* ativo: se falso, oculta pag-2 e ajusta o botão CTA da pag-1 para ir direto para pag-3 */
@@ -34111,6 +34112,21 @@ button[onclick*="fecharModalQuantidadeDoce"] {
     max-width: calc(100% - 48px) !important; /* reserva espaço para o ícone */
   }
 
+
+  /* ── E) Desktop com foto: sobrescreve max-width:560px do B1 ──────
+     O B1 define #pag-1 { max-width: 560px } em >=768px.
+     Com b2b-com-foto ativo, a Pg1 precisa de max-width: 1100px
+     para a foto absoluta (55%) ter espaço. O seletor com classe
+     (#pag-1.b2b-com-foto) tem especificidade maior que (#pag-1)
+     do B1, portanto vence mesmo que o B1 venha depois no DOM.
+  ────────────────────────────────────────────────────────────────── */
+  @media (min-width: 1024px) {
+    #pag-1.b2b-com-foto {
+      max-width: 1100px !important;
+      width: 100% !important;
+    }
+  }
+
 </style>
 
 <!-- ================================================================
@@ -34201,7 +34217,6 @@ button[onclick*="fecharModalQuantidadeDoce"] {
       letter-spacing: .08em !important;
     }
   }
-
 </style>
 
 <style id="b1-responsivo-entrada">
