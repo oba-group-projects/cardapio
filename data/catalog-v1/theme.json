@@ -2,7 +2,7 @@
   "paginas": {
     "boas_vindas": {
       "ativo": true,
-      "botaoCTA": "Conhecer nossos doces →",
+      "botaoCTA": "Ver o Cardápio →",
       "capa_alt": "",
       "capa_ativa": true,
       "capa_enquadramento": "ampla",
@@ -21,7 +21,7 @@
       "marca_cor": "",
       "marca_peso": "600",
       "marca_tam": "pequeno",
-      "marca_texto": "CATÁLOGO OBA DOCERIA",
+      "marca_texto": "CARDÁPIO - OBA DOCERIA",
       "marca_visivel": true,
       "pesoCTA": "",
       "pesoSubtitulo": "",
@@ -71,7 +71,7 @@
           "icone": "fa-solid fa-gift",
           "id": "btn-2",
           "label": "Presenteáveis / Especiais",
-          "sublabel": "Escolher um presente especial",
+          "sublabel": "Para Presentear",
           "url": "",
           "visivel": true
         },
