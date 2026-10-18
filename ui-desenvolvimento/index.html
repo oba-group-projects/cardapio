@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -33864,12 +33864,14 @@ button[onclick*="fecharModalQuantidadeDoce"] {
       display: flex !important;
       flex-direction: column !important;
       justify-content: center !important;
+      align-items: flex-start !important;
       /* Limitar largura total da Pg1 para desktop full */
       max-width: 1100px !important;
-      padding-right: 55% !important;     /* reserva a metade direita para a foto */
+      padding-right: 52% !important;     /* reserva a metade direita para a foto (era 55%) */
       padding-left: clamp(32px, 5vw, 64px) !important;
-      padding-top: clamp(32px, 5dvh, 60px) !important;
-      padding-bottom: clamp(32px, 5dvh, 60px) !important;
+      /* Sem padding-top/bottom: justify-content:center faz a centralização sozinho */
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
       overflow: hidden !important;
     }
 
@@ -33884,7 +33886,7 @@ button[onclick*="fecharModalQuantidadeDoce"] {
       position: absolute !important;
       top: 0 !important;
       right: 0 !important;
-      width: 55% !important;
+      width: 52% !important;
       height: 100% !important;
       margin: 0 !important;
       border-radius: 0 !important;
@@ -33924,6 +33926,19 @@ button[onclick*="fecharModalQuantidadeDoce"] {
     /* Resetar max-width do essência no desktop com foto */
     #pag-1.b2b-com-foto #pag1-essencia {
       max-width: 480px !important;
+    }
+
+    /* Tipografia desktop: título e parágrafo maiores na coluna de texto */
+    #pag-1.b2b-com-foto #pag1-ne-titulo {
+      font-size: clamp(2.2rem, 3.2vw, 3rem) !important;
+      line-height: 1.1 !important;
+      text-align: left !important;
+    }
+    #pag-1.b2b-com-foto #pag1-ne-texto {
+      font-size: clamp(15px, 1.4vw, 18px) !important;
+      line-height: 1.65 !important;
+      max-width: 38ch !important;
+      text-align: left !important;
     }
 
     /* CTA: não sticky no desktop — flui normalmente */
