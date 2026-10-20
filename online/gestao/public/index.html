@@ -298,7 +298,7 @@ function obaLogout() {
                 <div id="pg1-prev-gradiente" style="position:absolute;bottom:0;left:0;right:0;pointer-events:none;background:linear-gradient(to bottom,transparent,#FAF5F0);opacity:0;height:50%"></div>
               </div>
               <!-- Título -->
-              <div id="pg1-prev-titulo" style="font-family:'Cormorant Garamond',Georgia,serif;font-size:32px;font-weight:600;line-height:1.1;color:#3B2A1E;padding:16px 24px 0;flex-shrink:0"></div>
+              <div id="pg1-prev-titulo" style="font-family:'Cormorant Garamond',Georgia,serif;font-size:28px;font-weight:400;line-height:1.15;color:#3B2A1E;padding:16px 24px 0;flex-shrink:0"></div>
               <!-- Texto -->
               <div id="pg1-prev-texto" style="font-size:13px;font-weight:300;line-height:1.65;color:#4B5563;padding:10px 24px 0;flex-shrink:0;max-width:34ch"></div>
               <!-- CTA -->
@@ -354,6 +354,8 @@ function obaLogout() {
         <div class="field full" style="display:flex;gap:20px;flex-wrap:wrap">
           <label class="oba-toggle-label"><input type="checkbox" id="pg1-exibirSubtitulo" checked> Exibir subtítulo</label>
           <label class="oba-toggle-label"><input type="checkbox" id="pg1-exibirCTA" checked> Exibir botão CTA</label>
+          <label class="oba-toggle-label"><input type="checkbox" id="pg1-exibirAssinatura"> Exibir assinatura abaixo do botão</label>
+          <label class="oba-toggle-label"><input type="checkbox" id="pg1-exibirRotulo"> Exibir rótulo da página <span class="hint">("CARDÁPIO — OBA DOCERIA")</span></label>
         </div>
 
         <div style="grid-column:1/-1"><p class="oba-secao-titulo">🏷️ Identificação da marca <span class="hint">(acima do título na capa)</span></p></div>
@@ -2750,6 +2752,8 @@ $('formConfig').onsubmit=async e=>{
     obaSetCorPagina('pg1-corTitulo',bv.corTitulo);
     obaSetCheck('pg1-exibirSubtitulo',bv.exibirSubtitulo!==false);
     obaSetCheck('pg1-exibirCTA',bv.exibirCTA!==false);
+    obaSetCheck('pg1-exibirAssinatura', bv.exibirAssinatura === true);
+    obaSetCheck('pg1-exibirRotulo',     bv.exibirRotulo === true);
     obaSetCheck('pg1-ativo',bv.ativo!==false);
     /* Marca */
     obaSetCheck('pg1-marca-visivel', bv.marca_visivel === true);
@@ -2913,7 +2917,7 @@ $('formConfig').onsubmit=async e=>{
   }
 
   /* Imagem de capa Pg1 — funções auxiliares do painel */
-  const PG1_CAPA_ENQUADRAMENTOS = { compacta: '100px', equilibrada: '140px', ampla: '180px' };
+  const PG1_CAPA_ENQUADRAMENTOS = { compacta: '205px', equilibrada: '256px', ampla: '320px' };
   const PG1_CAPA_GRADIENTE_OPACIDADE = { nenhum: 0, suave: 0.85, pronunciado: 1 };
 
   function pg1CapaAtualizarPrevia() {
@@ -2949,7 +2953,7 @@ $('formConfig').onsubmit=async e=>{
       fotoImg.src = src;
       fotoImg.style.objectPosition = posX + ' ' + posY;
       fotoImg.style.transform = scaleStr;
-      const altPx = { compacta: '120px', equilibrada: '180px', ampla: '220px' };
+      const altPx = { compacta: '200px', equilibrada: '250px', ampla: '280px' };
       fotoImg.style.height = altPx[enq] || '180px';
       fotoWrap.style.height = altPx[enq] || '180px';
       fotoWrap.style.display = '';
@@ -3033,6 +3037,28 @@ $('formConfig').onsubmit=async e=>{
   document.getElementById('pg2-texto')?.addEventListener('input', pg1CapaAtualizarPrevia);
   document.querySelectorAll('input[name="pg1-capa-enquadramento"]').forEach(r => r.addEventListener('change', pg1CapaAtualizarPrevia));
 
+  /* ── Clique para ponto focal na prévia da capa ──────────────────
+     Clicar na foto da prévia completa reposiciona o foco X/Y.
+     Converte a posição do clique em percentuais e sincroniza
+     com os sliders existentes, ativando a atualização da prévia.
+  ─────────────────────────────────────────────────────────────── */
+  (function() {
+    const prevImg = document.getElementById('pg1-prev-foto-img');
+    if (!prevImg) return;
+    /* Indicar interatividade visualmente */
+    prevImg.style.cursor = 'crosshair';
+    prevImg.title = 'Clique para definir o ponto focal';
+    prevImg.addEventListener('click', function(e) {
+      const rect = prevImg.getBoundingClientRect();
+      const x = Math.round((e.clientX - rect.left) / rect.width  * 100);
+      const y = Math.round((e.clientY - rect.top)  / rect.height * 100);
+      const rx = $('pg1-capa-pos-x'), ry = $('pg1-capa-pos-y');
+      if (rx) { rx.value = x; $('pg1-capa-pos-x-val').textContent = x + '%'; }
+      if (ry) { ry.value = y; $('pg1-capa-pos-y-val').textContent = y + '%'; }
+      pg1CapaAtualizarPrevia();
+    });
+  })();
+
   /* Monta o objeto tema completo a partir dos campos do form */
   function obaLerFormTema(){
     const varianteAtiva=document.querySelector('.oba-variante-card.oba-variante-ativa')?.dataset?.varianteId||'classica';
@@ -3059,6 +3085,8 @@ $('formConfig').onsubmit=async e=>{
           pesoCTA:$('pg1-pesoCTA')?.value||'',
           exibirSubtitulo:$('pg1-exibirSubtitulo')?.checked!==false,
           exibirCTA:$('pg1-exibirCTA')?.checked!==false,
+          exibirAssinatura: $('pg1-exibirAssinatura')?.checked === true,
+          exibirRotulo:     $('pg1-exibirRotulo')?.checked === true,
           marca_visivel: $('pg1-marca-visivel')?.checked === true,
           marca_texto:   $('pg1-marca-texto')?.value.trim() || 'OBA DOCERIA',
           marca_caixa:   $('pg1-marca-caixa')?.value  || 'upper',
