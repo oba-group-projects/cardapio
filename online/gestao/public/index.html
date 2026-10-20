@@ -368,8 +368,8 @@ function obaLogout() {
             <!-- Mobile -->
             <div>
               <p style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Recorte celular <span class="hint">(arraste para ajustar)</span></p>
-              <div id="pg1-capa-previa-mobile" style="width:160px;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#FAF5F0;position:relative">
-                <img id="pg1-capa-previa-mobile-img" src="" alt="" style="width:100%;display:block;object-fit:cover;object-position:50% 40%;cursor:grab">
+              <div id="pg1-capa-previa-mobile" style="width:160px;height:256px;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#FAF5F0;position:relative">
+                <img id="pg1-capa-previa-mobile-img" src="" alt="" style="width:100%;height:100%;display:block;object-fit:cover;object-position:50% 40%;cursor:grab">
               </div>
             </div>
             <!-- Desktop -->
@@ -3127,7 +3127,10 @@ $('formConfig').onsubmit=async e=>{
        idsXval/idsYval: arrays de IDs de spans de valor. */
     function criarDrag(imgEl, idsX, idsXval, idsY, idsYval, idsZoom, idsZoomVal) {
       if (!imgEl) return;
+      /* Usar o contêiner pai para rect — tem dimensões estáveis independente da img */
+      const containerEl = imgEl.parentElement || imgEl;
       imgEl.style.cursor = 'grab';
+      containerEl.style.cursor = 'grab';
       imgEl.title = 'Arraste para posicionar · Scroll para zoom';
       imgEl.draggable = false;
 
@@ -3147,51 +3150,56 @@ $('formConfig').onsubmit=async e=>{
         idsYval.forEach(id => { const el = $(id); if (el) el.textContent = y + '%'; });
         pg1CapaAtualizarPrevia();
       }
-
-      imgEl.addEventListener('mousedown', function(e) {
-        e.preventDefault(); dragging = true; imgEl.style.cursor = 'grabbing';
-        startX = e.clientX; startY = e.clientY;
+      function onStart(clientX, clientY) {
+        dragging = true;
+        imgEl.style.cursor = 'grabbing';
+        containerEl.style.cursor = 'grabbing';
+        startX = clientX; startY = clientY;
         const f = getFocal(); startFX = f.x; startFY = f.y;
-      });
-      document.addEventListener('mousemove', function(e) {
+      }
+      function onMove(clientX, clientY) {
         if (!dragging) return;
-        const rect = imgEl.getBoundingClientRect();
-        /* Usar o menor lado como base para sensibilidade igual em H e V */
-        const base = Math.min(rect.width, rect.height);
-        setFocal(startFX - (e.clientX - startX) / base * 100,
-                 startFY - (e.clientY - startY) / base * 100);
-      });
-      document.addEventListener('mouseup', function() {
-        if (!dragging) return; dragging = false; imgEl.style.cursor = 'grab';
-      });
+        /* Ler rect do contêiner — dimensões estáveis e corretas */
+        const rect = containerEl.getBoundingClientRect();
+        const w = rect.width  || 160;
+        const h = rect.height || 160;
+        /* Base = menor dimensão: sensibilidade igual em H e V */
+        const base = Math.min(w, h);
+        setFocal(startFX - (clientX - startX) / base * 100,
+                 startFY - (clientY - startY) / base * 100);
+      }
+      function onEnd() {
+        if (!dragging) return;
+        dragging = false;
+        imgEl.style.cursor = 'grab';
+        containerEl.style.cursor = 'grab';
+      }
+
+      imgEl.addEventListener('mousedown', function(e) { e.preventDefault(); onStart(e.clientX, e.clientY); });
+      document.addEventListener('mousemove', function(e) { onMove(e.clientX, e.clientY); });
+      document.addEventListener('mouseup', onEnd);
       imgEl.addEventListener('touchstart', function(e) {
-        if (e.touches.length !== 1) return; e.preventDefault(); dragging = true;
-        startX = e.touches[0].clientX; startY = e.touches[0].clientY;
-        const f = getFocal(); startFX = f.x; startFY = f.y;
+        if (e.touches.length !== 1) return; e.preventDefault();
+        onStart(e.touches[0].clientX, e.touches[0].clientY);
       }, { passive: false });
       imgEl.addEventListener('touchmove', function(e) {
         if (!dragging || e.touches.length !== 1) return; e.preventDefault();
-        const rect = imgEl.getBoundingClientRect();
-        const base = Math.min(rect.width, rect.height);
-        setFocal(startFX - (e.touches[0].clientX - startX) / base * 100,
-                 startFY - (e.touches[0].clientY - startY) / base * 100);
+        onMove(e.touches[0].clientX, e.touches[0].clientY);
       }, { passive: false });
-      imgEl.addEventListener('touchend', function() { dragging = false; });
+      imgEl.addEventListener('touchend', onEnd);
 
-      /* Scroll para zoom — roda para cima aproxima, roda para baixo afasta */
+      /* Scroll para zoom */
       if (idsZoom && idsZoom.length) {
-        imgEl.addEventListener('wheel', function(e) {
+        containerEl.addEventListener('wheel', function(e) {
           e.preventDefault();
           const rz = $(idsZoom[0]);
           if (!rz) return;
-          const step = 5;
-          const novo = Math.min(300, Math.max(100, Number(rz.value) + (e.deltaY < 0 ? step : -step)));
+          const novo = Math.min(300, Math.max(100, Number(rz.value) + (e.deltaY < 0 ? 5 : -5)));
           rz.value = novo;
           const zv = (novo / 100).toFixed(1) + '×';
           idsZoomVal.forEach(id => { const el = $(id); if (el) el.textContent = zv; });
-          /* Aviso zoom alto */
-          const aviso = $(idsZoom[0].replace('pg1-capa-zoom', 'pg1-capa-zoom') + '-aviso') ||
-                        document.getElementById(idsZoom[0] + '-aviso');
+          const avisoId = idsZoom[0] + '-aviso';
+          const aviso = document.getElementById(avisoId);
           if (aviso) aviso.style.display = novo > 200 ? '' : 'none';
           pg1CapaAtualizarPrevia();
         }, { passive: false });
