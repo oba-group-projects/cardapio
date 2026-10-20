@@ -3981,6 +3981,12 @@ async function hidratarTemaDoModeloMestre() {
     if (elSub1) elSub1.style.display = bv.exibirSubtitulo === false ? 'none' : '';
     const elCTA1 = document.getElementById('oba-pag1-btn-cta');
     if (elCTA1) elCTA1.style.display = bv.exibirCTA === false ? 'none' : '';
+    /* Assinatura Pg1 — padrão: oculta (opt-in via bv.exibirAssinatura) */
+    const elAss1 = document.getElementById('pag1-ne-citacao');
+    if (elAss1) elAss1.style.setProperty('display', bv.exibirAssinatura === true ? '' : 'none', 'important');
+    /* Rótulo Pg1 — padrão: oculto (opt-in via bv.exibirRotulo) */
+    const elRot1 = document.getElementById('pag1-ne-rotulo');
+    if (elRot1) elRot1.style.display = bv.exibirRotulo === true ? '' : 'none';
     /* ativo: se falso, oculta pag-1 e navega direto para pag-2 (ou pag-3 se ambas inativas) */
     if (bv.ativo === false) {
       const elP1 = document.getElementById('pag-1');
@@ -4072,10 +4078,8 @@ async function hidratarTemaDoModeloMestre() {
     /* Visibilidade pag2 */
     const elCitacao2 = document.getElementById('oba-pag2-citacao');
     if (elCitacao2) elCitacao2.style.display = ne.exibirCitacao === false ? 'none' : '';
-    /* Bug fix: exibirCitacao controla também o espelho na Pg1 */
-    const elCitacao1 = document.getElementById('pag1-ne-citacao');
-    /* setProperty com 'important' vence o display:block !important do stylesheet */
-    if (elCitacao1) elCitacao1.style.setProperty('display', ne.exibirCitacao === false ? 'none' : '', ne.exibirCitacao === false ? 'important' : '');
+    /* Nota: a assinatura da Pg1 (pag1-ne-citacao) é agora controlada por bv.exibirAssinatura
+       na seção de visibilidade da Pg1 acima — não mais por ne.exibirCitacao. */
     const elSep2 = document.querySelector('#pag-2 .bg-orange-200\\/60');
     if (elSep2) elSep2.style.display = ne.exibirSeparador === false ? 'none' : '';
     /* ativo: se falso, oculta pag-2 e ajusta o botão CTA da pag-1 para ir direto para pag-3 */
@@ -33581,9 +33585,9 @@ button[onclick*="fecharModalQuantidadeDoce"] {
     margin-right: auto !important;
   }
 
-  /* Ocultar rótulo "CARDÁPIO" — não acrescenta nada numa capa */
+  /* Rótulo "CARDÁPIO" — oculto por padrão, controlável pelo editor via JS */
   #pag1-ne-rotulo {
-    display: none !important;
+    display: none;
   }
 
   /* Ocultar 2º parágrafo — reduz para uma frase impactante */
@@ -33924,8 +33928,9 @@ button[onclick*="fecharModalQuantidadeDoce"] {
 
     /* Tipografia desktop: título e parágrafo maiores na coluna de texto */
     #pag-1.b2b-com-foto #pag1-ne-titulo {
-      font-size: clamp(2.2rem, 3.2vw, 3rem) !important;
-      line-height: 1.1 !important;
+      font-size: clamp(2.0rem, 2.8vw, 2.4rem) !important;
+      font-weight: 400 !important;
+      line-height: 1.15 !important;
       text-align: left !important;
     }
     #pag-1.b2b-com-foto #pag1-ne-texto {
@@ -33955,6 +33960,26 @@ button[onclick*="fecharModalQuantidadeDoce"] {
      Nenhuma regra acima afeta #pag-1 sem a classe b2b-com-foto.
      A capa tipográfica existente (B1 + B2) permanece intacta.
   ────────────────────────────────────────────────────────────────── */
+
+  /* ── TABLET COM FOTO (768–1023px): limitar margin-top do essência ──
+     Em >=768px, b2-polimento aplica margin-top:auto em #pag1-essencia
+     para centralizar verticalmente. Com foto, isso cria um gap enorme
+     entre a foto e o texto porque a foto já ocupa boa parte da altura.
+     Seletor de alta especificidade (2 IDs) vence o b2-polimento (1 ID).
+  ────────────────────────────────────────────────────────────────── */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    #pag-1.b2b-com-foto #pag1-essencia {
+      margin-top: clamp(16px, 3dvh, 32px) !important;
+      margin-bottom: 0 !important;
+    }
+    /* CTA: remover sticky no tablet com foto — conteúdo curto faz o
+       sticky colar no fundo e criar um vazio enorme acima do botão.
+       No tablet o conteúdo cabe na tela sem necessidade de sticky. */
+    #pag-1.b2b-com-foto #oba-pag1-btn-cta {
+      position: static !important;
+      margin-top: clamp(20px, 3dvh, 36px) !important;
+    }
+  }
 
 </style>
 
@@ -34141,14 +34166,17 @@ button[onclick*="fecharModalQuantidadeDoce"] {
     text-overflow: ellipsis !important;
   }
 
-  /* ── TÍTULO DA PG1: clamp corrigido ────────────────────────────
-     7vw e 8vw escalavam demais no desktop (>80px em 1440px).
-     Máximo fixo de 2.6rem; no desktop >=768px o override abaixo
-     permite ir até 2.8rem sem usar vw.
+  /* ── TÍTULO DA PG1: clamp revisado para "Cardápio Oba Doceria" ──
+     Título funcional (22 chars) — menor que "Nossa Essência" editorial.
+     font-weight:400 sobrescreve o 500 definido no b2-polimento.
+     mobile: clamp(1.7rem,5.5vw,2rem) → 320px≈27px, 360px≈27px, 480px≈27px
+     desktop sem foto: máx 2rem=32px (b4 vence b2 L33735 por posição DOM)
+     desktop com foto: controlado por seletor de alta especificidade em b2b
   ────────────────────────────────────────────────────────────────── */
   #pag1-ne-titulo {
-    font-size: clamp(1.9rem, 6vw, 2.6rem) !important;
-    line-height: 1.12 !important;
+    font-size: clamp(1.7rem, 5.5vw, 2rem) !important;
+    font-weight: 400 !important;
+    line-height: 1.15 !important;
     text-align: center !important;
   }
 
