@@ -3913,7 +3913,7 @@ async function hidratarTemaDoModeloMestre() {
         const posX  = (bv.capa_pos_x  ?? 50) + '%';
         const posY  = (bv.capa_pos_y  ?? 40) + '%';
         const enq   = bv.capa_enquadramento || 'equilibrada';
-        const zoom  = Math.min(2.0, Math.max(1.0, Number(bv.capa_zoom ?? 1.0)));
+        const zoom  = Math.min(3.0, Math.max(1.0, Number(bv.capa_zoom ?? 1.0)));
         const grad  = bv.capa_gradiente || 'suave';
         const alts  = { compacta: 'clamp(160px,32dvh,260px)', equilibrada: 'clamp(200px,40dvh,340px)', ampla: 'clamp(240px,50dvh,420px)' };
         const alt   = alts[enq] || alts.equilibrada;
