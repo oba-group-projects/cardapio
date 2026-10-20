@@ -249,9 +249,10 @@ function obaLogout() {
         <div class="field">
           <label>Zoom <span class="hint">(1× = sem zoom · 2× = máximo)</span></label>
           <div style="display:flex;gap:10px;align-items:center">
-            <input type="range" id="pg1-capa-zoom" min="100" max="200" value="100" step="5" style="flex:1" oninput="document.getElementById('pg1-capa-zoom-val').textContent=(this.value/100).toFixed(1)+'×';pg1CapaAtualizarPrevia()">
+            <input type="range" id="pg1-capa-zoom" min="100" max="300" value="100" step="5" style="flex:1" oninput="const zv=this.value/100;document.getElementById('pg1-capa-zoom-val').textContent=zv.toFixed(1)+'×';document.getElementById('pg1-capa-zoom-aviso').style.display=zv>2?'':'none';pg1CapaAtualizarPrevia()">
             <span id="pg1-capa-zoom-val" style="font-size:12px;min-width:36px;text-align:right">1.0×</span>
           </div>
+          <span id="pg1-capa-zoom-aviso" class="hint" style="display:none;color:#B45309">⚠️ Zoom alto — use fotos com boa resolução para evitar desfoque.</span>
         </div>
         <div class="field">
           <label>Transição para o fundo <span class="hint">(degradê na base da foto)</span></label>
@@ -3037,25 +3038,76 @@ $('formConfig').onsubmit=async e=>{
   document.getElementById('pg2-texto')?.addEventListener('input', pg1CapaAtualizarPrevia);
   document.querySelectorAll('input[name="pg1-capa-enquadramento"]').forEach(r => r.addEventListener('change', pg1CapaAtualizarPrevia));
 
-  /* ── Clique para ponto focal na prévia da capa ──────────────────
-     Clicar na foto da prévia completa reposiciona o foco X/Y.
-     Converte a posição do clique em percentuais e sincroniza
-     com os sliders existentes, ativando a atualização da prévia.
+  /* ── Arrastar para ponto focal na prévia da capa ───────────────
+     Arrastar a foto da prévia completa reposiciona o foco X/Y
+     em tempo real. Os sliders sincronizam ao soltar.
+     Funciona com mouse e touch.
   ─────────────────────────────────────────────────────────────── */
   (function() {
     const prevImg = document.getElementById('pg1-prev-foto-img');
     if (!prevImg) return;
-    /* Indicar interatividade visualmente */
-    prevImg.style.cursor = 'crosshair';
-    prevImg.title = 'Clique para definir o ponto focal';
-    prevImg.addEventListener('click', function(e) {
-      const rect = prevImg.getBoundingClientRect();
-      const x = Math.round((e.clientX - rect.left) / rect.width  * 100);
-      const y = Math.round((e.clientY - rect.top)  / rect.height * 100);
+    prevImg.style.cursor = 'grab';
+    prevImg.title = 'Arraste para definir o ponto focal';
+    prevImg.draggable = false; /* evita arrastar o arquivo de imagem */
+
+    let dragging = false, startX = 0, startY = 0, startFX = 50, startFY = 40;
+
+    function getFocal() {
+      const rx = $('pg1-capa-pos-x'), ry = $('pg1-capa-pos-y');
+      return {
+        x: rx ? Number(rx.value) : 50,
+        y: ry ? Number(ry.value) : 40
+      };
+    }
+    function setFocal(x, y) {
+      x = Math.min(100, Math.max(0, Math.round(x)));
+      y = Math.min(100, Math.max(0, Math.round(y)));
       const rx = $('pg1-capa-pos-x'), ry = $('pg1-capa-pos-y');
       if (rx) { rx.value = x; $('pg1-capa-pos-x-val').textContent = x + '%'; }
       if (ry) { ry.value = y; $('pg1-capa-pos-y-val').textContent = y + '%'; }
       pg1CapaAtualizarPrevia();
+    }
+
+    /* Mouse */
+    prevImg.addEventListener('mousedown', function(e) {
+      e.preventDefault();
+      dragging = true;
+      prevImg.style.cursor = 'grabbing';
+      startX = e.clientX; startY = e.clientY;
+      const f = getFocal(); startFX = f.x; startFY = f.y;
+    });
+    document.addEventListener('mousemove', function(e) {
+      if (!dragging) return;
+      const rect = prevImg.getBoundingClientRect();
+      /* Mover na direção oposta ao arrastar — efeito "mover a imagem sob o recorte" */
+      const dx = -(e.clientX - startX) / rect.width  * 100;
+      const dy = -(e.clientY - startY) / rect.height * 100;
+      setFocal(startFX + dx, startFY + dy);
+    });
+    document.addEventListener('mouseup', function() {
+      if (!dragging) return;
+      dragging = false;
+      prevImg.style.cursor = 'grab';
+    });
+
+    /* Touch */
+    prevImg.addEventListener('touchstart', function(e) {
+      if (e.touches.length !== 1) return;
+      e.preventDefault();
+      dragging = true;
+      startX = e.touches[0].clientX; startY = e.touches[0].clientY;
+      const f = getFocal(); startFX = f.x; startFY = f.y;
+    }, { passive: false });
+    prevImg.addEventListener('touchmove', function(e) {
+      if (!dragging || e.touches.length !== 1) return;
+      e.preventDefault();
+      const rect = prevImg.getBoundingClientRect();
+      const dx = -(e.touches[0].clientX - startX) / rect.width  * 100;
+      const dy = -(e.touches[0].clientY - startY) / rect.height * 100;
+      setFocal(startFX + dx, startFY + dy);
+    }, { passive: false });
+    prevImg.addEventListener('touchend', function() {
+      dragging = false;
     });
   })();
 
