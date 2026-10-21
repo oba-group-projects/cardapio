@@ -369,14 +369,14 @@ function obaLogout() {
             <div>
               <p style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Recorte celular <span class="hint">(arraste para ajustar)</span></p>
               <div id="pg1-capa-previa-mobile" style="width:160px;height:256px;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#FAF5F0;position:relative">
-                <img id="pg1-capa-previa-mobile-img" src="" alt="" style="width:100%;height:100%;display:block;object-fit:cover;object-position:50% 40%;cursor:grab">
+                <img id="pg1-capa-previa-mobile-img" src="" alt="" style="position:absolute;display:block;cursor:grab">
               </div>
             </div>
             <!-- Desktop -->
             <div>
               <p style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Desktop coluna direita <span class="hint">(arraste para ajustar)</span></p>
-              <div id="pg1-capa-previa-desktop" style="width:280px;height:160px;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#FAF5F0">
-                <img id="pg1-capa-previa-desktop-img" src="" alt="" style="width:100%;height:100%;display:block;object-fit:cover;object-position:50% 40%;cursor:grab">
+              <div id="pg1-capa-previa-desktop" style="width:280px;height:160px;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#FAF5F0;position:relative">
+                <img id="pg1-capa-previa-desktop-img" src="" alt="" style="position:absolute;display:block;cursor:grab">
               </div>
             </div>
           </div>
@@ -2978,6 +2978,64 @@ $('formConfig').onsubmit=async e=>{
   const PG1_CAPA_ENQUADRAMENTOS = { compacta: '205px', equilibrada: '256px', ampla: '320px' };
   const PG1_CAPA_GRADIENTE_OPACIDADE = { nenhum: 0, suave: 0.85, pronunciado: 1 };
 
+  /* ── Renderização de recorte por posição absoluta ──────────────────
+     Substitui object-fit:cover + object-position nos recortes de prévia.
+     Garante excedente em X e Y para qualquer proporção de foto,
+     permitindo arraste visual nos dois eixos.
+
+     Fator 1.5: escala mínima × 1.5 → excedente mínimo de 50%
+     da dimensão do contêiner em cada eixo. Demonstrado:
+       excedente_x_min = 0.5 × C_w   (quando s_min = C_h/I_h)
+       excedente_y_min = 0.5 × C_h   (quando s_min = C_w/I_w)
+
+     Semântica dos sliders preservada:
+       posX=0   → left=0        (borda esq. da imagem = borda esq. do contêiner)
+       posX=100 → left=-(R_w-C_w) (borda dir. da imagem = borda dir. do contêiner)
+       posX=50  → centralizado
+
+     Zoom preserva ancoragem:
+       left(z) = -(posX/100) × (I_w × s_render × z − C_w)
+       Extremos (posX=0 e posX=100) permanecem corretos para qualquer z.
+
+     Carregamento tardio: registra handler único via _recortePendente.
+     Quando load dispara, lê os sliders no estado corrente — não captura
+     valores antigos do momento do registro.
+  ─────────────────────────────────────────────────────────────────── */
+  const PG1_RECORTE_FATOR = 1.5;
+
+  function aplicarRecorteEl(imgEl, C_w, C_h, idPosX, idPosY, idZoom) {
+    if (!imgEl.complete || !imgEl.naturalWidth) {
+      if (!imgEl._recortePendente) {
+        imgEl._recortePendente = true;
+        imgEl.addEventListener('load', function h() {
+          imgEl.removeEventListener('load', h);
+          imgEl._recortePendente = false;
+          /* Lê sliders no estado corrente, não no momento do registro */
+          aplicarRecorteEl(imgEl, C_w, C_h, idPosX, idPosY, idZoom);
+        });
+      }
+      return;
+    }
+    const posX = Number($(idPosX)?.value ?? 50);
+    const posY = Number($(idPosY)?.value ?? 40);
+    const zoom = Number($(idZoom)?.value  ?? 100) / 100;
+    const I_w  = imgEl.naturalWidth;
+    const I_h  = imgEl.naturalHeight;
+    /* Escala mínima para cobrir o contêiner (equivalente a cover) */
+    const s_min    = Math.max(C_w / I_w, C_h / I_h);
+    /* Escala de renderização: FATOR garante excedente em ambos os eixos */
+    const s_render = s_min * PG1_RECORTE_FATOR * zoom;
+    const R_w  = I_w * s_render;
+    const R_h  = I_h * s_render;
+    const exc_x = R_w - C_w;   /* sempre > 0 */
+    const exc_y = R_h - C_h;   /* sempre > 0 */
+    imgEl.style.width     = R_w.toFixed(1) + 'px';
+    imgEl.style.height    = R_h.toFixed(1) + 'px';
+    imgEl.style.left      = (-(posX / 100) * exc_x).toFixed(1) + 'px';
+    imgEl.style.top       = (-(posY / 100) * exc_y).toFixed(1) + 'px';
+    imgEl.style.transform = '';  /* zoom incorporado em s_render, sem transform */
+  }
+
   function pg1CapaAtualizarPrevia() {
     const src  = ($('pg1-capa-imagem')?.value || '').trim();
     const posX = ($('pg1-capa-pos-x')?.value ?? 50) + '%';
@@ -2997,13 +3055,22 @@ $('formConfig').onsubmit=async e=>{
     if (!src) { if (container) container.style.display = 'none'; return; }
     if (container) container.style.display = '';
 
-    /* Prévias de recorte — cada uma usa seus próprios parâmetros */
+    /* Prévias de recorte — usa aplicarRecorteEl (position:absolute + left/top)
+       Os valores posX/posY numéricos são passados via IDs — a função lê
+       os sliders no momento da execução, incluindo após carregamento tardio. */
     const imgM = $('pg1-capa-previa-mobile-img');
     const imgD = $('pg1-capa-previa-desktop-img');
     const divM = $('pg1-capa-previa-mobile');
-    if (imgM) { imgM.src = src; imgM.style.objectPosition = posX + ' ' + posY; imgM.style.height = altMobile; imgM.style.transform = scaleStr; }
-    if (divM) divM.style.height = altMobile;
-    if (imgD) { imgD.src = src; imgD.style.objectPosition = posXd + ' ' + posYd; imgD.style.transform = scaleDStr; }
+    if (imgM && divM) {
+      imgM.src = src;
+      divM.style.height = altMobile;  /* altura do contêiner varia com enquadramento */
+      const C_h_M = parseInt(altMobile);
+      aplicarRecorteEl(imgM, 160, C_h_M, 'pg1-capa-pos-x', 'pg1-capa-pos-y', 'pg1-capa-zoom');
+    }
+    if (imgD) {
+      imgD.src = src;
+      aplicarRecorteEl(imgD, 280, 160, 'pg1-capa-pos-x-desk', 'pg1-capa-pos-y-desk', 'pg1-capa-zoom-desk');
+    }
     /* Preview miniatura */
     const prev = $('pg1-capa-preview');
     if (prev) { prev.src = src; prev.style.display = ''; }
