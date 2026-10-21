@@ -3939,7 +3939,7 @@ async function hidratarTemaDoModeloMestre() {
         const zoomD = Math.min(3.0, Math.max(1.0, Number(bv.capa_zoom_desk ?? bv.capa_zoom ?? 1.0)));
         let styleDesk = document.getElementById('oba-capa-desk-style');
         if (!styleDesk) { styleDesk = document.createElement('style'); styleDesk.id = 'oba-capa-desk-style'; document.head.appendChild(styleDesk); }
-        styleDesk.textContent = '@media (min-width:1024px){#pag1-capa-foto-img{object-position:' + posXd + ' ' + posYd + '!important;transform:' + (zoomD > 1.0 ? 'scale(' + zoomD.toFixed(2) + ')' : 'none') + '!important}}';
+        styleDesk.textContent = '@media (min-width:1024px){#pag1-capa-foto-img{object-position:' + posXd + ' ' + posYd + ' !important;transform:' + (zoomD > 1.0 ? 'scale(' + zoomD.toFixed(2) + ')' : 'none') + ' !important}}';
       } else {
         elCapaFoto.style.display   = 'none';
         elCapaImg.src              = '';

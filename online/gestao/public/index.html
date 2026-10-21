@@ -255,9 +255,9 @@ function obaLogout() {
         <div class="field full" id="pg1-capa-previa-container" style="display:none">
           <p class="oba-secao-titulo" style="margin-bottom:12px">👁️ Prévia da capa</p>
 
-          <!-- Prévia completa — usa object-position + scale(), mesma lógica do cardápio publicado -->
+          <!-- ── Prévia completa CELULAR ── -->
           <div style="margin-bottom:24px">
-            <p style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Capa completa (celular)</p>
+            <p style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">📱 Capa completa — celular</p>
             <div id="pg1-capa-previa-completa"
                  style="width:360px;max-width:100%;height:640px;background:#FAF5F0;border-radius:16px;border:1px solid var(--line);overflow:hidden;position:relative;display:flex;flex-direction:column;font-family:'Poppins',system-ui,sans-serif;">
               <!-- Identificador -->
@@ -278,8 +278,36 @@ function obaLogout() {
               </div>
             </div>
             <p class="hint" style="margin-top:6px;max-width:360px">
-              Esta prévia usa a mesma lógica de posição e zoom do cardápio publicado (object-position + scale).
-              A altura da foto pode variar levemente no dispositivo real por causa do tamanho da tela.
+              Usa a mesma lógica de posição e zoom do cardápio publicado (object-position + scale).
+              A altura pode variar levemente no dispositivo real.
+            </p>
+          </div>
+
+          <!-- ── Prévia completa DESKTOP ── -->
+          <div style="margin-bottom:24px">
+            <p style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🖥️ Capa completa — desktop</p>
+            <!-- Layout 2 colunas: texto à esq, foto à dir — proporcional a 1280×480px -->
+            <div id="pg1-capa-previa-desk-completa"
+                 style="width:100%;max-width:760px;height:360px;background:#FAF5F0;border-radius:16px;border:1px solid var(--line);overflow:hidden;position:relative;display:flex;font-family:'Poppins',system-ui,sans-serif;">
+              <!-- Coluna texto (45%) -->
+              <div style="width:45%;padding:32px 28px;display:flex;flex-direction:column;justify-content:center;flex-shrink:0;gap:12px;position:relative;z-index:1">
+                <div id="pg1-prev-desk-titulo" style="font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;font-weight:400;line-height:1.15;color:#3B2A1E;text-transform:uppercase"></div>
+                <div id="pg1-prev-desk-texto" style="font-size:11px;font-weight:300;line-height:1.65;color:#4B5563;max-width:30ch"></div>
+                <div style="margin-top:4px">
+                  <div id="pg1-prev-desk-cta" style="background:#8B4513;color:#fff;border-radius:999px;padding:10px 16px;font-size:8px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;text-align:center;display:inline-block"></div>
+                </div>
+              </div>
+              <!-- Coluna foto (55%) — usa parâmetros desktop independentes -->
+              <div style="flex:1;position:relative;overflow:hidden">
+                <img id="pg1-prev-desk-foto-img" src="" alt=""
+                     style="width:100%;height:100%;display:block;object-fit:cover;object-position:50% 40%;transform:scale(1);transform-origin:center center;">
+                <!-- Degradê lateral (esq→direita, transição entre texto e foto) -->
+                <div style="position:absolute;top:0;left:0;bottom:0;width:60px;background:linear-gradient(to right,#FAF5F0,transparent);pointer-events:none"></div>
+              </div>
+            </div>
+            <p class="hint" style="margin-top:6px;max-width:760px">
+              Usa os parâmetros de enquadramento do Desktop (coluna direita). Proporcional a 1280×480px.
+              A posição e o zoom aplicados aqui são os que serão publicados em telas ≥ 1024px.
             </p>
           </div>
 
@@ -3073,7 +3101,7 @@ $('formConfig').onsubmit=async e=>{
       fotoWrap.style.display = '';
     }
     if (gradDiv) { gradDiv.style.opacity = gradOp; }
-    /* Texto real dos campos do painel → prévia.
+    /* Texto real dos campos do painel → prévia celular e desktop.
        T2: se pg1-titulo estiver preenchido, tem prioridade (igual ao comportamento do cardápio).
        Fallback: pg2-titulo (Nossa Essência), exatamente como o JS do cardápio faz. */
     const pg1titulo = ($('pg1-titulo')?.value || '').trim();
@@ -3081,14 +3109,34 @@ $('formConfig').onsubmit=async e=>{
     const pg1subtit = ($('pg1-subtitulo')?.value || '').trim();
     const pg2texto  = ($('pg2-texto')?.value  || '').trim();
     const pg1cta    = ($('pg1-cta')?.value    || 'Ver o Cardápio').trim();
+    const tituloFinal = (pg1titulo || pg2titulo) || 'Título da capa';
+    const textoFinal  = (pg1subtit || pg2texto)  || '';
     const elTit  = $('pg1-prev-titulo');
     const elTxt  = $('pg1-prev-texto');
     const elCTA  = $('pg1-prev-cta');
     const elRot  = $('pg1-prev-rotulo');
-    if (elTit)  elTit.textContent  = (pg1titulo || pg2titulo) || 'Título da capa';
-    if (elTxt)  elTxt.textContent  = (pg1subtit || pg2texto)  || '';
+    if (elTit)  elTit.textContent  = tituloFinal;
+    if (elTxt)  elTxt.textContent  = textoFinal;
     if (elCTA)  elCTA.textContent  = pg1cta;
     if (elRot)  elRot.textContent  = 'OBA DOCERIA';
+
+    /* ── Prévia completa DESKTOP ─────────────────────────────────────
+       Usa parâmetros desktop independentes (posXd, posYd, zoomD).
+       Imagem: object-position + scale(), mesma lógica do cardápio ≥1024px.
+       Texto: mesmos campos do painel, igual à prévia celular.
+    ─────────────────────────────────────────────────────────────────── */
+    const deskFotoImg = $('pg1-prev-desk-foto-img');
+    if (deskFotoImg) {
+      deskFotoImg.src = src;
+      deskFotoImg.style.objectPosition = posXd + ' ' + posYd;
+      deskFotoImg.style.transform = scaleDStr;
+    }
+    const elDTit = $('pg1-prev-desk-titulo');
+    const elDTxt = $('pg1-prev-desk-texto');
+    const elDCTA = $('pg1-prev-desk-cta');
+    if (elDTit) elDTit.textContent = tituloFinal;
+    if (elDTxt) elDTxt.textContent = textoFinal;
+    if (elDCTA) elDCTA.textContent = pg1cta;
   }
   window.pg1CapaAtualizarPrevia = pg1CapaAtualizarPrevia;
 
