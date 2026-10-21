@@ -233,76 +233,10 @@ function obaLogout() {
           <input id="pg1-capa-alt" placeholder="Brigadeiros artesanais Oba Doceria">
         </div>
 
-        <!-- ── ENQUADRAMENTO POR DISPOSITIVO ─────────────────────────────
-             Duas abas independentes: Celular e Desktop.
-             Cada aba tem seus próprios sliders de Foco H, Foco V e Zoom.
-             Desktop usa fallback para os valores de celular quando não configurado.
-        ─────────────────────────────────────────────────────────────────── -->
-        <div class="field full" style="margin-top:4px">
-          <div style="display:flex;gap:0;border-bottom:2px solid var(--line);margin-bottom:16px">
-            <button type="button" id="pg1-aba-celular" onclick="pg1AtivarAba('celular')"
-              style="padding:8px 20px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid #8B4513;margin-bottom:-2px;color:#8B4513">
-              📱 Celular
-            </button>
-            <button type="button" id="pg1-aba-desktop" onclick="pg1AtivarAba('desktop')"
-              style="padding:8px 20px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;color:var(--muted)">
-              🖥️ Desktop
-            </button>
-          </div>
-
-          <!-- Painel celular -->
-          <div id="pg1-painel-celular">
-            <div class="field">
-              <label>Foco horizontal <span class="hint">(0 = esq · 50 = centro · 100 = dir)</span></label>
-              <div style="display:flex;gap:10px;align-items:center">
-                <input type="range" id="pg1-capa-pos-x" min="0" max="100" value="50" style="flex:1" oninput="document.getElementById('pg1-capa-pos-x-val').textContent=this.value+'%';pg1CapaAtualizarPrevia()">
-                <span id="pg1-capa-pos-x-val" style="font-size:12px;min-width:36px;text-align:right">50%</span>
-              </div>
-            </div>
-            <div class="field">
-              <label>Foco vertical <span class="hint">(0 = topo · 40 = centro-alto · 100 = base)</span></label>
-              <div style="display:flex;gap:10px;align-items:center">
-                <input type="range" id="pg1-capa-pos-y" min="0" max="100" value="40" style="flex:1" oninput="document.getElementById('pg1-capa-pos-y-val').textContent=this.value+'%';pg1CapaAtualizarPrevia()">
-                <span id="pg1-capa-pos-y-val" style="font-size:12px;min-width:36px;text-align:right">40%</span>
-              </div>
-            </div>
-            <div class="field">
-              <label>Zoom <span class="hint">(1× = sem zoom · 3× = máximo)</span></label>
-              <div style="display:flex;gap:10px;align-items:center">
-                <input type="range" id="pg1-capa-zoom" min="100" max="300" value="100" step="5" style="flex:1" oninput="const zv=this.value/100;document.getElementById('pg1-capa-zoom-val').textContent=zv.toFixed(1)+'×';document.getElementById('pg1-capa-zoom-aviso').style.display=zv>2?'':'none';pg1CapaAtualizarPrevia()">
-                <span id="pg1-capa-zoom-val" style="font-size:12px;min-width:36px;text-align:right">1.0×</span>
-              </div>
-              <span id="pg1-capa-zoom-aviso" class="hint" style="display:none;color:#B45309">⚠️ Zoom alto — use fotos com boa resolução para evitar desfoque.</span>
-            </div>
-          </div>
-
-          <!-- Painel desktop -->
-          <div id="pg1-painel-desktop" style="display:none">
-            <p class="hint" style="margin-bottom:12px">Enquadramento independente para a coluna direita no desktop. Se não configurado, usa os valores do celular.</p>
-            <div class="field">
-              <label>Foco horizontal <span class="hint">(0 = esq · 50 = centro · 100 = dir)</span></label>
-              <div style="display:flex;gap:10px;align-items:center">
-                <input type="range" id="pg1-capa-pos-x-desk" min="0" max="100" value="50" style="flex:1" oninput="document.getElementById('pg1-capa-pos-x-desk-val').textContent=this.value+'%';pg1CapaAtualizarPrevia()">
-                <span id="pg1-capa-pos-x-desk-val" style="font-size:12px;min-width:36px;text-align:right">50%</span>
-              </div>
-            </div>
-            <div class="field">
-              <label>Foco vertical <span class="hint">(0 = topo · 40 = centro-alto · 100 = base)</span></label>
-              <div style="display:flex;gap:10px;align-items:center">
-                <input type="range" id="pg1-capa-pos-y-desk" min="0" max="100" value="40" style="flex:1" oninput="document.getElementById('pg1-capa-pos-y-desk-val').textContent=this.value+'%';pg1CapaAtualizarPrevia()">
-                <span id="pg1-capa-pos-y-desk-val" style="font-size:12px;min-width:36px;text-align:right">40%</span>
-              </div>
-            </div>
-            <div class="field">
-              <label>Zoom <span class="hint">(1× = sem zoom · 3× = máximo)</span></label>
-              <div style="display:flex;gap:10px;align-items:center">
-                <input type="range" id="pg1-capa-zoom-desk" min="100" max="300" value="100" step="5" style="flex:1" oninput="const zd=this.value/100;document.getElementById('pg1-capa-zoom-desk-val').textContent=zd.toFixed(1)+'×';document.getElementById('pg1-capa-zoom-desk-aviso').style.display=zd>2?'':'none';pg1CapaAtualizarPrevia()">
-                <span id="pg1-capa-zoom-desk-val" style="font-size:12px;min-width:36px;text-align:right">1.0×</span>
-              </div>
-              <span id="pg1-capa-zoom-desk-aviso" class="hint" style="display:none;color:#B45309">⚠️ Zoom alto — use fotos com boa resolução para evitar desfoque.</span>
-            </div>
-          </div>
-        </div>
+        <!-- ── ENQUADRAMENTO + PRÉVIAS ─────────────────────────────────
+             Controles de cada dispositivo ficam diretamente abaixo
+             do seu recorte. Celular e desktop são independentes.
+        ─────────────────────────────────────────────────────────────── -->
 
         <div class="field">
           <label>Transição para o fundo <span class="hint">(degradê na base da foto)</span></label>
@@ -316,27 +250,13 @@ function obaLogout() {
           <button type="button" class="secondary" style="font-size:12px" onclick="pg1CapaRestaurarAjustes()">↺ Restaurar ajustes</button>
           <span class="hint">Restaura zoom, foco e degradê de celular e desktop. Mantém a imagem e o texto alternativo.</span>
         </div>
-        <div class="field full">
-          <label>Altura da foto no celular</label>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 14px;border:1.5px solid var(--line);border-radius:8px;font-size:12px;font-weight:600">
-              <input type="radio" name="pg1-capa-enquadramento" value="compacta" style="margin:0"> Compacta
-            </label>
-            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 14px;border:1.5px solid var(--brand);border-radius:8px;font-size:12px;font-weight:600;background:var(--brand-light)">
-              <input type="radio" name="pg1-capa-enquadramento" value="equilibrada" checked style="margin:0"> Equilibrada
-            </label>
-            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 14px;border:1.5px solid var(--line);border-radius:8px;font-size:12px;font-weight:600">
-              <input type="radio" name="pg1-capa-enquadramento" value="ampla" style="margin:0"> Ampla
-            </label>
-          </div>
-        </div>
 
-        <!-- Prévia de recorte + prévia completa da capa -->
+        <!-- Prévia completa + recortes com controles inline -->
         <div class="field full" id="pg1-capa-previa-container" style="display:none">
           <p class="oba-secao-titulo" style="margin-bottom:12px">👁️ Prévia da capa</p>
 
-          <!-- Prévia completa — simulação 360x640 da Pg1 real -->
-          <div style="margin-bottom:20px">
+          <!-- Prévia completa — usa object-position + scale(), mesma lógica do cardápio publicado -->
+          <div style="margin-bottom:24px">
             <p style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Capa completa (celular)</p>
             <div id="pg1-capa-previa-completa"
                  style="width:360px;max-width:100%;height:640px;background:#FAF5F0;border-radius:16px;border:1px solid var(--line);overflow:hidden;position:relative;display:flex;flex-direction:column;font-family:'Poppins',system-ui,sans-serif;">
@@ -358,29 +278,93 @@ function obaLogout() {
               </div>
             </div>
             <p class="hint" style="margin-top:6px;max-width:360px">
-              Simulação aproximada da Pg1. Pode diferir da capa publicada em tipografia exata, fontes e espaçamentos finos.
-              O layout real usa as mesmas regras CSS do cardápio publicado.
+              Esta prévia usa a mesma lógica de posição e zoom do cardápio publicado (object-position + scale).
+              A altura da foto pode variar levemente no dispositivo real por causa do tamanho da tela.
             </p>
           </div>
 
-          <!-- Prévias de recorte -->
-          <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start">
-            <!-- Mobile -->
-            <div>
-              <p style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Recorte celular <span class="hint">(arraste para ajustar)</span></p>
+          <!-- Recortes com controles inline -->
+          <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
+
+            <!-- ── CELULAR ── -->
+            <div style="display:flex;flex-direction:column;gap:10px;max-width:320px">
+              <p style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:0">📱 Celular</p>
               <div id="pg1-capa-previa-mobile" style="width:160px;height:256px;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#FAF5F0;position:relative">
                 <img id="pg1-capa-previa-mobile-img" src="" alt="" style="position:absolute;display:block;cursor:grab">
               </div>
+              <p class="hint" style="margin:0;max-width:280px">Arraste para ajustar o enquadramento. Use a prévia completa acima para confirmar o resultado publicado.</p>
+
+              <div class="field">
+                <label>Foco horizontal <span class="hint">(0 = esq · 50 = centro · 100 = dir)</span></label>
+                <div style="display:flex;gap:10px;align-items:center">
+                  <input type="range" id="pg1-capa-pos-x" min="0" max="100" value="50" style="flex:1" oninput="document.getElementById('pg1-capa-pos-x-val').textContent=this.value+'%';pg1CapaAtualizarPrevia()">
+                  <span id="pg1-capa-pos-x-val" style="font-size:12px;min-width:36px;text-align:right">50%</span>
+                </div>
+              </div>
+              <div class="field">
+                <label>Foco vertical <span class="hint">(0 = topo · 40 = centro-alto · 100 = base)</span></label>
+                <div style="display:flex;gap:10px;align-items:center">
+                  <input type="range" id="pg1-capa-pos-y" min="0" max="100" value="40" style="flex:1" oninput="document.getElementById('pg1-capa-pos-y-val').textContent=this.value+'%';pg1CapaAtualizarPrevia()">
+                  <span id="pg1-capa-pos-y-val" style="font-size:12px;min-width:36px;text-align:right">40%</span>
+                </div>
+              </div>
+              <div class="field">
+                <label>Zoom <span class="hint">(1× = sem zoom · 3× = máximo)</span></label>
+                <div style="display:flex;gap:10px;align-items:center">
+                  <input type="range" id="pg1-capa-zoom" min="100" max="300" value="100" step="5" style="flex:1" oninput="const zv=this.value/100;document.getElementById('pg1-capa-zoom-val').textContent=zv.toFixed(1)+'×';document.getElementById('pg1-capa-zoom-aviso').style.display=zv>2?'':'none';pg1CapaAtualizarPrevia()">
+                  <span id="pg1-capa-zoom-val" style="font-size:12px;min-width:36px;text-align:right">1.0×</span>
+                </div>
+                <span id="pg1-capa-zoom-aviso" class="hint" style="display:none;color:#B45309">⚠️ Zoom alto — use fotos com boa resolução para evitar desfoque.</span>
+              </div>
+              <div class="field">
+                <label>Altura da foto no celular</label>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                  <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 14px;border:1.5px solid var(--line);border-radius:8px;font-size:12px;font-weight:600">
+                    <input type="radio" name="pg1-capa-enquadramento" value="compacta" style="margin:0"> Compacta
+                  </label>
+                  <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 14px;border:1.5px solid var(--brand);border-radius:8px;font-size:12px;font-weight:600;background:var(--brand-light)">
+                    <input type="radio" name="pg1-capa-enquadramento" value="equilibrada" checked style="margin:0"> Equilibrada
+                  </label>
+                  <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 14px;border:1.5px solid var(--line);border-radius:8px;font-size:12px;font-weight:600">
+                    <input type="radio" name="pg1-capa-enquadramento" value="ampla" style="margin:0"> Ampla
+                  </label>
+                </div>
+              </div>
             </div>
-            <!-- Desktop -->
-            <div>
-              <p style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Desktop coluna direita <span class="hint">(arraste para ajustar)</span></p>
+
+            <!-- ── DESKTOP ── -->
+            <div style="display:flex;flex-direction:column;gap:10px;max-width:360px">
+              <p style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:0">🖥️ Desktop (coluna direita)</p>
               <div id="pg1-capa-previa-desktop" style="width:280px;height:160px;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#FAF5F0;position:relative">
                 <img id="pg1-capa-previa-desktop-img" src="" alt="" style="position:absolute;display:block;cursor:grab">
               </div>
+              <p class="hint" style="margin:0;max-width:280px">Enquadramento independente do celular. Se não ajustado, usa os valores do celular como ponto de partida.</p>
+
+              <div class="field">
+                <label>Foco horizontal <span class="hint">(0 = esq · 50 = centro · 100 = dir)</span></label>
+                <div style="display:flex;gap:10px;align-items:center">
+                  <input type="range" id="pg1-capa-pos-x-desk" min="0" max="100" value="50" style="flex:1" oninput="document.getElementById('pg1-capa-pos-x-desk-val').textContent=this.value+'%';pg1CapaAtualizarPrevia()">
+                  <span id="pg1-capa-pos-x-desk-val" style="font-size:12px;min-width:36px;text-align:right">50%</span>
+                </div>
+              </div>
+              <div class="field">
+                <label>Foco vertical <span class="hint">(0 = topo · 40 = centro-alto · 100 = base)</span></label>
+                <div style="display:flex;gap:10px;align-items:center">
+                  <input type="range" id="pg1-capa-pos-y-desk" min="0" max="100" value="40" style="flex:1" oninput="document.getElementById('pg1-capa-pos-y-desk-val').textContent=this.value+'%';pg1CapaAtualizarPrevia()">
+                  <span id="pg1-capa-pos-y-desk-val" style="font-size:12px;min-width:36px;text-align:right">40%</span>
+                </div>
+              </div>
+              <div class="field">
+                <label>Zoom <span class="hint">(1× = sem zoom · 3× = máximo)</span></label>
+                <div style="display:flex;gap:10px;align-items:center">
+                  <input type="range" id="pg1-capa-zoom-desk" min="100" max="300" value="100" step="5" style="flex:1" oninput="const zd=this.value/100;document.getElementById('pg1-capa-zoom-desk-val').textContent=zd.toFixed(1)+'×';document.getElementById('pg1-capa-zoom-desk-aviso').style.display=zd>2?'':'none';pg1CapaAtualizarPrevia()">
+                  <span id="pg1-capa-zoom-desk-val" style="font-size:12px;min-width:36px;text-align:right">1.0×</span>
+                </div>
+                <span id="pg1-capa-zoom-desk-aviso" class="hint" style="display:none;color:#B45309">⚠️ Zoom alto — use fotos com boa resolução para evitar desfoque.</span>
+              </div>
             </div>
+
           </div>
-          <p class="hint" style="margin-top:8px">Prévia de recorte — arraste para ajustar o enquadramento de cada dispositivo independentemente.</p>
         </div>
 
         <div style="grid-column:1/-1"><p class="oba-secao-titulo">🎨 Cores desta página</p></div>
@@ -3107,17 +3091,6 @@ $('formConfig').onsubmit=async e=>{
     if (elRot)  elRot.textContent  = 'OBA DOCERIA';
   }
   window.pg1CapaAtualizarPrevia = pg1CapaAtualizarPrevia;
-
-  /* Troca entre painel Celular / Desktop na seção de enquadramento */
-  function pg1AtivarAba(aba) {
-    const isCel = aba === 'celular';
-    $('pg1-painel-celular').style.display = isCel ? '' : 'none';
-    $('pg1-painel-desktop').style.display = isCel ? 'none' : '';
-    const abaCel = $('pg1-aba-celular'), abaDesk = $('pg1-aba-desktop');
-    if (abaCel)  { abaCel.style.borderBottomColor  = isCel  ? '#8B4513' : 'transparent'; abaCel.style.color  = isCel  ? '#8B4513' : 'var(--muted)'; }
-    if (abaDesk) { abaDesk.style.borderBottomColor = !isCel ? '#8B4513' : 'transparent'; abaDesk.style.color = !isCel ? '#8B4513' : 'var(--muted)'; }
-  }
-  window.pg1AtivarAba = pg1AtivarAba;
 
   function pg1CapaRestaurarAjustes() {
     const rx = $('pg1-capa-pos-x'); if (rx) { rx.value = 50; $('pg1-capa-pos-x-val').textContent = '50%'; }
