@@ -1,6 +1,6 @@
 ﻿# ROADMAP
 
-Atualizado: 2026-10-09 (sessão 11)
+Atualizado: 2026-10-20 (sessão 22)
 
 ## Concluído
 
@@ -13,7 +13,8 @@ Atualizado: 2026-10-09 (sessão 11)
 - Homologação Geral e Encerramento da Migração
 
 ### Cardápio
-- Pg1 Interpretação B (Nossa Essência como título principal)
+- Pg1 redesenhada (sessão 22): novo texto, tipografia calibrada, checkboxes de visibilidade
+- Editor de imagem de capa: arraste X/Y, zoom 3×, enquadramento independente celular/desktop
 - Pg3 refinamento visual (labels, ícones, subtítulo)
 - Fluxo de montagem (grid 3 colunas, resumo caixa)
 - Editor Visual completo: Pg1/Pg2/Pg3 + Tema Global

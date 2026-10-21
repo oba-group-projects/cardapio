@@ -1,99 +1,72 @@
 # HANDOFF
 
-Atualizado: 2026-10-15 (sessão 21)
+Atualizado: 2026-10-20 (sessão 22)
 
 Branch: feature/gestao-online-segura
-HEAD: 12b1a5e
+HEAD: e3232ed
 
-## Última entrega
-Diagnóstico definitivo e correção da causa raiz do bug no Catálogo/Cardápio em smartphones. O problema não era CSP (como diagnosticado na sessão anterior) — era o `/published-bootstrap.js` retornando HTTP 303 para usuários anônimos porque o script caía no catch-all do Worker, que está atrás do gate de autenticação. Correção mínima aplicada, testada e deployada.
+## Última entrega — Sessão 22
+Redesenho da capa do Cardápio (Pg1) e melhoria completa do editor de imagem de capa na Central.
 
-## Commits desta sessão
+### Commits desta sessão
 | Commit   | O que fez |
 |----------|-----------|
-| 12b1a5e  | fix(gate): CATALOGO-gate-headers.ps1 reescrito sem caracteres especiais |
-| b609189  | fix(worker): published-bootstrap.js exposto como rota pública — causa raiz corrigida |
-| e1117ae  | fix(catalogo): CSP na rota /catalogo (sessão anterior — não era a causa raiz) |
+| e3232ed  | refactor(editor): layout de recorte inline — controles abaixo de cada prévia |
+| e2c9028  | fix(editor): recorte de capa com arraste X/Y nos dois eixos |
+| f25a054  | fix(editor): drag usa rect do container + height explícita no recorte celular |
+| 0435cd2  | fix(editor): drag igual H/V + scroll para zoom nos recortes |
+| b8ee0e3  | feat(editor): enquadramento independente celular/desktop na capa |
+| 8b94e67  | feat(editor): arrastar para ponto focal + zoom até 3× na prévia da capa |
+| 5c408ce  | feat(cardápio): redesenho capa Pg1 — tipografia, checkboxes, gap tablet, ponto focal prévia |
+
+### Entregas confirmadas em produção
+
+**Cardápio — Pg1 (capa):**
+- Título: `Cardápio Oba Doceria` (Cormorant Garamond, weight 400)
+- Parágrafo: "Brigadeiros gourmet artesanais, com cremosidade envolvente..."
+- CTA: "DESCUBRA NOSSOS SABORES"
+- Tipografia ajustada: `clamp(1.7rem, 5.5vw, 2rem)` mobile · `clamp(2.0rem, 2.8vw, 2.4rem)` desktop com foto
+- Checkboxes novos: Exibir assinatura abaixo do botão · Exibir rótulo da página
+- Gap tablet 768–1023px corrigido (position:static no CTA + margin-top limitado)
+
+**Editor de imagem de capa (Central):**
+- Arraste para ponto focal na prévia: drag X e Y funcionando nos dois recortes
+- Zoom até 3× (era 2×) com aviso de qualidade acima de 2×
+- Recortes celular e desktop com enquadramento independente
+- Layout redesenhado: controles inline abaixo de cada recorte (sem abas)
+- Altura dos recortes na prévia corrigida para valores representativos
+- Nota clara: prévia completa usa a mesma lógica do cardápio publicado
+
+**Version ID atual:** `f1b55715-b673-400b-9ff5-e6c888b7b8e2`
 
 ## Estado atual — TUDO APROVADO E EM PRODUÇÃO
 
-### Bug crítico resolvido — sessão 21
+### Pendentes identificados na sessão
 
-**Causa raiz comprovada:**
-- `/published-bootstrap.js` caia no catch-all `env.ASSETS.fetch(request)`, que está **após** o gate de autenticação (`validateSession`)
-- Usuários anônimos (smartphones sem sessão ativa) recebiam HTTP 303 → redirect para login
-- O bootstrap nunca executava → `window.fetch` não era interceptado → `catIniciar()` falhava com erro de rede
-- O mesmo problema afetava `/cardapio` para usuários anônimos (mesma causa, mesma correção)
+**Título em maiúsculas na capa**
+- O `text-transform: uppercase` da classe Tailwind `uppercase` no HTML do `#pag1-ne-titulo` faz "Cardápio Oba Doceria" aparecer em caixa alta como "CARDÁPIO OBA DOCERIA"
+- O CSS do b2-polimento define `text-transform: none !important`, mas o elemento HTML tem a classe diretamente
+- Decisão tomada: manter em maiúsculas (aprovado pelo usuário)
 
-**Evidência concreta:**
-```
-GET /published-bootstrap.js  →  HTTP 303 (antes do fix)
-GET /published-bootstrap.js  →  HTTP 200 conteúdo válido (após fix)
-```
+**Divergência entre recortes e cardápio publicado**
+- Os recortes de prévia (celular/desktop) usam `position:absolute + left/top` com FATOR=1.5
+- O cardápio usa `object-position` com `object-fit:cover`
+- As fórmulas são diferentes — recortes exageram o movimento no eixo que não tem sobra no cover
+- A prévia completa (360×640) usa `object-position + scale()`, igual ao cardápio — essa é a referência fiel
+- Valores salvos e cardápio publicado: não afetados. Problema é apenas visual nos thumbnails de recorte
+- Decisão: manter FATOR=1.5 (arraste funciona) com nota orientando usar a prévia completa
 
-**Correção aplicada (Worker src/index.js):**
-- Adicionada rota pública explícita para `/published-bootstrap.js`, `/preview-bootstrap.js` e `/cardapio-bootstrap.js`
-- Inserida **antes** de `validateSession()`, junto com `/api/catalog` e `/api/media/`
-- Headers corretos: `Content-Type`, `Cache-Control: public, max-age=60, stale-while-revalidate=300`, `X-Content-Type-Options: nosniff`
+**Validação no smartphone real**
+- Ainda recomendada para confirmar o comportamento visual final da capa redesenhada
 
-**Por que o desktop funcionava:**
-- Usuário do desktop tinha sessão ativa (usava a Central) → passava pelo gate → bootstrap era servido normalmente
-
-**Testes (9/9 passaram):**
-- T1: /catalogo HTTP 200 ✓
-- T2: /catalogo CSP presente ✓
-- T3: CSP connect-src correto ✓
-- T4: /cardapio HTTP 200 ✓
-- T5: /api/catalog ok:true ✓
-- T6: bootstrap injetado no HTML ✓
-- T7: grupos_ordem e imagem presentes ✓
-- T8: **/published-bootstrap.js HTTP 200 sem auth** ✓ ← prova a correção
-- T9: /cardapio bootstrap presente ✓
-
-**Version ID atual:** `89d2f393-cbbf-4cf8-bd0c-a5a7e81bd49f`
-
-### Trabalho das sessões anteriores (preservado)
-Ver HANDOFF sessão 20 para:
-- Catálogo Pg2 redesenhada (composição, botões, centralização)
-- Pg1 proporção tablet, imagem de fundo por grupo
-- Destaque fotográfico Pg1 completo
-- Editor Visual do Catálogo completo (sessões 12–14)
-- Módulo de Contratos (sessões 9–11, 15–16)
-
-## REGRAS TÉCNICAS CRÍTICAS
-1. Nunca usar Set-Content/Out-File do PowerShell — adiciona BOM
-2. theme.json = cardápio. theme-catalogo.json = catálogo. NUNCA misturar.
-3. theme-catalogo.json é schemaVersion 4 — `pg2.grupos_ordem[]` é o campo canônico
-4. Ao ler grupos: checar `pg2.grupos_ordem` primeiro, fallback para campos legados
-5. `grupos{}` = configurações de Pg4 (cores, tipografia). NÃO confundir com `pg2.grupos_ordem[]`
-6. catAbrirGrupo recebe qualquer string como `grupo` — não assume artesanais/finos
-7. Modal `cat-modal-nova-categoria`: `_cardOrigem` e `_modoNovoGrupo` são propriedades dinâmicas no elemento DOM
-8. `catEdPopularSelectGrupo(card, valorAtual)` deve ser chamado após qualquer operação que muda o ID do grupo
-9. cpf_cnpj está em contracts, NÃO em proposals
-10. Rota /contrato/:token fica ANTES de validateSession — é pública por design
-11. **Assets públicos (bootstraps) devem ter rota explícita ANTES de validateSession — não confiar no catch-all**
-
-## Pendente — próximas sessões
-
-### Validação no smartphone real
-- O fix resolve a causa raiz comprovada automaticamente
-- Validação final no aparelho real ainda é recomendada para confirmar o comportamento visual
-
-### Catálogo — imagem de fundo nos botões Pg2
-- Funcionalidade implementada e funcionando (opacidade 15%)
-- Imagens atuais são capturas de tela — trocar por fotos dos doces na Central quando disponíveis
-
-### Catálogo — Borda do botão Voltar
+**Borda do botão Voltar no Catálogo**
 - Confirmada nos prints — regra `.oba-btn-voltar-dest` ainda aplica borda
 - Uma linha de CSS para remover quando decidido
 
-### Contratos — fase 2 (itens restantes)
-- Aditivos, templates de cláusulas, integração Autentique
-
 ## Pontos de retorno seguros
-- HEAD atual = 12b1a5e (estável, deploy validado — sessão 21)
-- Anterior = b609189 (fix causa raiz)
-- Anterior = e1117ae (fix CSP — não era a causa raiz, mas não faz mal)
+- HEAD atual = e3232ed (estável, deploy validado — sessão 22)
+- Anterior = e2c9028 (fix arraste X/Y)
+- Anterior = 5c408ce (redesenho Pg1 + checkboxes + gap tablet)
 
 ## Links
 - Central: https://oba-cardapio-gestao.obadoceria.workers.dev/
