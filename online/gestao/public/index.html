@@ -311,16 +311,13 @@ function obaLogout() {
             </p>
           </div>
 
-          <!-- Recortes com controles inline -->
+          <!-- Controles celular — inline abaixo da prévia completa celular -->
           <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
 
             <!-- ── CELULAR ── -->
-            <div style="display:flex;flex-direction:column;gap:10px;max-width:320px">
-              <p style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:0">📱 Celular</p>
-              <div id="pg1-capa-previa-mobile" style="width:160px;height:256px;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#FAF5F0;position:relative">
-                <img id="pg1-capa-previa-mobile-img" src="" alt="" style="position:absolute;display:block;cursor:grab">
-              </div>
-              <p class="hint" style="margin:0;max-width:280px">Arraste para ajustar o enquadramento. Use a prévia completa acima para confirmar o resultado publicado.</p>
+            <div style="display:flex;flex-direction:column;gap:10px;max-width:360px">
+              <p style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:0">📱 Controles — celular</p>
+              <p class="hint" style="margin:0;max-width:360px">Arraste diretamente na prévia celular acima para ajustar o enquadramento. Os sliders refletem o mesmo resultado.</p>
 
               <div class="field">
                 <label>Foco horizontal <span class="hint">(0 = esq · 50 = centro · 100 = dir)</span></label>
@@ -362,11 +359,8 @@ function obaLogout() {
 
             <!-- ── DESKTOP ── -->
             <div style="display:flex;flex-direction:column;gap:10px;max-width:360px">
-              <p style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:0">🖥️ Desktop (coluna direita)</p>
-              <div id="pg1-capa-previa-desktop" style="width:280px;height:160px;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#FAF5F0;position:relative">
-                <img id="pg1-capa-previa-desktop-img" src="" alt="" style="position:absolute;display:block;cursor:grab">
-              </div>
-              <p class="hint" style="margin:0;max-width:280px">Enquadramento independente do celular. Se não ajustado, usa os valores do celular como ponto de partida.</p>
+              <p style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:0">🖥️ Controles — desktop</p>
+              <p class="hint" style="margin:0;max-width:360px">Arraste na coluna da foto na prévia desktop acima. Enquadramento independente do celular.</p>
 
               <div class="field">
                 <label>Foco horizontal <span class="hint">(0 = esq · 50 = centro · 100 = dir)</span></label>
@@ -3067,22 +3061,9 @@ $('formConfig').onsubmit=async e=>{
     if (!src) { if (container) container.style.display = 'none'; return; }
     if (container) container.style.display = '';
 
-    /* Prévias de recorte — usa aplicarRecorteEl (position:absolute + left/top)
-       Os valores posX/posY numéricos são passados via IDs — a função lê
-       os sliders no momento da execução, incluindo após carregamento tardio. */
-    const imgM = $('pg1-capa-previa-mobile-img');
-    const imgD = $('pg1-capa-previa-desktop-img');
+    /* Prévias de recorte removidas — drag direto nas prévias completas abaixo */
     const divM = $('pg1-capa-previa-mobile');
-    if (imgM && divM) {
-      imgM.src = src;
-      divM.style.height = altMobile;  /* altura do contêiner varia com enquadramento */
-      const C_h_M = parseInt(altMobile);
-      aplicarRecorteEl(imgM, 160, C_h_M, 'pg1-capa-pos-x', 'pg1-capa-pos-y', 'pg1-capa-zoom');
-    }
-    if (imgD) {
-      imgD.src = src;
-      aplicarRecorteEl(imgD, 280, 160, 'pg1-capa-pos-x-desk', 'pg1-capa-pos-y-desk', 'pg1-capa-zoom-desk');
-    }
+    if (divM) divM.style.height = altMobile;  /* mantido para compatibilidade futura */
     /* Preview miniatura */
     const prev = $('pg1-capa-preview');
     if (prev) { prev.src = src; prev.style.display = ''; }
@@ -3202,67 +3183,70 @@ $('formConfig').onsubmit=async e=>{
   document.getElementById('pg2-texto')?.addEventListener('input', pg1CapaAtualizarPrevia);
   document.querySelectorAll('input[name="pg1-capa-enquadramento"]').forEach(r => r.addEventListener('change', pg1CapaAtualizarPrevia));
 
-  /* ── Arrastar para ponto focal na prévia da capa ───────────────
-     Três pontos de arraste independentes:
-     1. Prévia completa celular (#pg1-prev-foto-img) → parâmetros mobile
-     2. Recorte celular (#pg1-capa-previa-mobile-img) → parâmetros mobile
-     3. Recorte desktop (#pg1-capa-previa-desktop-img) → parâmetros desktop
-     Funciona com mouse e touch.
-  ─────────────────────────────────────────────────────────────── */
+  /* ── Drag direto nas prévias completas (fidelidade total ao cardápio) ────
+     Usa object-fit:cover + object-position — mesma lógica do cardápio publicado.
+     Sensibilidade calculada a partir do excedente real do cover:
+       exc_x = R_w_cover * zoom - C_w   (pode ser 0 se nao ha sobra horizontal)
+       exc_y = R_h_cover * zoom - C_h
+     Se exc = 0 em algum eixo, arraste nesse eixo nao produz efeito visual
+     e o slider nao e atualizado (respeita a limitacao geometrica real).
+     Scroll no container ajusta o zoom.
+  ─────────────────────────────────────────────────────────────────────── */
   (function() {
-    /* Cria drag handler para um elemento img.
-       idsX/idsY: arrays de IDs de sliders a atualizar.
-       idsXval/idsYval: arrays de IDs de spans de valor. */
-    function criarDrag(imgEl, idsX, idsXval, idsY, idsYval, idsZoom, idsZoomVal) {
+    function criarDragCover(imgEl, idsX, idsXval, idsY, idsYval, idsZoom, idsZoomVal) {
       if (!imgEl) return;
-      /* Usar o contêiner pai para rect — tem dimensões estáveis independente da img */
       const containerEl = imgEl.parentElement || imgEl;
       imgEl.style.cursor = 'grab';
-      containerEl.style.cursor = 'grab';
       imgEl.title = 'Arraste para posicionar · Scroll para zoom';
       imgEl.draggable = false;
 
       let dragging = false, startX = 0, startY = 0, startFX = 50, startFY = 40;
+      let excX = 0, excY = 0;
 
+      function calcExcedente() {
+        if (!imgEl.complete || !imgEl.naturalWidth) return;
+        const I_w = imgEl.naturalWidth, I_h = imgEl.naturalHeight;
+        const C_w = containerEl.offsetWidth  || 160;
+        const C_h = containerEl.offsetHeight || 160;
+        const zoom = Number($(idsZoom[0])?.value ?? 100) / 100;
+        const s_cover = Math.max(C_w / I_w, C_h / I_h);
+        excX = Math.max(0, I_w * s_cover * zoom - C_w);
+        excY = Math.max(0, I_h * s_cover * zoom - C_h);
+      }
       function getFocal() {
-        const rx = $(idsX[0]);
-        const ry = $(idsY[0]);
-        return { x: rx ? Number(rx.value) : 50, y: ry ? Number(ry.value) : 40 };
+        return { x: Number($(idsX[0])?.value ?? 50), y: Number($(idsY[0])?.value ?? 40) };
       }
       function setFocal(x, y) {
-        x = Math.min(100, Math.max(0, Math.round(x)));
-        y = Math.min(100, Math.max(0, Math.round(y)));
-        idsX.forEach(id => { const el = $(id); if (el) el.value = x; });
-        idsXval.forEach(id => { const el = $(id); if (el) el.textContent = x + '%'; });
-        idsY.forEach(id => { const el = $(id); if (el) el.value = y; });
-        idsYval.forEach(id => { const el = $(id); if (el) el.textContent = y + '%'; });
+        if (excX > 0) {
+          x = Math.min(100, Math.max(0, Math.round(x)));
+          idsX.forEach(id => { const el = $(id); if (el) el.value = x; });
+          idsXval.forEach(id => { const el = $(id); if (el) el.textContent = x + '%'; });
+        }
+        if (excY > 0) {
+          y = Math.min(100, Math.max(0, Math.round(y)));
+          idsY.forEach(id => { const el = $(id); if (el) el.value = y; });
+          idsYval.forEach(id => { const el = $(id); if (el) el.textContent = y + '%'; });
+        }
         pg1CapaAtualizarPrevia();
       }
       function onStart(clientX, clientY) {
+        calcExcedente();
         dragging = true;
         imgEl.style.cursor = 'grabbing';
-        containerEl.style.cursor = 'grabbing';
         startX = clientX; startY = clientY;
         const f = getFocal(); startFX = f.x; startFY = f.y;
       }
       function onMove(clientX, clientY) {
         if (!dragging) return;
-        /* Ler rect do contêiner — dimensões estáveis e corretas */
-        const rect = containerEl.getBoundingClientRect();
-        const w = rect.width  || 160;
-        const h = rect.height || 160;
-        /* Base = menor dimensão: sensibilidade igual em H e V */
-        const base = Math.min(w, h);
-        setFocal(startFX - (clientX - startX) / base * 100,
-                 startFY - (clientY - startY) / base * 100);
+        const dx = excX > 0 ? -(clientX - startX) / excX * 100 : 0;
+        const dy = excY > 0 ? -(clientY - startY) / excY * 100 : 0;
+        setFocal(startFX + dx, startFY + dy);
       }
       function onEnd() {
         if (!dragging) return;
         dragging = false;
         imgEl.style.cursor = 'grab';
-        containerEl.style.cursor = 'grab';
       }
-
       imgEl.addEventListener('mousedown', function(e) { e.preventDefault(); onStart(e.clientX, e.clientY); });
       document.addEventListener('mousemove', function(e) { onMove(e.clientX, e.clientY); });
       document.addEventListener('mouseup', onEnd);
@@ -3275,37 +3259,27 @@ $('formConfig').onsubmit=async e=>{
         onMove(e.touches[0].clientX, e.touches[0].clientY);
       }, { passive: false });
       imgEl.addEventListener('touchend', onEnd);
-
-      /* Scroll para zoom */
-      if (idsZoom && idsZoom.length) {
-        containerEl.addEventListener('wheel', function(e) {
-          e.preventDefault();
-          const rz = $(idsZoom[0]);
-          if (!rz) return;
-          const novo = Math.min(300, Math.max(100, Number(rz.value) + (e.deltaY < 0 ? 5 : -5)));
-          rz.value = novo;
-          const zv = (novo / 100).toFixed(1) + '×';
-          idsZoomVal.forEach(id => { const el = $(id); if (el) el.textContent = zv; });
-          const avisoId = idsZoom[0] + '-aviso';
-          const aviso = document.getElementById(avisoId);
-          if (aviso) aviso.style.display = novo > 200 ? '' : 'none';
-          pg1CapaAtualizarPrevia();
-        }, { passive: false });
-      }
+      containerEl.addEventListener('wheel', function(e) {
+        e.preventDefault();
+        const rz = $(idsZoom[0]);
+        if (!rz) return;
+        const novo = Math.min(300, Math.max(100, Number(rz.value) + (e.deltaY < 0 ? 5 : -5)));
+        rz.value = novo;
+        idsZoomVal.forEach(id => { const el = $(id); if (el) el.textContent = (novo / 100).toFixed(1) + 'x'; });
+        const aviso = document.getElementById(idsZoom[0] + '-aviso');
+        if (aviso) aviso.style.display = novo > 200 ? '' : 'none';
+        pg1CapaAtualizarPrevia();
+      }, { passive: false });
     }
 
-    /* Prévia completa (celular) + Recorte celular → parâmetros mobile */
-    criarDrag(document.getElementById('pg1-prev-foto-img'),
-      ['pg1-capa-pos-x'], ['pg1-capa-pos-x-val'],
-      ['pg1-capa-pos-y'], ['pg1-capa-pos-y-val'],
-      ['pg1-capa-zoom'],  ['pg1-capa-zoom-val']);
-    criarDrag(document.getElementById('pg1-capa-previa-mobile-img'),
+    /* Previa completa celular → parametros mobile */
+    criarDragCover(document.getElementById('pg1-prev-foto-img'),
       ['pg1-capa-pos-x'], ['pg1-capa-pos-x-val'],
       ['pg1-capa-pos-y'], ['pg1-capa-pos-y-val'],
       ['pg1-capa-zoom'],  ['pg1-capa-zoom-val']);
 
-    /* Recorte desktop → parâmetros desktop */
-    criarDrag(document.getElementById('pg1-capa-previa-desktop-img'),
+    /* Previa completa desktop (coluna da foto) → parametros desktop */
+    criarDragCover(document.getElementById('pg1-prev-desk-foto-img'),
       ['pg1-capa-pos-x-desk'], ['pg1-capa-pos-x-desk-val'],
       ['pg1-capa-pos-y-desk'], ['pg1-capa-pos-y-desk-val'],
       ['pg1-capa-zoom-desk'],  ['pg1-capa-zoom-desk-val']);
