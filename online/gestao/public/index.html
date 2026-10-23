@@ -320,7 +320,7 @@ function obaLogout() {
             <div style="display:flex;flex-direction:column;gap:10px;max-width:360px">
               <p style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:0">📱 Recorte celular <span class="hint">(arraste para ajustar)</span></p>
               <div id="pg1-capa-previa-mobile" style="width:160px;height:256px;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#FAF5F0;position:relative">
-                <img id="pg1-capa-previa-mobile-img" src="" alt="" style="position:absolute;display:block;cursor:grab">
+                <img id="pg1-capa-previa-mobile-img" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:block;cursor:grab">
               </div>
               <p class="hint" style="margin:0;max-width:280px">Arraste para ajustar posição em X e Y. Confirme o resultado final nas prévias completas acima.</p>
 
@@ -366,7 +366,7 @@ function obaLogout() {
             <div style="display:flex;flex-direction:column;gap:10px;max-width:360px">
               <p style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:0">🖥️ Desktop coluna direita <span class="hint">(arraste para ajustar)</span></p>
               <div id="pg1-capa-previa-desktop" style="width:280px;height:160px;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#FAF5F0;position:relative">
-                <img id="pg1-capa-previa-desktop-img" src="" alt="" style="position:absolute;display:block;cursor:grab">
+                <img id="pg1-capa-previa-desktop-img" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:block;cursor:grab">
               </div>
               <p class="hint" style="margin:0;max-width:360px">Arraste para ajustar o enquadramento da coluna direita no desktop. Enquadramento independente do celular.</p>
 
@@ -3069,21 +3069,22 @@ $('formConfig').onsubmit=async e=>{
     if (!src) { if (container) container.style.display = 'none'; return; }
     if (container) container.style.display = '';
 
-    /* Prévias de recorte — usa aplicarRecorteEl (position:absolute + left/top)
-       Os valores posX/posY numéricos são passados via IDs — a função lê
-       os sliders no momento da execução, incluindo após carregamento tardio. */
+    /* Miniaturas de recorte — mesma fórmula das prévias completas e do cardápio publicado:
+       object-fit:cover + object-position + scale(zoom).
+       Elimina a divergência do FATOR 1.5 que existia em aplicarRecorteEl. */
     const imgM = $('pg1-capa-previa-mobile-img');
     const imgD = $('pg1-capa-previa-desktop-img');
     const divM = $('pg1-capa-previa-mobile');
     if (imgM && divM) {
       imgM.src = src;
       divM.style.height = altMobile;  /* altura do contêiner varia com enquadramento */
-      const C_h_M = parseInt(altMobile);
-      aplicarRecorteEl(imgM, 160, C_h_M, 'pg1-capa-pos-x', 'pg1-capa-pos-y', 'pg1-capa-zoom');
+      imgM.style.objectPosition = posX + ' ' + posY;
+      imgM.style.transform = scaleStr;
     }
     if (imgD) {
       imgD.src = src;
-      aplicarRecorteEl(imgD, 280, 160, 'pg1-capa-pos-x-desk', 'pg1-capa-pos-y-desk', 'pg1-capa-zoom-desk');
+      imgD.style.objectPosition = posXd + ' ' + posYd;
+      imgD.style.transform = scaleDStr;
     }
     /* Preview miniatura */
     const prev = $('pg1-capa-preview');
