@@ -264,7 +264,7 @@ function obaLogout() {
               <div id="pg1-prev-rotulo" style="font-size:10px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:rgba(139,69,19,.6);padding:18px 24px 0;flex-shrink:0"></div>
               <!-- Foto -->
               <div id="pg1-prev-foto-wrap" style="display:none;overflow:hidden;border-radius:12px;margin:12px 24px 0;flex-shrink:0;position:relative">
-                <img id="pg1-prev-foto-img" src="" alt="" style="width:100%;display:block;object-fit:cover;object-position:50% 40%;transform:scale(1);transform-origin:center center;">
+                <img id="pg1-prev-foto-img" src="" alt="" style="position:absolute;display:block;cursor:grab">
                 <!-- Degradê -->
                 <div id="pg1-prev-gradiente" style="position:absolute;bottom:0;left:0;right:0;pointer-events:none;background:linear-gradient(to bottom,transparent,#FAF5F0);opacity:0;height:50%"></div>
               </div>
@@ -300,7 +300,7 @@ function obaLogout() {
               <!-- Coluna foto (55%) — usa parâmetros desktop independentes -->
               <div style="flex:1;position:relative;overflow:hidden">
                 <img id="pg1-prev-desk-foto-img" src="" alt=""
-                     style="width:100%;height:100%;display:block;object-fit:cover;object-position:50% 40%;transform:scale(1);transform-origin:center center;">
+                     style="position:absolute;display:block;cursor:grab">
                 <!-- Degradê lateral (esq→direita, transição entre texto e foto) -->
                 <div style="position:absolute;top:0;left:0;bottom:0;width:60px;background:linear-gradient(to right,#FAF5F0,transparent);pointer-events:none"></div>
               </div>
@@ -320,7 +320,7 @@ function obaLogout() {
             <div style="display:flex;flex-direction:column;gap:10px;max-width:360px">
               <p style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:0">📱 Recorte celular <span class="hint">(arraste para ajustar)</span></p>
               <div id="pg1-capa-previa-mobile" style="width:160px;height:256px;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#FAF5F0;position:relative">
-                <img id="pg1-capa-previa-mobile-img" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:block;cursor:grab">
+                <img id="pg1-capa-previa-mobile-img" src="" alt="" style="position:absolute;display:block;cursor:grab">
               </div>
               <p class="hint" style="margin:0;max-width:280px">Arraste para ajustar posição em X e Y. Confirme o resultado final nas prévias completas acima.</p>
 
@@ -366,7 +366,7 @@ function obaLogout() {
             <div style="display:flex;flex-direction:column;gap:10px;max-width:360px">
               <p style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:0">🖥️ Desktop coluna direita <span class="hint">(arraste para ajustar)</span></p>
               <div id="pg1-capa-previa-desktop" style="width:280px;height:160px;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#FAF5F0;position:relative">
-                <img id="pg1-capa-previa-desktop-img" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:block;cursor:grab">
+                <img id="pg1-capa-previa-desktop-img" src="" alt="" style="position:absolute;display:block;cursor:grab">
               </div>
               <p class="hint" style="margin:0;max-width:360px">Arraste para ajustar o enquadramento da coluna direita no desktop. Enquadramento independente do celular.</p>
 
@@ -2993,29 +2993,21 @@ $('formConfig').onsubmit=async e=>{
   const PG1_CAPA_GRADIENTE_OPACIDADE = { nenhum: 0, suave: 0.85, pronunciado: 1 };
 
   /* ── Renderização de recorte por posição absoluta ──────────────────
-     Substitui object-fit:cover + object-position nos recortes de prévia.
-     Garante excedente em X e Y para qualquer proporção de foto,
-     permitindo arraste visual nos dois eixos.
+     Replica fielmente object-fit:cover + object-position + scale() —
+     a mesma fórmula usada no cardápio publicado.
 
-     Fator 1.5: escala mínima × 1.5 → excedente mínimo de 50%
-     da dimensão do contêiner em cada eixo. Demonstrado:
-       excedente_x_min = 0.5 × C_w   (quando s_min = C_h/I_h)
-       excedente_y_min = 0.5 × C_h   (quando s_min = C_w/I_w)
+     Derivação:
+       s_cover = max(C_w/I_w, C_h/I_h)
+       exc_cx  = max(0, I_w*s_cover - C_w)    excedente do cover
+       exc_cy  = max(0, I_h*s_cover - C_h)
+       left_obj = -(posX/100)*exc_cx           (object-position sem zoom)
+       Após scale(zoom) com transform-origin:center center do elemento:
+         left = C_w*(1-zoom)/2 - (posX/100)*exc_cx*zoom
+         top  = C_h*(1-zoom)/2 - (posY/100)*exc_cy*zoom
 
-     Semântica dos sliders preservada:
-       posX=0   → left=0        (borda esq. da imagem = borda esq. do contêiner)
-       posX=100 → left=-(R_w-C_w) (borda dir. da imagem = borda dir. do contêiner)
-       posX=50  → centralizado
-
-     Zoom preserva ancoragem:
-       left(z) = -(posX/100) × (I_w × s_render × z − C_w)
-       Extremos (posX=0 e posX=100) permanecem corretos para qualquer z.
-
-     Carregamento tardio: registra handler único via _recortePendente.
-     Quando load dispara, lê os sliders no estado corrente — não captura
-     valores antigos do momento do registro.
-  ─────────────────────────────────────────────────────────────────── */
-  const PG1_RECORTE_FATOR = 1.5;
+     Se exc_cy=0 (foto landscape em contêiner landscape, zoom=1.0), posY
+     não tem efeito visual — limitação idêntica ao cardápio publicado.
+  ──────────────────────────────────────────────────────────────────── */
 
   function aplicarRecorteEl(imgEl, C_w, C_h, idPosX, idPosY, idZoom) {
     if (!imgEl.complete || !imgEl.naturalWidth) {
@@ -3024,7 +3016,6 @@ $('formConfig').onsubmit=async e=>{
         imgEl.addEventListener('load', function h() {
           imgEl.removeEventListener('load', h);
           imgEl._recortePendente = false;
-          /* Lê sliders no estado corrente, não no momento do registro */
           aplicarRecorteEl(imgEl, C_w, C_h, idPosX, idPosY, idZoom);
         });
       }
@@ -3035,78 +3026,84 @@ $('formConfig').onsubmit=async e=>{
     const zoom = Number($(idZoom)?.value  ?? 100) / 100;
     const I_w  = imgEl.naturalWidth;
     const I_h  = imgEl.naturalHeight;
-    /* Escala mínima para cobrir o contêiner (equivalente a cover) */
-    const s_min    = Math.max(C_w / I_w, C_h / I_h);
-    /* Escala de renderização: FATOR garante excedente em ambos os eixos */
-    const s_render = s_min * PG1_RECORTE_FATOR * zoom;
-    const R_w  = I_w * s_render;
-    const R_h  = I_h * s_render;
-    const exc_x = R_w - C_w;   /* sempre > 0 */
-    const exc_y = R_h - C_h;   /* sempre > 0 */
-    imgEl.style.width     = R_w.toFixed(1) + 'px';
-    imgEl.style.height    = R_h.toFixed(1) + 'px';
-    imgEl.style.left      = (-(posX / 100) * exc_x).toFixed(1) + 'px';
-    imgEl.style.top       = (-(posY / 100) * exc_y).toFixed(1) + 'px';
-    imgEl.style.transform = '';  /* zoom incorporado em s_render, sem transform */
+    /* Cover: escala que cobre o contêiner exatamente */
+    const s_cover  = Math.max(C_w / I_w, C_h / I_h);
+    /* Dimensões cobertas sem zoom */
+    const cov_w    = I_w * s_cover;
+    const cov_h    = I_h * s_cover;
+    /* Excedente do cover puro — base do object-position */
+    const exc_cx   = Math.max(0, cov_w - C_w);
+    const exc_cy   = Math.max(0, cov_h - C_h);
+    /* Dimensões finais com zoom */
+    const R_w      = cov_w * zoom;
+    const R_h      = cov_h * zoom;
+    /* Posição equivalente a:
+       left_obj = -(posX/100)*exc_cx   (object-position)
+       top_obj  = -(posY/100)*exc_cy
+       Após scale(zoom) com transform-origin:center center do ELEMENTO (C_w/2, C_h/2):
+         left = C_w/2 + (left_obj - C_w/2)*zoom = C_w*(1-zoom)/2 - (posX/100)*exc_cx*zoom
+         top  = C_h/2 + (top_obj  - C_h/2)*zoom = C_h*(1-zoom)/2 - (posY/100)*exc_cy*zoom  */
+    imgEl.style.width  = R_w.toFixed(1) + 'px';
+    imgEl.style.height = R_h.toFixed(1) + 'px';
+    imgEl.style.left   = (C_w * (1 - zoom) / 2 - (posX / 100) * exc_cx * zoom).toFixed(1) + 'px';
+    imgEl.style.top    = (C_h * (1 - zoom) / 2 - (posY / 100) * exc_cy * zoom).toFixed(1) + 'px';
+    imgEl.style.transform = '';
   }
+
 
   function pg1CapaAtualizarPrevia() {
     const src  = ($('pg1-capa-imagem')?.value || '').trim();
-    const posX = ($('pg1-capa-pos-x')?.value ?? 50) + '%';
-    const posY = ($('pg1-capa-pos-y')?.value ?? 40) + '%';
-    const zoom = Number($('pg1-capa-zoom')?.value ?? 100) / 100;
-    /* Parâmetros desktop — fallback para mobile quando não configurados separadamente */
-    const posXd = ($('pg1-capa-pos-x-desk')?.value ?? $('pg1-capa-pos-x')?.value ?? 50) + '%';
-    const posYd = ($('pg1-capa-pos-y-desk')?.value ?? $('pg1-capa-pos-y')?.value ?? 40) + '%';
-    const zoomD = Number($('pg1-capa-zoom-desk')?.value ?? $('pg1-capa-zoom')?.value ?? 100) / 100;
     const enq  = document.querySelector('input[name="pg1-capa-enquadramento"]:checked')?.value || 'equilibrada';
     const grad = $('pg1-capa-gradiente')?.value || 'suave';
     const altMobile = PG1_CAPA_ENQUADRAMENTOS[enq] || '140px';
     const gradOp = PG1_CAPA_GRADIENTE_OPACIDADE[grad] ?? 0.85;
-    const scaleStr  = 'scale(' + zoom.toFixed(2) + ')';
-    const scaleDStr = 'scale(' + zoomD.toFixed(2) + ')';
     const container = $('pg1-capa-previa-container');
     if (!src) { if (container) container.style.display = 'none'; return; }
     if (container) container.style.display = '';
 
-    /* Miniaturas de recorte — mesma fórmula das prévias completas e do cardápio publicado:
-       object-fit:cover + object-position + scale(zoom).
-       Elimina a divergência do FATOR 1.5 que existia em aplicarRecorteEl. */
+    /* ── Miniaturas de recorte ──────────────────────────────────────
+       Posicionamento explícito com excedente garantido (K=20%).
+       IDs de slider passados diretamente — aplicarRecorteEl lê no
+       momento da execução, incluindo após carregamento tardio.
+    ─────────────────────────────────────────────────────────────────── */
     const imgM = $('pg1-capa-previa-mobile-img');
     const imgD = $('pg1-capa-previa-desktop-img');
     const divM = $('pg1-capa-previa-mobile');
     if (imgM && divM) {
       imgM.src = src;
-      divM.style.height = altMobile;  /* altura do contêiner varia com enquadramento */
-      imgM.style.objectPosition = posX + ' ' + posY;
-      imgM.style.transform = scaleStr;
+      divM.style.height = altMobile;
+      const C_h_M = parseInt(altMobile);
+      aplicarRecorteEl(imgM, 160, C_h_M, 'pg1-capa-pos-x', 'pg1-capa-pos-y', 'pg1-capa-zoom');
     }
     if (imgD) {
       imgD.src = src;
-      imgD.style.objectPosition = posXd + ' ' + posYd;
-      imgD.style.transform = scaleDStr;
+      aplicarRecorteEl(imgD, 280, 160, 'pg1-capa-pos-x-desk', 'pg1-capa-pos-y-desk', 'pg1-capa-zoom-desk');
     }
+
     /* Preview miniatura */
     const prev = $('pg1-capa-preview');
     if (prev) { prev.src = src; prev.style.display = ''; }
 
-    /* Prévia completa (celular) */
+    /* ── Prévia completa CELULAR ────────────────────────────────────
+       Contêiner: pg1-prev-foto-wrap — largura = 360-48=312px,
+       altura definida abaixo pelo JS (altPx).
+    ─────────────────────────────────────────────────────────────────── */
     const fotoWrap = $('pg1-prev-foto-wrap');
     const fotoImg  = $('pg1-prev-foto-img');
     const gradDiv  = $('pg1-prev-gradiente');
     if (fotoWrap && fotoImg) {
       fotoImg.src = src;
-      fotoImg.style.objectPosition = posX + ' ' + posY;
-      fotoImg.style.transform = scaleStr;
-      const altPx = { compacta: '200px', equilibrada: '250px', ampla: '280px' };
-      fotoImg.style.height = altPx[enq] || '180px';
-      fotoWrap.style.height = altPx[enq] || '180px';
+      const altPx = { compacta: '205px', equilibrada: '256px', ampla: '320px' };
+      const altStr = altPx[enq] || '256px';
+      fotoWrap.style.height = altStr;
       fotoWrap.style.display = '';
+      aplicarRecorteEl(fotoImg, 312, parseInt(altStr), 'pg1-capa-pos-x', 'pg1-capa-pos-y', 'pg1-capa-zoom');
     }
     if (gradDiv) { gradDiv.style.opacity = gradOp; }
-    /* Texto real dos campos do painel → prévia celular e desktop.
-       T2: se pg1-titulo estiver preenchido, tem prioridade (igual ao comportamento do cardápio).
-       Fallback: pg2-titulo (Nossa Essência), exatamente como o JS do cardápio faz. */
+
+    /* Texto real dos campos do painel → prévias.
+       T2: se pg1-titulo estiver preenchido, tem prioridade.
+       Fallback: pg2-titulo (Nossa Essência). */
     const pg1titulo = ($('pg1-titulo')?.value || '').trim();
     const pg2titulo = ($('pg2-titulo')?.value || '').trim();
     const pg1subtit = ($('pg1-subtitulo')?.value || '').trim();
@@ -3123,16 +3120,15 @@ $('formConfig').onsubmit=async e=>{
     if (elCTA)  elCTA.textContent  = pg1cta;
     if (elRot)  elRot.textContent  = 'OBA DOCERIA';
 
-    /* ── Prévia completa DESKTOP ─────────────────────────────────────
-       Usa parâmetros desktop independentes (posXd, posYd, zoomD).
-       Imagem: object-position + scale(), mesma lógica do cardápio ≥1024px.
-       Texto: mesmos campos do painel, igual à prévia celular.
+    /* ── Prévia completa DESKTOP ────────────────────────────────────
+       Contêiner: coluna de foto (flex:1) dentro de max-width:760px,
+       altura:360px. Coluna texto = 45% → coluna foto ≈ 55% = 418px.
+       Parâmetros desktop independentes com fallback para mobile.
     ─────────────────────────────────────────────────────────────────── */
     const deskFotoImg = $('pg1-prev-desk-foto-img');
     if (deskFotoImg) {
       deskFotoImg.src = src;
-      deskFotoImg.style.objectPosition = posXd + ' ' + posYd;
-      deskFotoImg.style.transform = scaleDStr;
+      aplicarRecorteEl(deskFotoImg, 418, 360, 'pg1-capa-pos-x-desk', 'pg1-capa-pos-y-desk', 'pg1-capa-zoom-desk');
     }
     const elDTit = $('pg1-prev-desk-titulo');
     const elDTxt = $('pg1-prev-desk-texto');
