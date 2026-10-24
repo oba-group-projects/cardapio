@@ -1,72 +1,63 @@
 # HANDOFF
 
-Atualizado: 2026-10-20 (sessão 22)
+Atualizado: 2026-10-22 (sessão 23)
 
 Branch: feature/gestao-online-segura
-HEAD: e3232ed
+HEAD: 2884048
+Sincronizado com origin: sim
+Working tree: limpo
 
-## Última entrega — Sessão 22
-Redesenho da capa do Cardápio (Pg1) e melhoria completa do editor de imagem de capa na Central.
+## Última entrega — Sessão 23
+Simplificação do editor de capa do Cardápio na Central.
 
-### Commits desta sessão
+### Commits desta sessão (pós-sessão 22)
 | Commit   | O que fez |
 |----------|-----------|
-| e3232ed  | refactor(editor): layout de recorte inline — controles abaixo de cada prévia |
-| e2c9028  | fix(editor): recorte de capa com arraste X/Y nos dois eixos |
-| f25a054  | fix(editor): drag usa rect do container + height explícita no recorte celular |
-| 0435cd2  | fix(editor): drag igual H/V + scroll para zoom nos recortes |
-| b8ee0e3  | feat(editor): enquadramento independente celular/desktop na capa |
-| 8b94e67  | feat(editor): arrastar para ponto focal + zoom até 3× na prévia da capa |
-| 5c408ce  | feat(cardápio): redesenho capa Pg1 — tipografia, checkboxes, gap tablet, ponto focal prévia |
+| 2884048  | refactor(editor): simplificar editor de capa — controles nas prévias completas |
+| 9bfb0ce  | fix(editor): recorte das prévias via posicionamento explícito fiel ao publicado |
+| b35b3d6  | fix(editor): unificar recorte miniaturas com prévias completas via object-position |
+| 24fbd5b  | fix(editor): restaurar miniaturas de recorte + criarDrag com 3 pontos de arraste |
+| 8381e30  | fix(editor): drag fiel ao cardápio publicado via object-position |
+| 5647b7a  | fix(cardápio): corrigir espaço em !important desktop + duas prévias completas |
 
 ### Entregas confirmadas em produção
 
-**Cardápio — Pg1 (capa):**
-- Título: `Cardápio Oba Doceria` (Cormorant Garamond, weight 400)
-- Parágrafo: "Brigadeiros gourmet artesanais, com cremosidade envolvente..."
-- CTA: "DESCUBRA NOSSOS SABORES"
-- Tipografia ajustada: `clamp(1.7rem, 5.5vw, 2rem)` mobile · `clamp(2.0rem, 2.8vw, 2.4rem)` desktop com foto
-- Checkboxes novos: Exibir assinatura abaixo do botão · Exibir rótulo da página
-- Gap tablet 768–1023px corrigido (position:static no CTA + margin-top limitado)
+**Editor de capa simplificado:**
+- Controles de foco H/V, zoom e altura ficam diretamente abaixo de cada prévia completa
+- Celular e desktop com configurações independentes
+- Prévias usam `object-fit:cover + object-position + scale()` — mesma lógica do publicado
+- Drag nas próprias prévias completas (sem miniaturas separadas)
+- Miniaturas de recorte e código morto removidos
+- 47 checks estáticos + sintaxe JS validada (vm.Script, 9 blocos, 324.758 chars)
 
-**Editor de imagem de capa (Central):**
-- Arraste para ponto focal na prévia: drag X e Y funcionando nos dois recortes
-- Zoom até 3× (era 2×) com aviso de qualidade acima de 2×
-- Recortes celular e desktop com enquadramento independente
-- Layout redesenhado: controles inline abaixo de cada recorte (sem abas)
-- Altura dos recortes na prévia corrigida para valores representativos
-- Nota clara: prévia completa usa a mesma lógica do cardápio publicado
+**Version ID atual:** `9e8074d1-a0d2-4746-882c-3f4bcfe01d81`
 
-**Version ID atual:** `f1b55715-b673-400b-9ff5-e6c888b7b8e2`
+## Pendência documentada — foco vertical da capa
 
-## Estado atual — TUDO APROVADO E EM PRODUÇÃO
+**Situação:** o slider de foco vertical (Y) não produz deslocamento visível em fotos 4:3 com zoom=1.0.
 
-### Pendentes identificados na sessão
+**Causa confirmada:** limitação geométrica de `object-fit:cover`. Com foto 4:3 e contêiner landscape, o cover é escalado pela largura → a altura já ocupa 100% do contêiner → excedente Y = 0 → `object-position` Y não tem efeito. O comportamento é **idêntico ao cardápio publicado** — não é um bug do editor.
 
-**Título em maiúsculas na capa**
-- O `text-transform: uppercase` da classe Tailwind `uppercase` no HTML do `#pag1-ne-titulo` faz "Cardápio Oba Doceria" aparecer em caixa alta como "CARDÁPIO OBA DOCERIA"
-- O CSS do b2-polimento define `text-transform: none !important`, mas o elemento HTML tem a classe diretamente
-- Decisão tomada: manter em maiúsculas (aprovado pelo usuário)
+**Com zoom ≥ 1.2:** foco Y funciona normalmente em todos os contextos.
 
-**Divergência entre recortes e cardápio publicado**
-- Os recortes de prévia (celular/desktop) usam `position:absolute + left/top` com FATOR=1.5
-- O cardápio usa `object-position` com `object-fit:cover`
-- As fórmulas são diferentes — recortes exageram o movimento no eixo que não tem sobra no cover
-- A prévia completa (360×640) usa `object-position + scale()`, igual ao cardápio — essa é a referência fiel
-- Valores salvos e cardápio publicado: não afetados. Problema é apenas visual nos thumbnails de recorte
-- Decisão: manter FATOR=1.5 (arraste funciona) com nota orientando usar a prévia completa
+**Decisão:** documentado. Não será retomado nesta fase.
 
-**Validação no smartphone real**
-- Ainda recomendada para confirmar o comportamento visual final da capa redesenhada
+## Como retomar o desenvolvimento
 
-**Borda do botão Voltar no Catálogo**
-- Confirmada nos prints — regra `.oba-btn-voltar-dest` ainda aplica borda
-- Uma linha de CSS para remover quando decidido
+1. Leia AGENTS.md, CURRENT_STATE.md, DECISIONS.md, ROADMAP.md
+2. `git checkout feature/gestao-online-segura && git pull`
+3. `cd online/gestao && npx wrangler dev`
+4. Branch de trabalho: `feature/gestao-online-segura`
+5. Fluxo obrigatório: DRAFT → PREVIEW → PUBLISHED
+
+## Próximo passo recomendado
+**Editor Visual do Catálogo — P1+P2**
+- Editar textos existentes, mostrar/ocultar, reordenar botões
+- Baseado nos mecanismos do Editor do Cardápio (~70% reaproveitamento)
 
 ## Pontos de retorno seguros
-- HEAD atual = e3232ed (estável, deploy validado — sessão 22)
-- Anterior = e2c9028 (fix arraste X/Y)
-- Anterior = 5c408ce (redesenho Pg1 + checkboxes + gap tablet)
+- HEAD = 2884048 (estável, deploy validado — sessão 23)
+- Anterior = c7dc3ef (sessão 22 — redesenho Pg1 + editor imagem capa)
 
 ## Links
 - Central: https://oba-cardapio-gestao.obadoceria.workers.dev/

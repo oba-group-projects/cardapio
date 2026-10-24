@@ -2,6 +2,49 @@
 
 Formato inspirado em Keep a Changelog.
 
+## [Sessão 23] — 2026-10-22 — commit 2884048
+
+### Refactored
+- **Editor de capa (Central):** simplificação da interface de recorte
+  - Removidas miniaturas de recorte separadas (`pg1-capa-previa-mobile/desktop`)
+  - Controles de foco H/V, zoom e altura movidos para abaixo de cada prévia completa
+  - Prévias celular e desktop passam a usar `object-fit:cover + object-position + scale()` — idêntico ao cardápio publicado, sem intermediário
+  - Drag nas próprias prévias completas (celular e desktop independentes)
+  - `criarDrag`: 2 chamadas (era 3) — `pg1-prev-foto-img` e `pg1-prev-desk-foto-img`
+  - Removidos `aplicarRecorteEl` e `PG1_RECORTE_K` (código morto)
+  - Corrigido bloco `elDCTA` duplicado (SyntaxError potencial)
+  - 47 checks estáticos aprovados; sintaxe JS validada via `vm.Script`
+
+### Fixed (commits 5647b7a–9bfb0ce — iteração durante sessão 23)
+- Corrigido espaço em `!important` no CSS desktop da capa
+- Drag fiel ao cardápio publicado via `object-position`
+- Unificação de recorte das miniaturas com prévias completas
+- Restauração de miniaturas de recorte + criarDrag com 3 pontos (intermediário)
+
+### Known limitation
+- Ajuste do foco vertical da capa não foi solucionado nesta fase
+  (limitação geométrica de `object-fit:cover` em contêineres landscape com foto 4:3 em zoom=1.0)
+  Documentado e não será retomado nesta fase.
+
+## [Sessão 22] — 2026-10-20 — commit e3232ed / c7dc3ef
+
+### Added
+- **Redesenho da Pg1 do Cardápio:**
+  - Título: "Cardápio Oba Doceria" (Cormorant Garamond, weight 400, uppercase)
+  - Parágrafo: "Brigadeiros gourmet artesanais, com cremosidade envolvente..."
+  - CTA: "DESCUBRA NOSSOS SABORES"
+  - Tipografia: `clamp(1.7rem,5.5vw,2rem)` mobile · `clamp(2.0rem,2.8vw,2.4rem)` desktop
+  - Checkboxes novos: Exibir assinatura / Exibir rótulo (ambos opt-in)
+  - Gap tablet 768–1023px corrigido
+
+### Added
+- **Editor de imagem de capa (Central):**
+  - Arraste para ponto focal + zoom até 3×
+  - Enquadramento independente celular/desktop
+  - Layout inline: controles abaixo de cada prévia
+
+
+
 ## [Sessão 13] — 2026-10-09 — commit dbeb0ea
 
 ### Added
