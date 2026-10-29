@@ -2,36 +2,41 @@
   "paginas": {
     "boas_vindas": {
       "ativo": true,
-      "botaoCTA": "Ver o Cardápio →",
+      "botaoCTA": "DESCUBRA NOSSOS SABORES →",
       "capa_alt": "",
       "capa_ativa": true,
       "capa_enquadramento": "ampla",
       "capa_gradiente": "suave",
       "capa_imagem": "/api/media/media_fee230b9b9c54de8",
-      "capa_pos_x": 50,
-      "capa_pos_y": 40,
-      "capa_zoom": 1.75,
+      "capa_pos_x": 54,
+      "capa_pos_x_desk": 68,
+      "capa_pos_y": 48,
+      "capa_pos_y_desk": 53,
+      "capa_zoom": 1,
+      "capa_zoom_desk": 1,
       "corFundo": "",
       "corTitulo": "",
+      "exibirAssinatura": false,
       "exibirCTA": true,
+      "exibirRotulo": false,
       "exibirSubtitulo": true,
       "logo": "",
       "logo_visivel": false,
       "marca_caixa": "upper",
       "marca_cor": "",
-      "marca_peso": "600",
+      "marca_peso": "700",
       "marca_tam": "pequeno",
       "marca_texto": "CARDÁPIO - OBA DOCERIA",
-      "marca_visivel": true,
+      "marca_visivel": false,
       "pesoCTA": "",
       "pesoSubtitulo": "",
       "pesoTitulo": "",
-      "subtitulo": "Doces artesanais feitos à mão, com amor e precisão.",
+      "subtitulo": "Brigadeiros gourmet artesanais, com cremosidade envolvente, sabores marcantes e doçura equilibrada - um acabamento que encanta antes mesmo da primeira mordida.",
       "tamCTA": "",
       "tamSubtitulo": "",
       "tamTitulo": "",
       "tamanhoLogo": "medio",
-      "titulo": "Seu momento começa aqui."
+      "titulo": "CARDÁPIO OBA DOCERIA"
     },
     "eventos_modal": {
       "ativo": true,
@@ -111,7 +116,7 @@
     },
     "nossa_essencia": {
       "ativo": false,
-      "citacao": "Feito à mão, com amor e precisão.",
+      "citacao": "Oba! Um jeito doce de expressar felicidade.",
       "corFundo": "",
       "corTexto": "",
       "corTitulo": "",
@@ -124,11 +129,11 @@
       "pesoTitulo": "",
       "tamCitacao": "",
       "tamTexto": "",
-      "tamTitulo": "",
+      "tamTitulo": "14",
       "tamanhoLogo": "pequeno",
       "texto": "Brigadeiros artesanais, intensamente cremosos e preparados com cuidado de tornar seus momentos ainda mais especiais.",
       "texto2": "Tudo é feito à mão, em pequenos detalhes, com tempo, precisão e carinho.",
-      "titulo": "Brigadeiros que ficam na memória."
+      "titulo": "BRIGADEIROS QUE FICAM NA MEMÓRIA."
     },
     "personalizados_modal": {
       "ativo": false,
@@ -182,6 +187,6 @@
     "tamanhoSubtitulo": "11",
     "tamanhoTitulo": "26"
   },
-  "updatedAt": "2026-10-17",
+  "updatedAt": "2026-10-22",
   "variante": "classica"
 }
