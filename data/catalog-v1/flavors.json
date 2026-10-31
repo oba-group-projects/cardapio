@@ -720,7 +720,7 @@
   },
   {
     "ativo": true,
-    "categoriaId": "categoria-especiais-i",
+    "categoriaId": "especiais-1",
     "descricao": "Branco ou Ao Leite",
     "disponivel": true,
     "id": "sabor-branco-com-geleia-de-morango",
