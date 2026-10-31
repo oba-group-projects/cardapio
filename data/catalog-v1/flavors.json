@@ -647,7 +647,7 @@
     "descricao": "Branco ou Preto",
     "disponivel": true,
     "id": "morango-com-brigadeiro-ao-leite",
-    "imagem": "Images/Sabores_Doces/Morango - Ao Leite.jpeg",
+    "imagem": "/api/media/media_5b11452586f441dc",
     "nome": "Bombom de Morango",
     "ordem": 510,
     "preco": 5,
